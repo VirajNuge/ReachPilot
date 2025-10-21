@@ -1,0 +1,83 @@
+.guestNavBarContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  gap: 200px;
+  background-color: white;
+  height: max-content;
+  width: max-content;
+  padding: 10px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 12px;
+  margin-top: 25px;
+  box-shadow: 0 9px 38px rgba(0, 0, 0, 0.2);
+}
+
+.guestNavBarTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guestNavBarTitle img {
+  height: 35px;
+  background: linear-gradient(to right, #9c4bff, #8035ff);
+  padding: 8px;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.guestNavBarTitle p {
+  font-weight: 600;
+  font-size: 20px;
+  margin-left: 15px;
+}
+
+.guestNavBarLinks {
+  display: flex;
+  gap: 50px;
+}
+
+.guestNavBarLinks a {
+  all: unset;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.guestNavBarLinks a[aria-current="page"] {
+  font-size: 600;
+}
+
+.guestNavBarButtons {
+  display: flex;
+  gap: 20px;
+}
+
+.guestNavBarButtons button {
+  all: unset;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.guestNavBarButtons .login {
+  padding: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+  border: 2px solid black;
+  border-radius: 90px;
+  cursor: pointer;
+}
+
+.guestNavBarButtons .signup {
+  padding: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+  background: linear-gradient(to right, #9c4bff, #8035ff);
+  border-radius: 90px;
+  color: white;
+  cursor: pointer;
+}

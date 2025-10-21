@@ -1,0 +1,68 @@
+/* Container */
+.faq-container {
+  max-width: 1600px;
+  margin: 2.5rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Each FAQ card */
+.faq-item {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+/* Gradient background when active */
+.faq-item.active {
+  background: linear-gradient(to right, #f7f7ff, #e2e6ff);
+}
+
+/* Question row */
+.faq-question {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.faq-question-text {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Icon */
+.faq-icon {
+  font-size: 1.25rem;
+  color: #555;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.faq-icon.open {
+  transform: rotate(45deg);
+  color: #6366f1; /* indigo-500 */
+}
+
+/* Answer section */
+.faq-answer {
+  color: #555;
+  padding: 0 1.5rem;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-answer.show {
+  max-height: 200px;
+  padding: 0.5rem 1.5rem 1.2rem;
+  opacity: 1;
+}

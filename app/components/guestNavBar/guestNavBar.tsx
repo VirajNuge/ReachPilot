@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./guestNavBar.module.css";
 
 const GuestNavBar = () => {
@@ -19,8 +20,22 @@ const GuestNavBar = () => {
       </div>
 
       <div className={styles.guestNavBarButtons}>
-        <button className={styles.login}>LOGIN</button>
-        <button className={styles.signup}>SIGN UP</button>
+        <button className={styles.login}>
+          <Link
+            href="/pages/guestPages/loginPage"
+            className="[all:unset] cursor-pointer"
+          >
+            LOGIN
+          </Link>
+        </button>
+        <button className={styles.signup}>
+          <Link
+            href="/pages/guestPages/signupPage"
+            className="[all:unset] cursor-pointer"
+          >
+            SIGN UP
+          </Link>
+        </button>
       </div>
     </div>
   );

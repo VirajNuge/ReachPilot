@@ -42,7 +42,7 @@
   height: 30px;
   width: 300px;
   border-radius: 8px;
-  background-color: white;
+  background-color: rgb(232, 240, 254);
   padding: 10px;
   font-size: 16px;
   margin-top: 6px;
@@ -54,7 +54,7 @@
   height: 30px;
   width: 300px;
   border-radius: 8px;
-  background-color: rgb(232, 240, 254);
+  background-color: white;
   padding: 10px;
   font-size: 16px;
   margin-top: 6px;

@@ -1,0 +1,83 @@
+body {
+  margin: 15px;
+}
+
+.appTopContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.appTitle {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.appTitle h3 {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.appTitle .titleIcon {
+  padding: 15px;
+  background-color: black;
+  border-radius: 50%;
+  border: none;
+  overflow: visible;
+  cursor: pointer;
+  transition: ease 0.5s;
+}
+
+.appTitle .titleIcon:hover {
+  background-color: rgb(39, 39, 39);
+}
+
+.appUserDetails {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.appTockens {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding-left: 12px;
+  padding-right: 12px;
+  background-color: #c7cbff;
+  border-radius: 90px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.appTockens h4 {
+  font-weight: 500;
+}
+
+.appUserName {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  width: max-content;
+  background: linear-gradient(to right, #ffffff, #c7cbff);
+  padding: 12px;
+  border-radius: 90px;
+  border: 2px solid #c7cbff;
+}
+
+.appUserName h3 {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.appUserName h4 {
+  font-weight: 400;
+  font-size: 10px;
+}
+
+.appUserName img {
+  height: 40px;
+  width: max-content;
+  border-radius: 90px;
+}

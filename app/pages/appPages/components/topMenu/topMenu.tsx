@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import "./layout.css";
+import "./topMenu.css";
 import Link from "next/link";
 import { BsGrid, BsCoin } from "react-icons/bs";
 import {
@@ -14,7 +14,21 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 
-const Layout = () => {
+interface LayoutProps {
+  pageName: string;
+  userName: string;
+  userTier: string;
+  tokens: number;
+  children?: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({
+  pageName,
+  userName,
+  userTier,
+  tokens,
+  children,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
@@ -34,34 +48,36 @@ const Layout = () => {
               className="titleIcon"
               onClick={() => setIsOpen(true)}
             />
-            <h3>Profile Analyzer</h3>
+            <h3>{pageName}</h3>
           </div>
         </div>
 
         <div className="appUserDetails">
           <div className="appTockens">
             <BsCoin size={24} />
-            <h4>2000</h4>
+            <h4>{tokens}</h4>
           </div>
 
           <div className="appUserName">
-            <img src="/images/app/pp.jpg" alt="" />
+            <img src="/images/app/pp.jpg" alt="user profile" />
             <div>
-              <h3>Robert Downey Jr.</h3>
-              <h4>Free Tier</h4>
+              <h3>{userName}</h3>
+              <h4>{userTier}</h4>
             </div>
           </div>
         </div>
       </div>
 
+      {/* --- Sidebar Overlay --- */}
       {isOpen && (
         <div className="overlay" onClick={() => setIsOpen(false)}></div>
       )}
 
+      {/* --- Sidebar --- */}
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="sidebar-header">
           <div className="flex items-center">
-            <img src="/images/logo.svg" alt="" />
+            <img src="/images/logo.svg" alt="logo" />
             <h2>ReachPilot</h2>
           </div>
           <button className="close-btn" onClick={() => setIsOpen(false)}>
@@ -157,6 +173,9 @@ const Layout = () => {
           </div>
         </nav>
       </div>
+
+      {/* --- Main Content Area --- */}
+      <main className="pageContent">{children}</main>
     </>
   );
 };

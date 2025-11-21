@@ -1,0 +1,27 @@
+.analyzeAccContainer {
+}
+
+.QkFixContainer {
+  background-color: #f9f9f9;
+  width: 478px;
+  height: 436px;
+  border-radius: 10px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+/* scrollbar.css */
+
+/* Scrollable container */
+.custom-scroll {
+  max-height: 400px; /* adjust height as you need */
+  overflow-y: auto;
+  padding-right: 6px; /* avoid text overlap with scrollbar */
+  scroll-behavior: smooth;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #d1d5db transparent;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  display: none;
+}

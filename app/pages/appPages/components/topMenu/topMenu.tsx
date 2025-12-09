@@ -103,10 +103,18 @@ const Layout: React.FC<LayoutProps> = ({
             </div>
             {openMenu === "content" && (
               <div className="submenu">
-                <Link href="/persona-builder">Persona Builder</Link>
-                <Link href="/profile-analyzer">Profile Analyzer</Link>
-                <Link href="/profile-comparison">Profile Comparison</Link>
-                <Link href="/post-generator">Post Generator</Link>
+                <Link href="/pages/appPages/1/accountPersona/">
+                  Persona Builder
+                </Link>
+                <Link href="/pages/appPages/1/profileAnalyzer/">
+                  Profile Analyzer
+                </Link>
+                <Link href="/pages/appPages/1/profileComparison/">
+                  Profile Comparison
+                </Link>
+                <Link href="/pages/appPages/1/postGenerator/">
+                  Post Generator
+                </Link>
                 <Link href="/templates-library">Templates Library</Link>
               </div>
             )}

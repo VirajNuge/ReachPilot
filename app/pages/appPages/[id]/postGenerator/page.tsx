@@ -1,16 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
+
 // --- IMPORTS ---
-// Ensure these paths match your actual folder structure.
-// If your components are in the same folder, use "./GeneratorForm".
 import TopMenu from "../../components/topMenu/topMenu";
 import GeneratorForm from "./GeneratorForm";
 import GeneratorResults, { GeneratedContent } from "./GeneratorResults";
 
-// ==========================================
-// 1. SHARED TYPES (Exported for use in other files)
-// ==========================================
+// =====================================================
+// 1. SHARED TYPES (Expanded to support Step 1–9)
+// =====================================================
 
 export type PostType = "SINGLE" | "CAROUSEL";
 
@@ -18,13 +17,17 @@ export type PlatformFormat =
   | "IG_SQUARE"
   | "IG_PORTRAIT"
   | "IG_STORY"
+  | "IG_REEL_COVER"
   | "LINKEDIN_LANDSCAPE"
   | "LINKEDIN_PORTRAIT"
   | "LINKEDIN_SQUARE"
   | "TWITTER_POST"
   | "FB_POST"
   | "FB_STORY"
-  | "THREADS_PORTRAIT";
+  | "FB_EVENT_BANNER"
+  | "YOUTUBE_THUMBNAIL"
+  | "PINTEREST_PIN"
+  | "TIKTOK_COVER";
 
 export interface TextElement {
   id: string;
@@ -43,39 +46,89 @@ export interface UploadedImage {
   file: File;
   previewUrl: string;
   description?: string;
-  // Optional properties for the API payload
+
   base64?: string;
   mimeType?: string;
 }
 
+// =====================================================
+// STEP 5 — STEP 9 TYPES
+// =====================================================
+
+export interface StrategyBlock {
+  best_posting_day: string;
+  best_posting_time: string;
+  why_this_works: string;
+  algorithm_alignment: string;
+  engagement_tips: string[];
+  visual_tips: string[];
+  caption_tips: string[];
+}
+
+export interface EngagementScore {
+  score_value: number;
+  predicted_performance: string;
+  score_explanation: string;
+  platform_factors?: Record<string, string>;
+  content_factors?: Record<string, string>;
+  audience_factors?: Record<string, string>;
+}
+
+export interface SinglePostContent {
+  type: string;
+  headline: string;
+  content: string;
+  caption: string;
+  visual_description: string;
+
+  strategy?: StrategyBlock;
+  engagement_score?: EngagementScore;
+
+  hashtags?: string[];
+  alt_text?: string;
+  seo_keywords?: string[];
+  thumbnail_text?: string;
+  cross_platform_reposts?: Record<string, string>;
+  caption_variants?: Record<string, string>;
+  headline_variants?: Record<string, string>;
+  visual_variants?: Record<string, string>;
+
+  // IMAGE
+  generated_image?: string;
+  image_width?: number;
+  image_height?: number;
+}
+
+export type GeneratedSinglePost = SinglePostContent;
+
+// =====================================================
+// FORM STATE
+// =====================================================
+
 export interface GeneratorFormState {
-  // Strategy
   postType: PostType;
   platform: PlatformFormat;
   postIdea: string;
   targetAudience: string;
 
-  // Design & Vibe
   tone: string;
   typographyMood: string;
   layoutDensity: number;
   designKeywords: string;
 
-  // Assets
   useBrandKit: boolean;
   backgroundStyle: string;
   colors: BrandColor[];
   images: UploadedImage[];
   logoPlacement: "AUTO" | "MANUAL";
 
-  // Content
   textElements: TextElement[];
 }
 
-// ==========================================
-// 2. HELPER: FILE TO BASE64
-// ==========================================
-// This converts the raw File object into a string string the API can read.
+// =====================================================
+// File → Base64 Helper
+// =====================================================
+
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -85,13 +138,11 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-// ==========================================
-// 3. MAIN PAGE COMPONENT
-// ==========================================
+// =====================================================
+// MAIN COMPONENT
+// =====================================================
 
 export default function PostGeneratorPage() {
-  // --- A. State Initialization ---
-  // This object holds EVERY piece of data from your form.
   const [formState, setFormState] = useState<GeneratorFormState>({
     postType: "SINGLE",
     platform: "IG_SQUARE",
@@ -112,42 +163,71 @@ export default function PostGeneratorPage() {
     textElements: [{ id: "init-1", type: "HEADLINE", content: "" }],
   });
 
-  // State for the Result (Typed to avoid 'never' errors)
   const [generatedResult, setGeneratedResult] =
     useState<GeneratedContent | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // --- B. API Integration ---
+  // =====================================================
+  // HELPER — Platform Size Map
+  // (Same structure as in singlePostPrompt.ts)
+  // =====================================================
+
+  const PLATFORM_SIZE_MAP: Record<
+    PlatformFormat,
+    { width: number; height: number }
+  > = {
+    IG_SQUARE: { width: 1080, height: 1080 },
+    IG_PORTRAIT: { width: 1080, height: 1350 },
+    IG_STORY: { width: 1080, height: 1920 },
+    IG_REEL_COVER: { width: 1080, height: 1920 },
+    LINKEDIN_LANDSCAPE: { width: 1200, height: 627 },
+    LINKEDIN_PORTRAIT: { width: 1080, height: 1350 },
+    LINKEDIN_SQUARE: { width: 1080, height: 1080 },
+    TWITTER_POST: { width: 1600, height: 900 },
+    FB_POST: { width: 1200, height: 1500 },
+    FB_STORY: { width: 1080, height: 1920 },
+    FB_EVENT_BANNER: { width: 1920, height: 1080 },
+    YOUTUBE_THUMBNAIL: { width: 1280, height: 720 },
+    PINTEREST_PIN: { width: 1000, height: 1500 },
+    TIKTOK_COVER: { width: 1080, height: 1920 },
+  };
+
+  // =====================================================
+  // API HANDLER
+  // =====================================================
+
   const handleGenerate = async () => {
-    // 1. Validation
     if (!formState.postIdea.trim()) {
       alert("Please enter a Post Idea first!");
       return;
     }
 
     setIsGenerating(true);
-    setGeneratedResult(null); // Clear previous results
+    setGeneratedResult(null);
 
     try {
-      // 2. IMAGE PROCESSING
-      // We must convert the File objects to Base64 strings before sending to the API.
+      // 1. Convert images to Base64
       const imagesWithBase64 = await Promise.all(
         formState.images.map(async (img) => ({
           id: img.id,
-          description: img.description, // Keep the text context
-          base64: await fileToBase64(img.file), // The actual image data
+          description: img.description || "",
+          base64: await fileToBase64(img.file),
           mimeType: img.file.type,
         }))
       );
 
-      // 3. CREATE PAYLOAD
-      // Construct the final object to send to the server
+      // 2. Platform size
+      const size = PLATFORM_SIZE_MAP[formState.platform];
+
+      // 3. Payload for Gemini
       const payload = {
         ...formState,
-        images: imagesWithBase64, // Use the processed images
+        images: imagesWithBase64,
+        image_width: size.width,
+        image_height: size.height,
       };
 
-      // 4. SEND TO API
+      // 4. Request text + metadata from Gemini
       const response = await fetch("/api/generate-post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -156,24 +236,48 @@ export default function PostGeneratorPage() {
 
       const json = await response.json();
 
-      if (json.success) {
-        setGeneratedResult(json.data);
-      } else {
+      if (!json.success) {
         console.error("Generation failed:", json.error);
-        alert(`Failed: ${json.error}`);
+        alert(`Generation failed: ${json.error}`);
+        return;
       }
+
+      // 5. Now generate image using Imagen
+      const visualPrompt = json.data.visual_description;
+
+      const imgResponse = await fetch("/api/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: visualPrompt,
+          width: size.width,
+          height: size.height,
+        }),
+      });
+
+      const imgJson = await imgResponse.json();
+
+      // 6. Merge image into final JSON result
+      setGeneratedResult({
+        ...json.data,
+        generated_image: imgJson.url,
+        image_width: size.width,
+        image_height: size.height,
+      });
     } catch (error) {
       console.error("Network error:", error);
-      alert("Something went wrong connecting to the server.");
+      alert("Network error. Please try again.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  // --- C. RENDER ---
+  // =====================================================
+  // RENDER UI
+  // =====================================================
+
   return (
     <div className="min-h-screen bg-[#F8F9FC] flex flex-col font-sans">
-      {/* Top Menu */}
       <TopMenu
         pageName="Post Generator"
         userName="Robert Downey Jr."
@@ -181,9 +285,8 @@ export default function PostGeneratorPage() {
         tokens={2000}
       />
 
-      {/* Main Layout */}
       <div className="flex-1 flex overflow-hidden h-[calc(100vh-80px)]">
-        {/* Left Column: Form */}
+        {/* LEFT PANEL */}
         <div className="w-[420px] flex-shrink-0 bg-white border-r border-gray-200 h-full overflow-y-auto custom-scrollbar">
           <div className="p-6">
             <GeneratorForm
@@ -195,7 +298,7 @@ export default function PostGeneratorPage() {
           </div>
         </div>
 
-        {/* Right Column: Results */}
+        {/* RIGHT PANEL */}
         <div className="flex-1 h-full overflow-y-auto bg-[#FAFAFA] p-8 custom-scrollbar">
           <div className="max-w-6xl mx-auto h-full">
             <GeneratorResults

@@ -115,7 +115,10 @@ const Layout: React.FC<LayoutProps> = ({
                 <Link href="/pages/appPages/1/postGenerator/">
                   Post Generator
                 </Link>
-                <Link href="/templates-library">Templates Library</Link>
+                <Link href="/pages/appPages/1/templateLibrary/">
+                  Templates Library
+                </Link>
+                <Link href="/templates-library">ThreadPilot</Link>
               </div>
             )}
           </div>

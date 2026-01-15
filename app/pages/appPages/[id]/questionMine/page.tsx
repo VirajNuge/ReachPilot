@@ -6,30 +6,22 @@ import { Pickaxe } from "lucide-react";
 // --- IMPORTS ---
 import TopMenu from "../../components/topMenu/topMenu";
 import MinerInput from "../../components/QuestionMine/MinerInput";
-import QuestionFeed, {
-  QuestionItem,
-} from "../../components/QuestionMine/QuestionFeed";
+import QuestionFeed from "../../components/QuestionMine/QuestionFeed";
 import SolutionModal from "../../components/QuestionMine/SolutionModal";
 
 export default function QuestionMinePage() {
-  // --- STATE ---
   const [isMining, setIsMining] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState<QuestionItem | null>(
-    null
-  );
+  const [selectedQuestion, setSelectedQuestion] = useState();
 
-  // --- HANDLERS ---
   const handleSearch = (term: string, sources: string[]) => {
-    console.log("Excavating:", term, sources);
     setIsMining(true);
-    // Simulate scraping delay
     setTimeout(() => {
       setIsMining(false);
     }, 2500);
   };
 
-  const handleSolve = (question: QuestionItem) => {
+  const handleSolve = (question: any) => {
     setSelectedQuestion(question);
     setIsModalOpen(true);
   };
@@ -74,6 +66,7 @@ export default function QuestionMinePage() {
             </div>
 
             {/* ⭐ STEP 2: Miner Inputs */}
+            {/* TODO: Pass onSearch and isMining props */}
             <MinerInput onSearch={handleSearch} isMining={isMining} />
           </div>
         </div>
@@ -82,12 +75,14 @@ export default function QuestionMinePage() {
         <div className="flex-1 h-full overflow-y-auto bg-[#FAFAFA] p-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="max-w-[1000px] mx-auto h-full">
             {/* ⭐ STEP 3: Question Feed */}
+            {/* TODO: Pass isMining and onSolve props */}
             <QuestionFeed isMining={isMining} onSolve={handleSolve} />
           </div>
         </div>
       </div>
 
       {/* ⭐ STEP 4: The Solution Modal */}
+      {/* TODO: Pass isOpen, onClose, and question props */}
       <SolutionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -9,14 +9,15 @@ import {
   HelpCircle,
 } from "lucide-react";
 
+// --- TYPES ---
 interface MinerInputProps {
-  onSearch: (term: string, sources: string[]) => void;
-  isMining: boolean;
+  onSearch?: (term: string, sources: string[]) => void;
+  isMining?: boolean;
 }
 
 export default function MinerInput({ onSearch, isMining }: MinerInputProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sources, setSources] = useState<string[]>(["reddit", "quora"]);
+  const [sources, setSources] = useState(["reddit", "quora", "google"]);
 
   const toggleSource = (id: string) => {
     if (sources.includes(id)) {
@@ -28,7 +29,7 @@ export default function MinerInput({ onSearch, isMining }: MinerInputProps) {
 
   const handleSearch = () => {
     if (searchTerm.trim().length > 2) {
-      onSearch(searchTerm, sources);
+      onSearch?.(searchTerm, sources);
     }
   };
 
@@ -63,12 +64,12 @@ export default function MinerInput({ onSearch, isMining }: MinerInputProps) {
         </label>
         <div className="relative">
           <input
-            type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            type="text"
             placeholder="e.g. 'Freelancing' or 'SaaS Churn'"
             className="w-[315px] pl-4 pr-10 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all shadow-sm"
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
         </div>
       </div>
@@ -80,6 +81,7 @@ export default function MinerInput({ onSearch, isMining }: MinerInputProps) {
         </label>
         <div className="space-y-2">
           {platforms.map((p) => {
+            // TODO: Replace false with sources.includes(p.id)
             const isActive = sources.includes(p.id);
             return (
               <button
@@ -125,29 +127,14 @@ export default function MinerInput({ onSearch, isMining }: MinerInputProps) {
         <button
           onClick={handleSearch}
           disabled={isMining || searchTerm.length < 3 || sources.length === 0}
-          className={`
-            w-full py-4 px-6 rounded-xl font-bold text-sm uppercase tracking-wide shadow-lg transition-all transform flex items-center justify-center gap-3
-            ${
-              searchTerm.length >= 3 && sources.length > 0 && !isMining
-                ? "bg-orange-600 hover:bg-orange-700 text-white shadow-orange-200 hover:scale-[1.02] active:scale-[0.98]"
-                : "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
-            }
-          `}
+          className={`w-full py-4 px-6 rounded-xl font-bold text-sm uppercase tracking-wide shadow-lg transition-all transform flex items-center justify-center gap-3 ${
+            searchTerm.length >= 3 && sources.length > 0 && !isMining
+              ? "bg-orange-600 hover:bg-orange-700 text-white"
+              : "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+          }`}
         >
-          {isMining ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Digging Deep...
-            </>
-          ) : (
-            <>
-              <Pickaxe
-                size={20}
-                className={searchTerm.length >= 3 ? "animate-bounce" : ""}
-              />
-              Start Excavation
-            </>
-          )}
+          <Pickaxe size={20} />
+          {isMining ? "Digging Deep..." : "Start Excavation"}
         </button>
 
         <p className="text-center text-[10px] text-gray-400 mt-3 font-medium">

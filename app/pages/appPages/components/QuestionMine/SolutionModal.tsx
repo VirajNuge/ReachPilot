@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   X,
   Copy,
@@ -12,10 +12,11 @@ import {
 } from "lucide-react";
 import { QuestionItem } from "./QuestionFeed";
 
+// --- TYPES ---
 interface SolutionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  question: QuestionItem | null;
+  isOpen?: boolean;
+  onClose?: () => void;
+  question?: QuestionItem | null;
 }
 
 export default function SolutionModal({
@@ -23,34 +24,31 @@ export default function SolutionModal({
   onClose,
   question,
 }: SolutionModalProps) {
-  const [loading, setLoading] = useState(true);
-  const [draft, setDraft] = useState("");
+  // TODO: Add state for loading (boolean) - tracks if AI is generating
+  // TODO: Add state for draft (string) - stores the AI-generated response
 
-  // --- MOCK AI GENERATOR ---
-  useEffect(() => {
-    if (isOpen && question) {
-      setLoading(true);
-      // Simulate AI writing a PAS (Problem-Agitate-Solution) post
-      setTimeout(() => {
-        setDraft(
-          `Stop worrying about the "${question.title.substring(
-            0,
-            20
-          )}..."\n\n` +
-            `I see so many people stressing about this, but here is the truth: \n` +
-            `The anxiety you feel isn't about the problem itself. It's about lack of clarity.\n\n` +
-            `Here is the 3-step fix I use:\n` +
-            `1. Audit your current situation.\n` +
-            `2. Remove the friction points (usually manual tasks).\n` +
-            `3. Double down on what works.\n\n` +
-            `Don't overcomplicate it. 👊\n\n` +
-            `#Advice #Growth #ProblemSolving`
-        );
-        setLoading(false);
-      }, 1500);
-    }
-  }, [isOpen, question]);
+  // TODO: Add useEffect to simulate AI generation
+  // - Trigger when isOpen becomes true AND question is provided
+  // - Set loading to true initially
+  // - After 1500ms delay, set the draft text and set loading to false
+  // - Generate a PAS (Problem-Agitate-Solution) style response using question.title
 
+  // Example draft template:
+  // `Stop worrying about the "${question.title.substring(0, 20)}..."
+  //
+  // I see so many people stressing about this, but here is the truth:
+  // The anxiety you feel isn't about the problem itself. It's about lack of clarity.
+  //
+  // Here is the 3-step fix I use:
+  // 1. Audit your current situation.
+  // 2. Remove the friction points (usually manual tasks).
+  // 3. Double down on what works.
+  //
+  // Don't overcomplicate it. 👊
+  //
+  // #Advice #Growth #ProblemSolving`
+
+  // TODO: Add early return if !isOpen || !question
   if (!isOpen || !question) return null;
 
   return (
@@ -133,23 +131,29 @@ export default function SolutionModal({
 
           {/* Editor Area */}
           <div className="flex-1 p-8 relative bg-gray-50/30">
-            {loading ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 z-10 backdrop-blur-sm">
-                <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-                <p className="text-sm font-medium text-gray-500 animate-pulse">
-                  Analyzing pain point & drafting...
-                </p>
-              </div>
-            ) : (
-              <div className="w-full h-full bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col">
-                <textarea
-                  className="flex-1 w-full resize-none outline-none text-base text-gray-800 leading-relaxed placeholder:text-gray-300 font-medium p-2"
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  placeholder="AI draft will appear here..."
-                />
-              </div>
-            )}
+            {/* TODO: Add conditional rendering for loading state */}
+            {/* If loading: show spinner overlay */}
+            {/* If not loading: show textarea editor */}
+
+            {/* Loading State (uncomment and use when loading is true) */}
+            {/* 
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 z-10 backdrop-blur-sm">
+              <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+              <p className="text-sm font-medium text-gray-500 animate-pulse">
+                Analyzing pain point & drafting...
+              </p>
+            </div>
+            */}
+
+            {/* Editor (show when not loading) */}
+            <div className="w-full h-full bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col">
+              <textarea
+                className="flex-1 w-full resize-none outline-none text-base text-gray-800 leading-relaxed placeholder:text-gray-300 font-medium p-2"
+                // TODO: Add value={draft}
+                // TODO: Add onChange={(e) => setDraft(e.target.value)}
+                placeholder="AI draft will appear here..."
+              />
+            </div>
           </div>
 
           {/* Footer Actions */}

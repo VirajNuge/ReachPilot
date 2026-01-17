@@ -27,50 +27,16 @@ export interface QuestionItem {
 
 interface QuestionFeedProps {
   isMining?: boolean;
+  questions: QuestionItem[]; // Receive from parent
   onSolve?: (question: QuestionItem) => void;
 }
 
-// --- MOCK DATA (for reference during implementation) ---
-const MOCK_QUESTIONS: QuestionItem[] = [
-  {
-    id: "1",
-    source: "reddit",
-    title: "Why is everyone quitting freelance for full-time jobs?",
-    snippet:
-      "I've been seeing a trend of successful freelancers going back to corporate. Is the market drying up? I'm scared to make the jump...",
-    metrics: { upvotes: 452, comments: 89 },
-    painLevel: "Critical",
-    timestamp: "4h ago",
-  },
-  {
-    id: "2",
-    source: "quora",
-    title: "What is the biggest hidden cost of running a SaaS?",
-    snippet:
-      "Beyond server costs and salaries, what eats up margin that first-time founders don't expect?",
-    metrics: { upvotes: 1200, comments: 45 },
-    painLevel: "High",
-    timestamp: "1d ago",
-  },
-  {
-    id: "3",
-    source: "google",
-    title: "how to get clients without cold calling",
-    snippet:
-      "People also ask: What is the best alternative to cold email for agencies?",
-    metrics: { upvotes: 0, comments: 0 },
-    painLevel: "High",
-    timestamp: "Trending",
-  },
-];
-
-export default function QuestionFeed({ isMining, onSolve }: QuestionFeedProps) {
-  // TODO: Add state for questions (QuestionItem[]) - stores the list of mined questions
-
-  // TODO: Add useEffect to handle mining simulation
-  // - When isMining becomes true: clear the questions array
-  // - When isMining becomes false: populate questions with MOCK_QUESTIONS (use setTimeout for natural feel)
-  // - Remember to cleanup the timer on unmount
+export default function QuestionFeed({
+  isMining,
+  questions,
+  onSolve,
+}: QuestionFeedProps) {
+  // Questions are now managed by the parent component
 
   // --- HELPER: Platform Styles ---
   const getPlatformBadge = (source: string) => {
@@ -104,11 +70,6 @@ export default function QuestionFeed({ isMining, onSolve }: QuestionFeedProps) {
       return "text-orange-600 bg-orange-50 border-orange-100";
     return "text-yellow-600 bg-yellow-50 border-yellow-100";
   };
-
-  // TODO: Add conditional rendering for 3 states:
-  // 1. MINING STATE (isMining === true): Show skeleton loaders
-  // 2. EMPTY STATE (questions.length === 0): Show "Ready to excavate?" placeholder
-  // 3. RESULTS STATE: Show the question cards
 
   // --- SKELETON LOADER (for mining state) ---
   const SkeletonLoader = () => (
@@ -194,7 +155,24 @@ export default function QuestionFeed({ isMining, onSolve }: QuestionFeedProps) {
     </div>
   );
 
-  // TODO: Replace this with conditional rendering based on isMining and questions.length
-  // For now, showing empty state as default
-  return <EmptyState />;
+  // Conditional rendering for 3 states:
+  // 1. MINING STATE (isMining === true): Show skeleton loaders
+  // 2. EMPTY STATE (questions.length === 0): Show "Ready to excavate?" placeholder
+  // 3. RESULTS STATE: Show the question cards
+  if (isMining) {
+    return <SkeletonLoader />;
+  }
+
+  if (questions.length === 0) {
+    return <EmptyState />;
+  }
+
+  // RESULTS STATE: Show question cards
+  return (
+    <div className="space-y-4 max-w-3xl mx-auto pb-20">
+      {questions.map((q) => (
+        <QuestionCard key={q.id} q={q} />
+      ))}
+    </div>
+  );
 }

@@ -6,19 +6,37 @@ import { Pickaxe } from "lucide-react";
 // --- IMPORTS ---
 import TopMenu from "../../components/topMenu/topMenu";
 import MinerInput from "../../components/QuestionMine/MinerInput";
-import QuestionFeed from "../../components/QuestionMine/QuestionFeed";
+import QuestionFeed, {
+  QuestionItem,
+} from "../../components/QuestionMine/QuestionFeed";
 import SolutionModal from "../../components/QuestionMine/SolutionModal";
 
 export default function QuestionMinePage() {
   const [isMining, setIsMining] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState();
+  const [questions, setQuestions] = useState<QuestionItem[]>([]);
 
-  const handleSearch = (term: string, sources: string[]) => {
+  const handleSearch = async (term: string, sources: string[]) => {
     setIsMining(true);
-    setTimeout(() => {
+    setQuestions([]); // Clear old results immediately
+
+    try {
+      const response = await fetch("/api/question-mine", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword: term, sources }), // Send data to backend
+      });
+
+      if (!response.ok) throw new Error("Mining failed");
+
+      const data = await response.json();
+      setQuestions(data.questions || []); // Update UI with real questions
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
       setIsMining(false);
-    }, 2500);
+    }
   };
 
   const handleSolve = (question: any) => {
@@ -75,8 +93,11 @@ export default function QuestionMinePage() {
         <div className="flex-1 h-full overflow-y-auto bg-[#FAFAFA] p-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="max-w-[1000px] mx-auto h-full">
             {/* ⭐ STEP 3: Question Feed */}
-            {/* TODO: Pass isMining and onSolve props */}
-            <QuestionFeed isMining={isMining} onSolve={handleSolve} />
+            <QuestionFeed
+              isMining={isMining}
+              questions={questions}
+              onSolve={handleSolve}
+            />
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   X,
   Copy,
@@ -49,6 +49,38 @@ export default function SolutionModal({
   // #Advice #Growth #ProblemSolving`
 
   // TODO: Add early return if !isOpen || !question
+  const [loading, setLoading] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(draft); //
+    setCopied(true); //
+
+    // Reset the button after 2 seconds
+    setTimeout(() => setCopied(false), 2000); //
+  };
+
+  useEffect(() => {
+    if (isOpen && question) {
+      setLoading(true);
+      setDraft("");
+
+      // Call your AI API route
+      fetch("/api/generate-solution", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setDraft(data.draft || "AI failed to respond."); // Show real AI text
+        })
+        .catch((err) => console.error("AI Error:", err))
+        .finally(() => setLoading(false));
+    }
+  }, [isOpen, question]);
+
   if (!isOpen || !question) return null;
 
   return (
@@ -131,19 +163,22 @@ export default function SolutionModal({
 
           {/* Editor Area */}
           <div className="flex-1 p-8 relative bg-gray-50/30">
-            {/* TODO: Add conditional rendering for loading state */}
-            {/* If loading: show spinner overlay */}
-            {/* If not loading: show textarea editor */}
-
-            {/* Loading State (uncomment and use when loading is true) */}
-            {/* 
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 z-10 backdrop-blur-sm">
-              <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-              <p className="text-sm font-medium text-gray-500 animate-pulse">
-                Analyzing pain point & drafting...
-              </p>
-            </div>
-            */}
+            {loading ? (
+              // 1. Show this while loading is true
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60">
+                <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-3" />
+                <p>Analyzing pain point & drafting...</p>
+              </div>
+            ) : (
+              // 2. Show the editor when loading is false
+              <div className="w-full h-full p-6">
+                <textarea
+                  value={draft} // Binds the text to our state
+                  onChange={(e) => setDraft(e.target.value)} // Allows you to edit the draft
+                  className="w-full h-full resize-none outline-none"
+                />
+              </div>
+            )}
 
             {/* Editor (show when not loading) */}
             <div className="w-full h-full bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col">
@@ -158,8 +193,19 @@ export default function SolutionModal({
 
           {/* Footer Actions */}
           <div className="p-6 border-t border-gray-100 bg-white flex justify-end gap-3 z-20">
-            <button className="px-5 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
-              <Copy size={16} /> Copy to Clipboard
+            <button
+              onClick={handleCopy} // NEW: Trigger the copy function
+              className="px-5 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2"
+            >
+              {/* Switch icons based on state */}
+              {copied ? (
+                <CheckCircle2 size={16} className="text-green-500" />
+              ) : (
+                <Copy size={16} />
+              )}
+
+              {/* Switch text based on state */}
+              {copied ? "Copied!" : "Copy to Clipboard"}
             </button>
             <button className="px-6 py-3 rounded-xl bg-gray-900 text-white font-bold text-sm hover:bg-black shadow-lg transition-all flex items-center gap-2">
               <CheckCircle2 size={16} /> Save to Content Lab

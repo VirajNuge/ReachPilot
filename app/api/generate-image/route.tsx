@@ -70,10 +70,16 @@ export async function POST(req: NextRequest) {
       Array.isArray(assets) && assets.length > 0
         ? assets
             .filter((img: any) => !!img.base64)
-            .map((img: any) => ({
-              bytesBase64Encoded: img.base64.split(",")[1],
-              mimeType: img.mimeType || "image/png",
-            }))
+            .map((img: any) => {
+              // Handle base64 string with or without data URL prefix
+              const base64Data = img.base64.includes(",") 
+                ? img.base64.split(",")[1] 
+                : img.base64;
+              return {
+                bytesBase64Encoded: base64Data,
+                mimeType: img.mimeType || "image/png",
+              };
+            })
         : [];
 
     // ----------------------------------------------------
@@ -129,7 +135,16 @@ CRITICAL:
       );
     }
 
-    const data = JSON.parse(text);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (parseError) {
+      console.error("❌ Failed to parse Imagen API response:", text);
+      return NextResponse.json(
+        { success: false, error: "Invalid JSON response from Imagen API" },
+        { status: 500 }
+      );
+    }
     const base64String = data?.predictions?.[0]?.bytesBase64Encoded;
 
     if (!base64String) {

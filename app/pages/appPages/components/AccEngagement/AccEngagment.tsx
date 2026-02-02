@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { BsBarChartFill, BsStars } from "react-icons/bs";
 import {
@@ -7,12 +9,15 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
+  Cell,
+  Tooltip,
 } from "recharts";
+import { triggerChatbot } from "@/app/components/Chatbot/chatbotEvents";
 
-interface ChartDataPoint {
-  name: string;
-  value: number;
-  max: number;
+interface ContentMetrics {
+  frequencyScore: number;
+  contentMixScore: number;
+  engagementScore: number;
 }
 
 interface AnalysisText {
@@ -22,71 +27,123 @@ interface AnalysisText {
 }
 
 interface AccEngagmentProps {
-  chartData: ChartDataPoint[];
+  contentMetrics?: ContentMetrics;
   analysisText: AnalysisText;
 }
 
+const CHART_COLORS = {
+  frequency: "#818CF8", // Purple
+  contentMix: "#34D399", // Green
+  engagement: "#F472B6", // Pink
+};
+
 const AccEngagment: React.FC<AccEngagmentProps> = ({
-  chartData,
+  contentMetrics,
   analysisText,
 }) => {
+  const chartData = [
+    {
+      name: "Frequency",
+      value: contentMetrics?.frequencyScore ?? 50,
+      fill: CHART_COLORS.frequency,
+    },
+    {
+      name: "Content Mix",
+      value: contentMetrics?.contentMixScore ?? 50,
+      fill: CHART_COLORS.contentMix,
+    },
+    {
+      name: "Engagement",
+      value: contentMetrics?.engagementScore ?? 50,
+      fill: CHART_COLORS.engagement,
+    },
+  ];
+
   return (
-    <div>
-      <div className="bg-white rounded-[8px] p-[12px] w-[450px] h-max">
-        <div className="flex gap-[6px] items-center mb-[6px]">
-          <BsBarChartFill size="16px" />
-          <h4 className="font-[600]">Content & Engagement</h4>
+    <div className="flex h-full w-full flex-col p-5">
+      <div className="flex gap-2 items-center mb-4">
+        <div className="bg-pink-50 p-2 rounded-lg text-pink-600">
+          <BsBarChartFill size={16} />
         </div>
-        <ResponsiveContainer width="100%" height={200}>
+        <div>
+          <h4 className="font-bold text-lg text-gray-900">Engagement</h4>
+          <p className="text-xs text-gray-500 font-medium">
+            Performance Metrics
+          </p>
+        </div>
+      </div>
+
+      <div className="flex-1 min-h-[160px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            barCategoryGap="40%"
+            margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
+            barCategoryGap="20%"
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#e0e0e0"
+              stroke="#f3f4f6"
               vertical={false}
             />
-
             <YAxis
               domain={[0, 100]}
               tickLine={false}
               axisLine={false}
-              stroke="#a0a0a0"
+              stroke="#9ca3af"
+              fontSize={10}
+              fontWeight={500}
+              tickFormatter={(value) => `${value}`}
             />
-
             <XAxis
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              stroke="#555"
-              interval={0}
+              stroke="#6b7280"
+              fontSize={10}
+              fontWeight={600}
+              tick={{ dy: 10 }}
             />
-
-            <Bar dataKey="max" fill="#F0F0FF" barSize={50} />
-
-            <Bar dataKey="value" fill="#9999FF" barSize={50} />
+            <Tooltip
+              cursor={{ fill: "#f9fafb" }}
+              contentStyle={{
+                backgroundColor: "#1f2937",
+                border: "none",
+                borderRadius: "12px",
+                fontSize: "12px",
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+              }}
+              labelStyle={{ color: "#e5e7eb", marginBottom: "4px" }}
+              itemStyle={{ color: "#fff", fontWeight: 600 }}
+              formatter={(value: number) => [`${value}/100`, "Score"]}
+            />
+            <Bar dataKey="value" radius={[6, 6, 0, 0]} animationDuration={1500}>
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
-        <div>
-          <p className="text-[14px] mb-[12px]">
-            <b>Posting frequency → </b>
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-2 border-t border-gray-50 pt-3">
+        <div className="flex justify-between items-center text-xs">
+          <span className="font-medium text-gray-500">Frequency</span>
+          <span className="font-bold text-gray-800">
             {analysisText.frequency}
-          </p>
-          <p className="text-[14px] mb-[12px]">
-            <b>Content mix → </b>
-            {analysisText.contentMix}
-          </p>
-          <p className="text-[14px] mb-[12px]">
-            <b>Engagement → </b>
-            {analysisText.engagement}
-          </p>
+          </span>
         </div>
-        <p className="w-max p-[8px] font-[500] rounded-[20px] px-[14px] bg-[#E7E6FF] text-[#0900FF] text-[12px] flex gap-[6px] items-center cursor-pointer hover:bg-[#d3d1ff] transition-all duration-[300ms] ease-in">
-          <BsStars size="16px" color="#0900FF" />
-          Re-write with AI
-        </p>
+        <div className="flex justify-between items-center text-xs">
+          <span className="font-medium text-gray-500">Mix</span>
+          <span className="font-bold text-gray-800">
+            {analysisText.contentMix}
+          </span>
+        </div>
+        <div className="flex justify-between items-center text-xs">
+          <span className="font-medium text-gray-500">Eng.</span>
+          <span className="font-bold text-gray-800">
+            {analysisText.engagement}
+          </span>
+        </div>
       </div>
     </div>
   );

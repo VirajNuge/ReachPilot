@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
 /* -------------------------------------------------------
    ROBUST JSON EXTRACTOR
 ------------------------------------------------------- */
@@ -65,6 +63,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Initialize genAI after API key check
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
     // Build prompt
     const { buildSinglePostPrompt } = await import("@/lib/singlePostPrompt");
 
@@ -78,9 +79,13 @@ export async function POST(req: NextRequest) {
     if (Array.isArray(data.images)) {
       for (const img of data.images) {
         if (!img.base64) continue;
+        // Handle base64 string with or without data URL prefix
+        const base64Data = img.base64.includes(",") 
+          ? img.base64.split(",")[1] 
+          : img.base64;
         promptParts.push({
           inlineData: {
-            data: img.base64.split(",")[1],
+            data: base64Data,
             mimeType: img.mimeType || "image/png",
           },
         });

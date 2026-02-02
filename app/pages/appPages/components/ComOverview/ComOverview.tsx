@@ -1,6 +1,7 @@
 "use client";
 import { BsDiamond, BsCheckSquareFill, BsXLg } from "react-icons/bs";
 import React from "react";
+import { motion } from "framer-motion";
 import {
   Radar,
   RadarChart,
@@ -37,10 +38,40 @@ const ComOverview: React.FC<ComOverviewProps> = ({
   tableData,
   insights,
 }) => {
+  const rowVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: (i: number) => ({
+      opacity: 1,
+      x: 0,
+      transition: {
+        delay: 0.4 + i * 0.08,
+        duration: 0.3,
+      },
+    }),
+  };
+
+  const insightVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: 0.6 + i * 0.1,
+        duration: 0.3,
+      },
+    }),
+  };
+
   return (
     <>
       <div>
-        <div className="h-[550px] w-full">
+        {/* Animated Chart Container */}
+        <motion.div
+          className="h-[550px] w-full"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
               <PolarGrid stroke="#e5e7eb" />
@@ -85,8 +116,15 @@ const ComOverview: React.FC<ComOverviewProps> = ({
               <Legend wrapperStyle={{ paddingTop: "20px" }} />
             </RadarChart>
           </ResponsiveContainer>
-        </div>
-        <div className="overflow-hidden rounded-lg border border-[#0012FF] mb-6">
+        </motion.div>
+
+        {/* Animated Table */}
+        <motion.div
+          className="overflow-hidden rounded-lg border border-[#0012FF] mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-[#E7E6FF] text-[#0012FF]">
@@ -107,7 +145,15 @@ const ComOverview: React.FC<ComOverviewProps> = ({
 
             <tbody>
               {tableData.map((row, index) => (
-                <tr key={index} className="bg-[#F9F9F9]">
+                <motion.tr
+                  key={index}
+                  className="bg-[#F9F9F9]"
+                  custom={index}
+                  initial="hidden"
+                  animate="visible"
+                  variants={rowVariants}
+                  whileHover={{ backgroundColor: "#f0f0f0" }}
+                >
                   <td className="py-3 px-4 text-center font-medium text-black border-r border-b border-[#0012FF] last:border-b-0">
                     {row.label}
                   </td>
@@ -118,30 +164,53 @@ const ComOverview: React.FC<ComOverviewProps> = ({
                     {row.comp}
                   </td>
                   <td className="py-3 px-4 flex justify-center items-center border-b border-[#0012FF] last:border-b-0 h-full">
-                    {row.win ? (
-                      <BsCheckSquareFill size={22} className="text-[#00C805]" />
-                    ) : (
-                      <BsXLg
-                        size={22}
-                        className="text-[#FF0000] stroke-[1px]"
-                      />
-                    )}
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        delay: 0.5 + index * 0.1,
+                        type: "spring",
+                        stiffness: 300,
+                      }}
+                    >
+                      {row.win ? (
+                        <BsCheckSquareFill
+                          size={22}
+                          className="text-[#00C805]"
+                        />
+                      ) : (
+                        <BsXLg
+                          size={22}
+                          className="text-[#FF0000] stroke-[1px]"
+                        />
+                      )}
+                    </motion.div>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </motion.div>
 
+        {/* Animated Insights */}
         <div className="flex flex-col gap-3">
           {insights.map((insight, index) => (
-            <div
+            <motion.div
               key={index}
               className="bg-white p-3 rounded-md shadow-sm border border-gray-100 flex items-start gap-3"
+              custom={index}
+              initial="hidden"
+              animate="visible"
+              variants={insightVariants}
+              whileHover={{
+                scale: 1.01,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                transition: { duration: 0.15 },
+              }}
             >
               <BsDiamond className="mt-1 flex-shrink-0 text-black" size={12} />
               <p className="text-sm text-gray-800">{insight}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

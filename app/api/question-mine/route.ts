@@ -23,17 +23,20 @@ export async function POST(req: NextRequest) {
 
     const allQuestions: MinedQuestion[] = [];
 
+    // Ensure sources is an array
+    const sourcesArray = Array.isArray(sources) ? sources : [];
+
     // 3. Conditional Mining: Only search sources the user checked
-    if (sources.includes("reddit")) {
+    if (sourcesArray.includes("reddit")) {
       const redditResults = await mineReddit(keyword);
       allQuestions.push(...redditResults);
     }
-    if (sources.includes("quora")) {
+    if (sourcesArray.includes("quora")) {
       const quoraResults = await mineQuora(keyword);
       allQuestions.push(...quoraResults);
     }
 
-    if (sources.includes("google")) {
+    if (sourcesArray.includes("google")) {
       const googleResults = await mineGoogle(keyword);
       allQuestions.push(...googleResults);
     }
@@ -64,20 +67,22 @@ async function mineReddit(keyword: string): Promise<MinedQuestion[]> {
   const data = await response.json();
   const posts = data?.data?.children || [];
 
-  return posts.map((post: any) => ({
-    id: `reddit-${post.data.id}`,
-    source: "reddit",
-    title: post.data.title,
-    snippet:
-      post.data.selftext?.substring(0, 200) || "No description provided.",
-    metrics: {
-      upvotes: post.data.ups || 0,
-      comments: post.data.num_comments || 0,
-    },
-    // We calculate "Pain Level" based on how many people are talking about it
-    painLevel: post.data.ups > 100 ? "Critical" : "High",
-    timestamp: "Recent",
-  }));
+  return posts
+    .filter((post: any) => post?.data) // Filter out posts without data
+    .map((post: any) => ({
+      id: `reddit-${post.data?.id || Date.now()}`,
+      source: "reddit",
+      title: post.data?.title || "Untitled",
+      snippet:
+        post.data?.selftext?.substring(0, 200) || "No description provided.",
+      metrics: {
+        upvotes: post.data?.ups || 0,
+        comments: post.data?.num_comments || 0,
+      },
+      // We calculate "Pain Level" based on how many people are talking about it
+      painLevel: (post.data?.ups || 0) > 100 ? "Critical" : "High",
+      timestamp: "Recent",
+    }));
 }
 async function mineGoogle(keyword: string): Promise<MinedQuestion[]> {
   const serpApiKey = process.env.SERP_API_KEY;
@@ -93,15 +98,17 @@ async function mineGoogle(keyword: string): Promise<MinedQuestion[]> {
   const data = await response.json();
   const paaQuestions = data?.related_questions || [];
 
-  return paaQuestions.map((q: any, index: number) => ({
-    id: `google-paa-${index}`,
-    source: "google",
-    title: q.question,
-    snippet: q.snippet || "High-intent search query from Google.",
-    metrics: { upvotes: 0, comments: 0 },
-    painLevel: "High",
-    timestamp: "Trending",
-  }));
+  return paaQuestions
+    .filter((q: any) => q?.question) // Filter out questions without title
+    .map((q: any, index: number) => ({
+      id: `google-paa-${index}`,
+      source: "google",
+      title: q.question || "Untitled Question",
+      snippet: q.snippet || "High-intent search query from Google.",
+      metrics: { upvotes: 0, comments: 0 },
+      painLevel: "High",
+      timestamp: "Trending",
+    }));
 }
 async function mineQuora(keyword: string): Promise<MinedQuestion[]> {
   const serpApiKey = process.env.SERP_API_KEY;
@@ -119,13 +126,15 @@ async function mineQuora(keyword: string): Promise<MinedQuestion[]> {
   const data = await response.json();
   const results = data?.organic_results || [];
 
-  return results.map((r: any, index: number) => ({
-    id: `quora-${index}`,
-    source: "quora",
-    title: r.title,
-    snippet: r.snippet || "Quora discussion thread.",
-    metrics: { upvotes: 0, comments: 0 },
-    painLevel: "Medium",
-    timestamp: "Recent",
-  }));
+  return results
+    .filter((r: any) => r?.title) // Filter out results without title
+    .map((r: any, index: number) => ({
+      id: `quora-${index}`,
+      source: "quora",
+      title: r.title || "Untitled",
+      snippet: r.snippet || "Quora discussion thread.",
+      metrics: { upvotes: 0, comments: 0 },
+      painLevel: "Medium",
+      timestamp: "Recent",
+    }));
 }

@@ -29,8 +29,6 @@ export async function scrapeProfile(url: string): Promise<string> {
       return body ? body.innerText.substring(0, 100000) : "";
     });
 
-    await browser.close();
-
     // Basic check if we got blocked
     if (rawText.length < 200) {
       return `ERROR: Content blocked or empty. URL: ${url}`;
@@ -38,8 +36,14 @@ export async function scrapeProfile(url: string): Promise<string> {
 
     return rawText;
   } catch (error) {
-    await browser.close();
     console.error("Scraping failed:", error);
     return `ERROR: Scraping failed. ${error}`;
+  } finally {
+    // Ensure browser is always closed, even if close() throws
+    try {
+      await browser.close();
+    } catch (closeError) {
+      console.error("Error closing browser:", closeError);
+    }
   }
 }

@@ -1,0 +1,362 @@
+/* ===== Unified Analyzer Entry - Pure White Minimal ===== */
+
+/* Pure White Background */
+.unifiedAnalyzerContainer {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-color: #ffffff;
+  font-family:
+    "Plus Jakarta Sans",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  overflow: hidden;
+}
+
+/* Very subtle ambient light for depth, almost invisible */
+.unifiedAnalyzerContainer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(243, 244, 246, 0.4) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+/* Card - Seamless blend with subtle lift */
+.analyzerCard {
+  position: relative;
+  z-index: 10;
+  background: #ffffff;
+  /* Removed border to make it cleaner */
+  padding: 48px;
+  max-width: 600px;
+  width: 90%;
+  /* Very soft shadow for lift */
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.03),
+    0 20px 40px -10px rgba(0, 0, 0, 0.06);
+  border-radius: 24px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.analyzerCard:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.03),
+    0 30px 60px -12px rgba(0, 0, 0, 0.08);
+}
+
+/* Typography */
+.analyzerTitle {
+  color: #111827;
+  font-size: 42px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 12px;
+  letter-spacing: -1.2px;
+  line-height: 1.1;
+}
+
+.analyzerSubtitle {
+  color: #6b7280;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 48px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+}
+
+/* Mode Toggle - Clean Pill */
+.modeToggleContainer {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 40px;
+  padding: 6px;
+  background: #f9fafb;
+  border-radius: 100px; /* Pill shape */
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #f3f4f6;
+}
+
+.modeButton {
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modeButton:hover:not(.active) {
+  color: #111827;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.modeButton.active {
+  background: #ffffff;
+  color: #4f46e5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Lifted active state */
+}
+
+/* Inputs */
+.inputsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.inputLabel {
+  display: block;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-left: 6px;
+}
+
+.inputFieldWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 20px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: #9ca3af;
+  transition: color 0.2s ease;
+}
+
+.inputFieldWrapper:focus-within .inputIcon {
+  color: #4f46e5;
+}
+
+.inputValidIcon {
+  position: absolute;
+  right: 20px;
+  color: #10b981;
+  background: #ecfdf5;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  pointer-events: none;
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.linkInput {
+  width: 100%;
+  padding: 20px 24px 20px 54px;
+  border-radius: 18px;
+  border: 2px solid #f3f4f6;
+  background: #f9fafb;
+  font-size: 16px;
+  color: #111827;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-weight: 500;
+}
+
+.linkInput:hover {
+  border-color: #e5e7eb;
+  background: #ffffff;
+}
+
+.linkInput:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+}
+
+.linkInput::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* Premium Analyze Button */
+.analyzeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px 32px;
+  margin-top: 40px;
+  border-radius: 18px;
+  border: none;
+  /* Brand Gradient */
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle shine effect */
+.analyzeButton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transform: skewX(-20deg) translateX(-150%);
+  transition: transform 0.5s ease;
+}
+
+.analyzeButton:hover:not(.disabled) {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 12px 24px -4px rgba(79, 70, 229, 0.5);
+  background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+}
+
+.analyzeButton:hover:not(.disabled)::before {
+  transform: skewX(-20deg) translateX(150%);
+  transition: transform 0.7s ease;
+}
+
+.analyzeButton:active:not(.disabled) {
+  transform: translateY(0) scale(0.99);
+}
+
+.analyzeButton.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #d1d5db;
+  box-shadow: none;
+}
+
+/* Minimal Features */
+.featuresList {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px dashed #e5e7eb; /* Dashed divider */
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.featureIcon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4f46e5;
+  background: transparent;
+  font-size: 14px;
+}
+
+/* Manual Entry Hint */
+.manualEntryHint {
+  text-align: center;
+  font-size: 13px;
+  color: #9ca3af;
+  margin-top: 24px;
+  font-weight: 500;
+}
+
+.manualEntryLink {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.manualEntryLink:hover {
+  text-decoration: underline;
+}
+
+/* Error */
+.inputError {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .analyzerCard {
+    padding: 32px 24px;
+    margin: 16px;
+    border-radius: 24px;
+    width: 95%;
+  }
+
+  .analyzerTitle {
+    font-size: 32px;
+  }
+}

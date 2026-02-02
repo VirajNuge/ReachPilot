@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
@@ -23,9 +22,8 @@ interface EngagementStat {
   winner: "You" | "Competitor";
 }
 
-// CHANGED: Renamed to match the new data logic
 interface RecentPostDataPoint {
-  post: string; // e.g., "P1" (Newest), "P2", etc.
+  post: string;
   You: number;
   Competitor: number;
 }
@@ -39,7 +37,7 @@ interface InteractionDataPoint {
 
 interface EngagementComparisonTabProps {
   statsCards: EngagementStat[];
-  recentPostsTrendData: RecentPostDataPoint[]; // <--- Updated Prop
+  recentPostsTrendData: RecentPostDataPoint[];
   interactionsData: InteractionDataPoint[];
 }
 
@@ -48,42 +46,87 @@ const EngagementComparisonTab: React.FC<EngagementComparisonTabProps> = ({
   recentPostsTrendData,
   interactionsData,
 }) => {
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.35,
+        ease: "easeOut",
+      },
+    }),
+  };
+
   return (
     <div className="w-[630px] h-[1000px] bg-gray-50 font-sans overflow-y-auto p-6 border border-gray-200 rounded-xl mx-auto">
       <div className="mb-6">
-        {/* Stats Cards Grid */}
+        {/* Stats Cards Grid with Animations */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {statsCards.map((stat, index) => (
-            <div
+            <motion.div
               key={index}
               className="bg-white p-4 rounded-xl shadow-sm border border-gray-100"
+              custom={index}
+              initial="hidden"
+              animate="visible"
+              variants={cardVariants}
+              whileHover={{
+                y: -2,
+                boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
+                transition: { duration: 0.15 },
+              }}
             >
               <h4 className="text-sm font-bold text-gray-900 mb-3">
                 {stat.title}
               </h4>
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-3 py-1 bg-[#dcfce7] text-[#166534] text-xs font-bold rounded-full">
+                <motion.span
+                  className="px-3 py-1 bg-[#dcfce7] text-[#166534] text-xs font-bold rounded-full"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2 + index * 0.1 }}
+                >
                   You : {stat.youValue}
-                </span>
-                <span className="px-3 py-1 bg-[#fee2e2] text-[#991b1b] text-xs font-bold rounded-full">
+                </motion.span>
+                <motion.span
+                  className="px-3 py-1 bg-[#fee2e2] text-[#991b1b] text-xs font-bold rounded-full"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.25 + index * 0.1 }}
+                >
                   Comp : {stat.compValue}
-                </span>
+                </motion.span>
               </div>
-              <div
+              <motion.div
                 className={`text-xs font-bold px-3 py-1 rounded-full w-max mt-2 ${
                   stat.winner === "You"
                     ? "bg-[#dcfce7] text-[#166534]"
                     : "bg-[#fee2e2] text-[#991b1b]"
                 }`}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{
+                  delay: 0.35 + index * 0.1,
+                  type: "spring",
+                  stiffness: 300,
+                }}
               >
-                {stat.winner === "You" ? "You Wins" : "Competitor Wins"}
-              </div>
-            </div>
+                {stat.winner === "You" ? "🏆 You Win" : "Competitor Wins"}
+              </motion.div>
+            </motion.div>
           ))}
         </div>
 
-        {/* REPLACED: Chart 1 - Recent Posts Consistency */}
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+        {/* Chart 1 - Recent Posts Consistency */}
+        <motion.div
+          className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-sm font-bold text-gray-900">
               Recent Posts Consistency (Last 12 Posts)
@@ -93,9 +136,13 @@ const EngagementComparisonTab: React.FC<EngagementComparisonTabProps> = ({
             </span>
           </div>
 
-          <div className="h-[250px] w-full text-xs">
+          <motion.div
+            className="h-[250px] w-full text-xs"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
             <ResponsiveContainer width="100%" height="100%">
-              {/* Changed to AreaChart for a slightly different "Trend" look */}
               <AreaChart
                 data={recentPostsTrendData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
@@ -112,7 +159,7 @@ const EngagementComparisonTab: React.FC<EngagementComparisonTabProps> = ({
                 </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  vertical={false} // Clean horizontal lines only
+                  vertical={false}
                   stroke="#e5e7eb"
                 />
                 <XAxis
@@ -126,7 +173,7 @@ const EngagementComparisonTab: React.FC<EngagementComparisonTabProps> = ({
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 10, fill: "#6b7280" }}
-                  domain={[0, "auto"]} // Auto scale based on engagement
+                  domain={[0, "auto"]}
                 />
                 <Tooltip
                   contentStyle={{
@@ -158,15 +205,25 @@ const EngagementComparisonTab: React.FC<EngagementComparisonTabProps> = ({
                 />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* Chart 2: Average Interactions per Post (Grouped Bar Chart) */}
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+        {/* Chart 2: Average Interactions per Post */}
+        <motion.div
+          className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+        >
           <h3 className="text-sm font-bold text-gray-900 mb-4">
             Average Interactions per Post
           </h3>
-          <div className="h-[250px] w-full text-xs">
+          <motion.div
+            className="h-[250px] w-full text-xs"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={interactionsData}
@@ -223,8 +280,8 @@ const EngagementComparisonTab: React.FC<EngagementComparisonTabProps> = ({
                 />
               </BarChart>
             </ResponsiveContainer>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );

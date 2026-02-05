@@ -14,7 +14,7 @@ interface AudiencePersonaProps {
 
 const AudiencePersona: React.FC<AudiencePersonaProps> = ({ personas = [] }) => {
   return (
-    <div className="flex h-full w-full flex-col p-6">
+    <div className="flex h-[360px] w-[540px] flex-col p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h4 className="font-bold text-lg text-gray-900">Persona Deck</h4>

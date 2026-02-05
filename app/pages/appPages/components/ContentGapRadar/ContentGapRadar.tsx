@@ -34,7 +34,7 @@ const ContentGapRadar: React.FC<ContentGapRadarProps> = ({
   ];
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex h-full w-[360px] flex-col">
       <div className="flex items-center justify-between mb-2">
         <div>
           <h4 className="text-lg font-bold text-gray-900">Topic Radar</h4>
@@ -47,7 +47,7 @@ const ContentGapRadar: React.FC<ContentGapRadarProps> = ({
 
       <div className="flex-1 w-full min-h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="75%" data={data}>
+          <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
             <PolarGrid stroke="#f3f4f6" />
             <PolarAngleAxis
               dataKey="subject"

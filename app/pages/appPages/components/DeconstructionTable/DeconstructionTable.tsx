@@ -20,15 +20,15 @@ const DeconstructionTable: React.FC<DeconstructionTableProps> = ({
 }) => {
   return (
     <div className="flex h-full w-full flex-col p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-2 mb-6">
+        <div className="bg-rose-50 p-2 rounded-lg text-rose-600">
+          <BsTrophyFill size={16} />
+        </div>
         <div>
           <h4 className="font-bold text-lg text-gray-900">DNA Deconstructor</h4>
           <p className="text-xs text-gray-500 font-medium">
             Reverse-engineering winning content
           </p>
-        </div>
-        <div className="bg-rose-50 p-2 rounded-lg text-rose-600">
-          <BsTrophyFill size={16} />
         </div>
       </div>
 

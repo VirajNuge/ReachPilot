@@ -69,7 +69,7 @@ const BestTimePost: React.FC<BestTimeProps> = ({ scheduleData, aiInsight }) => {
   } | null>(null);
 
   return (
-    <div className="flex h-full w-full flex-col p-6">
+    <div className="flex h-[360px] w-[540px] flex-col p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h4 className="font-bold text-lg text-gray-900">Posting Schedule</h4>
@@ -127,6 +127,14 @@ const BestTimePost: React.FC<BestTimeProps> = ({ scheduleData, aiInsight }) => {
             </div>
           ))}
         </div>
+        {aiInsight && (
+          <div className="flex gap-3 items-start p-3 bg-indigo-50/50 rounded-xl border border-indigo-50">
+            <BsStars className="text-indigo-500 mt-0.5 shrink-0" size={14} />
+            <p className="text-xs font-medium text-indigo-900 leading-relaxed">
+              <span className="font-bold">AI Insight:</span> {aiInsight}
+            </p>
+          </div>
+        )}
 
         {/* Floating Tooltip */}
         {hoveredSlot && (
@@ -144,15 +152,6 @@ const BestTimePost: React.FC<BestTimeProps> = ({ scheduleData, aiInsight }) => {
           </div>
         )}
       </div>
-
-      {aiInsight && (
-        <div className="mt-4 flex gap-3 items-start p-3 bg-indigo-50/50 rounded-xl border border-indigo-50">
-          <BsStars className="text-indigo-500 mt-0.5 shrink-0" size={14} />
-          <p className="text-xs font-medium text-indigo-900 leading-relaxed">
-            <span className="font-bold">AI Insight:</span> {aiInsight}
-          </p>
-        </div>
-      )}
     </div>
   );
 };

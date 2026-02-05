@@ -20,6 +20,16 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 body {
   color: var(--text-primary);
   background: var(--sidebar-bg); /* Setting the shell background */

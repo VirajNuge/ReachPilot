@@ -73,7 +73,7 @@ const AccEngagment: React.FC<AccEngagmentProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 min-h-[160px] w-full">
+      <div className="flex min-h-[320px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
@@ -126,20 +126,20 @@ const AccEngagment: React.FC<AccEngagmentProps> = ({
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-2 border-t border-gray-50 pt-3">
-        <div className="flex justify-between items-center text-xs">
-          <span className="font-medium text-gray-500">Frequency</span>
+        <div className="flex items-center text-xs">
+          <span className="font-medium text-gray-500">Frequency ➜</span>
           <span className="font-bold text-gray-800">
             {analysisText.frequency}
           </span>
         </div>
-        <div className="flex justify-between items-center text-xs">
-          <span className="font-medium text-gray-500">Mix</span>
+        <div className="flex items-center text-xs">
+          <span className="font-medium text-gray-500">Mix ➜</span>
           <span className="font-bold text-gray-800">
             {analysisText.contentMix}
           </span>
         </div>
-        <div className="flex justify-between items-center text-xs">
-          <span className="font-medium text-gray-500">Eng.</span>
+        <div className="flex items-center text-xs">
+          <span className="font-medium text-gray-500">Eng. ➜</span>
           <span className="font-bold text-gray-800">
             {analysisText.engagement}
           </span>

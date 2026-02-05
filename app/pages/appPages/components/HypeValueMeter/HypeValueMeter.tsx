@@ -18,22 +18,22 @@ const HypeValueMeter: React.FC<HypeValueMeterProps> = ({
   const hypePercent = Math.round((score.hype / total) * 100);
 
   return (
-    <div className="flex h-full w-full flex-col p-5">
-      <div className="flex items-center justify-between mb-4">
-        <div>
+    <div className="flex h-full w-full flex-col pl-5">
+      <div className="flex items-center mb-2">
+        <div className="rounded-lg bg-orange-50 p-2 text-orange-600 mr-2">
+          <BsLightningFill size={16} />
+        </div>
+        <div className="pt-5">
           <h4 className="text-lg font-bold text-gray-900">Authority Balance</h4>
           <p className="text-xs text-gray-500 font-medium">
             Hype vs. Value Ratio
           </p>
         </div>
-        <div className="rounded-lg bg-orange-50 p-2 text-orange-600">
-          <BsLightningFill size={16} />
-        </div>
       </div>
 
-      <div className="relative flex-1 flex flex-col justify-center">
+      <div className="relative flex-1 flex flex-col justify-center p-0">
         {/* Ruler Track */}
-        <div className="relative h-4 w-full rounded-full bg-gray-100 shadow-inner">
+        <div className="relative h-4 max-w-[330px] rounded-full bg-gray-100 shadow-inner">
           {/* Gradient Fill */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-400 via-violet-500 to-blue-500 opacity-20" />
 
@@ -57,13 +57,13 @@ const HypeValueMeter: React.FC<HypeValueMeterProps> = ({
         </div>
 
         {/* Labels */}
-        <div className="mt-4 flex justify-between text-xs font-bold uppercase tracking-widest text-gray-400">
+        <div className="mt-4 flex justify-between max-w-[330px] text-xs font-bold uppercase tracking-widest text-gray-400">
           <span className="text-orange-400">Hype</span>
           <span className="text-blue-500">Value</span>
         </div>
       </div>
 
-      <p className="mt-auto text-xs font-medium text-gray-500 flex items-center gap-2 pt-4 border-t border-gray-50">
+      <p className="mt-auto text-xs font-medium text-gray-500 flex items-center gap-2 pt-4 border-t border-gray-50 pb-5">
         {hypePercent > 40
           ? "⚠️ High 'Hype'. Add more depth."
           : hypePercent < 20

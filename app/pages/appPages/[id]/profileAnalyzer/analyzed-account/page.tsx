@@ -5,25 +5,38 @@ import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Component imports
-import TopMenu from "../../../components/topMenu/topMenu";
+import ContentPillars, {
+  PillarData,
+} from "../../../components/ContentPillars/ContentPillars";
 import AccStatus from "../../../components/AccStatus/page";
 import QkFix from "../../../components/AccQkFix/page";
 import AccBio from "../../../components/AccBio/AccBio";
-import KeyAcc from "../../../components/KeyAcc/KeyAcc";
-import AccEngagment from "../../../components/AccEngagement/AccEngagment";
-import AccTime from "../../../components/AccTime/AccTime";
+import VelocityMeter, {
+  VelocityData,
+} from "../../../components/VelocityMeter/VelocityMeter";
+import PsychTriggers, {
+  PsychData,
+} from "../../../components/PsychTriggers/PsychTriggers";
+import PostFatigue, {
+  FatigueData,
+} from "../../../components/PostFatigue/PostFatigue";
+import CompetitorGap, {
+  GapData,
+} from "../../../components/CompetitorGap/CompetitorGap";
+import ViralRecipe, {
+  ViralPostData,
+} from "../../../components/ViralRecipe/ViralRecipe";
+import VoiceSpectrum, {
+  VoiceData,
+} from "../../../components/VoiceSpectrum/VoiceSpectrum";
+import SentimentMap from "../../../components/SentimentMap/SentimentMap";
+import ActiveHours from "../../../components/ActiveHours/ActiveHours";
+import CrowdPersonas from "../../../components/CrowdPersonas/CrowdPersonas";
+import QuestionCloud from "../../../components/QuestionCloud/QuestionCloud";
 import LoadingScreen from "../../../components/LoadingScreen/LoadingScreen";
 import { ErrorState } from "../../../components/ErrorState/ErrorState";
 import AnalyzerTabs from "../../../components/Shared/AnalyzerTabs";
 import CsiHealthBar from "../../../components/CsiHealthBar/CsiHealthBar";
-import AudiencePersona from "../../../components/AudiencePersona/AudiencePersona";
-import ContentPillars from "../../../components/ContentPillars/ContentPillars";
-import IdeaPlanner from "../../../components/IdeaPlanner/IdeaPlanner";
-import DeconstructionTable from "../../../components/DeconstructionTable/DeconstructionTable";
-import HypeValueMeter from "../../../components/HypeValueMeter/HypeValueMeter";
-import ContentGapRadar from "../../../components/ContentGapRadar/ContentGapRadar";
-import TribalMap from "../../../components/TribalMap/TribalMap";
-import ShadowAudience from "../../../components/ShadowAudience/ShadowAudience";
 import StreakCounter from "../../../components/StreakCounter/StreakCounter";
 import OnboardingTour from "../../../components/OnboardingTour/OnboardingTour";
 
@@ -37,11 +50,7 @@ interface AnalysisData {
     projects: string;
     profileScore?: number;
   };
-  contentMetrics?: {
-    frequencyScore: number;
-    contentMixScore: number;
-    engagementScore: number;
-  };
+
   quickFixes: Array<{
     headline: string;
     description: string;
@@ -57,52 +66,10 @@ interface AnalysisData {
   };
   keywords: { current: string[]; missing: string[] };
   textAnalysis: { frequency: string; contentMix: string; engagement: string };
-  schedule: Array<{
-    day: string;
-    slots: Array<{
-      id: string;
-      label: string;
-      value: number;
-      engagement: string;
-    }>;
-  }>;
-  scheduleHighlight: string;
+
   // Phase 2 Deep Analysis Data
   csiScore?: number;
-  contentPillars?: Array<{
-    topic: string;
-    performance: string;
-  }>;
-  audiencePersonas?: Array<{
-    name: string;
-    description: string;
-    percentage: number;
-  }>;
-  hypeValueScore?: {
-    hype: number;
-    value: number;
-  };
-  ideaBank?: Array<{
-    concept: string;
-    impact: string;
-  }>;
-  postDNA?: Array<{
-    hookType: string;
-    format: string;
-    topic: string;
-    verdict: string;
-  }>;
-  tribes?: Array<{
-    name: string;
-    size: number;
-    growth: string;
-    sentiment: string;
-  }>;
-  shadowAudience?: {
-    lurkersPercent: number;
-    engagersPercent: number;
-    insight: string;
-  };
+  contentPillars?: PillarData[];
 }
 
 function AnalysisContent() {
@@ -202,6 +169,212 @@ function AnalysisContent() {
     },
   };
 
+  const MOCK_PILLARS: PillarData[] = [
+    {
+      name: "Educational",
+      percentage: 45,
+      count: 22,
+      avgEngagement: "4.2%",
+      color: "#8b5cf6",
+      description: "Tutorials, How-to, Industry News",
+      topPosts: [
+        {
+          id: "1",
+          type: "Reel",
+          engagementRate: "5.1%",
+          captionSnippet: "3 steps to master the algorithm in 2024...",
+        },
+        {
+          id: "2",
+          type: "Carousel",
+          engagementRate: "4.8%",
+          captionSnippet: "The ultimate guide to Next.js routing...",
+        },
+        {
+          id: "3",
+          type: "Reel",
+          engagementRate: "4.5%",
+          captionSnippet: "Stop doing this mistake in your code...",
+        },
+      ],
+    },
+    {
+      name: "Personal",
+      percentage: 25,
+      count: 12,
+      avgEngagement: "6.1%",
+      color: "#ec4899",
+      description: "Behind the scenes, Finder stories",
+      topPosts: [
+        {
+          id: "4",
+          type: "Image",
+          engagementRate: "6.5%",
+          captionSnippet: "My workspace setup for 2024!",
+        },
+      ],
+    },
+    {
+      name: "Promotional",
+      percentage: 15,
+      count: 7,
+      avgEngagement: "2.1%",
+      color: "#f59e0b",
+      description: "Sales, Launches, Discounts",
+      topPosts: [],
+    },
+    {
+      name: "Engagement",
+      percentage: 15,
+      count: 7,
+      avgEngagement: "3.5%",
+      color: "#10b981",
+      description: "Memes, Polls, Questions",
+      topPosts: [],
+    },
+  ];
+
+  const MOCK_VELOCITY: VelocityData = {
+    hookRate: 88,
+    category: "Flash",
+    velocityGraph: [
+      { hour: "1h", engagement: 320 },
+      { hour: "2h", engagement: 680 },
+      { hour: "4h", engagement: 750 },
+      { hour: "12h", engagement: 810 },
+      { hour: "24h", engagement: 830 },
+    ],
+    insight:
+      "This competitor uses 'Open Loop' hooks. Their posts get 82% of total engagement in the first 2 hours.",
+  };
+
+  const MOCK_PSYCH: PsychData = {
+    radarData: [
+      { trigger: "Authority", score: 85, fullMark: 100 },
+      { trigger: "Scarcity", score: 30, fullMark: 100 },
+      { trigger: "Social Proof", score: 95, fullMark: 100 },
+      { trigger: "Reciprocity", score: 60, fullMark: 100 },
+      { trigger: "Liking", score: 75, fullMark: 100 },
+      { trigger: "Curiosity", score: 50, fullMark: 100 },
+    ],
+    winningTrigger: "Social Proof",
+    insight:
+      "This brand leans heavily into Social Proof. Their engagement spikes by 40% when they use testimonials or user results.",
+  };
+
+  const MOCK_FATIGUE: FatigueData = {
+    status: "Saturated",
+    fatigueScore: 45,
+    optimalFrequency: "3-4 posts/week",
+    saturationPoint: 5,
+    weeklyImpact: [
+      { day: "Mon", posts: 1, impactScore: 1.1 },
+      { day: "Tue", posts: 0, impactScore: 1.0 },
+      { day: "Wed", posts: 2, impactScore: 0.6 },
+      { day: "Thu", posts: 1, impactScore: 0.9 },
+      { day: "Fri", posts: 1, impactScore: 1.2 },
+      { day: "Sat", posts: 0, impactScore: 1.0 },
+      { day: "Sun", posts: 1, impactScore: 1.05 },
+    ],
+  };
+
+  const MOCK_GAPS: GapData = {
+    metrics: [
+      {
+        category: "Reels",
+        profileValue: 75,
+        benchmarkValue: 40,
+        gapType: "Over-indexed",
+      },
+      {
+        category: "Carousels",
+        profileValue: 10,
+        benchmarkValue: 35,
+        gapType: "Opportunity",
+      },
+      {
+        category: "Static",
+        profileValue: 15,
+        benchmarkValue: 25,
+        gapType: "Opportunity",
+      },
+    ],
+    topOpportunity: "High-Value Carousels",
+    insight:
+      "This profile posts 75% Reels, but the industry average is only 40%. They are completely missing the 35% 'Carousel' market that drives saves & shares.",
+    recommendations: [
+      "Repurpose their top Reel into a 'Step-by-Step' Carousel.",
+      "Post a 'Industry Update' slide deck on Tuesday (their silent day).",
+      "Create a 'Checklist' graphic for their audience to save.",
+    ],
+  };
+
+  const MOCK_VIRAL: ViralPostData = {
+    id: "outlier-1",
+    engagementMultiplier: "5.2x",
+    hookType: "Controversial Statement",
+    hookText: "Stop using useEffect for data fetching.",
+    ingredients: [
+      {
+        name: "Caption Density",
+        value: "Short & Punchy (Under 150 chars)",
+        score: 9,
+      },
+      {
+        name: "Emoji Saturation",
+        value: "Minimalist (Only 2 emojis)",
+        score: 8,
+      },
+      {
+        name: "Visual Sentiment",
+        value: "High Contrast / Bold Text",
+        score: 9,
+      },
+    ],
+    whyItWorked:
+      "This post challenged a common developer habit (Controversy) and offered a simpler alternative immediately, creating a high 'Share' impulse.",
+    templateStructure: [
+      "HOOK: [Stop doing Common Habit X]",
+      "BODY: [Explain why it's bad/slow]",
+      "SOLUTION: [Introduce Better Alternative Y]",
+      "CTA: [Save this for your next project]",
+    ],
+  };
+
+  const MOCK_VOICE: VoiceData = {
+    personaName: "The Scholarly Authority",
+    axes: [
+      { id: "tone", leftLabel: "Professional", rightLabel: "Casual", score: 2 },
+      {
+        id: "logic",
+        leftLabel: "Scientific",
+        rightLabel: "Emotional",
+        score: 9,
+      },
+      {
+        id: "energy",
+        leftLabel: "Minimalist",
+        rightLabel: "High-Energy",
+        score: 3,
+      },
+      {
+        id: "access",
+        leftLabel: "Exclusive",
+        rightLabel: "Accessible",
+        score: 5,
+      },
+    ],
+    signatureWords: [
+      "Framework",
+      "Analysis",
+      "Deep-dive",
+      "Nuance",
+      "Strategic",
+    ],
+    insight:
+      "This brand wins by being the 'smartest person in the room.' They use a highly Professional and Scientific tone. Opportunity: There is zero 'Relatable' content here.",
+  };
+
   return (
     <>
       <OnboardingTour />
@@ -227,11 +400,6 @@ function AnalysisContent() {
                     id: "Crowd",
                     label: "The Crowd",
                     icon: <span>👥</span>,
-                  },
-                  {
-                    id: "Blueprint",
-                    label: "Blueprint",
-                    icon: <span>🗺️</span>,
                   },
                 ]}
                 activeTab={activeTab}
@@ -323,6 +491,7 @@ function AnalysisContent() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="flex flex-col gap-6"
                   >
+                    {/* Lab Header */}
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">🔬</span>
@@ -332,57 +501,61 @@ function AnalysisContent() {
                       </div>
                       <div className="flex gap-2">
                         <span className="px-3 py-1 bg-violet-50 text-violet-700 border border-violet-100 rounded-full text-xs font-bold shadow-sm">
-                          AI Powered Analysis
+                          Deep Dive
                         </span>
                       </div>
                     </div>
 
-                    {/* Bento Grid Layout - Phase 8 */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 auto-rows-fr">
-                      {/* 1. Hype Meter (Top Left) - spans 4 cols */}
-                      <div className="lg:col-span-4 h-full min-h-[220px]">
-                        <div className="h-full bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden p-1">
-                          <HypeValueMeter score={data.hypeValueScore} />
+                    {/* --- Dashboard Grid Layout (12 Columns) --- */}
+                    <div className="grid grid-cols-12 gap-5">
+                      {/* Row 1: Engagement Velocity, Psych Triggers, Content Pillars */}
+                      <div className="col-span-12 md:col-span-6 lg:col-span-5 min-h-[380px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <VelocityMeter data={MOCK_VELOCITY} />
                         </div>
                       </div>
-
-                      {/* 2. Content Pillars (Top Right) - spans 8 cols */}
-                      <div className="lg:col-span-8 h-full min-h-[220px]">
-                        <div className="h-full bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
-                          <ContentPillars pillars={data.contentPillars} />
+                      <div className="col-span-12 md:col-span-6 lg:col-span-7 min-h-[380px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <PsychTriggers data={MOCK_PSYCH} />
                         </div>
                       </div>
-
-                      {/* 3. Engagement Chart (Middle) - spans 8 cols */}
-                      <div className="lg:col-span-8 h-full min-h-[300px]">
-                        <div className="h-full bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
-                          <AccEngagment
-                            contentMetrics={data.contentMetrics}
-                            analysisText={data.textAnalysis}
+                      <div className="col-span-12 lg:col-span-12 min-h-[380px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <ContentPillars
+                            pillars={data?.contentPillars || MOCK_PILLARS}
+                            aiSummary={
+                              data?.contentPillars
+                                ? "Analyzed from real data..."
+                                : "This profile focuses heavily on 'Authority Building' through tutorials, using personal posts to maintain a human connection."
+                            }
+                            onGenerateFormula={() =>
+                              alert("Creating your custom formula...")
+                            }
                           />
                         </div>
                       </div>
 
-                      {/* 4. Radar (Bottom Left) - spans 4 cols */}
-                      <div className="lg:col-span-4 h-full">
-                        <div className="h-full bg-white rounded-[24px] border border-gray-100 shadow-sm p-4">
-                          <ContentGapRadar
-                            currentKeywords={data.keywords?.current}
-                            missingKeywords={data.keywords?.missing}
-                          />
+                      {/* Row 2: Post Fatigue, Content Gap */}
+                      <div className="col-span-12 md:col-span-6 lg:col-span-4 min-h-[360px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <PostFatigue data={MOCK_FATIGUE} />
+                        </div>
+                      </div>
+                      <div className="col-span-12 md:col-span-6 lg:col-span-8 min-h-[360px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <CompetitorGap data={MOCK_GAPS} />
                         </div>
                       </div>
 
-                      {/* 5. Keywords and DNA (Bottom Right) - spans 12 cols for better flow */}
-                      <div className="lg:col-span-12 flex flex-col lg:flex-row gap-6">
-                        <div className="flex-1">
-                          <KeyAcc
-                            alignmentTags={data.keywords?.current || []}
-                            statusData={statusDataMap}
-                          />
+                      {/* Row 3: Viral Recipe, Brand Voice */}
+                      <div className="col-span-12 lg:col-span-6 min-h-[400px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <ViralRecipe data={MOCK_VIRAL} />
                         </div>
-                        <div className="flex-1 bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-x-auto">
-                          <DeconstructionTable posts={data.postDNA} />
+                      </div>
+                      <div className="col-span-12 lg:col-span-6 min-h-[400px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <VoiceSpectrum data={MOCK_VOICE} />
                         </div>
                       </div>
                     </div>
@@ -413,66 +586,36 @@ function AnalysisContent() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 h-auto">
-                      {/* 1. Tribal Map - 7 Cols */}
-                      <div className="lg:col-span-7 h-full min-h-[400px]">
-                        <div className="h-full bg-white rounded-[24px] border border-gray-100 shadow-sm p-6">
-                          <TribalMap tribes={data.tribes} />
+                    {/* Placeholder for future content */}
+                    {/* --- Crowd Grid Layout (12 Columns) --- */}
+                    <div className="grid grid-cols-12 gap-5">
+                      {/* 1. Sentiment Map (Vibe Decoder) */}
+                      <div className="col-span-12 md:col-span-6 lg:col-span-6 min-h-[400px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <SentimentMap />
                         </div>
                       </div>
 
-                      {/* 2. Shadow Audience - 5 Cols */}
-                      <div className="lg:col-span-5 h-full">
-                        <div className="h-full bg-white rounded-[24px] border border-gray-100 shadow-sm p-6">
-                          <ShadowAudience data={data.shadowAudience} />
+                      {/* 2. Active Hours (Clock Map) */}
+                      <div className="col-span-12 md:col-span-6 lg:col-span-6 min-h-[400px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <ActiveHours />
                         </div>
                       </div>
 
-                      {/* 3. Schedule & Time - 6 Cols */}
-                      <div className="lg:col-span-6 h-full">
-                        <div className="h-full bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
-                          <AccTime
-                            scheduleData={data.schedule || []}
-                            aiInsight={data.scheduleHighlight || ""}
-                          />
+                      {/* Row 2: Top Fan Archetypes */}
+                      <div className="col-span-12 lg:col-span-6 min-h-[400px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <CrowdPersonas />
                         </div>
                       </div>
 
-                      {/* 4. Persona Cards - 6 Cols */}
-                      <div className="lg:col-span-6 h-full">
-                        <div className="h-full bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
-                          <AudiencePersona personas={data.audiencePersonas} />
+                      {/* 2. Headline Keyword Cloud */}
+                      <div className="col-span-12 lg:col-span-6 min-h-[400px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <QuestionCloud />
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* --- Zone 4: The Blueprint (Planner) --- */}
-                {activeTab === "Blueprint" && (
-                  <motion.div
-                    key="Blueprint"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="flex flex-col gap-2"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">⚡</span>
-                        <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
-                          Content Blueprint
-                        </h3>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full text-xs font-bold shadow-sm">
-                          Flow Board
-                        </span>
-                      </div>
-                    </div>
-                    <div className="min-h-[600px]">
-                      <IdeaPlanner initialIdeas={data.ideaBank} />
                     </div>
                   </motion.div>
                 )}

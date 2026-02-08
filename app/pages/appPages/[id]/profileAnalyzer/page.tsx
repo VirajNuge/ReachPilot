@@ -1,233 +1,146 @@
 "use client";
 
 import React, { useState } from "react";
-import { useParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
-import {
-  BsSend,
-  BsLightningChargeFill,
-  BsBarChartFill,
-  BsPersonLinesFill,
-  BsSearch,
-  BsArrowRepeat,
-} from "react-icons/bs";
-import {
-  PlatformSelector,
-  getPlatformConfig,
-  validatePlatformUrl,
-} from "../../components/Shared";
-import type { Platform } from "../../components/Shared";
-
-type AnalysisMode = "solo" | "compare";
+import { motion } from "framer-motion";
+import { FaChrome, FaArrowRight, FaSearch } from "react-icons/fa";
+import MotionBackground from "../../components/Shared/MotionBackground";
+import AnalyzedAccountPage from "./analyzed-account/page";
 
 export default function UnifiedAnalyzerPage() {
-  const [platform, setPlatform] = useState<Platform>("linkedin");
-  const [mode, setMode] = useState<AnalysisMode>("solo");
-  const [profileLink, setProfileLink] = useState("");
-  const [competitorLink, setCompetitorLink] = useState("");
-
-  const platformConfig = getPlatformConfig(platform);
-
-  const isValidUrl =
-    profileLink.trim().length > 0 && validatePlatformUrl(profileLink, platform);
-  const isValid =
-    mode === "solo"
-      ? isValidUrl
-      : isValidUrl &&
-        competitorLink.trim().length > 0 &&
-        validatePlatformUrl(competitorLink, platform);
-
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  const paramsHook = useParams();
-  const id = paramsHook?.id as string;
-
-  const getAnalyzeUrl = () => {
-    const base = `/pages/appPages/${id}/profileAnalyzer/analyzed-account`;
-    const params = new URLSearchParams({
-      link: profileLink,
-      platform: platform,
-    });
-    if (mode === "compare" && competitorLink) {
-      params.append("competitor", competitorLink);
-      params.append("mode", "compare");
-    }
-    return `${base}?${params.toString()}`;
-  };
+  const [hasAnalysis, setHasAnalysis] = useState(false); // Toggle for demo purposes
 
   return (
-    <div className="grid place-items-center w-[1240px]">
-      <div className="flex flex-col justify-center items-center relative overflow-hidden font-sans p-6">
+    <div className="relative min-h-screen bg-[#F9F9FB] font-sans text-gray-900 overflow-x-hidden">
+      <MotionBackground />
+
+      <div className="relative z-10 p-4 md:p-8 max-w-7xl mx-auto pb-24">
+        {/* Header Section */}
         <motion.div
-          className="relative z-10 bg-white p-12 max-w-2xl w-full shadow-[0_2px_12px_rgba(0,0,0,0.04)] rounded-[24px] border border-gray-100/50"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="mb-8 flex justify-between items-end"
         >
-          <motion.h1
-            className="text-gray-900 text-3xl font-bold text-center mb-2 tracking-tight leading-tight"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.3 }}
+          {/* Dev Toggle - Remove in production */}
+          <button
+            onClick={() => setHasAnalysis(!hasAnalysis)}
+            className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
           >
-            Optimize Your Social Presence
-          </motion.h1>
-
-          <motion.p
-            className="text-gray-500 text-[15px] text-center mb-10 font-medium tracking-tight"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.15, duration: 0.3 }}
-          >
-            Get AI-powered insights for any platform
-          </motion.p>
-
-          {/* Platform Selector */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.3 }}
-          >
-            <PlatformSelector selected={platform} onSelect={setPlatform} />
-          </motion.div>
-
-          {/* Mode Toggle */}
-          <motion.div
-            className="flex justify-center gap-1.5 mb-10 p-1.5 bg-gray-50 rounded-full w-fit mx-auto border border-gray-100"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.25, duration: 0.3 }}
-          >
-            <motion.button
-              className={`px-6 py-2.5 rounded-full text-sm font-semibold cursor-pointer transition-all duration-200 border-none flex items-center gap-2 ${
-                mode === "solo"
-                  ? "bg-white text-indigo-600 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
-                  : "bg-transparent text-gray-500 hover:text-gray-900 hover:bg-black/5"
-              }`}
-              onClick={() => setMode("solo")}
-              whileTap={{ scale: 0.98 }}
-            >
-              Analyze Profile
-            </motion.button>
-            <motion.button
-              className={`px-6 py-2.5 rounded-full text-sm font-semibold cursor-pointer transition-all duration-200 border-none flex items-center gap-2 ${
-                mode === "compare"
-                  ? "bg-white text-indigo-600 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
-                  : "bg-transparent text-gray-500 hover:text-gray-900 hover:bg-black/5"
-              }`}
-              onClick={() => setMode("compare")}
-              whileTap={{ scale: 0.98 }}
-            >
-              Compare
-            </motion.button>
-          </motion.div>
-
-          {/* Input Fields */}
-          <div className="flex flex-col gap-7">
-            <motion.div
-              className="relative"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.3 }}
-            >
-              <label className="block text-gray-700 text-xs font-bold mb-2.5 uppercase tracking-wide ml-1.5">
-                Your {platformConfig.name} Profile
-              </label>
-              <div className="relative flex items-center group">
-                <span className="absolute left-5 z-10 flex items-center justify-center pointer-events-none transition-colors duration-200 text-gray-400 group-focus-within:text-indigo-600">
-                  {React.createElement(platformConfig.icon, { size: 18 })}
-                </span>
-                <input
-                  type="text"
-                  className={`w-full py-4 px-6 pl-[54px] rounded-2xl border-none bg-[#F9FAFB] text-sm text-gray-900 transition-all duration-200 font-medium ring-1 ring-transparent hover:bg-gray-100 focus:outline-none focus:bg-white focus:ring-gray-200 placeholder:text-gray-400 placeholder:font-normal ${
-                    profileLink && !isValidUrl
-                      ? "ring-red-500/20 bg-red-50/50"
-                      : ""
-                  }`}
-                  placeholder={platformConfig.placeholder}
-                  value={profileLink}
-                  onChange={(e) => setProfileLink(e.target.value)}
-                />
-                {profileLink && isValidUrl && (
-                  <span className="absolute right-5 text-emerald-500 bg-emerald-50 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold pointer-events-none animate-in fade-in zoom-in duration-300">
-                    ✓
-                  </span>
-                )}
-              </div>
-              <AnimatePresence>
-                {profileLink && !isValidUrl && (
-                  <motion.p
-                    className="flex items-center gap-1.5 text-red-500 text-[13px] mt-2 font-medium ml-1.5"
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                  >
-                    Please enter a valid {platformConfig.name} URL
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </motion.div>
-
-            <AnimatePresence>
-              {mode === "compare" && (
-                <motion.div
-                  className="relative"
-                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                  animate={{ opacity: 1, height: "auto", marginTop: 4 }}
-                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                >
-                  <label className="block text-gray-700 text-xs font-bold mb-2.5 uppercase tracking-wide ml-1.5">
-                    Competitor&apos;s {platformConfig.name} Profile
-                  </label>
-                  <div className="relative flex items-center group">
-                    <span className="absolute left-5 z-10 flex items-center justify-center pointer-events-none transition-colors duration-200 text-gray-400 group-focus-within:text-indigo-600">
-                      <BsArrowRepeat size={18} />
-                    </span>
-                    <input
-                      type="text"
-                      className="w-full py-5 px-6 pl-[54px] rounded-[18px] border-2 border-gray-100 bg-gray-50 text-base text-gray-900 transition-all duration-200 font-medium hover:border-gray-200 hover:bg-white focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 placeholder:text-gray-400 placeholder:font-normal"
-                      placeholder={platformConfig.placeholder}
-                      value={competitorLink}
-                      onChange={(e) => setCompetitorLink(e.target.value)}
-                    />
-                    {competitorLink &&
-                      validatePlatformUrl(competitorLink, platform) && (
-                        <span className="absolute right-5 text-emerald-500 bg-emerald-50 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold pointer-events-none animate-in fade-in zoom-in duration-300">
-                          ✓
-                        </span>
-                      )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Analyze Button */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.35, duration: 0.3 }}
-          >
-            <Link
-              href={isValid ? getAnalyzeUrl() : "#"}
-              className={`flex items-center justify-center gap-3 w-[620px] py-4 px-8 mt-8 rounded-full border-none text-[15px] font-bold cursor-pointer no-underline transition-all duration-300 shadow-md hover:translate-y-[-1px] hover:shadow-lg active:scale-[0.98] group ${
-                !isValid
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
-                  : "bg-black text-white shadow-gray-200"
-              }`}
-              onClick={(e) => !isValid && e.preventDefault()}
-            >
-              <BsSend
-                size={14}
-                className={`transition-transform mb-0.5 ${
-                  isValid ? "group-hover:rotate-12" : ""
-                }`}
-              />
-              Analyze {platformConfig.name}
-            </Link>
-          </motion.div>
+            [Dev: Toggle Analysis View]
+          </button>
         </motion.div>
+
+        {!hasAnalysis ? (
+          /* --- STATE 1: GUIDE / LANDING --- */
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-12"
+          >
+            {/* Left: Value Prop & CTA */}
+            <div className="space-y-8">
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 leading-[1.1]">
+                Audit any profile <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">
+                  in seconds.
+                </span>
+              </h2>
+              <p className="text-lg text-gray-500 font-medium leading-relaxed max-w-md">
+                Stop guessing why you're not growing. Get a deep-dive audit of
+                your content strategy, audience, and revenue funnels.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="px-8 py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-xl shadow-gray-900/20 hover:scale-[1.02] active:scale-[0.98]">
+                  <FaChrome size={20} />
+                  Download Extension
+                </button>
+                <button className="px-8 py-4 bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all">
+                  Watch Demo <FaArrowRight size={12} />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-4 pt-4">
+                <div className="flex -space-x-3">
+                  {[10, 11, 12, 13].map((i) => (
+                    <div
+                      key={i}
+                      className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 overflow-hidden"
+                    >
+                      <img
+                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`}
+                        alt="User"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm font-bold text-gray-500">
+                  Join <span className="text-gray-900">5,000+ marketers</span>{" "}
+                  using ReachPilot.
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Visual Steps */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-tr from-violet-500/10 to-indigo-500/10 rounded-[40px] blur-3xl" />
+              <div className="relative bg-white/60 backdrop-blur-xl border border-white/50 rounded-[32px] p-8 shadow-2xl shadow-indigo-500/10">
+                <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-violet-500" /> How it
+                  works
+                </h3>
+
+                <div className="space-y-6">
+                  {[
+                    {
+                      step: "01",
+                      title: "Install & Pin",
+                      desc: "Add the ReachPilot extension to your browser.",
+                    },
+                    {
+                      step: "02",
+                      title: "Visit Profile",
+                      desc: "Go to any LinkedIn or Twitter profile you want to audit.",
+                    },
+                    {
+                      step: "03",
+                      title: "One-Click Audit",
+                      desc: "Open the extension and click 'Run Deep Scan'.",
+                    },
+                    {
+                      step: "04",
+                      title: "Growth Blueprint",
+                      desc: "Get a complete breakdown of their pillars, funnel, and strategy.",
+                    },
+                  ].map((item, i) => (
+                    <div key={i} className="flex gap-4 group">
+                      <div className="w-10 h-10 rounded-xl bg-gray-50 text-gray-300 font-bold flex items-center justify-center border border-gray-100 group-hover:bg-violet-50 group-hover:text-violet-600 group-hover:border-violet-100 transition-colors">
+                        {item.step}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-sm group-hover:text-violet-700 transition-colors">
+                          {item.title}
+                        </h4>
+                        <p className="text-sm text-gray-500 leading-snug">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          /* --- STATE 2: ANALYSIS DASHBOARD --- */
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-4"
+          >
+            <AnalyzedAccountPage />
+          </motion.div>
+        )}
       </div>
     </div>
   );

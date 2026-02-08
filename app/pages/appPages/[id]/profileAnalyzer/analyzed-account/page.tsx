@@ -29,10 +29,23 @@ import ViralRecipe, {
 import VoiceSpectrum, {
   VoiceData,
 } from "../../../components/VoiceSpectrum/VoiceSpectrum";
-import SentimentMap from "../../../components/SentimentMap/SentimentMap";
-import ActiveHours from "../../../components/ActiveHours/ActiveHours";
-import CrowdPersonas from "../../../components/CrowdPersonas/CrowdPersonas";
-import QuestionCloud from "../../../components/QuestionCloud/QuestionCloud";
+import SentimentMap, {
+  CrowdAnalysisData,
+} from "../../../components/SentimentMap/SentimentMap";
+import ActiveHours, {
+  ActiveHourData,
+} from "../../../components/ActiveHours/ActiveHours";
+import CrowdPersonas, {
+  CrowdPersonaData,
+} from "../../../components/CrowdPersonas/CrowdPersonas";
+import QuestionCloud, {
+  KeywordNode,
+} from "../../../components/QuestionCloud/QuestionCloud";
+import EthicalBribe from "../../../components/EthicalBribe/EthicalBribe";
+import CTACommand from "../../../components/CTACommand/CTACommand";
+import StackFingerprint from "../../../components/StackFingerprint/StackFingerprint";
+import ValueLadder from "../../../components/ValueLadder/ValueLadder";
+import GrowthCommand from "../../../components/GrowthCommand/GrowthCommand";
 import LoadingScreen from "../../../components/LoadingScreen/LoadingScreen";
 import { ErrorState } from "../../../components/ErrorState/ErrorState";
 import AnalyzerTabs from "../../../components/Shared/AnalyzerTabs";
@@ -68,79 +81,286 @@ interface AnalysisData {
   textAnalysis: { frequency: string; contentMix: string; engagement: string };
 
   // Phase 2 Deep Analysis Data
+  // Phase 2 Deep Analysis Data
   csiScore?: number;
+
+  // The Lab Data
   contentPillars?: PillarData[];
+  velocity?: VelocityData;
+  triggers?: PsychData[];
+  postFatigue?: FatigueData;
+  competitorGap?: GapData;
+  viralRecipe?: ViralPostData[];
+  voiceSpectrum?: VoiceData;
+
+  // The Crowd Data
+  crowdSentiment?: CrowdAnalysisData;
+  activeHours?: ActiveHourData[];
+  crowdPersonas?: CrowdPersonaData;
+  keywordCloud?: KeywordNode[];
 }
+
+const MOCK_PILLARS: PillarData[] = [
+  {
+    name: "Educational",
+    percentage: 45,
+    count: 22,
+    avgEngagement: "4.2%",
+    color: "#8b5cf6",
+    description: "Tutorials, How-to, Industry News",
+    topPosts: [
+      {
+        id: "1",
+        type: "Reel",
+        engagementRate: "5.1%",
+        captionSnippet: "3 steps to master the algorithm in 2024...",
+      },
+      {
+        id: "2",
+        type: "Carousel",
+        engagementRate: "4.8%",
+        captionSnippet: "The ultimate guide to Next.js routing...",
+      },
+      {
+        id: "3",
+        type: "Reel",
+        engagementRate: "4.5%",
+        captionSnippet: "Stop doing this mistake in your code...",
+      },
+    ],
+  },
+  {
+    name: "Personal",
+    percentage: 25,
+    count: 12,
+    avgEngagement: "6.1%",
+    color: "#ec4899",
+    description: "Behind the scenes, Finder stories",
+    topPosts: [
+      {
+        id: "4",
+        type: "Image",
+        engagementRate: "6.5%",
+        captionSnippet: "My workspace setup for 2024!",
+      },
+    ],
+  },
+  {
+    name: "Promotional",
+    percentage: 15,
+    count: 7,
+    avgEngagement: "2.1%",
+    color: "#f59e0b",
+    description: "Sales, Launches, Discounts",
+    topPosts: [],
+  },
+  {
+    name: "Engagement",
+    percentage: 15,
+    count: 7,
+    avgEngagement: "3.5%",
+    color: "#10b981",
+    description: "Memes, Polls, Questions",
+    topPosts: [],
+  },
+];
+
+const MOCK_VELOCITY: VelocityData = {
+  hookRate: 88,
+  category: "Flash",
+  velocityGraph: [
+    { hour: "1h", engagement: 320 },
+    { hour: "2h", engagement: 680 },
+    { hour: "4h", engagement: 750 },
+    { hour: "12h", engagement: 810 },
+    { hour: "24h", engagement: 830 },
+  ],
+  insight:
+    "This competitor uses 'Open Loop' hooks. Their posts get 82% of total engagement in the first 2 hours.",
+};
+
+const MOCK_PSYCH: PsychData = {
+  radarData: [
+    { trigger: "Authority", score: 85, fullMark: 100 },
+    { trigger: "Scarcity", score: 30, fullMark: 100 },
+    { trigger: "Social Proof", score: 95, fullMark: 100 },
+    { trigger: "Reciprocity", score: 60, fullMark: 100 },
+    { trigger: "Liking", score: 75, fullMark: 100 },
+    { trigger: "Curiosity", score: 50, fullMark: 100 },
+  ],
+  winningTrigger: "Social Proof",
+  insight:
+    "This brand leans heavily into Social Proof. Their engagement spikes by 40% when they use testimonials or user results.",
+};
+
+const MOCK_FATIGUE: FatigueData = {
+  status: "Saturated",
+  fatigueScore: 45,
+  optimalFrequency: "3-4 posts/week",
+  saturationPoint: 5,
+  weeklyImpact: [
+    { day: "Mon", posts: 1, impactScore: 1.1 },
+    { day: "Tue", posts: 0, impactScore: 1.0 },
+    { day: "Wed", posts: 2, impactScore: 0.6 },
+    { day: "Thu", posts: 1, impactScore: 0.9 },
+    { day: "Fri", posts: 1, impactScore: 1.2 },
+    { day: "Sat", posts: 0, impactScore: 1.0 },
+    { day: "Sun", posts: 1, impactScore: 1.05 },
+  ],
+};
+
+const MOCK_GAPS: GapData = {
+  metrics: [
+    {
+      category: "Reels",
+      profileValue: 75,
+      benchmarkValue: 40,
+      gapType: "Over-indexed",
+    },
+    {
+      category: "Carousels",
+      profileValue: 10,
+      benchmarkValue: 35,
+      gapType: "Opportunity",
+    },
+    {
+      category: "Static",
+      profileValue: 15,
+      benchmarkValue: 25,
+      gapType: "Opportunity",
+    },
+  ],
+  topOpportunity: "High-Value Carousels",
+  insight:
+    "This profile posts 75% Reels, but the industry average is only 40%. They are completely missing the 35% 'Carousel' market that drives saves & shares.",
+  recommendations: [
+    "Repurpose their top Reel into a 'Step-by-Step' Carousel.",
+    "Post a 'Industry Update' slide deck on Tuesday (their silent day).",
+    "Create a 'Checklist' graphic for their audience to save.",
+  ],
+};
+
+const MOCK_VIRAL: ViralPostData = {
+  id: "outlier-1",
+  engagementMultiplier: "5.2x",
+  hookType: "Controversial Statement",
+  hookText: "Stop using useEffect for data fetching.",
+  ingredients: [
+    {
+      name: "Caption Density",
+      value: "Short & Punchy (Under 150 chars)",
+      score: 9,
+    },
+    {
+      name: "Emoji Saturation",
+      value: "Minimalist (Only 2 emojis)",
+      score: 8,
+    },
+    {
+      name: "Visual Sentiment",
+      value: "High Contrast / Bold Text",
+      score: 9,
+    },
+  ],
+  whyItWorked:
+    "This post challenged a common developer habit (Controversy) and offered a simpler alternative immediately, creating a high 'Share' impulse.",
+  templateStructure: [
+    "HOOK: [Stop doing Common Habit X]",
+    "BODY: [Explain why it's bad/slow]",
+    "SOLUTION: [Introduce Better Alternative Y]",
+    "CTA: [Save this for your next project]",
+  ],
+};
+
+const MOCK_VOICE: VoiceData = {
+  personaName: "The Scholarly Authority",
+  axes: [
+    { id: "tone", leftLabel: "Professional", rightLabel: "Casual", score: 2 },
+    {
+      id: "logic",
+      leftLabel: "Scientific",
+      rightLabel: "Emotional",
+      score: 9,
+    },
+    {
+      id: "energy",
+      leftLabel: "Minimalist",
+      rightLabel: "High-Energy",
+      score: 3,
+    },
+    {
+      id: "access",
+      leftLabel: "Exclusive",
+      rightLabel: "Accessible",
+      score: 5,
+    },
+  ],
+  signatureWords: ["Framework", "Analysis", "Deep-dive", "Nuance", "Strategic"],
+  insight:
+    "This brand wins by being the 'smartest person in the room.' They use a highly Professional and Scientific tone. Opportunity: There is zero 'Relatable' content here.",
+};
 
 function AnalysisContent() {
   const searchParams = useSearchParams();
   const link = searchParams.get("link");
 
   const [activeTab, setActiveTab] = useState("Pulse");
-  const [data, setData] = useState<AnalysisData | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  // Merged Mock Data
+  const initialData: AnalysisData = {
+    profile: {
+      name: "Alex Hormozi Fan",
+      headline: "Scaling companies to $100M+ | Acquisition.com",
+      followers: 124500,
+      projects: "3",
+      profileScore: 78,
+    },
+    quickFixes: [
+      {
+        headline: "Optimize Headline Keyowrds",
+        description:
+          "Add 'SaaS' and 'Founder' to rank for high-value searches.",
+        tag: "HIGH IMPACT",
+      },
+      {
+        headline: "Update Featured Section",
+        description: "Your top link is broken. Switch to your newsletter.",
+        tag: "MEDIUM IMPACT",
+      },
+    ],
+    bioAnalysis: {
+      clarityScore: 8,
+      keywordScore: 7,
+      tone: "Authoritative",
+      strengths: ["Clear Value Prop", "Strong Social Proof"],
+      weaknesses: ["Missing specific niche keywords"],
+      suggestions: ["Add 'Investor' to headline"],
+    },
+    keywords: {
+      current: ["Business", "Scaling", "Money"],
+      missing: ["SaaS", "B2B", "Equity"],
+    },
+    textAnalysis: {
+      frequency: "Daily",
+      contentMix: "Video Heavy",
+      engagement: "High",
+    },
+    csiScore: 78,
+    contentPillars: MOCK_PILLARS,
+    velocity: MOCK_VELOCITY,
+    triggers: MOCK_PSYCH,
+    postFatigue: MOCK_FATIGUE,
+    competitorGap: MOCK_GAPS,
+    viralRecipe: [MOCK_VIRAL],
+    voiceSpectrum: MOCK_VOICE,
+  };
+
+  const [data, setData] = useState<AnalysisData>(initialData);
+  const [loading, setLoading] = useState(false); // No loading for mock
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!link) {
-      setError("No link provided.");
-      setLoading(false);
-      return;
-    }
-    const fetchData = async () => {
-      try {
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ link }),
-        });
-        if (!res.ok) throw new Error("Server Error");
-        setData(await res.json());
-      } catch (err) {
-        console.error(err);
-        setError("Analysis Failed.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [link]);
-
-  // Retry function
   const handleRetry = () => {
-    setError("");
-    setLoading(true);
-    setData(null);
-    // Re-trigger fetch
-    if (link) {
-      fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          link,
-          platform: searchParams.get("platform") || "linkedin",
-        }),
-      })
-        .then(async (res) => {
-          if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(errorText || "Server Error");
-          }
-          return res.json();
-        })
-        .then((data) => {
-          if (data && typeof data === "object") {
-            setData(data);
-          } else {
-            throw new Error("Invalid response format");
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          setError("Analysis Failed. Please check the URL and try again.");
-        })
-        .finally(() => setLoading(false));
-    }
+    window.location.reload();
   };
 
   if (loading) return <LoadingScreen link={link || ""} />;
@@ -169,212 +389,6 @@ function AnalysisContent() {
     },
   };
 
-  const MOCK_PILLARS: PillarData[] = [
-    {
-      name: "Educational",
-      percentage: 45,
-      count: 22,
-      avgEngagement: "4.2%",
-      color: "#8b5cf6",
-      description: "Tutorials, How-to, Industry News",
-      topPosts: [
-        {
-          id: "1",
-          type: "Reel",
-          engagementRate: "5.1%",
-          captionSnippet: "3 steps to master the algorithm in 2024...",
-        },
-        {
-          id: "2",
-          type: "Carousel",
-          engagementRate: "4.8%",
-          captionSnippet: "The ultimate guide to Next.js routing...",
-        },
-        {
-          id: "3",
-          type: "Reel",
-          engagementRate: "4.5%",
-          captionSnippet: "Stop doing this mistake in your code...",
-        },
-      ],
-    },
-    {
-      name: "Personal",
-      percentage: 25,
-      count: 12,
-      avgEngagement: "6.1%",
-      color: "#ec4899",
-      description: "Behind the scenes, Finder stories",
-      topPosts: [
-        {
-          id: "4",
-          type: "Image",
-          engagementRate: "6.5%",
-          captionSnippet: "My workspace setup for 2024!",
-        },
-      ],
-    },
-    {
-      name: "Promotional",
-      percentage: 15,
-      count: 7,
-      avgEngagement: "2.1%",
-      color: "#f59e0b",
-      description: "Sales, Launches, Discounts",
-      topPosts: [],
-    },
-    {
-      name: "Engagement",
-      percentage: 15,
-      count: 7,
-      avgEngagement: "3.5%",
-      color: "#10b981",
-      description: "Memes, Polls, Questions",
-      topPosts: [],
-    },
-  ];
-
-  const MOCK_VELOCITY: VelocityData = {
-    hookRate: 88,
-    category: "Flash",
-    velocityGraph: [
-      { hour: "1h", engagement: 320 },
-      { hour: "2h", engagement: 680 },
-      { hour: "4h", engagement: 750 },
-      { hour: "12h", engagement: 810 },
-      { hour: "24h", engagement: 830 },
-    ],
-    insight:
-      "This competitor uses 'Open Loop' hooks. Their posts get 82% of total engagement in the first 2 hours.",
-  };
-
-  const MOCK_PSYCH: PsychData = {
-    radarData: [
-      { trigger: "Authority", score: 85, fullMark: 100 },
-      { trigger: "Scarcity", score: 30, fullMark: 100 },
-      { trigger: "Social Proof", score: 95, fullMark: 100 },
-      { trigger: "Reciprocity", score: 60, fullMark: 100 },
-      { trigger: "Liking", score: 75, fullMark: 100 },
-      { trigger: "Curiosity", score: 50, fullMark: 100 },
-    ],
-    winningTrigger: "Social Proof",
-    insight:
-      "This brand leans heavily into Social Proof. Their engagement spikes by 40% when they use testimonials or user results.",
-  };
-
-  const MOCK_FATIGUE: FatigueData = {
-    status: "Saturated",
-    fatigueScore: 45,
-    optimalFrequency: "3-4 posts/week",
-    saturationPoint: 5,
-    weeklyImpact: [
-      { day: "Mon", posts: 1, impactScore: 1.1 },
-      { day: "Tue", posts: 0, impactScore: 1.0 },
-      { day: "Wed", posts: 2, impactScore: 0.6 },
-      { day: "Thu", posts: 1, impactScore: 0.9 },
-      { day: "Fri", posts: 1, impactScore: 1.2 },
-      { day: "Sat", posts: 0, impactScore: 1.0 },
-      { day: "Sun", posts: 1, impactScore: 1.05 },
-    ],
-  };
-
-  const MOCK_GAPS: GapData = {
-    metrics: [
-      {
-        category: "Reels",
-        profileValue: 75,
-        benchmarkValue: 40,
-        gapType: "Over-indexed",
-      },
-      {
-        category: "Carousels",
-        profileValue: 10,
-        benchmarkValue: 35,
-        gapType: "Opportunity",
-      },
-      {
-        category: "Static",
-        profileValue: 15,
-        benchmarkValue: 25,
-        gapType: "Opportunity",
-      },
-    ],
-    topOpportunity: "High-Value Carousels",
-    insight:
-      "This profile posts 75% Reels, but the industry average is only 40%. They are completely missing the 35% 'Carousel' market that drives saves & shares.",
-    recommendations: [
-      "Repurpose their top Reel into a 'Step-by-Step' Carousel.",
-      "Post a 'Industry Update' slide deck on Tuesday (their silent day).",
-      "Create a 'Checklist' graphic for their audience to save.",
-    ],
-  };
-
-  const MOCK_VIRAL: ViralPostData = {
-    id: "outlier-1",
-    engagementMultiplier: "5.2x",
-    hookType: "Controversial Statement",
-    hookText: "Stop using useEffect for data fetching.",
-    ingredients: [
-      {
-        name: "Caption Density",
-        value: "Short & Punchy (Under 150 chars)",
-        score: 9,
-      },
-      {
-        name: "Emoji Saturation",
-        value: "Minimalist (Only 2 emojis)",
-        score: 8,
-      },
-      {
-        name: "Visual Sentiment",
-        value: "High Contrast / Bold Text",
-        score: 9,
-      },
-    ],
-    whyItWorked:
-      "This post challenged a common developer habit (Controversy) and offered a simpler alternative immediately, creating a high 'Share' impulse.",
-    templateStructure: [
-      "HOOK: [Stop doing Common Habit X]",
-      "BODY: [Explain why it's bad/slow]",
-      "SOLUTION: [Introduce Better Alternative Y]",
-      "CTA: [Save this for your next project]",
-    ],
-  };
-
-  const MOCK_VOICE: VoiceData = {
-    personaName: "The Scholarly Authority",
-    axes: [
-      { id: "tone", leftLabel: "Professional", rightLabel: "Casual", score: 2 },
-      {
-        id: "logic",
-        leftLabel: "Scientific",
-        rightLabel: "Emotional",
-        score: 9,
-      },
-      {
-        id: "energy",
-        leftLabel: "Minimalist",
-        rightLabel: "High-Energy",
-        score: 3,
-      },
-      {
-        id: "access",
-        leftLabel: "Exclusive",
-        rightLabel: "Accessible",
-        score: 5,
-      },
-    ],
-    signatureWords: [
-      "Framework",
-      "Analysis",
-      "Deep-dive",
-      "Nuance",
-      "Strategic",
-    ],
-    insight:
-      "This brand wins by being the 'smartest person in the room.' They use a highly Professional and Scientific tone. Opportunity: There is zero 'Relatable' content here.",
-  };
-
   return (
     <>
       <OnboardingTour />
@@ -400,6 +414,16 @@ function AnalysisContent() {
                     id: "Crowd",
                     label: "The Crowd",
                     icon: <span>👥</span>,
+                  },
+                  {
+                    id: "Blueprint",
+                    label: "The Blueprint",
+                    icon: <span>🗺️</span>,
+                  },
+                  {
+                    id: "Growth",
+                    label: "Growth Command",
+                    icon: <span>🚀</span>,
                   },
                 ]}
                 activeTab={activeTab}
@@ -615,6 +639,90 @@ function AnalysisContent() {
                         <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
                           <QuestionCloud />
                         </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                {/* --- Zone 4: The Blueprint (Action Plan) --- */}
+                {activeTab === "Blueprint" && (
+                  <motion.div
+                    key="Blueprint"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="flex flex-col gap-6"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🗺️</span>
+                        <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
+                          The Blueprint
+                        </h3>
+                      </div>
+                      <div className="flex gap-2">
+                        <span className="px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full text-xs font-bold shadow-sm">
+                          Strategic Roadmap
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-12 gap-5">
+                      {/* Row 1: Ethical Bribe (Lead Magnet) */}
+                      <div className="col-span-12 md:col-span-6 lg:col-span-5 min-h-[400px]">
+                        <EthicalBribe />
+                      </div>
+
+                      {/* Row 1: CTA Command Center */}
+                      <div className="col-span-12 md:col-span-6 lg:col-span-7 min-h-[400px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <CTACommand />
+                        </div>
+                      </div>
+
+                      {/* Row 2: Stack Fingerprinting */}
+                      <div className="col-span-12 md:col-span-4 min-h-[300px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <StackFingerprint />
+                        </div>
+                      </div>
+
+                      {/* Row 2: Value Ladder Reconstruction */}
+                      <div className="col-span-12 md:col-span-8 min-h-[300px]">
+                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
+                          <ValueLadder />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                {/* --- Zone 5: Growth Command (Simulation & Execution) --- */}
+                {activeTab === "Growth" && (
+                  <motion.div
+                    key="Growth"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="flex flex-col gap-6"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🚀</span>
+                        <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
+                          Growth Command
+                        </h3>
+                      </div>
+                      <div className="flex gap-2">
+                        <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-xs font-bold shadow-sm">
+                          Simulation & Execution
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-12 gap-5">
+                      <div className="col-span-12 min-h-[400px]">
+                        <GrowthCommand />
                       </div>
                     </div>
                   </motion.div>

@@ -129,7 +129,7 @@ const Sidebar = () => {
               {[
                 { name: "Persona Builder", path: "accountPersona" },
                 { name: "Profile Analyzer", path: "profileAnalyzer" },
-                { name: "Profile Comparison", path: "profileComparison" },
+                { name: "Post Analyzer", path: "postAnalyzer" },
                 { name: "Post Generator", path: "postGenerator" },
                 { name: "Template Library", path: "templateLibrary" },
                 { name: "ThreadPilot", path: "threadPilot" },

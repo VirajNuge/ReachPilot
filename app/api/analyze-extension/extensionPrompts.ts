@@ -13,13 +13,23 @@ function getPlatformName(platform: string): string {
   return names[platform] || platform;
 }
 
+// Normalize extension platform names to canonical Platform type names
+function normalizePlatform(platform: string): Platform {
+  const normalized: Record<string, Platform> = {
+    x: "twitter", // Extension outputs "x", but benchmarks use "twitter"
+    linkedin: "linkedin",
+    facebook: "facebook",
+    instagram: "instagram",
+  };
+  return normalized[platform.toLowerCase()] || "linkedin";
+}
+
 export function buildExtensionPrompt(
   formattedData: string,
   platform: string,
 ): string {
-  const platformType = (platform as Platform) || "linkedin";
-  const benchmarks =
-    PLATFORM_BENCHMARKS[platformType] || PLATFORM_BENCHMARKS.linkedin;
+  const platformType = normalizePlatform(platform);
+  const benchmarks = PLATFORM_BENCHMARKS[platformType];
   const platformName = getPlatformName(platform);
 
   return `

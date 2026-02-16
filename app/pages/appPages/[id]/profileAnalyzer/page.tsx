@@ -1,13 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { FaChrome, FaArrowRight, FaSearch } from "react-icons/fa";
 import MotionBackground from "../../components/Shared/MotionBackground";
 import AnalyzedAccountPage from "./analyzed-account/page";
 
 export default function UnifiedAnalyzerPage() {
-  const [hasAnalysis, setHasAnalysis] = useState(false); // Toggle for demo purposes
+  const searchParams = useSearchParams();
+  const isFromExtension = searchParams.get("source") === "extension";
+
+  // Auto-show dashboard when coming from extension, otherwise use toggle
+  const [hasAnalysis, setHasAnalysis] = useState(isFromExtension);
 
   return (
     <div className="relative min-h-screen bg-[#F9F9FB] font-sans text-gray-900 overflow-x-hidden">

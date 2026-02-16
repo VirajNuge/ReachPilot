@@ -7,13 +7,39 @@ import { buildExtensionPrompt } from "./extensionPrompts";
 // CORS headers for extension requests
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
+
+// In-memory cache of the latest analysis (persists across requests in the same server process)
+let latestAnalysisCache: {
+  analysis: any;
+  platform: string;
+  postCount: number;
+  timestamp: number;
+} | null = null;
 
 // Handle CORS preflight
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
+
+// GET: Retrieve cached analysis for the dashboard
+export async function GET() {
+  if (!latestAnalysisCache) {
+    return NextResponse.json(
+      { error: "No analysis available yet. Run the extension first." },
+      { status: 404, headers: corsHeaders },
+    );
+  }
+
+  return NextResponse.json(
+    {
+      success: true,
+      ...latestAnalysisCache,
+    },
+    { headers: corsHeaders },
+  );
 }
 
 export async function POST(req: Request) {
@@ -71,8 +97,15 @@ export async function POST(req: Request) {
       `[analyze-extension] Gemini response received (${analysisText.length} chars)`,
     );
 
-    // 6. Parse and return the structured analysis
+    // 6. Parse and cache the structured analysis
     const analysis = JSON.parse(analysisText);
+
+    latestAnalysisCache = {
+      analysis,
+      platform,
+      postCount,
+      timestamp: Date.now(),
+    };
 
     return NextResponse.json(
       {

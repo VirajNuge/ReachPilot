@@ -3,6 +3,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { analysisSchema } from "@/lib/analysisSchema";
 import { formatExtensionData } from "./extensionDataFormatter";
 import { buildExtensionPrompt } from "./extensionPrompts";
+import fs from "fs/promises";
+import path from "path";
 
 // CORS headers for extension requests
 const corsHeaders = {
@@ -11,14 +13,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-// In-memory cache of the latest analysis (persists across requests in the same server process)
-let latestAnalysisCache: {
-  analysis: any;
-  platform: string;
-  postCount: number;
-  source?: string;
-  timestamp: number;
-} | null = null;
+// File path for caching (persists across dev server restarts)
+const CACHE_FILE_PATH = path.join(process.cwd(), "analysis_cache.json");
 
 // Handle CORS preflight
 export async function OPTIONS() {
@@ -27,20 +23,24 @@ export async function OPTIONS() {
 
 // GET: Retrieve cached analysis for the dashboard
 export async function GET() {
-  if (!latestAnalysisCache) {
+  try {
+    const data = await fs.readFile(CACHE_FILE_PATH, "utf-8");
+    const cachedAnalysis = JSON.parse(data);
+
+    return NextResponse.json(
+      {
+        success: true,
+        ...cachedAnalysis,
+      },
+      { headers: corsHeaders },
+    );
+  } catch (error) {
+    // File doesn't exist or error reading
     return NextResponse.json(
       { error: "No analysis available yet. Run the extension first." },
       { status: 404, headers: corsHeaders },
     );
   }
-
-  return NextResponse.json(
-    {
-      success: true,
-      ...latestAnalysisCache,
-    },
-    { headers: corsHeaders },
-  );
 }
 
 export async function POST(req: Request) {
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
     // 6. Parse and cache the structured analysis
     const analysis = JSON.parse(analysisText);
 
-    latestAnalysisCache = {
+    const cacheData = {
       analysis,
       platform,
       postCount,
@@ -110,13 +110,13 @@ export async function POST(req: Request) {
       timestamp: Date.now(),
     };
 
+    // Write to file for persistence
+    await fs.writeFile(CACHE_FILE_PATH, JSON.stringify(cacheData, null, 2));
+
     return NextResponse.json(
       {
         success: true,
-        platform,
-        postCount,
-        source,
-        analysis,
+        ...cacheData,
       },
       { headers: corsHeaders },
     );

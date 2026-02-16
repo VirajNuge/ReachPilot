@@ -6,35 +6,15 @@ import {
   FaQuoteLeft,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { CrowdPersonaData, Archetype } from "@/lib/types/analysis";
 
-// --- Types ---
-
-export interface Archetype {
-  id: string;
-  role: string; // e.g., "The Agency Owner"
-  icon: React.ReactNode;
-  color: string;
-  bio: string; // "Focused on scaling team..."
-  percentage: number; // prevalence in comments
-  triggers: string[]; // "Scalability", "Client Acquisition"
-  painPoints: string[]; // "Hiring", "Retention"
-}
-
-export interface CrowdPersonaData {
-  primaryArchetype: Archetype;
-  secondaryArchetypes: Archetype[];
-  insight: {
-    title: string;
-    description: string;
-    actionable: string;
-  };
-}
+// --- Mock Data ---
 
 const MOCK_PERSONAS: CrowdPersonaData = {
   primaryArchetype: {
     id: "1",
     role: "The Mid-Level Dev",
-    icon: <FaLaptopCode />,
+    iconName: "LaptopCode",
     color: "#3b82f6", // Blue-500
     bio: "Backend-focused, uses Next.js professionally. Wants to move from Junior to Senior.",
     percentage: 55,
@@ -45,7 +25,7 @@ const MOCK_PERSONAS: CrowdPersonaData = {
     {
       id: "2",
       role: "The Agency Founder",
-      icon: <FaUserTie />,
+      iconName: "UserTie",
       color: "#8b5cf6", // Violet-500
       bio: "Selling web services to local businesses. Cared about speed and margins.",
       percentage: 30,
@@ -55,7 +35,7 @@ const MOCK_PERSONAS: CrowdPersonaData = {
     {
       id: "3",
       role: "The Indie Hacker",
-      icon: <FaBullhorn />,
+      iconName: "Bullhorn",
       color: "#10b981", // Emerald-500
       bio: "Building SaaS in public. Obsessed with MRR and marketing.",
       percentage: 15,
@@ -70,6 +50,20 @@ const MOCK_PERSONAS: CrowdPersonaData = {
     actionable:
       "Stop posting 'How to use map()'. Start posting 'Advanced Server Actions Patterns'.",
   },
+};
+
+// --- Helper ---
+const getIcon = (name: string) => {
+  switch (name) {
+    case "UserTie":
+      return <FaUserTie />;
+    case "LaptopCode":
+      return <FaLaptopCode />;
+    case "Bullhorn":
+      return <FaBullhorn />;
+    default:
+      return <FaUserTie />;
+  }
 };
 
 // --- Component ---
@@ -132,7 +126,7 @@ export default function CrowdPersonas({
                   className="absolute top-0 right-0 p-2 opacity-10"
                   style={{ color: persona.color }}
                 >
-                  {persona.icon}
+                  {getIcon(persona.iconName)}
                 </div>
                 <div className="z-10 text-xs font-bold uppercase tracking-wider opacity-70">
                   {persona.percentage}%
@@ -159,14 +153,14 @@ export default function CrowdPersonas({
               className="absolute top-[-20px] right-[-20px] text-[150px] opacity-5 pointer-events-none"
               style={{ color: selectedPersona.color }}
             >
-              {selectedPersona.icon}
+              {getIcon(selectedPersona.iconName)}
             </div>
 
             <div className="relative z-10 flex flex-col h-full justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <span style={{ color: selectedPersona.color }}>
-                    {selectedPersona.icon}
+                    {getIcon(selectedPersona.iconName)}
                   </span>
                   <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">
                     Bio Scan

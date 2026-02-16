@@ -9,20 +9,7 @@ import {
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 
-// --- Types ---
-export type LadderRung = "Bait" | "Tripwire" | "Core" | "High-Ticket";
-export interface ProductNode {
-  name: string;
-  price: string;
-  type: string; // e.g., "Checklist", "Course"
-  intensity: "Low" | "Medium" | "High"; // Effort required
-}
-
-export interface LadderData {
-  products: Partial<Record<LadderRung, ProductNode>>;
-  gap: string; // e.g., "Missing Tripwire"
-  insight: string;
-}
+import { LadderData, LadderRung, ProductNode } from "@/lib/types/analysis";
 
 // --- Mock Data ---
 const MOCK_LADDER: LadderData = {
@@ -53,9 +40,11 @@ const MOCK_LADDER: LadderData = {
 };
 
 // --- Component ---
-export default function ValueLadder() {
-  const data = MOCK_LADDER;
-
+export default function ValueLadder({
+  data = MOCK_LADDER,
+}: {
+  data?: LadderData;
+}) {
   const renderRung = (
     rung: LadderRung,
     label: string,

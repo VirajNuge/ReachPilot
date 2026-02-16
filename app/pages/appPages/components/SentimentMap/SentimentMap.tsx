@@ -103,7 +103,8 @@ export default function SentimentMap({
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Find the 'Seeker' data for the "Intent Hotspot"
-  const seekers = data.vibes.find((v) => v.type === "Seekers");
+  const safeVibes = data?.vibes || [];
+  const seekers = safeVibes.find((v) => v.type === "Seekers");
   const topSeekerQuestion = seekers?.keywords[0] || "Pricing?";
 
   const handleGenerateContent = () => {
@@ -175,7 +176,7 @@ export default function SentimentMap({
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={data.vibes}
+                  data={safeVibes}
                   cx="50%"
                   cy="50%"
                   innerRadius={50}
@@ -183,11 +184,11 @@ export default function SentimentMap({
                   paddingAngle={5}
                   dataKey="percentage"
                   onMouseEnter={(_, index) =>
-                    setActiveVibe(data.vibes[index].type)
+                    setActiveVibe(safeVibes[index].type)
                   }
                   onMouseLeave={() => setActiveVibe(null)}
                 >
-                  {data.vibes.map((entry, index) => (
+                  {safeVibes.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={entry.color}
@@ -232,7 +233,7 @@ export default function SentimentMap({
 
           {/* Legend / Stats */}
           <div className="grid grid-cols-2 gap-3 w-full">
-            {data.vibes.map((v) => (
+            {safeVibes.map((v) => (
               <motion.div
                 key={v.type}
                 className={`p-2 rounded-xl border border-gray-100 bg-gray-50/50 cursor-pointer transition-all ${

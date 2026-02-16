@@ -83,6 +83,15 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
           gradient: ["#6366f1", "#4f46e5"], // Indigo
           description: "SEO & High Shareability",
         };
+      default:
+        // Fallback for unknown categories
+        return {
+          icon: <FaHeartbeat />,
+          color: "text-rose-500",
+          bg: "bg-rose-100",
+          gradient: ["#f43f5e", "#e11d48"], // Rose
+          description: "Balanced Growth",
+        };
     }
   };
 

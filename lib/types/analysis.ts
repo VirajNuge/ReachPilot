@@ -99,7 +99,7 @@ export interface ActiveHourData {
   hours: number[];
 }
 
-export interface CrowdPersonaData {
+export interface SimpleCrowdPersona {
   name: string;
   description: string;
   percentage: number;
@@ -184,7 +184,7 @@ export interface RawAnalysisData {
   voiceSpectrum: VoiceData;
 
   // Crowd & Blueprint Data uses extracted interfaces
-  audiencePersonas: CrowdPersonaData[]; // Mapped from crowdPersonas?
+  audiencePersonas: SimpleCrowdPersona[]; // Mapped from crowdPersonas?
   hypeValueScore: {
     hype: number;
     value: number;
@@ -218,6 +218,49 @@ export interface RawAnalysisData {
   leadMagnet: LeadMagnetData;
   ctaAnalysis: CTAData;
   techStack: TechStackData[];
+
+  // New Fields for full UI integration
+  valueLadder: LadderData;
+  crowdPersonas: CrowdPersonaData;
+}
+
+// --- New Interfaces for UI Components ---
+
+export type LadderRung = "Bait" | "Tripwire" | "Core" | "High-Ticket";
+
+export interface ProductNode {
+  name: string;
+  price: string;
+  type: string;
+  intensity: "Low" | "Medium" | "High";
+}
+
+export interface LadderData {
+  products: Partial<Record<LadderRung, ProductNode>>;
+  gap: string;
+  insight: string;
+}
+
+export interface Archetype {
+  id: string;
+  role: string;
+  iconName: string; // Serialized icon name
+  color: string;
+  bio: string;
+  percentage: number;
+  triggers: string[];
+  painPoints: string[];
+}
+
+// Replaces the simple CrowdPersonaData
+export interface CrowdPersonaData {
+  primaryArchetype: Archetype;
+  secondaryArchetypes: Archetype[];
+  insight: {
+    title: string;
+    description: string;
+    actionable: string;
+  };
 }
 
 // --- Growth Command Types ---

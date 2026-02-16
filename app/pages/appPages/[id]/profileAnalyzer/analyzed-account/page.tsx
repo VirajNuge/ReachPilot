@@ -259,6 +259,29 @@ function AnalysisContent() {
               improvementSuggestion: "Add stronger calls to action.",
             },
             techStack: [],
+            crowdPersonas: {
+              primaryArchetype: {
+                id: "1",
+                role: "The Generic User",
+                iconName: "UserTie",
+                color: "#9ca3af",
+                bio: "General audience member.",
+                percentage: 100,
+                triggers: [],
+                painPoints: [],
+              },
+              secondaryArchetypes: [],
+              insight: {
+                title: "Audience Analysis",
+                description: "Not enough data to segment audience.",
+                actionable: "Post more to gather data.",
+              },
+            },
+            valueLadder: {
+              products: {},
+              gap: "N/A",
+              insight: "No product data available.",
+            },
           };
 
           setData(generatedData);
@@ -641,11 +664,14 @@ function AnalysisContent() {
                       {/* Row 2: Top Fan Archetypes */}
                       <div className="col-span-12 lg:col-span-6 min-h-[400px]">
                         <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {/* Crowd Personas Component (Using Tribes or audiencePersonas) */}
-                          <div className="p-4 text-center">
-                            Personas/Tribes Component placeholder (using{" "}
-                            {data.tribes?.length} tribes)
-                          </div>
+                          {/* Crowd Personas Component */}
+                          {data.crowdPersonas ? (
+                            <CrowdPersonas data={data.crowdPersonas} />
+                          ) : (
+                            <div className="p-4 text-center">
+                              No Persona Data
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -738,10 +764,13 @@ function AnalysisContent() {
                       {/* Row 2: Value Ladder Reconstruction */}
                       <div className="col-span-12 md:col-span-8 min-h-[300px]">
                         <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {/* Value Ladder placeholder or component */}
-                          <div className="p-4 text-center">
-                            Value Ladder Component
-                          </div>
+                          {data.valueLadder ? (
+                            <ValueLadder data={data.valueLadder} />
+                          ) : (
+                            <div className="p-4 text-center">
+                              No Value Ladder Data
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

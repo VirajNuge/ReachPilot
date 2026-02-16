@@ -16,6 +16,7 @@ let latestAnalysisCache: {
   analysis: any;
   platform: string;
   postCount: number;
+  source?: string;
   timestamp: number;
 } | null = null;
 
@@ -65,9 +66,10 @@ export async function POST(req: Request) {
 
     const platform = data.posts[0]?.platform || "unknown";
     const postCount = data.posts.length;
+    const source = data.source || "extension_scrape";
 
     console.log(
-      `[analyze-extension] Received ${postCount} posts from platform: ${platform}`,
+      `[analyze-extension] Received ${postCount} posts from platform: ${platform} (Source: ${source})`,
     );
 
     // 3. Format scraped data into rich text for Gemini
@@ -104,6 +106,7 @@ export async function POST(req: Request) {
       analysis,
       platform,
       postCount,
+      source,
       timestamp: Date.now(),
     };
 
@@ -112,6 +115,7 @@ export async function POST(req: Request) {
         success: true,
         platform,
         postCount,
+        source,
         analysis,
       },
       { headers: corsHeaders },

@@ -34,6 +34,7 @@ import HypeValueMeter from "../../../components/HypeValueMeter/HypeValueMeter";
 import "./analyzedAccount.css";
 
 import { useAnalysisData } from "../../../../../../hooks/useAnalysisData";
+import { saveAnalysis, getAnalysisById } from "../../../../../../lib/storage";
 import {
   RawAnalysisData,
   VelocityData,
@@ -97,29 +98,78 @@ const MOCK_PILLARS: UI_PillarData[] = [
 ];
 
 function AnalysisContent() {
-  const searchParams = useSearchParams();
-  const link = searchParams.get("link");
-  const source = searchParams.get("source"); // We can ignore 'source' check if we just want to load data if present
-
   const [activeTab, setActiveTab] = useState("Pulse");
+  const searchParams = useSearchParams();
+  const loadId = searchParams.get("loadId");
+  const link = searchParams.get("link"); // existing
 
-  // Use the new hook
-  // We can pass initial data if we had it, but here we fetch fresh
-  const { data, loading, error } = useAnalysisData();
+  // Hook logic
+  const {
+    data: apiData,
+    loading: apiLoading,
+    error: apiError,
+  } = useAnalysisData();
 
-  const handleRetry = () => {
-    window.location.reload();
-  };
+  // Local state to handle either API data or History data
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (loading) return <LoadingScreen link={link || ""} />;
-  if (error || !data)
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      // 1. Load from History if ID present
+      if (loadId) {
+        console.log("Loading from history:", loadId);
+        const session = getAnalysisById(loadId);
+        if (session) {
+          setData(session.data);
+          setLoading(false);
+          return;
+        } else {
+          // Fallback to API if not found (or show error)
+          console.warn("History session not found, falling back to API");
+        }
+      }
+
+      // 2. Load from API (standard flow)
+      if (apiData) {
+        setData(apiData);
+        setLoading(false);
+        // Auto-save only if it's a fresh analysis (no loadId)
+        if (!loadId) {
+          saveAnalysis(apiData);
+        }
+      } else if (apiError) {
+        setError(apiError);
+        setLoading(false);
+      } else if (!apiLoading && !apiData) {
+        // Waiting for hook... works because apiLoading is true initially in hook
+        // But here apiData might be null initially.
+        // Effectively, just sync with hook state
+      }
+    };
+
+    fetchData();
+  }, [loadId, apiData, apiLoading, apiError]);
+
+  // Sync loading state more directly
+  useEffect(() => {
+    if (!loadId) {
+      setLoading(apiLoading);
+    }
+  }, [apiLoading, loadId]);
+
+  if (error) {
     return (
-      <ErrorState
-        title="Analysis Failed"
-        message={error || "We couldn't analyze this profile."}
-        onRetry={handleRetry}
-      />
+      <ErrorState message={error} onRetry={() => window.location.reload()} />
     );
+  }
+
+  if (loading || !data) {
+    return <LoadingScreen link={link || "profile"} />;
+  }
 
   // Helper to map API pillar data to UI pillar data
   const mapPillars = (apiPillars?: ApiPillarData[]): UI_PillarData[] => {

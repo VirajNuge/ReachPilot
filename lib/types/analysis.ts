@@ -219,3 +219,37 @@ export interface RawAnalysisData {
   ctaAnalysis: CTAData;
   techStack: TechStackData[];
 }
+
+// --- Growth Command Types ---
+
+export type TaskCategory = "Quick Win" | "Big Bet" | "Filler" | "Money Pit";
+
+export interface GrowthTask {
+  id: string;
+  title: string;
+  category: TaskCategory;
+  impact: number;
+  effort: number;
+  type: "Funnel" | "Content" | "Crowd";
+  status: "Pending" | "In Progress" | "Completed";
+  reasoning?: string; // Added for UI details
+  actionType?: "Bio" | "Content" | "Strategy" | "Tech"; // extended for mapping
+}
+
+export interface GrowthSimulationResult {
+  input: {
+    authority: number;
+    frequency: number;
+  };
+  outcome: {
+    followers: number;
+    engagement: number;
+    revenue_potential: number;
+  };
+  trajectory_graph: { day: number; value: number }[];
+}
+
+export interface GrowthData {
+  tasks: GrowthTask[];
+  simulation: GrowthSimulationResult; // Initial state
+}

@@ -90,11 +90,45 @@ const MOCK_SCHEDULE = [
 ];
 
 // --- Component ---
+// ... imports ...
+import { GrowthSimulationResult } from "../../../../../lib/types/analysis";
+
+// ... Types & Mock Data ...
+
+// --- Component ---
 export default function GrowthCommand() {
   const [simulationValue, setSimulationValue] = useState(20);
   const [activeTab, setActiveTab] = useState<"All" | "Funnel" | "Crowd">("All");
 
+  // State for Simulation Result
+  const [simulationResult, setSimulationResult] =
+    useState<GrowthSimulationResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSimulate = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/simulate-growth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          input: {
+            authority: simulationValue,
+            frequency: 50, // Default or add another slider
+          },
+        }),
+      });
+      const result = await response.json();
+      setSimulationResult(result);
+    } catch (error) {
+      console.error("Simulation failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getCategoryColor = (cat: TaskCategory) => {
+    // ... existing switch ...
     switch (cat) {
       case "Quick Win":
         return "bg-emerald-100 text-emerald-700 border-emerald-200";
@@ -147,16 +181,33 @@ export default function GrowthCommand() {
                 Predicted Outcome (30 Days)
               </div>
               <div className="text-3xl font-black text-indigo-700">
-                +{Math.floor(simulationValue * 1.5)}%{" "}
-                <span className="text-lg text-indigo-400">Engagement</span>
+                {isLoading ? (
+                  <span className="animate-pulse">...</span>
+                ) : simulationResult ? (
+                  <>+{simulationResult.outcome.engagement}%</>
+                ) : (
+                  <>+{Math.floor(simulationValue * 1.5)}%</>
+                )}
+                <span className="text-lg text-indigo-400 ml-1">Engagement</span>
               </div>
               <div className="text-xs text-indigo-500 mt-1">
-                matches Competitor X's "Seeker" rate
+                {simulationResult
+                  ? "Based on simulation"
+                  : "matches Competitor X's 'Seeker' rate"}
               </div>
             </div>
 
-            <button className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
-              <FaMagic /> Apply Strategy
+            <button
+              onClick={handleSimulate}
+              disabled={isLoading}
+              className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+            >
+              {isLoading ? (
+                <FaChartLine className="animate-spin" />
+              ) : (
+                <FaMagic />
+              )}
+              {isLoading ? "Simulating..." : "Apply Strategy"}
             </button>
           </div>
         </div>

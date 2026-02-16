@@ -8,15 +8,11 @@ import {
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
-// --- Types ---
-export interface GrowthTask {
-  id: string;
-  title: string;
-  category: "Quick Win" | "Big Bet" | "Filler" | "Money Pit";
-  impact: number; // 1-10
-  effort: number; // 1-10
-  reasoning: string;
-  actionType: "Bio" | "Content" | "Strategy" | "Tech";
+import { GrowthTask } from "../../../../../lib/types/analysis";
+
+// ... Types ...
+interface PriorityHeatmapProps {
+  tasks?: GrowthTask[];
 }
 
 // --- Mock Data ---
@@ -30,6 +26,8 @@ const MOCK_TASKS: GrowthTask[] = [
     reasoning:
       "Competitor has no lead magnet. You can capture 20% more leads instantly.",
     actionType: "Tech",
+    type: "Funnel",
+    status: "Pending",
   },
   {
     id: "2",
@@ -40,6 +38,8 @@ const MOCK_TASKS: GrowthTask[] = [
     reasoning:
       "High demand in 'The Crowd' for advanced tutorials. Will drive authority.",
     actionType: "Content",
+    type: "Content",
+    status: "Pending",
   },
   {
     id: "3",
@@ -50,6 +50,8 @@ const MOCK_TASKS: GrowthTask[] = [
     reasoning:
       "Visual polish. Good for brand consistency but won't drive immediate growth.",
     actionType: "Bio",
+    type: "Content",
+    status: "Pending",
   },
   {
     id: "4",
@@ -60,6 +62,8 @@ const MOCK_TASKS: GrowthTask[] = [
     reasoning:
       "Saturated market. High effort with low probability of short-term return.",
     actionType: "Strategy",
+    type: "Content",
+    status: "Pending",
   },
   {
     id: "5",
@@ -70,11 +74,16 @@ const MOCK_TASKS: GrowthTask[] = [
     reasoning:
       "30+ unanswered questions in competitor comments. Easy authority win.",
     actionType: "Strategy",
+    type: "Crowd",
+    status: "Pending",
   },
 ];
 
-export default function PriorityHeatmap() {
+export default function PriorityHeatmap({
+  tasks = MOCK_TASKS,
+}: PriorityHeatmapProps) {
   const [selectedTask, setSelectedTask] = useState<GrowthTask | null>(null);
+  const displayTasks = tasks && tasks.length > 0 ? tasks : MOCK_TASKS;
 
   // Helper to position dots on the 10x10 grid
   const getPosition = (impact: number, effort: number) => {
@@ -172,7 +181,7 @@ export default function PriorityHeatmap() {
           </div>
 
           {/* Tasks Dots */}
-          {MOCK_TASKS.map((task) => {
+          {displayTasks.map((task) => {
             const pos = getPosition(task.impact, task.effort);
             return (
               <motion.button
@@ -184,7 +193,7 @@ export default function PriorityHeatmap() {
                 className={`absolute w-8 h-8 -ml-4 -mt-4 rounded-full flex items-center justify-center text-xs text-white shadow-lg border-2 border-white transition-colors ${getCategoryColor(task.category)} ${selectedTask?.id === task.id ? "ring-4 ring-offset-2 ring-indigo-200" : ""}`}
                 style={{ top: pos.top, left: pos.left }}
               >
-                {getIcon(task.actionType)}
+                {getIcon(task.actionType || "Strategy")}
               </motion.button>
             );
           })}

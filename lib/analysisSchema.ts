@@ -146,6 +146,165 @@ export const analysisSchema: Schema = {
       },
       required: ["hype", "value"],
     },
+    // --- THE LAB DATA ---
+    velocity: {
+      type: SchemaType.OBJECT,
+      properties: {
+        hookRate: { type: SchemaType.NUMBER },
+        category: { type: SchemaType.STRING },
+        velocityGraph: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              hour: { type: SchemaType.STRING },
+              engagement: { type: SchemaType.NUMBER },
+            },
+            required: ["hour", "engagement"],
+          },
+        },
+        insight: { type: SchemaType.STRING },
+      },
+      required: ["hookRate", "category", "velocityGraph", "insight"],
+    },
+    psychTriggers: {
+      type: SchemaType.OBJECT,
+      properties: {
+        radarData: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              trigger: { type: SchemaType.STRING },
+              score: { type: SchemaType.NUMBER },
+              fullMark: { type: SchemaType.NUMBER },
+            },
+            required: ["trigger", "score", "fullMark"],
+          },
+        },
+        winningTrigger: { type: SchemaType.STRING },
+        insight: { type: SchemaType.STRING },
+      },
+      required: ["radarData", "winningTrigger", "insight"],
+    },
+    postFatigue: {
+      type: SchemaType.OBJECT,
+      properties: {
+        status: { type: SchemaType.STRING },
+        fatigueScore: { type: SchemaType.NUMBER },
+        optimalFrequency: { type: SchemaType.STRING },
+        saturationPoint: { type: SchemaType.NUMBER },
+        weeklyImpact: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              day: { type: SchemaType.STRING },
+              posts: { type: SchemaType.NUMBER },
+              impactScore: { type: SchemaType.NUMBER },
+            },
+            required: ["day", "posts", "impactScore"],
+          },
+        },
+      },
+      required: [
+        "status",
+        "fatigueScore",
+        "optimalFrequency",
+        "saturationPoint",
+        "weeklyImpact",
+      ],
+    },
+    competitorGap: {
+      type: SchemaType.OBJECT,
+      properties: {
+        metrics: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              category: { type: SchemaType.STRING },
+              profileValue: { type: SchemaType.NUMBER },
+              benchmarkValue: { type: SchemaType.NUMBER },
+              gapType: { type: SchemaType.STRING },
+            },
+            required: ["category", "profileValue", "benchmarkValue", "gapType"],
+          },
+        },
+        topOpportunity: { type: SchemaType.STRING },
+        insight: { type: SchemaType.STRING },
+        recommendations: {
+          type: SchemaType.ARRAY,
+          items: { type: SchemaType.STRING },
+        },
+      },
+      required: ["metrics", "topOpportunity", "insight", "recommendations"],
+    },
+    viralRecipe: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          id: { type: SchemaType.STRING },
+          engagementMultiplier: { type: SchemaType.STRING },
+          hookType: { type: SchemaType.STRING },
+          hookText: { type: SchemaType.STRING },
+          ingredients: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                name: { type: SchemaType.STRING },
+                value: { type: SchemaType.STRING },
+                score: { type: SchemaType.NUMBER },
+              },
+              required: ["name", "value", "score"],
+            },
+          },
+          whyItWorked: { type: SchemaType.STRING },
+          templateStructure: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING },
+          },
+        },
+        required: [
+          "id",
+          "engagementMultiplier",
+          "hookType",
+          "hookText",
+          "ingredients",
+          "whyItWorked",
+          "templateStructure",
+        ],
+      },
+    },
+    voiceSpectrum: {
+      type: SchemaType.OBJECT,
+      properties: {
+        personaName: { type: SchemaType.STRING },
+        axes: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              id: { type: SchemaType.STRING },
+              leftLabel: { type: SchemaType.STRING },
+              rightLabel: { type: SchemaType.STRING },
+              score: { type: SchemaType.NUMBER },
+            },
+            required: ["id", "leftLabel", "rightLabel", "score"],
+          },
+        },
+        signatureWords: {
+          type: SchemaType.ARRAY,
+          items: { type: SchemaType.STRING },
+        },
+        insight: { type: SchemaType.STRING },
+      },
+      required: ["personaName", "axes", "signatureWords", "insight"],
+    },
+
+    // --- LEGACY/SHARED DATA ---
     ideaBank: {
       type: SchemaType.ARRAY,
       items: {
@@ -210,5 +369,11 @@ export const analysisSchema: Schema = {
     "postDNA",
     "tribes",
     "shadowAudience",
+    "velocity",
+    "psychTriggers",
+    "postFatigue",
+    "competitorGap",
+    "viralRecipe",
+    "voiceSpectrum",
   ],
 };

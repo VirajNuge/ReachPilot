@@ -104,22 +104,60 @@ REQUIREMENTS:
     - <50 = burnout risk, >80 = healthy growth
 
 11. **contentPillars**: Identify 3-4 recurring content themes from ACTUAL posts.
+    - performance: "Top Performer", "Consistent", "Underperforming"
 
-12. **audiencePersonas**: Infer 3 audience segments from commenter patterns and content topics.
+12. **velocity**: Analyze engagement speed based on hook strength & format:
+    - hookRate: 0-100 (how strong are the first lines?)
+    - category: "Flash" (high drop-off), "Steady" (consistent), "Slow-Burn" (grows over time)
+    - velocityGraph: 5 points (1h, 2h, 4h, 12h, 24h) estimating cumulative engagement %
+    - insight: 1 sentence analysis
 
-13. **hypeValueScore**: Analyze "Hype" vs "Value" balance from ACTUAL post content. Sum = 100.
+13. **psychTriggers**: Score 0-100 on 6 persuasion levers based on their writing style:
+    - radarData: [{trigger: "Authority", score: 0-100, fullMark: 100}, ...] (Triggers: Authority, Scarcity, Social Proof, Reciprocity, Liking, Curiosity)
+    - winningTrigger: The strongest one
+    - insight: 1 sentence analysis
 
-14. **ideaBank**: Generate 4-5 post ideas that fill gaps in their content strategy.
+14. **postFatigue**:
+    - status: "Fresh", "Saturated", "Burned Out"
+    - fatigueScore: 0-100
+    - optimalFrequency: e.g. "3-5 posts/week"
+    - saturationPoint: Max posts/day
+    - weeklyImpact: 7 days (Mon-Sun), impactScore 0-2.0
 
-15. **postDNA**: Analyze the ACTUAL posts (use real content from above):
+15. **competitorGap**: Compare against benchmarks:
+    - metrics: [{category: "Reels", profileValue: 50, benchmarkValue: 30, gapType: "Over-indexed"}, ...]
+    - topOpportunity: Biggest gap
+    - insight: Strategic analysis
+    - recommendations: 3 actionable tips
+
+16. **viralRecipe**: Analyze their BEST performing post:
+    - engagementMultiplier: e.g. "3.5x"
+    - hookType: e.g. "Controversial", "Story", "Data"
+    - hookText: The actual first line
+    - ingredients: [{name: "Visuals", value: "High Contrast", score: 9}, ...]
+    - whyItWorked: Psychological breakdown
+    - templateStructure: 4-step framework
+
+17. **voiceSpectrum**: Brand voice analysis:
+    - axes: [{id: "tone", leftLabel: "Pro", rightLabel: "Casual", score: 1-10}, ...]
+    - signatureWords: 5 unique words
+    - insight: Tone analysis
+
+18. **audiencePersonas**: Infer 3 audience segments from commenter patterns and content topics.
+
+19. **hypeValueScore**: Analyze "Hype" vs "Value" balance from ACTUAL post content. Sum = 100.
+
+20. **ideaBank**: Generate 4-5 post ideas that fill gaps in their content strategy.
+
+21. **postDNA**: Analyze the ACTUAL posts (use real content from above):
     - hookType: How the post opens
     - format: Detected content type
     - topic: Subject matter
     - verdict: Why it performed well/poorly based on REAL metrics
 
-16. **tribes**: Identify 3-4 audience sub-cultures from comment patterns.
+22. **tribes**: Identify 3-4 audience sub-cultures from comment patterns.
 
-17. **shadowAudience**: Estimate lurker vs active commenter ratio using ACTUAL data.
+23. **shadowAudience**: Estimate lurker vs active commenter ratio using ACTUAL data.
 
 Strictly follow the JSON schema. Base everything on the REAL scraped data provided.
   `.trim();

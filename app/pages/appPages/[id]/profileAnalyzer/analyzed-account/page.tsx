@@ -111,7 +111,7 @@ function AnalysisContent() {
   } = useAnalysisData();
 
   // Local state to handle either API data or History data
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<RawAnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -119,7 +119,157 @@ function AnalysisContent() {
     const fetchData = async () => {
       setLoading(true);
 
-      // 1. Load from History if ID present
+      const manualDataParam = searchParams.get("data");
+      const sourceParam = searchParams.get("source");
+
+      // 1. Load from Manual Entry (LocalStorage or URL)
+      let manualData: any = null;
+
+      if (sourceParam === "manual_storage") {
+        if (typeof window !== "undefined") {
+          const stored = localStorage.getItem("reachpilot_manual_data");
+          if (stored) {
+            try {
+              manualData = JSON.parse(stored);
+              // Optional: Clear after use if you don't want persistence on reload
+              // localStorage.removeItem("reachpilot_manual_data");
+            } catch (e) {
+              console.error("Failed to parse local storage data", e);
+            }
+          }
+        }
+      } else if (manualDataParam) {
+        // Fallback for old URL method
+        try {
+          manualData = JSON.parse(decodeURIComponent(manualDataParam));
+        } catch (e) {
+          console.error("Failed to parse manual data param", e);
+        }
+      }
+
+      if (manualData) {
+        try {
+          console.log("Loading manual data:", manualData);
+
+          // Construct RawAnalysisData from Manual Data
+          // We need to fill in all the required fields of RawAnalysisData with defaults or derived values
+          const generatedData: RawAnalysisData = {
+            profile: {
+              name: manualData.name || "Unknown User",
+              headline:
+                manualData.username || manualData.bio?.slice(0, 50) || "",
+              followers: manualData.followers || 0,
+              projects: "0", // Default
+              profileScore: 50, // Default score
+            },
+            quickFixes: [
+              {
+                headline: "Complete your profile",
+                description: "Add more details to get a full analysis.",
+                tag: "HIGH IMPACT",
+              },
+            ],
+            bioAnalysis: {
+              clarityScore: 7,
+              keywordScore: 6,
+              tone: "Neutral",
+              strengths: ["Clean layout"],
+              weaknesses: ["Missing keywords"],
+              suggestions: ["Add industry keywords"],
+            },
+            keywords: {
+              current: manualData.bio
+                ? manualData.bio.split(" ").slice(0, 5)
+                : [],
+              missing: ["Strategy", "Growth"],
+            },
+            textAnalysis: {
+              frequency: "Medium",
+              contentMix: "Varied",
+              engagement: "Average",
+            },
+            contentMetrics: {
+              frequencyScore: 60,
+              contentMixScore: 70,
+              engagementScore: 50,
+            },
+            schedule: [],
+            scheduleHighlight: "Consistency is key.",
+            csiScore: 65,
+            contentPillars: [], // Will use mock fallback
+            velocity: {
+              hookRate: 0,
+              category: "Growth",
+              velocityGraph: [],
+              insight: "Not enough data for velocity.",
+            },
+            psychTriggers: {
+              radarData: [],
+              winningTrigger: "N/A",
+              insight: "N/A",
+            },
+            postFatigue: {
+              status: "Healthy",
+              fatigueScore: 10,
+              optimalFrequency: "Daily",
+              saturationPoint: 3,
+              weeklyImpact: [],
+            },
+            competitorGap: {
+              metrics: [],
+              topOpportunity: "N/A",
+              insight: "N/A",
+              recommendations: [],
+            },
+            viralRecipe: [],
+            voiceSpectrum: {
+              personaName: "Observer",
+              axes: [],
+              signatureWords: [],
+              insight: "N/A",
+            },
+            audiencePersonas: [],
+            hypeValueScore: { hype: 50, value: 50 },
+            ideaBank: [],
+            postDNA: [],
+            tribes: [],
+            shadowAudience: {
+              lurkersPercent: 90,
+              engagersPercent: 10,
+              insight: "Typical distribution.",
+            },
+            crowdSentiment: {
+              positivePercent: 50,
+              neutralPercent: 30,
+              negativePercent: 20,
+              dominantEmotion: "Neutral",
+              insight: "Balanced sentiment.",
+            },
+            questionCloud: [],
+            activeHours: [],
+            leadMagnet: {
+              suggestion: "Checklist",
+              type: "PDF",
+              relevanceScore: 80,
+              whyItWorks: "Simple and effective.",
+            },
+            ctaAnalysis: {
+              effectivenessScore: 50,
+              commonPhrases: [],
+              improvementSuggestion: "Add stronger calls to action.",
+            },
+            techStack: [],
+          };
+
+          setData(generatedData);
+          setLoading(false);
+          return;
+        } catch (e) {
+          console.error("Failed to process manual data", e);
+        }
+      }
+
+      // 2. Load from History if ID present
       if (loadId) {
         console.log("Loading from history:", loadId);
         const session = getAnalysisById(loadId);
@@ -133,12 +283,12 @@ function AnalysisContent() {
         }
       }
 
-      // 2. Load from API (standard flow)
+      // 3. Load from API (standard flow)
       if (apiData) {
         setData(apiData);
         setLoading(false);
-        // Auto-save only if it's a fresh analysis (no loadId)
-        if (!loadId) {
+        // Auto-save only if it's a fresh analysis (no loadId and no manual data)
+        if (!loadId && !manualDataParam) {
           saveAnalysis(apiData);
         }
       } else if (apiError) {
@@ -152,7 +302,7 @@ function AnalysisContent() {
     };
 
     fetchData();
-  }, [loadId, apiData, apiLoading, apiError]);
+  }, [loadId, apiData, apiLoading, apiError, searchParams]);
 
   // Sync loading state more directly
   useEffect(() => {

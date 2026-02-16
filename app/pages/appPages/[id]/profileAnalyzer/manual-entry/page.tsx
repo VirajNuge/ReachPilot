@@ -13,10 +13,12 @@ export default function ManualEntryPage() {
   const platform = (searchParams.get("platform") as Platform) || "linkedin";
 
   const handleSubmit = (data: ManualProfileData) => {
-    // Encode the manual data and navigate to analysis page
-    const encodedData = encodeURIComponent(JSON.stringify(data));
+    // Save to localStorage to avoid URL length limits
+    if (typeof window !== "undefined") {
+      localStorage.setItem("reachpilot_manual_data", JSON.stringify(data));
+    }
     router.push(
-      `/pages/appPages/1/profileAnalyzer/analyzed-account?platform=${platform}&manual=true&data=${encodedData}`,
+      `/pages/appPages/1/profileAnalyzer/analyzed-account?platform=${platform}&source=manual_storage`,
     );
   };
 

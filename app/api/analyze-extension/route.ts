@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { analysisSchema } from "@/lib/analysisSchema";
+import { formatExtensionData } from "./extensionDataFormatter";
+import { buildExtensionPrompt } from "./extensionPrompts";
 
 // CORS headers for extension requests
 const corsHeaders = {
@@ -14,9 +18,18 @@ export async function OPTIONS() {
 
 export async function POST(req: Request) {
   try {
+    // 1. Validate API key
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "GEMINI_API_KEY is not set in .env.local" },
+        { status: 500, headers: corsHeaders },
+      );
+    }
+
+    // 2. Parse and validate request body
     const data = await req.json();
 
-    // Validate basic structure
     if (!data.posts || !Array.isArray(data.posts) || data.posts.length === 0) {
       return NextResponse.json(
         { error: "Invalid data: non-empty 'posts' array required" },
@@ -31,40 +44,59 @@ export async function POST(req: Request) {
       `[analyze-extension] Received ${postCount} posts from platform: ${platform}`,
     );
 
-    // TODO (Phase 2): Send to Gemini for deep analysis
-    // For now, return a success acknowledgment with basic stats
-    const totalLikes = data.posts.reduce(
-      (sum: number, p: any) => sum + (p.metrics?.likes || 0),
-      0,
+    // 3. Format scraped data into rich text for Gemini
+    const formattedData = formatExtensionData(data.posts);
+    console.log(
+      `[analyze-extension] Formatted data length: ${formattedData.length} chars`,
     );
-    const totalComments = data.posts.reduce(
-      (sum: number, p: any) => sum + (p.comments?.length || 0),
-      0,
+
+    // 4. Build the extension-specific prompt
+    const prompt = buildExtensionPrompt(formattedData, platform);
+
+    // 5. Setup Gemini with structured output
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: analysisSchema,
+      },
+    });
+
+    console.log(`[analyze-extension] Sending to Gemini...`);
+    const result = await model.generateContent(prompt);
+    const analysisText = result.response.text();
+
+    console.log(
+      `[analyze-extension] Gemini response received (${analysisText.length} chars)`,
     );
-    const totalViews = data.posts.reduce(
-      (sum: number, p: any) => sum + (p.metrics?.views || 0),
-      0,
-    );
+
+    // 6. Parse and return the structured analysis
+    const analysis = JSON.parse(analysisText);
 
     return NextResponse.json(
       {
         success: true,
-        message: "Data received successfully",
-        summary: {
-          platform,
-          postCount,
-          totalLikes,
-          totalComments,
-          totalViews,
-          author: data.posts[0]?.author || "Unknown",
-        },
+        platform,
+        postCount,
+        analysis,
       },
       { headers: corsHeaders },
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("[analyze-extension] Error:", error);
+
+    // Provide specific error messages
+    const message = error.message?.includes("API_KEY")
+      ? "Invalid Gemini API key"
+      : error.message?.includes("SAFETY")
+        ? "Content was blocked by Gemini safety filters"
+        : error.message?.includes("quota")
+          ? "Gemini API quota exceeded — try again later"
+          : "Failed to analyze profile data";
+
     return NextResponse.json(
-      { error: "Failed to process extension data" },
+      { error: message, details: error.message },
       { status: 500, headers: corsHeaders },
     );
   }

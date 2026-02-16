@@ -84,4 +84,4 @@ const AnalyzerTabs: React.FC<AnalyzerTabsProps> = ({
   );
 };
 
-export default AnalyzerTabs;
+export { AnalyzerTabs };

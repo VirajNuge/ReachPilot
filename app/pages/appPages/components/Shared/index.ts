@@ -7,7 +7,8 @@ export {
   StaggerContainer,
   StaggerItem,
 } from "./AnimatedCard";
-export { AnalyzerTabs, AnalyzerTabsPill } from "./AnalyzerTabs";
+export { AnalyzerTabs } from "./AnalyzerTabs";
+
 export {
   AnimatedCounter,
   AnimatedProgress,

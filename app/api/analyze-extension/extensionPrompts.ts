@@ -159,6 +159,38 @@ REQUIREMENTS:
 
 23. **shadowAudience**: Estimate lurker vs active commenter ratio using ACTUAL data.
 
+
+24. **crowdSentiment**: Analyze comment section sentiment:
+    - positivePercent: 0-100
+    - neutralPercent: 0-100
+    - negativePercent: 0-100
+    - dominantEmotion: e.g. "Inspiring", "Controversial", "Educational"
+    - insight: Summary of how people feel
+
+25. **questionCloud**: Identify top 5 questions people ask in comments:
+    - text: The question topic
+    - frequency: How often it appears
+
+26. **activeHours**: Heatmap of when their audience is most active (based on comment timestamps):
+    - day: "Monday", etc.
+    - hours: Array of active hours [9, 10, 14, 15]
+
+27. **leadMagnet**: Suggest a high-converting freebie based on their content:
+    - suggestion: e.g. "Ultimate Checklist"
+    - type: "PDF", "Webinar", "Template"
+    - relevanceScore: 0-100
+    - whyItWorks: Strategic reason
+
+28. **ctaAnalysis**: Evaluate their Calls to Action:
+    - effectivenessScore: 0-100
+    - commonPhrases: ["Link in bio", "DM me"]
+    - improvementSuggestion: Better CTA to resize
+
+29. **techStack**: Infer tools they use from their content style:
+    - tool: e.g. "Notion", "Canva", "Hypefury"
+    - category: "Design", "Productivity", "Scheduling"
+    - confidence: "High", "Medium", "Low"
+
 Strictly follow the JSON schema. Base everything on the REAL scraped data provided.
   `.trim();
 }

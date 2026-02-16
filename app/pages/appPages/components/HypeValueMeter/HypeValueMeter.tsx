@@ -12,7 +12,7 @@ interface HypeValueMeterProps {
 }
 
 const HypeValueMeter: React.FC<HypeValueMeterProps> = ({
-  score = { hype: 30, value: 70 },
+  score = { hype: 0, value: 0 },
 }) => {
   const total = score.hype + score.value;
   const hypePercent = Math.round((score.hype / total) * 100);

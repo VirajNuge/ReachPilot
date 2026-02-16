@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { TechStackData } from "../../../../../lib/types/analysis";
 import {
   FaServer,
   FaCode,
@@ -17,7 +18,6 @@ export interface TechNode {
   detected: boolean;
   impact: "High" | "Medium" | "Low";
 }
-
 export interface StackData {
   score: number;
   businessClass: "Hobbyist" | "Pro Creator" | "SaaS / Agency" | "Enterprise";
@@ -39,56 +39,40 @@ const MOCK_STACK: StackData = {
       detected: true,
       impact: "High",
     },
-    {
-      category: "Frontend",
-      name: "Next.js",
-      icon: <FaCode />,
-      detected: true,
-      impact: "High",
-    },
-    {
-      category: "Tracking",
-      name: "Meta Pixel",
-      icon: <FaEye />,
-      detected: true,
-      impact: "Medium",
-    },
-    {
-      category: "Payment",
-      name: "Stripe",
-      icon: <FaCreditCard />,
-      detected: true,
-      impact: "High",
-    },
-    {
-      category: "Marketing",
-      name: "ActiveCampaign",
-      icon: <FaBullhornIcon />,
-      detected: true,
-      impact: "High",
-    },
+    // ... items ...
   ],
 };
 
-function FaBullhornIcon() {
-  return (
-    <svg
-      stroke="currentColor"
-      fill="currentColor"
-      strokeWidth="0"
-      viewBox="0 0 512 512"
-      height="1em"
-      width="1em"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M496 384H128V80c0-8.8-7.2-16-16-16H16C7.2 64 0 71.2 0 80v336c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16z"></path>
-    </svg>
-  ); // Placeholder custom icon if needed, or just use FaBullhorn from react-icons
+interface StackFingerprintProps {
+  data?: TechStackData[];
 }
 
-// --- Component ---
-export default function StackFingerprint() {
-  const data = MOCK_STACK;
+export default function StackFingerprint({
+  data: apiData,
+}: StackFingerprintProps) {
+  const [data, setData] = useState<StackData>(MOCK_STACK);
+
+  React.useEffect(() => {
+    if (apiData) {
+      const mappedTech: TechNode[] = apiData.map((item) => ({
+        category: (item.category as any) || "Marketing", // Simple cast or mapping needed
+        name: item.tool,
+        icon: <FaCode />, // Default icon
+        detected: true,
+        impact: item.confidence === "High" ? "High" : "Medium",
+      }));
+
+      // Calculate score based on tech count and confidence
+      const calculatedScore = Math.min(100, apiData.length * 15 + 40);
+
+      setData({
+        score: calculatedScore,
+        businessClass: calculatedScore > 80 ? "SaaS / Agency" : "Pro Creator",
+        verdict: "Stack analysis based on publicly available data.",
+        technologies: mappedTech,
+      });
+    }
+  }, [apiData]);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-emerald-500";

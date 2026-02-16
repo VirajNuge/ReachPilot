@@ -74,6 +74,59 @@ export interface VoiceData {
   insight: string;
 }
 
+// Extracted interfaces for reusability
+
+export interface PillarData {
+  topic: string;
+  performance: string;
+}
+
+export interface CrowdAnalysisData {
+  positivePercent: number;
+  neutralPercent: number;
+  negativePercent: number;
+  dominantEmotion: string;
+  insight: string;
+}
+
+export interface KeywordNode {
+  text: string;
+  frequency: number;
+}
+
+export interface ActiveHourData {
+  day: string;
+  hours: number[];
+}
+
+export interface CrowdPersonaData {
+  name: string;
+  description: string;
+  percentage: number;
+}
+
+export interface LeadMagnetData {
+  suggestion: string;
+  type: string;
+  relevanceScore: number;
+  whyItWorks: string;
+}
+
+export interface CTAData {
+  effectivenessScore: number;
+  commonPhrases: string[];
+  improvementSuggestion: string;
+}
+
+export interface TechStackData {
+  tool: string;
+  category: string;
+  confidence: string;
+}
+
+// Alias for compatibility if needed, or use ViralRecipe directly
+export type ViralPostData = ViralRecipe;
+
 export interface RawAnalysisData {
   profile: {
     name: string;
@@ -120,15 +173,18 @@ export interface RawAnalysisData {
   }[];
   scheduleHighlight: string;
   csiScore: number;
-  contentPillars: {
-    topic: string;
-    performance: string;
-  }[];
-  audiencePersonas: {
-    name: string;
-    description: string;
-    percentage: number;
-  }[];
+
+  // Lab Data uses extracted or existing interfaces
+  contentPillars: PillarData[];
+  velocity: VelocityData;
+  psychTriggers: PsychData;
+  postFatigue: FatigueData;
+  competitorGap: CompetitorData;
+  viralRecipe: ViralRecipe[];
+  voiceSpectrum: VoiceData;
+
+  // Crowd & Blueprint Data uses extracted interfaces
+  audiencePersonas: CrowdPersonaData[]; // Mapped from crowdPersonas?
   hypeValueScore: {
     hype: number;
     value: number;
@@ -154,43 +210,12 @@ export interface RawAnalysisData {
     engagersPercent: number;
     insight: string;
   };
-  // Lab Data
-  velocity: VelocityData;
-  psychTriggers: PsychData;
-  postFatigue: FatigueData;
-  competitorGap: CompetitorData;
-  viralRecipe: ViralRecipe[];
-  voiceSpectrum: VoiceData;
-  // Crowd & Blueprint Data
-  crowdSentiment: {
-    positivePercent: number;
-    neutralPercent: number;
-    negativePercent: number;
-    dominantEmotion: string;
-    insight: string;
-  };
-  questionCloud: {
-    text: string;
-    frequency: number;
-  }[];
-  activeHours: {
-    day: string;
-    hours: number[];
-  }[];
-  leadMagnet: {
-    suggestion: string;
-    type: string;
-    relevanceScore: number;
-    whyItWorks: string;
-  };
-  ctaAnalysis: {
-    effectivenessScore: number;
-    commonPhrases: string[];
-    improvementSuggestion: string;
-  };
-  techStack: {
-    tool: string;
-    category: string;
-    confidence: string;
-  }[];
+
+  crowdSentiment: CrowdAnalysisData;
+  questionCloud: KeywordNode[];
+  activeHours: ActiveHourData[];
+
+  leadMagnet: LeadMagnetData;
+  ctaAnalysis: CTAData;
+  techStack: TechStackData[];
 }

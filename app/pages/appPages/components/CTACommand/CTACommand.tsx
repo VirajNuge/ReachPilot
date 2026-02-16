@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { CTAData as ApiCTAData } from "../../../../../lib/types/analysis";
 import {
   FaBullhorn,
   FaRobot,
@@ -50,8 +51,45 @@ const MOCK_CTA: CTAData = {
 };
 
 // --- Component ---
-export default function CTACommand() {
-  const data = MOCK_CTA;
+
+// ... existing imports ...
+
+// ... Types ...
+
+interface CTACommandProps {
+  data?: ApiCTAData;
+}
+
+export default function CTACommand({ data: apiData }: CTACommandProps) {
+  const [data, setData] = useState<CTAData>(MOCK_CTA);
+
+  React.useEffect(() => {
+    if (apiData) {
+      setData({
+        mix: [
+          { type: "Engagement", score: 40, fullMark: 100 },
+          { type: "Bridge", score: 30, fullMark: 100 },
+          {
+            type: "Conversion",
+            score: apiData.effectivenessScore || 50,
+            fullMark: 100,
+          },
+          { type: "Conversation", score: 60, fullMark: 100 },
+        ],
+        topTrigger: {
+          keyword: apiData.commonPhrases?.[0] || "Link in bio",
+          count: 10,
+        },
+        urgencyScore: apiData.effectivenessScore || 50,
+        dominantStyle: "Community Builder",
+        placementHeatmap: [
+          { location: "First Line", count: 2 },
+          { location: "Bottom", count: 25 },
+          { location: "P.S.", count: 3 },
+        ],
+      });
+    }
+  }, [apiData]);
 
   // Custom Tick for Radar
   const renderTick = ({ payload, x, y, textAnchor, stroke, radius }: any) => {

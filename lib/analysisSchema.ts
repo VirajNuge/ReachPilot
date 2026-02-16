@@ -138,6 +138,87 @@ export const analysisSchema: Schema = {
         required: ["name", "description", "percentage"],
       },
     },
+    // --- THE CROWD & BLUEPRINT DATA ---
+    crowdSentiment: {
+      type: SchemaType.OBJECT,
+      properties: {
+        positivePercent: { type: SchemaType.NUMBER },
+        neutralPercent: { type: SchemaType.NUMBER },
+        negativePercent: { type: SchemaType.NUMBER },
+        dominantEmotion: { type: SchemaType.STRING },
+        insight: { type: SchemaType.STRING },
+      },
+      required: [
+        "positivePercent",
+        "neutralPercent",
+        "negativePercent",
+        "dominantEmotion",
+        "insight",
+      ],
+    },
+    questionCloud: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          text: { type: SchemaType.STRING },
+          frequency: { type: SchemaType.NUMBER },
+        },
+        required: ["text", "frequency"],
+      },
+    },
+    activeHours: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          day: { type: SchemaType.STRING },
+          hours: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.NUMBER },
+          },
+        },
+        required: ["day", "hours"],
+      },
+    },
+    leadMagnet: {
+      type: SchemaType.OBJECT,
+      properties: {
+        suggestion: { type: SchemaType.STRING },
+        type: { type: SchemaType.STRING },
+        relevanceScore: { type: SchemaType.NUMBER },
+        whyItWorks: { type: SchemaType.STRING },
+      },
+      required: ["suggestion", "type", "relevanceScore", "whyItWorks"],
+    },
+    ctaAnalysis: {
+      type: SchemaType.OBJECT,
+      properties: {
+        effectivenessScore: { type: SchemaType.NUMBER },
+        commonPhrases: {
+          type: SchemaType.ARRAY,
+          items: { type: SchemaType.STRING },
+        },
+        improvementSuggestion: { type: SchemaType.STRING },
+      },
+      required: [
+        "effectivenessScore",
+        "commonPhrases",
+        "improvementSuggestion",
+      ],
+    },
+    techStack: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          tool: { type: SchemaType.STRING },
+          category: { type: SchemaType.STRING },
+          confidence: { type: SchemaType.STRING },
+        },
+        required: ["tool", "category", "confidence"],
+      },
+    },
     hypeValueScore: {
       type: SchemaType.OBJECT,
       properties: {
@@ -375,5 +456,11 @@ export const analysisSchema: Schema = {
     "competitorGap",
     "viralRecipe",
     "voiceSpectrum",
+    "crowdSentiment",
+    "questionCloud",
+    "activeHours",
+    "leadMagnet",
+    "ctaAnalysis",
+    "techStack",
   ],
 };

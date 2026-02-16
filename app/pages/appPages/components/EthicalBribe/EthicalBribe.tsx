@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { LeadMagnetData } from "../../../../../lib/types/analysis";
 import {
   FaMagnet,
   FaThermometerHalf,
@@ -45,13 +46,30 @@ const MOCK_BRIBE: BribeData = {
   url: "gumroad.com/l/launch-checklist",
 };
 
-// --- Component ---
+interface EthicalBribeProps {
+  data?: LeadMagnetData;
+}
 
-export default function EthicalBribe() {
+export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
   const [data, setData] = useState<BribeData>(MOCK_BRIBE);
   const [isCountering, setIsCountering] = useState(false);
   const [counterStrategy, setCounterStrategy] = useState<string | null>(null);
 
+  React.useEffect(() => {
+    if (apiData) {
+      setData({
+        type: (apiData.type as MagnetType) || "Checklist",
+        title: apiData.suggestion || "Suggested Lead Magnet",
+        hook: apiData.whyItWorks || "High value, low friction.",
+        friction: "Low", // Default or derive
+        fields: ["Email"], // Default
+        temp: "Warm", // Default
+        url: "#",
+      });
+    }
+  }, [apiData]);
+
+  // ... rest of component ...
   const getIcon = (type: MagnetType) => {
     switch (type) {
       case "Checklist":

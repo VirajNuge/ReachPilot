@@ -240,26 +240,47 @@ function AnalysisContent() {
               insight: "Typical distribution.",
             },
             crowdSentiment: {
-              positivePercent: 50,
-              neutralPercent: 30,
-              negativePercent: 20,
-              dominantEmotion: "Neutral",
-              insight: "Balanced sentiment.",
+              totalComments: 100,
+              vibeScore: 7.5,
+              vibes: [],
+              sentimentTrend: [],
             },
             questionCloud: [],
             activeHours: [],
             leadMagnet: {
-              suggestion: "Checklist",
-              type: "PDF",
-              relevanceScore: 80,
-              whyItWorks: "Simple and effective.",
+              type: "Checklist",
+              title: "Ultimate Guide",
+              hook: "Get started fast",
+              friction: "Low",
+              temp: "Cold",
+              suggestion: "Create a video course",
+              whyItWorks: "Low barrier relative to high value",
             },
             ctaAnalysis: {
-              effectivenessScore: 50,
-              commonPhrases: [],
-              improvementSuggestion: "Add stronger calls to action.",
+              mix: [
+                { type: "Engagement", score: 40, fullMark: 100 },
+                { type: "Bridge", score: 30, fullMark: 100 },
+                { type: "Conversion", score: 50, fullMark: 100 },
+                { type: "Conversation", score: 60, fullMark: 100 },
+              ],
+              topTrigger: { keyword: "Link in bio", count: 10 },
+              urgencyScore: 50,
+              dominantStyle: "Community Builder",
+              placementHeatmap: [
+                { location: "First Line", count: 2 },
+                { location: "Bottom", count: 25 },
+                { location: "P.S.", count: 3 },
+              ],
             },
-            techStack: [],
+            techStack: {
+              tools: [
+                { category: "Hosting", name: "Vercel", confidence: "High" },
+                { category: "Frontend", name: "Next.js", confidence: "High" },
+              ],
+              businessClass: "SaaS / Agency",
+              verdict:
+                "Professional setup utilizing modern JAMstack architecture.",
+            },
             crowdPersonas: {
               primaryArchetype: {
                 id: "1",
@@ -279,10 +300,50 @@ function AnalysisContent() {
               },
             },
             valueLadder: {
-              products: {},
-              gap: "N/A",
-              insight: "No product data available.",
+              products: {
+                Bait: {
+                  name: "Free Checklist",
+                  price: "Free",
+                  type: "PDF",
+                  intensity: "Low",
+                },
+                Core: {
+                  name: "Masterclass",
+                  price: "$197",
+                  type: "Course",
+                  intensity: "Medium",
+                },
+              },
+              gap: "Missing Tripwire",
+              insight:
+                "Big jump from Free to $197. Add a low-ticket offer to increase conversion.",
             },
+            growthTasks: [
+              {
+                id: "1",
+                title: "Add 'Lead Magnet' Link",
+                category: "Quick Win",
+                impact: 9,
+                effort: 2,
+                type: "Funnel",
+                status: "Pending",
+                reasoning:
+                  "Competitor has no lead magnet. You can capture 20% more leads instantly.",
+                actionType: "Tech",
+              },
+              {
+                id: "2",
+                title: "Launch 'React Patterns' Series",
+                category: "Big Bet",
+                impact: 9,
+                effort: 8,
+                type: "Content",
+                status: "Pending",
+                reasoning:
+                  "High demand in 'The Crowd' for advanced tutorials. Will drive authority.",
+                actionType: "Content",
+              },
+            ],
           };
 
           setData(generatedData);
@@ -384,7 +445,7 @@ function AnalysisContent() {
   return (
     <>
       <OnboardingTour />
-      <div className="analyzeAccContainer font-sans pb-20 pt-2 ">
+      <div className="analyzeAccContainer font-sans pb-20 pt-0">
         <Suspense fallback={<LoadingScreen link={link || ""} />}>
           <div className="flex flex-col gap-6">
             {/* Tabs */}
@@ -691,16 +752,14 @@ function AnalysisContent() {
                         <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
                           {data.questionCloud ? (
                             <QuestionCloud
-                              data={data.questionCloud.map(
-                                (q, i) =>
-                                  ({
-                                    id: `q-${i}`,
-                                    word: q.text || "Question",
-                                    count: q.frequency || 10,
-                                    engagement: "High",
-                                    category: "Question",
-                                  }) as any,
-                              )}
+                              data={data.questionCloud.map((q) => ({
+                                id: q.id || Math.random().toString(),
+                                word: q.word || (q as any).text || "Question",
+                                count: q.count || (q as any).frequency || 0,
+                                engagement: q.engagement || 0,
+                                intent: q.intent || "Educational",
+                                sampleQuestions: q.sampleQuestions || [],
+                              }))}
                             />
                           ) : (
                             <div className="p-4 text-center">

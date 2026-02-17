@@ -192,6 +192,38 @@ REQUIREMENTS:
 
 18. **audiencePersonas**: Infer 3 audience segments from commenter patterns and content topics.
 
+19. **crowdPersonas**: Deep Audience Archetype Modeling – Identify WHO is leading the conversation.
+
+    CRITICAL: Return 1 PRIMARY archetype + 2-3 SECONDARY archetypes.
+
+    METHODOLOGY:
+    1. Analyze comment AUTHORS (not just content):
+        - Who comments most frequently?
+        - What language/jargon do they use?
+        - What are they asking about?
+    2. Cluster commenters into personas based on:
+        - Job role signals (e.g., "I'm a dev", "our agency", "building a SaaS")
+        - Pain points mentioned
+        - Topics they engage with
+
+    For EACH archetype:
+    - **id**: Unique string
+    - **role**: Persona name (e.g., "The Mid-Level Dev", "The Agency Founder", "The Indie Hacker")
+    - **iconName**: Icon identifier from: "UserTie" | "LaptopCode" | "Bullhorn" | "Rocket" | "Users"
+    - **color**: HEX color code (use: #3b82f6, #8b5cf6, #10b981, #f59e0b, #ef4444)
+    - **bio**: 1-2 sentence persona description (who they are, what they do, what they care about)
+    - **percentage**: % of comment volume from this persona (should sum to 100 across all)
+    - **triggers**: Array of 3-4 topics that activate this persona (e.g., ["MRR", "Launch", "Viral"])
+    - **painPoints**: Array of 2-3 problems this persona faces (e.g., ["Churn", "Traffic"])
+
+    Additionally, provide:
+    - **insight**:
+        - **title**: Strategic summary (e.g., "Shift to Advanced Content")
+        - **description**: What the persona distribution reveals
+        - **actionable**: Specific content strategy recommendation
+
+    STRATEGIC INTENT: Use this to guide content strategy. If 60% are "Mid-Level Devs", stop posting "Hello World" tutorials.
+
 19. **hypeValueScore**: Analyze "Hype" vs "Value" balance from ACTUAL post content. Sum = 100.
 
 20. **ideaBank**: Generate 4-5 post ideas that fill gaps in their content strategy.
@@ -207,36 +239,167 @@ REQUIREMENTS:
 23. **shadowAudience**: Estimate lurker vs active commenter ratio using ACTUAL data.
 
 
-24. **crowdSentiment**: Analyze comment section sentiment:
     - positivePercent: 0-100
     - neutralPercent: 0-100
     - negativePercent: 0-100
     - dominantEmotion: e.g. "Inspiring", "Controversial", "Educational"
     - insight: Summary of how people feel
 
-25. **questionCloud**: Identify top 5 questions people ask in comments:
-    - text: The question topic
-    - frequency: How often it appears
+24. **crowdSentiment**: Deep vibe analysis of comment sections across all posts.
+    CRITICAL: Categorize comments into 4 strategic "Vibes" based on INTENT and LANGUAGE PATTERNS:
 
-26. **activeHours**: Heatmap of when their audience is most active (based on comment timestamps):
-    - day: "Monday", etc.
-    - hours: Array of active hours [9, 10, 14, 15]
+    - **Fanboys** (Loyalty & Social Proof):
+        - Detection: "amazing", "obsessed", "love this", "fire", "need this", emojis (🔥❤️), exclamation marks
+        - Percentage: % of total comments
+        - Count: Absolute number
+        - Keywords: Array of 5-8 sample phrases from actual comments
+        - Color: "#8b5cf6" (violet)
+        - Description: "Social Proof & Loyalty"
 
-27. **leadMagnet**: Suggest a high-converting freebie based on their content:
-    - suggestion: e.g. "Ultimate Checklist"
-    - type: "PDF", "Webinar", "Template"
-    - relevanceScore: 0-100
-    - whyItWorks: Strategic reason
+    - **Seekers** (Unmet Demand / High Intent):
+        - Detection: Questions about pricing, shipping, compatibility, how-to, availability
+        - Example patterns: "price?", "does this work with X?", "how to install?", "where to buy?"
+        - Percentage, Count, Keywords, Color: "#3b82f6" (blue)
+        - Description: "Unmet Demand (High Intent)"
 
-28. **ctaAnalysis**: Evaluate their Calls to Action:
-    - effectivenessScore: 0-100
-    - commonPhrases: ["Link in bio", "DM me"]
-    - improvementSuggestion: Better CTA to resize
+    - **Skeptics** (Trust Barriers):
+        - Detection: Doubt, comparison to competitors, requests for proof/reviews
+        - Example: "is this real?", "X is cheaper", "any reviews?", "looks too good to be true"
+        - Percentage, Count, Keywords, Color: "#f59e0b" (amber)
+        - Description: "Trust Barriers"
 
-29. **techStack**: Infer tools they use from their content style:
-    - tool: e.g. "Notion", "Canva", "Hypefury"
-    - category: "Design", "Productivity", "Scheduling"
-    - confidence: "High", "Medium", "Low"
+    - **Critics** (Vulnerabilities):
+        - Detection: Complaints, bugs, service issues, negative experiences
+        - Example: "broken", "slow", "bad support", "no response", "scam"
+        - Percentage, Count, Keywords, Color: "#ef4444" (red)
+        - Description: "Vulnerabilities"
+
+    - **totalComments**: Sum of all comment counts across posts
+    - **vibeScore**: 0-10 overall sentiment (weighted: Fanboys boost, Critics lower)
+    - **sentimentTrend**: Array of 5 objects tracking vibeScore across last 5 posts
+        - Format: [{ post: 1, score: 7.2 }, { post: 2, score: 8.1 }, ...]
+
+    AI INSTRUCTION: Read ACTUAL comment text. Use language patterns, not just keywords. If <10 comments total, still categorize but note low confidence.
+
+25. **questionCloud**: Strategic Question Intelligence – Extract keyword topics from questions/comments and classify by COMMERCIAL INTENT.
+
+    CRITICAL: Return 10-15 KeywordNodes. Each represents a topic/theme.
+
+    For EACH keyword:
+    - **id**: Unique string (e.g., "kw_1")
+    - **word**: Topic label (1-3 words, e.g., "Pricing", "Next.js", "Bug", "Shipping")
+    - **count**: How many comments mention this topic
+    - **engagement**: Average likes/reactions on comments mentioning this (0-100 normalized)
+    - **intent**: Classify as:
+        - **"Buying"** (GREEN): Price, payment, deals, refund, enterprise, purchasing questions
+            - Examples: "lifetime deal?", "discount code?", "enterprise plan?", "money-back guarantee?"
+        - **"Educational"** (BLUE): How-to, tutorials, feature questions, compatibility, integrations
+            - Examples: "how to install?", "works with Shopify?", "tutorial?", "mobile support?"
+        - **"Urgency"** (RED): Bugs, complaints, support requests, issues
+            - Examples: "not working", "slow", "crash", "customer support?"
+
+    - **sampleQuestions**: Array of 2-3 actual questions with:
+        - text: The full question from a comment
+        - likes: Number of likes on that comment
+
+    AI INSTRUCTION:
+    1. Read ALL comments across ALL posts
+    2. Extract question-like phrases (sentences with "?", or requests)
+    3. Cluster similar questions into themes/keywords
+    4. For each keyword, identify intent, count mentions, sample top questions
+
+    PRIORITIZATION: Focus on HIGH-ENGAGEMENT keywords (many mentions OR high likes).
+
+26. **activeHours**: 24-hour activity analysis comparing Creator Posting Schedule vs. Audience Engagement Windows.
+
+    CRITICAL: Return exactly 24 objects (one per hour, 0-23).
+
+    For EACH hour (0 = midnight, 12 = noon, 23 = 11 PM):
+    - **hour**: Integer 0-23
+    - **creatorPosts**: Count of posts made during this hour (analyze post timestamps)
+    - **audienceActivity**: 0-100 heatmap intensity based on:
+        - Comment timestamps (when audience replies)
+        - Like/reaction patterns if timestamps available
+        - Estimation: If most comments arrive 22:00-02:00, those hours = 80-100
+
+    AI LOGIC:
+    1. Parse ALL post timestamps → Identify creator's posting hours
+    2. Parse ALL comment timestamps → Identify audience response hours
+    3. For each of 24 hours, calculate:
+        - creatorPosts: How many posts were made in this hour?
+        - audienceActivity: Normalized comment volume (0-100, where 100 = peak hour)
+
+    STRATEGIC INSIGHT: The "Golden Window" is the hour with HIGHEST audienceActivity. If creator posts at low-activity hours, flag as "Misalignment Opportunity".
+
+27. **leadMagnet**: Analyze the "Ethical Bribe" (Freebie) strategy from bio links/posts.
+    - **type**: "Checklist" | "Webinar" | "Free Trial" | "Discovery Call" | "Other"
+    - **title**: The exact name of the freebie (e.g. "SaaS Launch Checklist")
+    - **hook**: The promise/benefit (e.g. "Get 100 users in 30 days")
+    - **friction**: 
+        - "Low" (Email only)
+        - "Medium" (Name + Email)
+        - "High" (Application/Phone required)
+    - **temp**: 
+        - "Cold" (Low commitment, e.g. PDF/Template)
+        - "Warm" (Webinar/Video)
+        - "Hot" (Call/Consultation)
+    - **suggestion**: A strategic counter-offer (e.g. "They digest content; you should offer a 'Done-For-You' template")
+    - **whyItWorks**: Why this hook is effective (brief analysis)
+
+28. **ctaAnalysis**: Decode the "Ask" strategy.
+    - **mix**: Analyze last 10-20 posts and categorize the "Ask" type (return 4 objects):
+        - { type: "Engagement", score: 0-100, fullMark: 100 } (e.g. "Tag a friend", "Save this")
+        - { type: "Bridge", score: 0-100, fullMark: 100 } (e.g. "Link in bio", "Check my story")
+        - { type: "Conversion", score: 0-100, fullMark: 100 } (e.g. "Buy now", "Sign up", "DM me 'CLIENT'")
+        - { type: "Conversation", score: 0-100, fullMark: 100 } (e.g. "Thoughts?", "Agree?")
+    - **topTrigger**: The most frequent automation keyword used
+        - { keyword: "GROWTH", count: 12 }
+    - **urgencyScore**: 0-100 (High if they use "Limited time", "Expires soon", "Only 3 spots")
+    - **dominantStyle**:
+        - "Hunter-Killer" (Aggressive sales, high Urgency/Conversion)
+        - "Reach Hunter" (Viral focus, high Engagement/Conversation)
+        - "Community Builder" (Balanced, high Conversation/Bridge)
+    - **placementHeatmap**: Where do they put the CTA? (Count occurrences)
+        - [{ location: "First Line", count: 2 }, { location: "Bottom", count: 15 }, { location: "P.S.", count: 5 }]
+
+29. **techStack**: X-Ray their infrastructure to determine "Business Class".
+    - **tools**: Infer tools from content/links (return 3-5 detected tools):
+        - { category: "Hosting", name: "Vercel", confidence: "High" }
+        - { category: "Marketing", name: "Hypefury", confidence: "Medium" }
+        - { category: "Payment", name: "Stripe", confidence: "High" }
+    - **businessClass**:
+        - "Hobbyist" (Linktree, Gumroad, Substack)
+        - "Pro Creator" (Kajabi, Beehiiv, Circle)
+        - "SaaS / Agency" (Custom Next.js, Framer, High-end tracking)
+        - "Enterprise" (HubSpot, Salesforce, Marketo)
+    - **verdict**: A 1-sentence analysis of their sophistication (e.g. "They are running a Pro setup with low overhead.")
+
+30. **valueLadder**: Map their Revenue Ecosystem (Products/Services).
+    - **products**: Identify up to 4 distinct offers from bio links/posts:
+        - **"Bait"** (Free): Lead magnets, newsletters, free templates.
+        - **"Tripwire"** (Low Ticket <$50): E-books, workshops, paid templates.
+        - **"Core"** (Mid Ticket $50-$500): Courses, cohorts, memberships.
+        - **"High-Ticket"** ($500+): Coaching, consulting, done-for-you services.
+    - Return object keys: "Bait", "Tripwire", "Core", "High-Ticket".
+    - For each found product:
+        - { name: "SaaS Kit", price: "$29", type: "Template", intensity: "Low" }
+    - **gap**: Identify the missing rung (e.g. "Missing Tripwire").
+    - **insight**: Strategic advice on how to fill the gap (e.g. "They jump from Free to $500. Offer a $47 workshop to capture the middle.").
+
+31. **growthTasks**: Synthesize a "Growth Battle Plan" (5-7 actionable tasks).
+    - Base tasks on gaps found in Zones 1-4 (e.g., if "Missing Tripwire", suggest "Create $27 Template").
+    - **category**:
+        - "Quick Win" (High Impact, Low Effort)
+        - "Big Bet" (High Impact, High Effort)
+        - "Filler" (Low Impact, Low Effort - avoid suggesting these unless necessary)
+        - "Money Pit" (Low Impact, High Effort - usually something to avoid, but maybe fixable)
+    - **impact**: 1-10 score (10 = Viral/Revenue spike).
+    - **effort**: 1-10 score (10 = Weeks of work).
+    - **type**: "Funnel" (Revenue), "Content" (Reach), "Crowd" (Engagement).
+    - **actionType**: "Bio", "Content", "Strategy", "Tech".
+    - **reasoning**: One sentence on WHY this is high priority (e.g. "Captures lost leads from bio.").
+    - Return a list of objects.
+
 
 Strictly follow the JSON schema. Base everything on the REAL scraped data provided.
   `.trim();

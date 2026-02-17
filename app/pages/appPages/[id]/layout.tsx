@@ -20,7 +20,7 @@ export default function DashboardLayout({
         <TopMenu pageName="Profile Analyzer" />
 
         {/* Scrollable Content Area */}
-        <main className="flex overflow-y-auto [scrollbar-width:none] max-w-[1300px]">
+        <main className="flex overflow-y-auto [scrollbar-width:none] w-full">
           {children}
         </main>
       </div>

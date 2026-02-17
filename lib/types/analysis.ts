@@ -94,22 +94,44 @@ export interface PillarData {
   topPosts: PillarPost[];
 }
 
+export type VibeType = "Fanboys" | "Seekers" | "Skeptics" | "Critics";
+
+export interface VibeData {
+  type: VibeType;
+  percentage: number;
+  count: number;
+  keywords: string[]; // Sample comment phrases
+  color: string;
+  description: string;
+}
+
 export interface CrowdAnalysisData {
-  positivePercent: number;
-  neutralPercent: number;
-  negativePercent: number;
-  dominantEmotion: string;
-  insight: string;
+  totalComments: number;
+  vibeScore: number; // 0-10 overall sentiment
+  vibes: VibeData[];
+  sentimentTrend: { post: number; score: number }[]; // Last 5 posts
+}
+
+export type IntentType = "Urgency" | "Buying" | "Educational";
+
+export interface QuestionData {
+  text: string;
+  likes: number;
 }
 
 export interface KeywordNode {
-  text: string;
-  frequency: number;
+  id: string;
+  word: string; // Keyword/topic, e.g. "Pricing", "Bug", "Tutorial"
+  count: number; // Frequency across all comments
+  engagement: number; // Avg likes/reactions on comments mentioning this
+  intent: IntentType;
+  sampleQuestions: QuestionData[]; // 2-3 actual questions
 }
 
 export interface ActiveHourData {
-  day: string;
-  hours: number[];
+  hour: number; // 0-23
+  creatorPosts: number; // Count of posts made in this hour
+  audienceActivity: number; // 0-100 heat (based on comment timestamps)
 }
 
 export interface SimpleCrowdPersona {
@@ -119,22 +141,42 @@ export interface SimpleCrowdPersona {
 }
 
 export interface LeadMagnetData {
-  suggestion: string;
-  type: string;
-  relevanceScore: number;
-  whyItWorks: string;
+  type: "Checklist" | "Webinar" | "Free Trial" | "Discovery Call" | "Other";
+  title: string;
+  hook: string;
+  friction: "Low" | "Medium" | "High";
+  temp: "Cold" | "Warm" | "Hot";
+  suggestion: string; // Counter-strategy
+  whyItWorks: string; // Added for compatibility with existing code if needed, or stick to the plan.
+  // The previous interface had 'whyItWorks'. The component uses it.
+  // I will keep 'whyItWorks' to avoid breaking the component immediately,
+  // or I should check if the component uses 'suggestion' as 'counterStrategy'.
+  // Looking at EthicalBribe.tsx: title=suggestion, hook=whyItWorks.
+  // The new BribeData has title, hook.
+  // Let's align with the component's BribeData but mapped from API.
 }
 
+export type CTAType = "Engagement" | "Bridge" | "Conversion" | "Conversation";
+
 export interface CTAData {
-  effectivenessScore: number;
-  commonPhrases: string[];
-  improvementSuggestion: string;
+  mix: { type: CTAType; score: number; fullMark: number }[];
+  topTrigger: { keyword: string; count: number };
+  urgencyScore: number; // 0-100
+  dominantStyle: "Hunter-Killer" | "Reach Hunter" | "Community Builder";
+  placementHeatmap: {
+    location: "First Line" | "Bottom" | "P.S.";
+    count: number;
+  }[];
 }
 
 export interface TechStackData {
-  tool: string;
-  category: string;
-  confidence: string;
+  tools: {
+    category: "Hosting" | "Frontend" | "Tracking" | "Payment" | "Marketing";
+    name: string;
+    confidence: "High" | "Medium" | "Low";
+  }[];
+  businessClass: "Hobbyist" | "Pro Creator" | "SaaS / Agency" | "Enterprise";
+  verdict: string;
 }
 
 // Alias for compatibility if needed, or use ViralRecipe directly
@@ -235,10 +277,11 @@ export interface RawAnalysisData {
 
   leadMagnet: LeadMagnetData;
   ctaAnalysis: CTAData;
-  techStack: TechStackData[];
+  techStack: TechStackData;
 
   // New Fields for full UI integration
   valueLadder: LadderData;
+  growthTasks: GrowthTask[];
   crowdPersonas: CrowdPersonaData;
 }
 
@@ -254,7 +297,9 @@ export interface ProductNode {
 }
 
 export interface LadderData {
-  products: Partial<Record<LadderRung, ProductNode>>;
+  products: {
+    [key in "Bait" | "Tripwire" | "Core" | "High-Ticket"]?: ProductNode;
+  };
   gap: string;
   insight: string;
 }
@@ -289,12 +334,12 @@ export interface GrowthTask {
   id: string;
   title: string;
   category: TaskCategory;
-  impact: number;
-  effort: number;
+  impact: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  effort: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
   type: "Funnel" | "Content" | "Crowd";
   status: "Pending" | "In Progress" | "Completed";
-  reasoning?: string; // Added for UI details
-  actionType?: "Bio" | "Content" | "Strategy" | "Tech"; // extended for mapping
+  reasoning: string; // Added for UI details
+  actionType: "Bio" | "Content" | "Strategy" | "Tech"; // extended for mapping
 }
 
 export interface GrowthSimulationResult {

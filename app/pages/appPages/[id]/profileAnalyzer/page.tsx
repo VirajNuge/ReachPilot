@@ -18,13 +18,8 @@ export default function UnifiedAnalyzerPage() {
     <div className="relative min-h-screen bg-[#F9F9FB] font-sans text-gray-900 overflow-x-hidden">
       <MotionBackground />
 
-      <div className="relative z-10 p-4 md:p-8 max-w-7xl mx-auto pb-24">
+      <div className="relative z-10 pl-4 max-w-7xl mx-auto pb-24">
         {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex justify-between items-end"
-        ></motion.div>
 
         {!hasAnalysis ? (
           /* --- STATE 1: GUIDE / LANDING --- */

@@ -17,17 +17,16 @@ import FunnelOptimizer from "../../components/FunnelOptimizer/FunnelOptimizer";
 import CrowdHijacker from "../../components/CrowdHijacker/CrowdHijacker";
 
 // --- Types ---
-export type TaskCategory = "Quick Win" | "Big Bet" | "Filler" | "Money Pit";
-export type ImpactLevel = "High" | "Low";
-export type EffortLevel = "High" | "Low";
+import { GrowthTask } from "../../../../../lib/types/analysis";
 
-export interface GrowthTask {
-  id: string;
-  title: string;
-  category: TaskCategory;
-  impact: ImpactLevel;
-  effort: EffortLevel;
-  type: "Funnel" | "Content" | "Crowd";
+// --- Mock Data ---
+// ... existing mock data ...
+
+// --- Component ---
+// ... imports ...
+
+interface GrowthCommandProps {
+  growthTasks?: GrowthTask[];
 }
 
 // --- Mock Data ---
@@ -96,7 +95,7 @@ import { GrowthSimulationResult } from "../../../../../lib/types/analysis";
 // ... Types & Mock Data ...
 
 // --- Component ---
-export default function GrowthCommand() {
+export default function GrowthCommand({ growthTasks }: GrowthCommandProps) {
   const [simulationValue, setSimulationValue] = useState(20);
   const [activeTab, setActiveTab] = useState<"All" | "Funnel" | "Crowd">("All");
 
@@ -147,7 +146,7 @@ export default function GrowthCommand() {
       <div className="grid grid-cols-12 gap-6">
         {/* 1. Priority Heatmap (The Command Center) */}
         <div className="col-span-12 lg:col-span-7 h-full">
-          <PriorityHeatmap />
+          <PriorityHeatmap tasks={growthTasks} />
         </div>
 
         {/* 2. Growth Trajectory (Simulator) */}

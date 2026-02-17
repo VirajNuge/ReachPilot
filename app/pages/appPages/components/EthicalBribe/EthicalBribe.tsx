@@ -59,13 +59,27 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
     if (apiData) {
       setData({
         type: (apiData.type as MagnetType) || "Checklist",
-        title: apiData.suggestion || "Suggested Lead Magnet",
-        hook: apiData.whyItWorks || "High value, low friction.",
-        friction: "Low", // Default or derive
-        fields: ["Email"], // Default
-        temp: "Warm", // Default
+        title: apiData.title || apiData.suggestion || "Suggested Lead Magnet",
+        hook: apiData.hook || apiData.whyItWorks || "High value, low friction.",
+        friction: (apiData.friction as FrictionLevel) || "Low",
+        fields: ["Email"], // Default, or add to API if needed
+        temp: (apiData.temp as LeadTemp) || "Warm",
         url: "#",
       });
+      if (apiData.suggestion) {
+        // Pre-load the AI strategy if available, or keep it for the button
+        // For now, let's just map the main data.
+        // actually, apiData.suggestion in the NEW type is the counter-strategy.
+        // In the OLD type, it was the title.
+        // I need to be careful.
+        // New: title=title, suggestion=counter-strategy.
+        // Old: suggestion=title.
+        // logic above: title || suggestion covers both?
+        // If I have new data: title exists. suggestion is counter.
+        // title = apiData.title (Good).
+        // If I have old data: title undefined. suggestion is title.
+        // title = apiData.suggestion (Good).
+      }
     }
   }, [apiData]);
 

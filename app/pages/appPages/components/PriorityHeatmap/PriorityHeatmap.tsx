@@ -87,10 +87,10 @@ export default function PriorityHeatmap({
 
   // Helper to position dots on the 10x10 grid
   const getPosition = (impact: number, effort: number) => {
-    // Impact (Y): 10 is top (0%), 1 is bottom (100%)
-    // Effort (X): 1 is left (0%), 10 is right (100%)
-    const top = `${(10 - impact) * 10 + 5}%`;
-    const left = `${(effort - 1) * 11 + 5}%`;
+    // Impact (Y): 10 is top (5%), 1 is bottom (95%)
+    // Effort (X): 1 is left (5%), 10 is right (95%)
+    const top = `${Math.max(5, Math.min(95, (10 - impact) * 10 + 5))}%`;
+    const left = `${Math.max(5, Math.min(95, (effort - 1) * 10 + 5))}%`;
     return { top, left };
   };
 

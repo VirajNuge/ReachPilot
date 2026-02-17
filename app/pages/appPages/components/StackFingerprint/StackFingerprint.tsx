@@ -44,7 +44,7 @@ const MOCK_STACK: StackData = {
 };
 
 interface StackFingerprintProps {
-  data?: TechStackData[];
+  data?: TechStackData;
 }
 
 export default function StackFingerprint({
@@ -54,23 +54,31 @@ export default function StackFingerprint({
 
   React.useEffect(() => {
     if (apiData) {
-      const mappedTech: TechNode[] = apiData.map((item) => ({
-        category: (item.category as any) || "Marketing", // Simple cast or mapping needed
-        name: item.tool,
-        icon: <FaCode />, // Default icon
-        detected: true,
-        impact: item.confidence === "High" ? "High" : "Medium",
-      }));
+      // Map API data to component state
+      // apiData is now the full object, not an array
+      if (apiData.tools) {
+        const mappedTech: TechNode[] = apiData.tools.map((item) => ({
+          category: item.category,
+          name: item.name,
+          icon: <FaCode />, // In a real app, mapping icons by category/name would be better
+          detected: true,
+          impact: item.confidence === "High" ? "High" : "Medium",
+        }));
 
-      // Calculate score based on tech count and confidence
-      const calculatedScore = Math.min(100, apiData.length * 15 + 40);
+        // Use the score if we derived it, or calculate simple one
+        // For now we calculate based on class
+        let baseScore = 40;
+        if (apiData.businessClass === "Pro Creator") baseScore = 65;
+        if (apiData.businessClass === "SaaS / Agency") baseScore = 85;
+        if (apiData.businessClass === "Enterprise") baseScore = 95;
 
-      setData({
-        score: calculatedScore,
-        businessClass: calculatedScore > 80 ? "SaaS / Agency" : "Pro Creator",
-        verdict: "Stack analysis based on publicly available data.",
-        technologies: mappedTech,
-      });
+        setData({
+          score: baseScore,
+          businessClass: apiData.businessClass,
+          verdict: apiData.verdict,
+          technologies: mappedTech,
+        });
+      }
     }
   }, [apiData]);
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CTAData as ApiCTAData } from "../../../../../lib/types/analysis";
+import { CTAData, CTAType } from "../../../../../lib/types/analysis";
 import {
   FaBullhorn,
   FaRobot,
@@ -18,27 +18,13 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 
-// --- Types ---
-export type CTAType = "Engagement" | "Bridge" | "Conversion" | "Conversation";
-
-export interface CTAData {
-  mix: { type: CTAType; score: number; fullMark: number }[];
-  topTrigger: { keyword: string; count: number }; // e.g., "Comment 'GROWTH'"
-  urgencyScore: number; // 0-100
-  dominantStyle: "Hunter-Killer" | "Reach Hunter" | "Community Builder";
-  placementHeatmap: {
-    location: "First Line" | "Bottom" | "P.S.";
-    count: number;
-  }[];
-}
-
 // --- Mock Data ---
 const MOCK_CTA: CTAData = {
   mix: [
-    { type: "Engagement", score: 30, fullMark: 100 }, // Tag a friend
-    { type: "Bridge", score: 60, fullMark: 100 }, // Link in bio
-    { type: "Conversion", score: 20, fullMark: 100 }, // Buy now
-    { type: "Conversation", score: 85, fullMark: 100 }, // DM me
+    { type: "Engagement", score: 30, fullMark: 100 },
+    { type: "Bridge", score: 60, fullMark: 100 },
+    { type: "Conversion", score: 20, fullMark: 100 },
+    { type: "Conversation", score: 85, fullMark: 100 },
   ],
   topTrigger: { keyword: "SCALE", count: 12 },
   urgencyScore: 75,
@@ -52,12 +38,8 @@ const MOCK_CTA: CTAData = {
 
 // --- Component ---
 
-// ... existing imports ...
-
-// ... Types ...
-
 interface CTACommandProps {
-  data?: ApiCTAData;
+  data?: CTAData;
 }
 
 export default function CTACommand({ data: apiData }: CTACommandProps) {
@@ -65,29 +47,15 @@ export default function CTACommand({ data: apiData }: CTACommandProps) {
 
   React.useEffect(() => {
     if (apiData) {
-      setData({
-        mix: [
-          { type: "Engagement", score: 40, fullMark: 100 },
-          { type: "Bridge", score: 30, fullMark: 100 },
-          {
-            type: "Conversion",
-            score: apiData.effectivenessScore || 50,
-            fullMark: 100,
-          },
-          { type: "Conversation", score: 60, fullMark: 100 },
-        ],
-        topTrigger: {
-          keyword: apiData.commonPhrases?.[0] || "Link in bio",
-          count: 10,
-        },
-        urgencyScore: apiData.effectivenessScore || 50,
-        dominantStyle: "Community Builder",
-        placementHeatmap: [
-          { location: "First Line", count: 2 },
-          { location: "Bottom", count: 25 },
-          { location: "P.S.", count: 3 },
-        ],
-      });
+      // If apiData has the new structure, use it directly.
+      // We can check if 'mix' exists to be safe, or just cast if we trust the types.
+      if (apiData.mix) {
+        setData(apiData);
+      } else {
+        // Fallback for old data or partial updates (if any)
+        // For now, we assume new data structure is enforced by parent
+        setData(apiData);
+      }
     }
   }, [apiData]);
 

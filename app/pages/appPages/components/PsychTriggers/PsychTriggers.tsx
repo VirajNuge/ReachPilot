@@ -42,10 +42,10 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
   const safeData: PsychData = data || {
     radarData: [
       { trigger: "Authority", score: 80, fullMark: 100 },
-      { trigger: "Scarcity", score: 40, fullMark: 100 },
+      { trigger: "FOMO", score: 40, fullMark: 100 },
       { trigger: "Social Proof", score: 90, fullMark: 100 },
       { trigger: "Reciprocity", score: 60, fullMark: 100 },
-      { trigger: "Liking", score: 70, fullMark: 100 },
+      { trigger: "Urgency", score: 70, fullMark: 100 },
       { trigger: "Curiosity", score: 50, fullMark: 100 },
     ],
     winningTrigger: "Social Proof",
@@ -55,10 +55,10 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
 
   const triggersList = [
     "Authority",
-    "Scarcity",
+    "FOMO",
     "Social Proof",
     "Reciprocity",
-    "Liking",
+    "Urgency",
     "Curiosity",
   ];
 

@@ -79,8 +79,11 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data }) => {
     setIsGenerating(true);
     setTimeout(() => {
       setIsGenerating(false);
+      const template = safeData.templateStructure
+        .map((line, i) => `${i + 1}. ${line}`)
+        .join("\n\n");
       setGeneratedDraft(
-        `Template based on Viral Logic:\n\n1. HOOK: "Stop [Your Topic's Bad Habit] immediately."\n2. REASON: "It's killing your [Metric/Goal]."\n3. FIX: "Try [Your Solution] instead."\n4. CTA: "Drop a 🔥 if you agree."`,
+        `Template based on Viral Logic:\n\n${template}\n\n// Fill in the brackets with your specific niche topic.`,
       );
     }, 1500);
   };

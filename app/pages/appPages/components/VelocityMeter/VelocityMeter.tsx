@@ -16,7 +16,7 @@ import { FaFire, FaBolt, FaHeartbeat } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
 // --- Types ---
-export type VelocityCategory = "Flash" | "Pulse" | "Slow Burn";
+export type VelocityCategory = "Pulse" | "Momentum" | "Growth" | "Viral";
 
 export interface VelocityData {
   hookRate: number; // 0 - 100
@@ -44,7 +44,7 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
   // Default Mock Data if none provided
   const safeData: VelocityData = data || {
     hookRate: 85,
-    category: "Flash",
+    category: "Momentum",
     velocityGraph: [
       { hour: "1h", engagement: 450 },
       { hour: "2h", engagement: 800 },
@@ -53,38 +53,45 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
       { hour: "24h", engagement: 1200 },
     ],
     insight:
-      "This competitor has a 90% Hook-Rate. They rely on controversial openings.",
+      "This competitor has a high Hook-Rate. They rely on controversial openings.",
   };
 
   // Visual Config based on Category
   const getCategoryConfig = (cat: VelocityCategory) => {
     switch (cat) {
-      case "Flash":
+      case "Pulse":
+        return {
+          icon: <FaHeartbeat />,
+          color: "text-gray-500",
+          bg: "bg-gray-100",
+          gradient: ["#9ca3af", "#6b7280"], // Gray
+          description: "Steady Engagement",
+        };
+      case "Momentum":
+        return {
+          icon: <FaFire />,
+          color: "text-rose-500",
+          bg: "bg-rose-100",
+          gradient: ["#f43f5e", "#e11d48"], // Rose
+          description: "Consistent Growth",
+        };
+      case "Growth":
         return {
           icon: <FaBolt />,
           color: "text-amber-500",
           bg: "bg-amber-100",
           gradient: ["#f59e0b", "#d97706"], // Amber
-          description: "Viral Peak & Hooks",
+          description: "Rapid Trajectory",
         };
-      case "Pulse":
-        return {
-          icon: <FaHeartbeat />,
-          color: "text-rose-500",
-          bg: "bg-rose-100",
-          gradient: ["#f43f5e", "#e11d48"], // Rose
-          description: "Steady Community Growth",
-        };
-      case "Slow Burn":
+      case "Viral":
         return {
           icon: <FaFire />,
           color: "text-indigo-500",
           bg: "bg-indigo-100",
           gradient: ["#6366f1", "#4f46e5"], // Indigo
-          description: "SEO & High Shareability",
+          description: "Massive Reach",
         };
       default:
-        // Fallback for unknown categories
         return {
           icon: <FaHeartbeat />,
           color: "text-rose-500",

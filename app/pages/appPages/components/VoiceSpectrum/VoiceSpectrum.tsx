@@ -15,7 +15,7 @@ export interface VoiceAxis {
   id: string;
   leftLabel: string;
   rightLabel: string;
-  score: number; // 1-10 (1 = Left, 10 = Right)
+  score: number; // -100 to 100
 }
 
 export interface VoiceData {
@@ -35,27 +35,32 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
   const [mimicResult, setMimicResult] = useState("");
 
   const safeData: VoiceData = data || {
-    personaName: "The Scholarly Authority",
+    personaName: "The Tech Philosopher",
     axes: [
-      { id: "tone", leftLabel: "Professional", rightLabel: "Casual", score: 2 }, // Mostly Professional
       {
-        id: "logic",
-        leftLabel: "Scientific",
-        rightLabel: "Emotional",
-        score: 3,
-      }, // More Scientific
+        id: "formal",
+        leftLabel: "Formal",
+        rightLabel: "Casual",
+        score: -40,
+      },
       {
-        id: "energy",
-        leftLabel: "Minimalist",
-        rightLabel: "High-Energy",
-        score: 4,
-      }, // Balanced/Calm
+        id: "tech",
+        leftLabel: "Technical",
+        rightLabel: "Simple",
+        score: -60,
+      },
       {
-        id: "access",
-        leftLabel: "Exclusive",
-        rightLabel: "Accessible",
-        score: 6,
-      }, // Slightly Accessible
+        id: "serious",
+        leftLabel: "Serious",
+        rightLabel: "Playful",
+        score: -20,
+      },
+      {
+        id: "data",
+        leftLabel: "Data-driven",
+        rightLabel: "Story-driven",
+        score: 30,
+      },
     ],
     signatureWords: [
       "Framework",
@@ -117,38 +122,41 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
       <div className="flex flex-col lg:flex-row flex-1 p-6 pt-2 gap-8">
         {/* Left: Interactive Sliders */}
         <div className="flex-1 flex flex-col justify-center gap-5">
-          {safeData.axes.map((axis) => (
-            <div key={axis.id} className="relative">
-              <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                <span className={axis.score <= 4 ? "text-indigo-600" : ""}>
-                  {axis.leftLabel}
-                </span>
-                <span className={axis.score >= 7 ? "text-indigo-600" : ""}>
-                  {axis.rightLabel}
-                </span>
-              </div>
-              {/* Track */}
-              <div className="h-2 w-full bg-gray-100 rounded-full relative overflow-hidden">
-                <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 transform -translate-x-1/2 z-10" />{" "}
-                {/* Center mark */}
+          {safeData.axes.map((axis) => {
+            const percentage = ((axis.score + 100) / 200) * 100;
+            return (
+              <div key={axis.id} className="relative">
+                <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  <span className={axis.score <= -30 ? "text-indigo-600" : ""}>
+                    {axis.leftLabel}
+                  </span>
+                  <span className={axis.score >= 30 ? "text-indigo-600" : ""}>
+                    {axis.rightLabel}
+                  </span>
+                </div>
+                {/* Track */}
+                <div className="h-2 w-full bg-gray-100 rounded-full relative overflow-hidden">
+                  <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 transform -translate-x-1/2 z-10" />{" "}
+                  {/* Center mark */}
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${percentage}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-300 to-indigo-500 rounded-full opacity-50"
+                  />
+                </div>
+                {/* Thumb / Marker */}
                 <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${axis.score * 10}%` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-300 to-indigo-500 rounded-full opacity-50"
-                />
+                  initial={{ left: "50%" }}
+                  animate={{ left: `${percentage}%` }}
+                  transition={{ duration: 1, type: "spring" }}
+                  className="absolute top-5 h-4 w-4 bg-white border-2 border-indigo-600 rounded-full shadow-md z-20 -mt-1.5 transform -translate-x-1/2 flex items-center justify-center"
+                >
+                  <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full" />
+                </motion.div>
               </div>
-              {/* Thumb / Marker */}
-              <motion.div
-                initial={{ left: "50%" }}
-                animate={{ left: `${axis.score * 10}%` }}
-                transition={{ duration: 1, type: "spring" }}
-                className="absolute top-5 h-4 w-4 bg-white border-2 border-indigo-600 rounded-full shadow-md z-20 -mt-1.5 transform -translate-x-1/2 flex items-center justify-center"
-              >
-                <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full" />
-              </motion.div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Right: Insights & Mimic */}

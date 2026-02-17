@@ -36,6 +36,7 @@ interface ContentPillarsProps {
   pillars?: PillarData[];
   aiSummary?: string;
   onGenerateFormula?: () => void;
+  strategyFormula?: string; // New: Detailed formula text
 }
 
 // --- Colors & Config ---
@@ -74,8 +75,10 @@ const ContentPillars: React.FC<ContentPillarsProps> = ({
   pillars = [],
   aiSummary = "Analyzing strategy...",
   onGenerateFormula,
+  strategyFormula,
 }) => {
   const [activePillar, setActivePillar] = useState<PillarData | null>(null);
+  const [showFormulaModal, setShowFormulaModal] = useState(false);
 
   // Normalize data for chart if not provided
   const chartData = pillars.map((p, i) => ({
@@ -223,7 +226,10 @@ const ContentPillars: React.FC<ContentPillarsProps> = ({
 
           {/* Action Button */}
           <button
-            onClick={onGenerateFormula}
+            onClick={() => {
+              if (onGenerateFormula) onGenerateFormula();
+              setShowFormulaModal(true);
+            }}
             className="w-full mt-2 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
           >
             <FaMagic className="text-indigo-400" />
@@ -231,6 +237,44 @@ const ContentPillars: React.FC<ContentPillarsProps> = ({
           </button>
         </div>
       </div>
+
+      {/* --- Formula Modal --- */}
+      <AnimatePresence>
+        {showFormulaModal && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="absolute inset-0 z-20 bg-gray-900/95 backdrop-blur-xl p-8 flex flex-col justify-center items-center text-center"
+          >
+            <div className="bg-indigo-600 p-4 rounded-3xl mb-6 shadow-2xl shadow-indigo-500/20">
+              <FaMagic size={32} className="text-white" />
+            </div>
+            <h3 className="text-2xl font-black text-white mb-2">
+              Your "DNA" Formula
+            </h3>
+            <p className="text-indigo-200 text-sm mb-8 max-w-sm">
+              We've analyzed your top performing Content Pillars to create your
+              optimal growth strategy.
+            </p>
+
+            <div className="bg-white/10 border border-white/10 rounded-2xl p-6 mb-8 w-full max-w-md">
+              <p className="text-white text-lg font-medium leading-relaxed">
+                {strategyFormula ||
+                  aiSummary ||
+                  "Focus on Educational content to build authority, mixed with 20% Personal stories."}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowFormulaModal(false)}
+              className="px-8 py-3 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl font-bold transition-colors"
+            >
+              Got it!
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* --- Deep Dive Overlay (Modal) --- */}
       <AnimatePresence>

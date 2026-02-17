@@ -20,7 +20,7 @@ export interface GapMetric {
   category: string;
   profileValue: number; // %
   benchmarkValue: number; // %
-  gapType: "Opportunity" | "Satigfied" | "Over-indexed";
+  gapType: "Opportunity" | "Over-indexed" | "On Par";
 }
 
 export interface GapData {
@@ -43,27 +43,27 @@ const CompetitorGap: React.FC<CompetitorGapProps> = ({ data }) => {
   const safeData: GapData = data || {
     metrics: [
       {
-        category: "Reels",
+        category: "Engagement Rate",
         profileValue: 80,
         benchmarkValue: 40,
         gapType: "Over-indexed",
       },
       {
-        category: "Carousels",
+        category: "Post Frequency",
         profileValue: 5,
         benchmarkValue: 35,
         gapType: "Opportunity",
       },
       {
-        category: "Static",
-        profileValue: 15,
-        benchmarkValue: 25,
-        gapType: "Opportunity",
+        category: "Content Quality",
+        profileValue: 45,
+        benchmarkValue: 50,
+        gapType: "On Par",
       },
     ],
-    topOpportunity: "Carousels",
+    topOpportunity: "Post Frequency",
     insight:
-      "They are obsessed with Viral Reels (80%), ignoring high-value Carousels. Industry avg is 35%. You can capture the 'Save & Share' audience they are missing.",
+      "This competitor is posting 5x less than the industry average. They have high engagement but low frequency, creating a massive void you can fill.",
     recommendations: [
       "Create a 'State of the Industry' carousel (5 slides).",
       "Summarize their latest viral Reel into a step-by-step PDF/Carousel.",

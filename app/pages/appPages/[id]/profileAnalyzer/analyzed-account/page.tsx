@@ -197,6 +197,7 @@ function AnalysisContent() {
             scheduleHighlight: "Consistency is key.",
             csiScore: 65,
             contentPillars: [], // Will use mock fallback
+            pillarInsight: "Start posting to see your pillars.",
             velocity: {
               hookRate: 0,
               category: "Growth",
@@ -346,15 +347,24 @@ function AnalysisContent() {
 
   // Helper to map API pillar data to UI pillar data
   const mapPillars = (apiPillars?: ApiPillarData[]): UI_PillarData[] => {
-    if (!apiPillars) return MOCK_PILLARS; // Fallback
+    if (!apiPillars || apiPillars.length === 0) return MOCK_PILLARS;
     return apiPillars.map((p, i) => ({
-      name: p.topic,
-      percentage: Math.round(100 / apiPillars.length), // Simple fallback logic
-      count: 0,
-      avgEngagement: p.performance,
-      color: ["#8b5cf6", "#ec4899", "#f59e0b", "#10b981"][i % 4] || "#8b5cf6",
-      description: p.performance,
-      topPosts: [],
+      name: p.name,
+      percentage: p.percentage > 1 ? p.percentage : p.percentage * 100, // Handle both 0.45 and 45
+      count: p.count,
+      avgEngagement: p.avgEngagement,
+      color:
+        p.color ||
+        ["#8b5cf6", "#ec4899", "#f59e0b", "#10b981"][i % 4] ||
+        "#8b5cf6",
+      description: p.description,
+      topPosts: p.topPosts.map((post) => ({
+        id: post.id,
+        type: post.type as any,
+        engagementRate: post.engagementRate,
+        captionSnippet: post.captionSnippet,
+        thumbnail: post.thumbnail,
+      })),
     }));
   };
 
@@ -549,9 +559,7 @@ function AnalysisContent() {
                           <ContentPillars
                             pillars={mapPillars(data.contentPillars)}
                             aiSummary={
-                              data.contentPillars
-                                ? "Analyzed from real data..."
-                                : "No pillars detected."
+                              data.pillarInsight || "Analyzing pillars..."
                             }
                             onGenerateFormula={() =>
                               alert("Creating your custom formula...")

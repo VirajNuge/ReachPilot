@@ -120,12 +120,38 @@ export const analysisSchema: Schema = {
       items: {
         type: SchemaType.OBJECT,
         properties: {
-          topic: { type: SchemaType.STRING },
-          performance: { type: SchemaType.STRING },
+          name: { type: SchemaType.STRING },
+          percentage: { type: SchemaType.NUMBER },
+          count: { type: SchemaType.NUMBER },
+          avgEngagement: { type: SchemaType.STRING },
+          color: { type: SchemaType.STRING },
+          description: { type: SchemaType.STRING },
+          topPosts: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                id: { type: SchemaType.STRING },
+                type: { type: SchemaType.STRING },
+                engagementRate: { type: SchemaType.STRING },
+                captionSnippet: { type: SchemaType.STRING },
+                thumbnail: { type: SchemaType.STRING },
+              },
+              required: ["id", "type", "engagementRate", "captionSnippet"],
+            },
+          },
         },
-        required: ["topic", "performance"],
+        required: [
+          "name",
+          "percentage",
+          "count",
+          "avgEngagement",
+          "description",
+          "topPosts",
+        ],
       },
     },
+    pillarInsight: { type: SchemaType.STRING },
     audiencePersonas: {
       type: SchemaType.ARRAY,
       items: {

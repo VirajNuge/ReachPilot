@@ -21,8 +21,8 @@ import { BsActivity } from "react-icons/bs";
 
 // --- Types ---
 export interface FatigueData {
-  status: "Hungry" | "Saturated" | "Burnout";
-  fatigueScore: number; // 0-100 (0=Hungry, 50=Optimal, 100=Burnout)
+  status: "Healthy" | "Warning" | "Critical";
+  fatigueScore: number; // 0-100
   optimalFrequency: string;
   saturationPoint: number; // Max posts before drop-off
   weeklyImpact: Array<{
@@ -39,14 +39,14 @@ interface PostFatigueProps {
 // --- Component ---
 const PostFatigue: React.FC<PostFatigueProps> = ({ data }) => {
   const safeData: FatigueData = data || {
-    status: "Saturated",
+    status: "Warning",
     fatigueScore: 45,
     optimalFrequency: "3-4 posts/week",
-    saturationPoint: 5,
+    saturationPoint: 2,
     weeklyImpact: [
       { day: "Mon", posts: 1, impactScore: 1.1 },
       { day: "Tue", posts: 0, impactScore: 1.0 },
-      { day: "Wed", posts: 2, impactScore: 0.6 }, // Fatigue hit
+      { day: "Wed", posts: 3, impactScore: 0.6 }, // Fatigue hit
       { day: "Thu", posts: 1, impactScore: 0.9 },
       { day: "Fri", posts: 1, impactScore: 1.2 },
       { day: "Sat", posts: 0, impactScore: 1.0 },
@@ -56,16 +56,16 @@ const PostFatigue: React.FC<PostFatigueProps> = ({ data }) => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Hungry":
+      case "Healthy":
         return {
           text: "text-emerald-500",
           bg: "bg-emerald-50",
           bar: "#10b981",
         };
-      case "Saturated":
-        return { text: "text-blue-500", bg: "bg-blue-50", bar: "#3b82f6" };
-      case "Burnout":
-        return { text: "text-red-500", bg: "bg-red-50", bar: "#ef4444" };
+      case "Warning":
+        return { text: "text-amber-500", bg: "bg-amber-50", bar: "#f59e0b" };
+      case "Critical":
+        return { text: "text-rose-500", bg: "bg-rose-50", bar: "#e11d48" };
       default:
         return { text: "text-gray-500", bg: "bg-gray-50", bar: "#9ca3af" };
     }
@@ -104,7 +104,7 @@ const PostFatigue: React.FC<PostFatigueProps> = ({ data }) => {
         <div
           className={`flex items-center gap-2 px-3 py-1 rounded-full border ${colors.bg} ${colors.text} border-current/20`}
         >
-          {safeData.status === "Burnout" ? (
+          {safeData.status === "Critical" || safeData.status === "Warning" ? (
             <FaExclamationTriangle />
           ) : (
             <FaCheckCircle />

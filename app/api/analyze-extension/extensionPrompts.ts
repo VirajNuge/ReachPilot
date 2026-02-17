@@ -118,45 +118,77 @@ REQUIREMENTS:
     - Content quality signals
     - <50 = burnout risk, >80 = healthy growth
 
-11. **contentPillars**: Identify 3-4 recurring content themes from ACTUAL posts.
-    - performance: "Top Performer", "Consistent", "Underperforming"
+11. **contentPillars**: Analyze the ACTUAL post content and engagement to cluster posts into 3-5 strategic themes (e.g., "Educational/How-to", "Personal/Behind-the-Scenes", "Promotional/Offers", "Thought Leadership"). For each pillar:
+    - name: The theme name (e.g., "Educational")
+    - percentage: Percentage of total content this pillar represents (should sum to 1.0 or 100).
+    - count: Number of posts in this pillar.
+    - avgEngagement: e.g., "3.5%" or "High"
+    - color: A HEX color representing the pillar (e.g., #8b5cf6)
+    - description: A brief summary of what this pillar contains.
+    - topPosts: Array of 2-3 top posts in this category:
+        - id: Post identifier or index
+        - type: "Image", "Video", "Carousel", or "Text"
+        - engagementRate: e.g., "5.2%"
+        - captionSnippet: A 2-sentence summary of the post content.
+        - thumbnail: (Optional) Mention media type if image/video.
+    AI SUMMARY (aiSummary field): Suggest an "Optimal Content Mix" based on their top performers. e.g., "Double down on Educational Reels; they drive 2x more engagement than plain text tips."
 
-12. **velocity**: Analyze engagement speed based on hook strength & format:
-    - hookRate: 0-100 (how strong are the first lines?)
-    - category: "Flash" (high drop-off), "Steady" (consistent), "Slow-Burn" (grows over time)
-    - velocityGraph: 5 points (1h, 2h, 4h, 12h, 24h) estimating cumulative engagement %
-    - insight: 1 sentence analysis
+12. **velocity**: Analyze engagement speed based on hook strength & format. Use ACTUAL data provided:
+    - hookRate: 0-100 (Estimate percentage of views that became interactions in the first 2 hours).
+    - category: Categorize based on Average Engagement Rate:
+        - "Pulse": < 5% engagement
+        - "Momentum": 5-10% engagement
+        - "Growth": 10-20% engagement
+        - "Viral": > 20% engagement
+    - velocityGraph: 5 points (1h, 2h, 4h, 12h, 24h) estimating cumulative engagement units based on the post metrics.
+    - insight: 1 sentence analysis focusing on the hook's effectiveness.
 
-13. **psychTriggers**: Score 0-100 on 6 persuasion levers based on their writing style:
-    - radarData: [{trigger: "Authority", score: 0-100, fullMark: 100}, ...] (Triggers: Authority, Scarcity, Social Proof, Reciprocity, Liking, Curiosity)
-    - winningTrigger: The strongest one
-    - insight: 1 sentence analysis
+13. **psychTriggers**: Score 1-100 on 6 specific persuasion levers based on their writing style and ACTUAL post content.
+    - radarData: Array of objects [{trigger: string, score: number, fullMark: 100}]
+    - REQUIRED TRIGGERS:
+      - **Urgency**: Detection keywords: "limited time", "now", "today only", countdowns.
+      - **Curiosity**: Detection patterns: Questions, cliffhangers, "wait for the end", teasers.
+      - **Social Proof**: Detection keywords: "X people", testimonials, client results, stats, case studies.
+      - **Authority**: Detection signals: Credentials, years of experience, expertise, certifications.
+      - **FOMO**: Detection keywords: "don't miss", "exclusivity", "scarcity", "last chance".
+      - **Reciprocity**: Detection patterns: Free value, actionable tips, industry insights, giveaways.
+    - winningTrigger: The highest scoring trigger.
+    - insight: 1 sentence explaining which trigger is most effective for their engagement.
 
-14. **postFatigue**:
-    - status: "Fresh", "Saturated", "Burned Out"
-    - fatigueScore: 0-100
-    - optimalFrequency: e.g. "3-5 posts/week"
-    - saturationPoint: Max posts/day
-    - weeklyImpact: 7 days (Mon-Sun), impactScore 0-2.0
+14. **postFatigue**: Analyze audience saturation based on posting frequency and engagement decay:
+    - status: "Healthy" (consistent/growing engagement), "Warning" (slight decay), or "Critical" (significant engagement drop-off).
+    - fatigueScore: 0-100 (0 = growing interest, 100 = terminal fatigue).
+    - optimalFrequency: Strategic recommendation, e.g., "Once every 2 days" or "3x per week".
+    - saturationPoint: Number of posts per day/week where engagement starts to significantly drop.
+    - weeklyImpact: 7 days (Mon-Sun), with avg posts and an impactScore (1.0 = baseline, <1.0 = decay, >1.0 = peak interest).
 
-15. **competitorGap**: Compare against benchmarks:
-    - metrics: [{category: "Reels", profileValue: 50, benchmarkValue: 30, gapType: "Over-indexed"}, ...]
-    - topOpportunity: Biggest gap
-    - insight: Strategic analysis
-    - recommendations: 3 actionable tips
+15. **competitorGap**: Benchmark this profile against industry averages for their niche (e.g., SaaS, Creator, Agency).
+    - metrics: Array of objects [{category: string, profileValue: number, benchmarkValue: number, gapType: string}]
+    - REQUIRED CATEGORIES: "Engagement Rate", "Post Frequency", "Content Quality", "Hook Strength".
+    - gapType: "Opportunity" (profile < benchmark), "Over-indexed" (profile > benchmark), or "On Par" (profile ≈ benchmark).
+    - topOpportunity: The category with the largest negative gap.
+    - insight: A detailed analysis of the competitor's weak point.
+    - recommendations: 3 specific tactics to exploit the identified gap.
 
-16. **viralRecipe**: Analyze their BEST performing post:
-    - engagementMultiplier: e.g. "3.5x"
-    - hookType: e.g. "Controversial", "Story", "Data"
-    - hookText: The actual first line
-    - ingredients: [{name: "Visuals", value: "High Contrast", score: 9}, ...]
-    - whyItWorked: Psychological breakdown
-    - templateStructure: 4-step framework
+16. **viralRecipe**: Identify the single highest-engagement post (outlier) to deconstruct:
+    - id: The post ID.
+    - engagementMultiplier: e.g. "5.2x" (compared to their average).
+    - hookType: Classify the hook (e.g., "Negative Hook", "Story", "Contrarian", "Listicle").
+    - hookText: The exact first sentence/line of the post.
+    - ingredients: 3 key elements that made it work (e.g., {name: "Formatting", value: "line breaks every 4 words", score: 9}).
+    - whyItWorked: A psychological analysis of why this specific post resonated.
+    - templateStructure: A 4-line reusable template based on the post's structure (e.g., "1. Hook: [Call out pain point]...").
 
-17. **voiceSpectrum**: Brand voice analysis:
-    - axes: [{id: "tone", leftLabel: "Pro", rightLabel: "Casual", score: 1-10}, ...]
-    - signatureWords: 5 unique words
-    - insight: Tone analysis
+17. **voiceSpectrum**: Deep brand voice analysis across 4 specific axes:
+    - axes: Array of 4 objects [{id: string, leftLabel: string, rightLabel: string, score: number}]
+    - REQUIRED AXES:
+        1. **Formal ↔ Casual** (Score -100 to 100: -100 = Extremely Formal, 100 = Street Slang/Casual)
+        2. **Technical ↔ Simple** (Score -100 to 100: -100 = Expert/Jargon-heavy, 100 = ELI5/Simple)
+        3. **Serious ↔ Playful** (Score -100 to 100: -100 = No-nonsense/Grave, 100 = Humorous/Witty)
+        4. **Data-driven ↔ Story-driven** (Score -100 to 100: -100 = Statistics/Facts, 100 = Narratives/Anecdotes)
+    - personaName: A catchy 2-3 word name for this writing style (e.g. "The Tech Philosopher").
+    - signatureWords: 5 unique words or phrases they use frequently.
+    - insight: 1 sentence analysis of why this voice works for their audience.
 
 18. **audiencePersonas**: Infer 3 audience segments from commenter patterns and content topics.
 

@@ -24,15 +24,7 @@ export default function UnifiedAnalyzerPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8 flex justify-between items-end"
-        >
-          {/* Dev Toggle - Remove in production */}
-          <button
-            onClick={() => setHasAnalysis(!hasAnalysis)}
-            className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
-          >
-            [Dev: Toggle Analysis View]
-          </button>
-        </motion.div>
+        ></motion.div>
 
         {!hasAnalysis ? (
           /* --- STATE 1: GUIDE / LANDING --- */

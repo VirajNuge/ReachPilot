@@ -76,9 +76,22 @@ export interface VoiceData {
 
 // Extracted interfaces for reusability
 
+export interface PillarPost {
+  id: string;
+  type: string;
+  engagementRate: string;
+  captionSnippet: string;
+  thumbnail?: string;
+}
+
 export interface PillarData {
-  topic: string;
-  performance: string;
+  name: string;
+  percentage: number;
+  count: number;
+  avgEngagement: string;
+  color?: string;
+  description: string;
+  topPosts: PillarPost[];
 }
 
 export interface CrowdAnalysisData {
@@ -180,6 +193,7 @@ export interface RawAnalysisData {
 
   // Lab Data uses extracted or existing interfaces
   contentPillars: PillarData[];
+  pillarInsight: string;
   velocity: VelocityData;
   psychTriggers: PsychData;
   postFatigue: FatigueData;

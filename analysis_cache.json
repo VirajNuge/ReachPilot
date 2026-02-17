@@ -1,0 +1,688 @@
+{
+  "analysis": {
+    "profile": {
+      "name": "Marc Lou",
+      "headline": "Building TrustMRR and helping founders sell startups.",
+      "followers": 15000,
+      "projects": "TrustMRR",
+      "profileScore": 68
+    },
+    "quickFixes": [
+      {
+        "headline": "Increase posting frequency to 3-5 times per day.",
+        "description": "Currently, posting frequency is low (1.7 posts/day). Increasing this to the optimal range for X (Twitter) will improve visibility and engagement.",
+        "tag": "HIGH IMPACT"
+      },
+      {
+        "headline": "Incorporate more diverse content formats, such as polls and threads.",
+        "description": "The content mix is currently limited to images, text, and mixed media. Adding polls and threads can boost engagement.",
+        "tag": "HIGH IMPACT"
+      },
+      {
+        "headline": "Actively engage with other accounts in the industry.",
+        "description": "Reply, retweet, and quote tweets from relevant accounts to increase visibility and build relationships.",
+        "tag": "MEDIUM IMPACT"
+      },
+      {
+        "headline": "Experiment with different posting times to identify optimal engagement windows.",
+        "description": "While there are peak times, testing different times can reveal unique engagement patterns for your audience.",
+        "tag": "MEDIUM IMPACT"
+      },
+      {
+        "headline": "Include clear calls to action in posts.",
+        "description": "Encourage specific actions, such as visiting TrustMRR or sharing the post, to improve conversion.",
+        "tag": "MEDIUM IMPACT"
+      },
+      {
+        "headline": "Optimize profile bio with relevant keywords.",
+        "description": "Improve searchability by including keywords related to startup sales and TrustMRR in the bio.",
+        "tag": "LOW IMPACT"
+      }
+    ],
+    "bioAnalysis": {
+      "clarityScore": 7,
+      "keywordScore": 6,
+      "tone": "Casual and conversational, with a focus on startup sales and legal documents.",
+      "strengths": [
+        "Clear focus on startup sales and TrustMRR",
+        "Conversational and engaging tone",
+        "Demonstrates expertise in legal document generation"
+      ],
+      "weaknesses": [
+        "Limited use of relevant keywords",
+        "Inconsistent posting schedule",
+        "Lacks a strong call to action in posts"
+      ],
+      "suggestions": [
+        "Incorporate more relevant keywords related to startups, sales, and legal tech.",
+        "Establish a consistent posting schedule to maintain visibility.",
+        "Include clear calls to action to drive engagement and conversions."
+      ]
+    },
+    "keywords": {
+      "current": [
+        "startups",
+        "TrustMRR",
+        "legal documents",
+        "sale",
+        "offers",
+        "Escrow",
+        "sold",
+        "founders",
+        "projects",
+        "payments"
+      ],
+      "missing": [
+        "acquisition",
+        "venture capital",
+        "entrepreneurship",
+        "SaaS",
+        "exit strategy",
+        "due diligence",
+        "marketplace",
+        "startup valuation"
+      ]
+    },
+    "textAnalysis": {
+      "frequency": "Low. 1.7 posts/day is below optimal.",
+      "contentMix": "Moderate. Primarily images and text, needs more video.",
+      "engagement": "Inconsistent. Some posts have high engagement, others very low."
+    },
+    "contentMetrics": {
+      "frequencyScore": 30,
+      "contentMixScore": 60,
+      "engagementScore": 55
+    },
+    "schedule": [
+      {
+        "day": "Monday",
+        "slots": [
+          {
+            "id": "Morning",
+            "label": "9 AM - 12 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Afternoon",
+            "label": "12 PM - 3 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Late Afternoon",
+            "label": "3 PM - 6 PM",
+            "value": 35,
+            "engagement": "Medium"
+          },
+          {
+            "id": "Evening",
+            "label": "6 PM - 9 PM",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "Tuesday",
+        "slots": [
+          {
+            "id": "Morning",
+            "label": "9 AM - 12 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Afternoon",
+            "label": "12 PM - 3 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Late Afternoon",
+            "label": "3 PM - 6 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Evening",
+            "label": "6 PM - 9 PM",
+            "value": 50,
+            "engagement": "High"
+          }
+        ]
+      },
+      {
+        "day": "Wednesday",
+        "slots": [
+          {
+            "id": "Morning",
+            "label": "9 AM - 12 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Afternoon",
+            "label": "12 PM - 3 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Late Afternoon",
+            "label": "3 PM - 6 PM",
+            "value": 60,
+            "engagement": "High"
+          },
+          {
+            "id": "Evening",
+            "label": "6 PM - 9 PM",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "Thursday",
+        "slots": [
+          {
+            "id": "Morning",
+            "label": "9 AM - 12 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Afternoon",
+            "label": "12 PM - 3 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Late Afternoon",
+            "label": "3 PM - 6 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Evening",
+            "label": "6 PM - 9 PM",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "Friday",
+        "slots": [
+          {
+            "id": "Morning",
+            "label": "9 AM - 12 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Afternoon",
+            "label": "12 PM - 3 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Late Afternoon",
+            "label": "3 PM - 6 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Evening",
+            "label": "6 PM - 9 PM",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "Saturday",
+        "slots": [
+          {
+            "id": "Morning",
+            "label": "9 AM - 12 PM",
+            "value": 50,
+            "engagement": "High"
+          },
+          {
+            "id": "Afternoon",
+            "label": "12 PM - 3 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Late Afternoon",
+            "label": "3 PM - 6 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Evening",
+            "label": "6 PM - 9 PM",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "Sunday",
+        "slots": [
+          {
+            "id": "Morning",
+            "label": "9 AM - 12 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Afternoon",
+            "label": "12 PM - 3 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Late Afternoon",
+            "label": "3 PM - 6 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "Evening",
+            "label": "6 PM - 9 PM",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      }
+    ],
+    "scheduleHighlight": "Wednesdays at 4 PM and Saturdays at 11 AM have shown good engagement. Tuesdays at 8 PM also perform well.",
+    "csiScore": 65,
+    "contentPillars": [
+      {
+        "topic": "Startup Sales & Acquisition",
+        "performance": "Top Performer"
+      },
+      {
+        "topic": "TrustMRR Updates & Features",
+        "performance": "Consistent"
+      },
+      {
+        "topic": "Legal Documents & Escrow",
+        "performance": "Consistent"
+      }
+    ],
+    "audiencePersonas": [
+      {
+        "name": "Startup Founders",
+        "description": "Looking to sell their startups or learn about the acquisition process.",
+        "percentage": 45
+      },
+      {
+        "name": "Investors",
+        "description": "Interested in acquiring startups or investing in TrustMRR.",
+        "percentage": 30
+      },
+      {
+        "name": "Legal Professionals",
+        "description": "Providing legal services related to startup sales and acquisitions.",
+        "percentage": 25
+      }
+    ],
+    "hypeValueScore": {
+      "hype": 40,
+      "value": 60
+    },
+    "ideaBank": [
+      {
+        "concept": "Create a thread discussing the common mistakes founders make when selling their startups.",
+        "impact": "High"
+      },
+      {
+        "concept": "Share a case study of a successful startup sale on TrustMRR.",
+        "impact": "High"
+      },
+      {
+        "concept": "Host a live Q&A session about legal document generation for startups.",
+        "impact": "Medium"
+      },
+      {
+        "concept": "Run a poll asking followers what their biggest challenge is when selling a startup.",
+        "impact": "Medium"
+      }
+    ],
+    "postDNA": [
+      {
+        "hookType": "Personal Story",
+        "format": "Image",
+        "topic": "Startup Sale Offers",
+        "verdict": "Performed well due to the relatable story and clear value proposition."
+      },
+      {
+        "hookType": "Update",
+        "format": "Text",
+        "topic": "Response to Confusion",
+        "verdict": "Performed poorly due to lack of context and value."
+      },
+      {
+        "hookType": "Achievement",
+        "format": "Image",
+        "topic": "Startup Sale Completion",
+        "verdict": "Performed moderately well due to showcasing success and social proof."
+      },
+      {
+        "hookType": "Expression",
+        "format": "Text",
+        "topic": "Short Response",
+        "verdict": "Performed poorly, lacked value and context."
+      },
+      {
+        "hookType": "How-to",
+        "format": "Mixed Media",
+        "topic": "Life Improvement",
+        "verdict": "Performed very well due to offering practical advice and visual appeal."
+      }
+    ],
+    "tribes": [
+      {
+        "name": "Startup Community",
+        "size": 60,
+        "growth": "Stable",
+        "sentiment": "Positive"
+      },
+      {
+        "name": "Legal Tech Enthusiasts",
+        "size": 25,
+        "growth": "Growing",
+        "sentiment": "Neutral"
+      },
+      {
+        "name": "TrustMRR Users",
+        "size": 15,
+        "growth": "Stable",
+        "sentiment": "Positive"
+      }
+    ],
+    "shadowAudience": {
+      "lurkersPercent": 80,
+      "engagersPercent": 20,
+      "insight": "A significant portion of the audience is passive, suggesting a need for more engaging content."
+    },
+    "velocity": {
+      "hookRate": 75,
+      "category": "Steady",
+      "velocityGraph": [
+        {
+          "hour": "1h",
+          "engagement": 15
+        },
+        {
+          "hour": "2h",
+          "engagement": 30
+        },
+        {
+          "hour": "4h",
+          "engagement": 55
+        },
+        {
+          "hour": "12h",
+          "engagement": 80
+        },
+        {
+          "hour": "24h",
+          "engagement": 100
+        }
+      ],
+      "insight": "Engagement increases steadily over time, suggesting the content resonates with the audience."
+    },
+    "psychTriggers": {
+      "radarData": [
+        {
+          "trigger": "Authority",
+          "score": 70,
+          "fullMark": 100
+        },
+        {
+          "trigger": "Scarcity",
+          "score": 30,
+          "fullMark": 100
+        },
+        {
+          "trigger": "Social Proof",
+          "score": 60,
+          "fullMark": 100
+        },
+        {
+          "trigger": "Reciprocity",
+          "score": 40,
+          "fullMark": 100
+        },
+        {
+          "trigger": "Liking",
+          "score": 50,
+          "fullMark": 100
+        },
+        {
+          "trigger": "Curiosity",
+          "score": 80,
+          "fullMark": 100
+        }
+      ],
+      "winningTrigger": "Curiosity",
+      "insight": "Curiosity is the strongest trigger, suggesting the need for more intriguing and thought-provoking content."
+    },
+    "postFatigue": {
+      "status": "Fresh",
+      "fatigueScore": 30,
+      "optimalFrequency": "3-5 posts/day",
+      "saturationPoint": 5,
+      "weeklyImpact": [
+        {
+          "day": "Mon",
+          "posts": 0,
+          "impactScore": 0
+        },
+        {
+          "day": "Tue",
+          "posts": 1,
+          "impactScore": 0.8
+        },
+        {
+          "day": "Wed",
+          "posts": 3,
+          "impactScore": 1.2
+        },
+        {
+          "day": "Thu",
+          "posts": 0,
+          "impactScore": 0
+        },
+        {
+          "day": "Fri",
+          "posts": 0,
+          "impactScore": 0
+        },
+        {
+          "day": "Sat",
+          "posts": 1,
+          "impactScore": 0.6
+        },
+        {
+          "day": "Sun",
+          "posts": 0,
+          "impactScore": 0
+        }
+      ]
+    },
+    "competitorGap": {
+      "metrics": [
+        {
+          "category": "Posting Frequency",
+          "profileValue": 1.7,
+          "benchmarkValue": 4,
+          "gapType": "Under-indexed"
+        },
+        {
+          "category": "Engagement Rate",
+          "profileValue": 0.2,
+          "benchmarkValue": 1.5,
+          "gapType": "Under-indexed"
+        },
+        {
+          "category": "Video Usage",
+          "profileValue": 20,
+          "benchmarkValue": 50,
+          "gapType": "Under-indexed"
+        }
+      ],
+      "topOpportunity": "Increase Posting Frequency",
+      "insight": "Significant opportunities exist in increasing posting frequency and improving engagement rates. Leveraging video content could also bridge the gap.",
+      "recommendations": [
+        "Schedule more posts throughout the day to reach a wider audience.",
+        "Experiment with different content formats to improve engagement.",
+        "Incorporate more video content to capture attention and increase shareability."
+      ]
+    },
+    "viralRecipe": [
+      {
+        "id": "Post 5",
+        "engagementMultiplier": "9.0x",
+        "hookType": "Question",
+        "hookText": "How to fix your entire life in 1 day",
+        "ingredients": [
+          {
+            "name": "Visuals",
+            "value": "High Quality",
+            "score": 9
+          },
+          {
+            "name": "Value Proposition",
+            "value": "Clear and Concise",
+            "score": 8
+          },
+          {
+            "name": "Relatability",
+            "value": "Offers Practical Advice",
+            "score": 7
+          }
+        ],
+        "whyItWorked": "The post resonated with the audience because it offered a simple solution to a common problem and presented it in a visually appealing manner.",
+        "templateStructure": [
+          "Intriguing Hook",
+          "Visual Aid",
+          "Step-by-Step Instructions",
+          "Call to Action"
+        ]
+      }
+    ],
+    "voiceSpectrum": {
+      "personaName": "The Pragmatic Entrepreneur",
+      "axes": [
+        {
+          "id": "tone",
+          "leftLabel": "Pro",
+          "rightLabel": "Casual",
+          "score": 7
+        },
+        {
+          "id": "style",
+          "leftLabel": "Formal",
+          "rightLabel": "Informal",
+          "score": 6
+        },
+        {
+          "id": "attitude",
+          "leftLabel": "Serious",
+          "rightLabel": "Humorous",
+          "score": 4
+        }
+      ],
+      "signatureWords": [
+        "TrustMRR",
+        "Escrow",
+        "Rince",
+        "Mehroz",
+        "Whop"
+      ],
+      "insight": "The voice is predominantly casual and informal, with a pragmatic approach to entrepreneurship."
+    },
+    "crowdSentiment": {
+      "positivePercent": 65,
+      "neutralPercent": 30,
+      "negativePercent": 5,
+      "dominantEmotion": "Inspiring",
+      "insight": "The overall sentiment is positive, with a sense of inspiration and encouragement."
+    },
+    "questionCloud": [
+      {
+        "text": "How can I list my startup?",
+        "frequency": 3
+      },
+      {
+        "text": "How can I access my startup?",
+        "frequency": 1
+      },
+      {
+        "text": "Can I use crypto payments?",
+        "frequency": 1
+      },
+      {
+        "text": "What kind of offers are you getting?",
+        "frequency": 1
+      },
+      {
+        "text": "How does TrustMRR work?",
+        "frequency": 1
+      }
+    ],
+    "activeHours": [
+      {
+        "day": "Tuesday",
+        "hours": [
+          20
+        ]
+      },
+      {
+        "day": "Wednesday",
+        "hours": [
+          16
+        ]
+      },
+      {
+        "day": "Saturday",
+        "hours": [
+          11
+        ]
+      }
+    ],
+    "leadMagnet": {
+      "suggestion": "Ultimate Checklist for Selling Your Startup",
+      "type": "PDF",
+      "relevanceScore": 90,
+      "whyItWorks": "Provides tangible value to the audience and addresses a key pain point."
+    },
+    "ctaAnalysis": {
+      "effectivenessScore": 50,
+      "commonPhrases": [],
+      "improvementSuggestion": "Include clear and specific calls to action in every post."
+    },
+    "techStack": [
+      {
+        "tool": "X (Twitter) Analytics",
+        "category": "Analytics",
+        "confidence": "High"
+      },
+      {
+        "tool": "Canva",
+        "category": "Design",
+        "confidence": "Medium"
+      }
+    ]
+  },
+  "platform": "x",
+  "postCount": 5,
+  "source": "extension_scrape",
+  "timestamp": 1771258401463
+}

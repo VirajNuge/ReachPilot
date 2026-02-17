@@ -110,7 +110,6 @@ export function formatExtensionData(posts: ExtensionPost[]): string {
   });
   const topCommenters = Object.entries(commenterFreq)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
     .map(([user, count]) => `${user} (${count}x)`)
     .join(", ");
 
@@ -133,16 +132,12 @@ export function formatExtensionData(posts: ExtensionPost[]): string {
       : "Unknown";
 
     const topComments = post.comments
-      .slice(0, 5)
-      .map(
-        (c) =>
-          `  • "${c.text.substring(0, 200)}" — ${c.user} (${c.engagement.likes} ❤️)`,
-      )
+      .map((c) => `  • "${c.text}" — ${c.user} (${c.engagement.likes} ❤️)`)
       .join("\n");
 
     return `
 POST ${i + 1}:
-Content: "${post.content.substring(0, 500)}"
+Content: "${post.content}"
 URL: ${post.postUrl}
 Posted: ${!isNaN(postDate.getTime()) ? postDate.toLocaleString() : post.postedAt} (${dayOfWeek} at ${hourPosted})
 Content Type: ${contentType}

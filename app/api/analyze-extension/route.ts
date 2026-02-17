@@ -66,6 +66,7 @@ export async function POST(req: Request) {
 
     const platform = data.posts[0]?.platform || "unknown";
     const postCount = data.posts.length;
+    const profile = data.profile || {};
     const source = data.source || "extension_scrape";
 
     console.log(
@@ -79,7 +80,7 @@ export async function POST(req: Request) {
     );
 
     // 4. Build the extension-specific prompt
-    const prompt = buildExtensionPrompt(formattedData, platform);
+    const prompt = buildExtensionPrompt(formattedData, platform, profile);
 
     // 5. Setup Gemini with structured output
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -101,6 +102,15 @@ export async function POST(req: Request) {
 
     // 6. Parse and cache the structured analysis
     const analysis = JSON.parse(analysisText);
+
+    // Overwrite analysis.profile with scraped profile data if available for better UI accuracy
+    if (profile.name) analysis.profile.name = profile.name;
+    if (profile.followers) analysis.profile.followers = profile.followers;
+    // Store additional scraped fields
+    analysis.profile.bio = profile.bio;
+    analysis.profile.pfp = profile.pfp;
+    analysis.profile.banner = profile.banner;
+    analysis.profile.followingCount = profile.following;
 
     const cacheData = {
       analysis,

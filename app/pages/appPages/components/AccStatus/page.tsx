@@ -9,6 +9,7 @@ interface AccStatusProps {
   title: string;
   image: string;
   followers: number;
+  following?: number;
   projects: string | number;
   target: number;
 }
@@ -47,6 +48,7 @@ export default function AccStatusBar({
   title,
   image,
   followers,
+  following,
   projects,
   target,
 }: AccStatusProps) {
@@ -122,6 +124,22 @@ export default function AccStatusBar({
                 </p>
               </div>
             </div>
+
+            {following !== undefined && (
+              <div className="group flex items-center gap-3 rounded-2xl bg-gray-50 px-5 py-2.5 transition-all hover:bg-white hover:shadow-md border border-transparent hover:border-violet-100">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-violet-600 shadow-sm transition-colors">
+                  <BsPersonFill size={14} />
+                </div>
+                <div className="text-left">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Following
+                  </p>
+                  <p className="text-sm font-bold text-gray-900">
+                    <AnimatedCounter value={following} />
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div className="group flex items-center gap-3 rounded-2xl bg-gray-50 px-5 py-2.5 transition-all hover:bg-white hover:shadow-md border border-transparent hover:border-blue-100">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm transition-colors">

@@ -27,10 +27,20 @@ function normalizePlatform(platform: string): Platform {
 export function buildExtensionPrompt(
   formattedData: string,
   platform: string,
+  profile: any = {},
 ): string {
   const platformType = normalizePlatform(platform);
   const benchmarks = PLATFORM_BENCHMARKS[platformType];
   const platformName = getPlatformName(platform);
+
+  const profileSummary = `
+- Name: ${profile.name || "Unknown"}
+- Bio: ${profile.bio || "No bio scraped"}
+- Followers: ${profile.followers || "Unknown"}
+- Following: ${profile.following || "Unknown"}
+- Profile Pic: ${profile.pfp || "None"}
+- Banner: ${profile.banner || "None"}
+  `.trim();
 
   return `
 You are an expert ${platformName} profile analyst and growth strategist.
@@ -38,7 +48,12 @@ You are an expert ${platformName} profile analyst and growth strategist.
 Below is REAL SCRAPED DATA from a ${platformName} profile, captured by a browser extension.
 This includes actual post content, engagement metrics, posting patterns, and comment data.
 
-SCRAPED PROFILE DATA:
+SCRAPED PROFILE INFO:
+---
+${profileSummary}
+---
+
+SCRAPED CONTENT DATA:
 ---
 ${formattedData}
 ---
@@ -69,7 +84,7 @@ REQUIREMENTS:
 
 2. **profile.headline**: Infer the creator's positioning from their content patterns.
 
-3. **profile.followers**: Estimate from engagement patterns (if not directly available).
+3. **profile.followers**: Use the REAL follower count from the scraped profile info: ${profile.followers || "Unknown"}. If unknown, estimate from engagement.
 
 4. **quickFixes**: Generate 6-8 ${platformName}-specific fixes:
    - 2-3 HIGH IMPACT (content strategy, posting cadence)

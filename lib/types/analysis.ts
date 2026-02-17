@@ -132,6 +132,10 @@ export interface RawAnalysisData {
     name: string;
     headline: string;
     followers: number;
+    followingCount?: number;
+    bio?: string;
+    pfp?: string;
+    banner?: string;
     projects: string;
     profileScore: number;
   };

@@ -431,9 +431,12 @@ function AnalysisContent() {
                         <div className="w-[750px]">
                           <AccStatus
                             name={data.profile?.name || "User"}
-                            title={data.profile?.headline || ""}
-                            image="/images/app/pp.jpg"
+                            title={
+                              data.profile?.bio || data.profile?.headline || ""
+                            }
+                            image={data.profile?.pfp || "/images/app/pp.jpg"}
                             followers={data.profile?.followers || 0}
+                            following={data.profile?.followingCount}
                             projects={data.profile?.projects || "0"}
                             target={data.profile?.profileScore || 50}
                           />

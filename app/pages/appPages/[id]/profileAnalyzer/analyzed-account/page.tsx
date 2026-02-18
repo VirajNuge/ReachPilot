@@ -25,6 +25,7 @@ import LoadingScreen from "../../../components/LoadingScreen/LoadingScreen";
 import { ErrorState } from "../../../components/ErrorState/ErrorState";
 import { AnalyzerTabs } from "../../../components/Shared/AnalyzerTabs";
 
+import PulseHeader from "../../../components/Pulse/PulseHeader";
 import PulseScore from "../../../components/Pulse/PulseScore";
 import HeartbeatChart from "../../../components/Pulse/HeartbeatChart";
 import EngagementVitalsPanel from "../../../components/Pulse/EngagementVitals";
@@ -538,36 +539,40 @@ function AnalysisContent() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="grid grid-cols-1 lg:grid-cols-3 gap-6"
                   >
-                    {/* Left Column (Wide) - 2/3 width */}
-                    <div className="lg:col-span-2 flex flex-col gap-6">
-                      {/* Pulse Score - Top Hero */}
-                      <PulseScore data={data} />
+                    {/* Header Summary */}
+                    <PulseHeader profile={data.profile} />
 
-                      {/* Heartbeat Chart - Middle */}
-                      <HeartbeatChart data={data.pulseHeartbeat} />
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Left Column (Wide) - 2/3 width */}
+                      <div className="lg:col-span-2 flex flex-col gap-6">
+                        {/* Pulse Score - Top Hero */}
+                        <PulseScore data={data} />
 
-                      {/* Growth Trend - Bottom */}
-                      <div className="min-h-[200px]">
-                        <GrowthTrend data={data.growthTrajectory} />
+                        {/* Heartbeat Chart - Middle */}
+                        <HeartbeatChart data={data.pulseHeartbeat} />
+
+                        {/* Growth Trend - Bottom */}
+                        <div className="min-h-[200px]">
+                          <GrowthTrend data={data.growthTrajectory} />
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Right Column (Narrow) - 1/3 width */}
-                    <div className="flex flex-col gap-6">
-                      {/* Engagement Vitals */}
-                      <EngagementVitalsPanel
-                        data={data.engagementVitals}
-                        contentMetrics={data.contentMetrics}
-                      />
+                      {/* Right Column (Narrow) - 1/3 width */}
+                      <div className="flex flex-col gap-6">
+                        {/* Engagement Vitals */}
+                        <EngagementVitalsPanel
+                          data={data.engagementVitals}
+                          contentMetrics={data.contentMetrics}
+                        />
 
-                      {/* Audience Temp */}
-                      <AudienceTemp data={data.audienceTemperature} />
+                        {/* Audience Temp */}
+                        <AudienceTemp data={data.audienceTemperature} />
 
-                      {/* Triage Station - Bottom */}
-                      <div className="flex-1 min-h-[300px]">
-                        <TriageStation fixes={data.quickFixes} />
+                        {/* Triage Station - Bottom */}
+                        <div className="flex-1 min-h-[300px]">
+                          <TriageStation fixes={data.quickFixes} />
+                        </div>
                       </div>
                     </div>
                   </motion.div>

@@ -2,7 +2,14 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FaChrome, FaArrowRight, FaSearch, FaMagic } from "react-icons/fa";
+import {
+  FaChrome,
+  FaArrowRight,
+  FaSearch,
+  FaMagic,
+  FaShare,
+  FaChevronRight,
+} from "react-icons/fa";
 import MotionBackground from "../../components/Shared/MotionBackground";
 import HookCTAScorecard from "../../components/PostAnalyzer/HookCTAScorecard";
 import CommentGapDiscovery from "../../components/PostAnalyzer/CommentGapDiscovery";
@@ -12,6 +19,7 @@ import ViralVelocity from "../../components/PostAnalyzer/ViralVelocity";
 import SentimentVibe from "../../components/PostAnalyzer/SentimentVibe";
 import AIRemixEngine from "../../components/PostAnalyzer/AIRemixEngine";
 import CompetitorBenchmarking from "../../components/PostAnalyzer/CompetitorBenchmarking";
+import RetentionHook from "../../components/PostAnalyzer/RetentionHook";
 
 export default function PostAnalyzerPage() {
   const [hasAnalysis, setHasAnalysis] = useState(false); // Toggle for demo purposes
@@ -20,29 +28,24 @@ export default function PostAnalyzerPage() {
     <div className="relative min-h-screen bg-[#F9F9FB] font-sans text-gray-900 overflow-x-hidden">
       <MotionBackground />
 
-      <div className="relative z-10 p-4 md:p-8 max-w-7xl mx-auto pb-24">
-        {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex justify-between items-end"
-        >
-          {/* Dev Toggle - Remove in production */}
+      <div className="relative z-10 px-4 py-6 md:px-8 max-w-[1600px] mx-auto pb-24">
+        {/* Dev Toggle - Remove in production */}
+        <div className="absolute top-4 right-4 z-50">
           <button
             onClick={() => setHasAnalysis(!hasAnalysis)}
-            className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
+            className="text-[10px] text-gray-300 hover:text-gray-500 bg-white/50 px-2 py-1 rounded border border-gray-100"
           >
             [Dev: Toggle View]
           </button>
-        </motion.div>
+        </div>
 
         {!hasAnalysis ? (
-          /* --- STATE 1: GUIDE / LANDING --- */
+          /* --- STATE 1: GUIDE / LANDING (MATCH PROFILE ANALYZER STYLE) --- */
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-12"
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-12 max-w-7xl mx-auto"
           >
             {/* Left: Value Prop & CTA */}
             <div className="space-y-8">
@@ -53,8 +56,8 @@ export default function PostAnalyzerPage() {
                 </span>
               </h2>
               <p className="text-lg text-gray-500 font-medium leading-relaxed max-w-md">
-                Don't guess what works. Use our browser extension to X-Ray top
-                performing posts on LinkedIn, X, and Instagram.
+                Stop guessing why your posts aren't going viral. Get a deep-dive
+                audit of hooks, visuals, and retention.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -69,7 +72,7 @@ export default function PostAnalyzerPage() {
 
               <div className="flex items-center gap-4 pt-4">
                 <div className="flex -space-x-3">
-                  {[1, 2, 3, 4].map((i) => (
+                  {[10, 11, 12, 13].map((i) => (
                     <div
                       key={i}
                       className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 overflow-hidden"
@@ -82,7 +85,7 @@ export default function PostAnalyzerPage() {
                   ))}
                 </div>
                 <p className="text-sm font-bold text-gray-500">
-                  Join <span className="text-gray-900">2,000+ creators</span>{" "}
+                  Join <span className="text-gray-900">5,000+ creators</span>{" "}
                   using ReachPilot.
                 </p>
               </div>
@@ -106,18 +109,18 @@ export default function PostAnalyzerPage() {
                     },
                     {
                       step: "02",
-                      title: "Browse & Hunt",
-                      desc: "Go to any social platform. Find a viral post.",
+                      title: "Visit Post",
+                      desc: "Go to any LinkedIn or X post you want to reverse-engineer.",
                     },
                     {
                       step: "03",
                       title: "One-Click Scan",
-                      desc: "Click the 'Analyze' button floating on the post.",
+                      desc: "Open the extension and click 'Analyze Post'.",
                     },
                     {
                       step: "04",
-                      title: "Deep Insights",
-                      desc: "See the Hook Score, Retention Logic, and CTA Breakdown right here.",
+                      title: "Viral Breakdown",
+                      desc: "Get a forensic breakdown of the hook, structure, and quality.",
                     },
                   ].map((item, i) => (
                     <div key={i} className="flex gap-4 group">
@@ -139,23 +142,31 @@ export default function PostAnalyzerPage() {
             </div>
           </motion.div>
         ) : (
-          /* --- STATE 2: ANALYSIS VIEW (REORGANIZED) --- */
+          /* --- STATE 2: ANALYSIS DASHBOARD (CONTROL CENTER LAYOUT) --- */
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-6"
+            className="flex flex-col gap-6"
           >
-            {/* ACTION BAR (Top) */}
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm gap-4">
+            {/* ─── 1. BREADCRUMBS & HEADER ─── */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-200 pb-6">
               <div>
-                <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
-                  Analysis Complete
-                </h2>
-                <p className="text-xs text-gray-500 font-medium">
-                  Scanned 124K followers • 2h ago
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  <span>Analyzed Accounts</span>
+                  <FaChevronRight size={8} />
+                  <span className="text-violet-600">@alex_hormozi_fan</span>
+                  <FaChevronRight size={8} />
+                  <span>Post Analysis</span>
+                </div>
+                <h1 className="text-3xl font-black text-gray-900 leading-tight">
+                  Post Vital Signs
+                </h1>
+                <p className="text-sm text-gray-500 font-medium mt-1">
+                  Scanned 124K followers • 2h ago •{" "}
+                  <span className="text-emerald-600">High Viral Potential</span>
                 </p>
               </div>
+
               <div className="flex gap-3">
                 <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm">
                   <FaSearch /> Find Similar
@@ -163,150 +174,152 @@ export default function PostAnalyzerPage() {
                 <button className="px-4 py-2 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-colors flex items-center gap-2 shadow-lg shadow-gray-200">
                   <FaMagic /> Generate Ideas
                 </button>
-                <button className="px-4 py-2 bg-violet-600 text-white rounded-xl text-xs font-bold hover:bg-violet-700 transition-colors flex items-center gap-2 shadow-lg shadow-violet-200">
-                  Save Analysis
+                <button className="p-2 bg-violet-50 text-violet-600 rounded-xl hover:bg-violet-100 transition-colors">
+                  <FaShare />
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-12 gap-6">
-              {/* --- LEFT COLUMN: CONTENT FORENSICS (The "What") --- */}
-              <div className="col-span-12 lg:col-span-4 space-y-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
-                    Content Forensics
-                  </span>
-                  <div className="h-px bg-gray-200 flex-1"></div>
-                </div>
-
-                {/* 1. Hook & CTA Scorecard */}
-                <HookCTAScorecard />
-
-                {/* 2. Visual Strategy */}
-                <VisualStrategyDecoder />
-
-                {/* 3. Sentiment Vibe */}
-                <SentimentVibe />
-              </div>
-
-              {/* --- CENTER COLUMN: POST CONTEXT (The "Status") --- */}
-              <div className="col-span-12 lg:col-span-4 flex flex-col gap-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
-                    Target Post
-                  </span>
-                  <div className="h-px bg-gray-200 flex-1"></div>
-                </div>
-
-                {/* The Post Itself */}
-                <div className="col-span-12 lg:col-span-4 flex flex-col items-center">
-                  <div className="w-full max-w-[380px] bg-white rounded-xl border border-gray-200 shadow-xl overflow-hidden relative transform scale-95 origin-top">
-                    {/* Floating 'Analyze' Action (Simulated Extension Overlay) */}
-                    <div className="absolute top-4 right-4 z-20">
-                      <div className="bg-gray-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2 animate-pulse">
-                        <FaChrome /> Analysis Live
-                      </div>
+            {/* ─── 2. MAIN GRID LAYOUT ─── */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* === LEFT COLUMN: THE PATIENT & VITALS (STICKY) === */}
+              <div className="lg:col-span-4 xl:col-span-3 space-y-6 lg:sticky lg:top-6 h-fit">
+                {/* A. TARGET POST PREVIEW */}
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden relative transform transition-transform hover:scale-[1.01] duration-300">
+                  {/* Floating Label */}
+                  <div className="absolute top-3 right-3 z-20">
+                    <div className="bg-black/80 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg flex items-center gap-2">
+                      <FaChrome size={10} /> Source
                     </div>
+                  </div>
 
-                    {/* Header */}
-                    <div className="p-4 flex items-center gap-3 border-b border-gray-50">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-500 p-[2px]">
-                        <img
-                          src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-                          alt="Profile"
-                          className="w-full h-full rounded-full border-2 border-white bg-white"
-                        />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900 text-sm">
-                          alex_hormozi_fan
-                        </h4>
-                        <p className="text-xs text-gray-400">
-                          124K followers • 2h ago
-                        </p>
-                      </div>
-                      <div className="ml-auto text-gray-300">•••</div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-4 pb-2">
-                      <p className="text-sm text-gray-800 leading-relaxed mb-3">
-                        <span className="font-bold">
-                          Stop trying to build a 'Personal Brand'.
-                        </span>{" "}
-                        🛑
-                        <br />
-                        <br />
-                        Build a reputation instead.
-                        <br />
-                        <br />
-                        Brand is what you say about you. Reputation is what they
-                        say about you when you leave the room.
-                        <br />
-                        <br />
-                        1. Do hard things.
-                        <br />
-                        2. Keep promises.
-                        <br />
-                        3. Give away the secrets.
-                        <br />
-                        <br />
-                        That's it. That's the strategy. 👇
-                      </p>
-                      <div className="text-blue-600 text-xs font-medium">
-                        #marketing #branding #business
-                      </div>
-                    </div>
-
-                    {/* Image Mockup */}
-                    <div className="w-full h-[250px] bg-gray-100 flex items-center justify-center relative overflow-hidden group cursor-pointer">
+                  {/* Header */}
+                  <div className="p-4 flex items-center gap-3 border-b border-gray-50 bg-gray-50/30">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-500 p-[2px]">
                       <img
-                        src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-                        alt="Post Visual"
-                        className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+                        alt="Profile"
+                        className="w-full h-full rounded-full border-2 border-white bg-white"
                       />
-                      <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-lg text-white text-[10px] font-bold">
-                        ALT: Meeting Room
-                      </div>
                     </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm leading-tight">
+                        alex_hormozi_fan
+                      </h4>
+                      <p className="text-[10px] text-gray-400 font-medium">
+                        Productivity Guru
+                      </p>
+                    </div>
+                    <div className="ml-auto text-gray-300 text-xs">•••</div>
+                  </div>
 
-                    {/* Footer Stats */}
-                    <div className="p-4 border-t border-gray-50 flex justify-between items-center text-sm text-gray-600">
-                      <div className="flex gap-4 font-bold">
-                        <span>❤️ 1,245</span>
-                        <span>💬 342</span>
-                        <span>🚀 890</span>
-                      </div>
-                      <div className="text-gray-400">Bookmark</div>
+                  {/* Post Content */}
+                  <div className="p-4 bg-white">
+                    <p className="text-sm text-gray-800 leading-relaxed font-medium">
+                      <span className="bg-yellow-100 px-0.5">
+                        Stop trying to build a 'Personal Brand'.
+                      </span>{" "}
+                      🛑
+                      <br />
+                      <br />
+                      Build a <span className="font-bold">reputation</span>{" "}
+                      instead.
+                      <br />
+                      <br />
+                      Brand is what you say about you. Reputation is what *they*
+                      say when you leave.
+                      <br />
+                      <br />
+                      1. Do hard things.
+                      <br />
+                      2. Keep promises.
+                      <br />
+                      3. Give away secrets.
+                      <br />
+                      <br />
+                      That's it. 👇
+                    </p>
+                    <div className="mt-3 text-blue-600 text-xs font-medium">
+                      #marketing #branding
                     </div>
+                  </div>
+
+                  {/* Fake Metrics Footer */}
+                  <div className="p-3 border-t border-gray-50 bg-gray-50/50 flex justify-between text-xs text-gray-500 font-bold">
+                    <span>1,245 Likes</span>
+                    <span>342 Comments</span>
                   </div>
                 </div>
 
-                {/* Competitor Benchmarking (Moved to Center) */}
-                <CompetitorBenchmarking />
+                {/* B. VITAL SIGNS (Small Cards) */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                    <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                      Vital Signs
+                    </span>
+                  </div>
 
-                {/* Viral Velocity (Moved to Center) */}
-                <ViralVelocity />
+                  <ViralVelocity />
+                  <SentimentVibe />
+                  <CompetitorBenchmarking />
+                </div>
               </div>
 
-              {/* --- RIGHT COLUMN: GROWTH & ACTION (The "Now What") --- */}
-              <div className="col-span-12 lg:col-span-4 space-y-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
-                    Growth Opportunities
-                  </span>
-                  <div className="h-px bg-gray-200 flex-1"></div>
+              {/* === RIGHT COLUMN: THE DIAGNOSIS & CURE (MAIN FEED) === */}
+              <div className="lg:col-span-8 xl:col-span-9 space-y-8">
+                {/* SECTION 1: THE HOOK (Priority) */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                      Phase 1: Attraction
+                    </span>
+                    <div className="h-px bg-gray-200 flex-1"></div>
+                  </div>
+                  <HookCTAScorecard />
                 </div>
 
-                {/* 1. Lead Persona ID */}
-                <LeadPersonaID />
+                {/* SECTION 2: RETENTION & VISUALS (Grid) */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                      Phase 2: Retention
+                    </span>
+                    <div className="h-px bg-gray-200 flex-1"></div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <RetentionHook />
+                    <VisualStrategyDecoder />
+                  </div>
+                </div>
 
-                {/* 2. Comment Gap Discovery */}
-                <CommentGapDiscovery />
+                {/* SECTION 3: REMIX ENGINE (Full Width) */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                      Phase 3: Viral Remix
+                    </span>
+                    <div className="h-px bg-gray-200 flex-1"></div>
+                  </div>
+                  <div className="h-[500px]">
+                    {" "}
+                    {/* Fixed height for editor */}
+                    <AIRemixEngine />
+                  </div>
+                </div>
 
-                {/* 3. AI Remix Engine */}
-                <div className="h-[340px]">
-                  <AIRemixEngine />
+                {/* SECTION 4: OPPORTUNITIES (Grid) */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                      Phase 4: Growth Gaps
+                    </span>
+                    <div className="h-px bg-gray-200 flex-1"></div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <LeadPersonaID />
+                    <CommentGapDiscovery />
+                  </div>
                 </div>
               </div>
             </div>

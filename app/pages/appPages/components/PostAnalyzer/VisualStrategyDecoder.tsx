@@ -1,30 +1,102 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FaEye,
   FaPalette,
-  FaChartLine,
   FaRobot,
   FaImage,
+  FaCheck,
+  FaCopy,
+  FaLayerGroup,
+  FaMagic,
 } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+
+// ─── Mock Data ────────────────────────────────────────────────────────────────
+
+const MOCK_DATA = {
+  category: "Technical Screenshot",
+  colors: ["#1A1A2E", "#16213E", "#0F3460", "#E94560", "#533483"],
+  prompts: {
+    midjourney:
+      "Dark mode code editor screenshot, syntax highlighting in purple and cyan, minimal UI, no faces, high contrast, 4K, --ar 4:5 --v 6.0",
+    dalle:
+      "A high-quality, realistic screenshot of a modern code editor in dark mode, showing TypeScript code with vibrant purple and blue syntax highlighting. Clean interface, no clutter, professional software engineering aesthetic.",
+  },
+};
+
+// ─── Components ───────────────────────────────────────────────────────────────
+
+function CopyButton({
+  text,
+  simple = false,
+}: {
+  text: string;
+  simple?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (simple) {
+    return (
+      <button
+        onClick={handleCopy}
+        className="text-gray-400 hover:text-white transition-colors"
+        title="Copy"
+      >
+        {copied ? (
+          <FaCheck size={10} className="text-green-500" />
+        ) : (
+          <FaCopy size={10} />
+        )}
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="p-1.5 bg-gray-200 hover:bg-indigo-600 hover:text-white text-gray-500 rounded-lg transition-colors"
+      title="Copy to Clipboard"
+    >
+      <AnimatePresence mode="wait">
+        {copied ? (
+          <motion.div
+            key="check"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+          >
+            <FaCheck size={12} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="copy"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+          >
+            <FaCopy size={12} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </button>
+  );
+}
 
 export default function VisualStrategyDecoder() {
-  // Mock Data
-  const visualData = {
-    category: "Technical Screenshot",
-    confidence: "94%",
-    elements: ["Code Snippet", "Dark Mode", "No Faces"],
-    performance: {
-      label: "Technical Authority",
-      score: "High", // High, Medium, Low
-      uplift: "+42%", // vs Average
-    },
-    insight:
-      "Dark mode code screenshots drive 2x more saves than light mode in SaaS.",
-  };
+  const [promptType, setPromptType] = useState<"midjourney" | "dalle">(
+    "midjourney",
+  );
+  const { category, colors, prompts } = MOCK_DATA;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-      {/* Header */}
+      {/* ─── Header ─── */}
       <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
@@ -34,84 +106,114 @@ export default function VisualStrategyDecoder() {
             <h3 className="font-bold text-gray-900 inline-block leading-tight">
               Visual DNA
             </h3>
-            {/* Tooltip */}
             <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
               <div className="font-bold mb-1 text-indigo-300">
                 Why this matters:
               </div>
-              Analyzes the visual elements (colors, faces, text) contributing to
-              performance.
-              <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+              Analyzes the visual elements (colors, layout) so you can replicate
+              the aesthetic.
+              <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45" />
             </div>
           </div>
         </div>
         <div className="flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold uppercase rounded-full tracking-wide">
-          <FaRobot size={10} /> AI Analyzed
+          <FaRobot size={10} /> {category}
         </div>
       </div>
 
-      <div className="p-5 space-y-5">
-        {/* --- SECTION 1: CLASSIFICATION --- */}
-        <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-lg bg-gray-900 flex items-center justify-center text-white text-xs font-mono border border-gray-700 shadow-inner">
-            {`<code>`}
-          </div>
-          <div>
-            <h4 className="font-bold text-gray-900 text-lg leading-tight">
-              {visualData.category}
-            </h4>
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {visualData.elements.map((el, i) => (
-                <span
-                  key={i}
-                  className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md border border-gray-200"
-                >
-                  {el}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* --- SECTION 2: PERFORMANCE CORRELATION --- */}
+      <div className="p-5 space-y-6">
+        {/* ─── SECTION 1: Vibe Palette (Hex Codes) ─── */}
         <div>
-          <div className="flex justify-between items-end mb-2">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-              Performance Impact
-            </span>
-            <span className="text-sm font-black text-emerald-600 flex items-center gap-1">
-              <FaChartLine /> {visualData.performance.uplift} Virality
-            </span>
-          </div>
-
-          <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden flex">
-            <div
-              className="w-1/2 bg-gray-300 h-full border-r border-white"
-              title="Niche Average"
-            ></div>
-            <div
-              className="w-[42%] bg-indigo-500 h-full relative"
-              title="This Post"
-            >
-              <div className="absolute top-0 right-0 bottom-0 w-0.5 bg-white opacity-50 animate-pulse"></div>
-            </div>
-          </div>
-          <div className="flex justify-between text-[9px] text-gray-400 mt-1 font-medium">
-            <span>Niche Avg</span>
-            <span>You are here</span>
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 block flex items-center gap-2">
+            <FaPalette /> Vibe Palette
+          </span>
+          <div className="flex gap-2">
+            {colors.map((color, i) => (
+              <div key={i} className="group relative">
+                <div
+                  className="w-10 h-10 rounded-full border-2 border-white shadow-sm cursor-pointer hover:scale-110 transition-transform"
+                  style={{ backgroundColor: color }}
+                  onClick={() => navigator.clipboard.writeText(color)}
+                  title={`Copy ${color}`}
+                />
+                <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 text-[9px] font-mono text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white px-1 rounded shadow-sm border border-gray-100">
+                  {color}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* --- SECTION 3: VISUAL BRIEF (INSIGHT) --- */}
-        <div className="bg-indigo-50 rounded-xl p-3 border border-indigo-100 flex gap-3 items-start">
-          <FaPalette className="text-indigo-400 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-xs text-indigo-900 font-bold mb-0.5">
-              Design Recommendation
+        {/* ─── SECTION 2: Text Overlay Zone ─── */}
+        <div>
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 block flex items-center gap-2">
+            <FaLayerGroup /> Text Safe Zone
+          </span>
+          <div className="flex gap-4">
+            {/* Diagram */}
+            <div className="w-24 h-32 bg-gray-100 border border-gray-200 rounded-lg relative overflow-hidden flex flex-col">
+              {/* Top UI Chrome Buffer */}
+              <div className="h-[20%] w-full bg-red-500/10 border-b border-red-500/20 flex items-center justify-center">
+                <span className="text-[8px] text-red-400 font-bold">UI</span>
+              </div>
+              {/* Safe Zone */}
+              <div className="flex-1 w-full bg-green-500/10 flex items-center justify-center border-y border-green-500/20">
+                <span className="text-[8px] text-green-600 font-bold">
+                  Safe Zone
+                </span>
+              </div>
+              {/* Bottom UI Chrome Buffer */}
+              <div className="h-[20%] w-full bg-red-500/10 border-t border-red-500/20 flex items-center justify-center">
+                <span className="text-[8px] text-red-400 font-bold">UI</span>
+              </div>
+            </div>
+
+            {/* Explanation */}
+            <div className="flex-1 py-1">
+              <h4 className="font-bold text-gray-800 text-xs mb-1">
+                Center 60% Rule
+              </h4>
+              <p className="text-[10px] text-gray-500 leading-relaxed mb-2">
+                Keep your hook and key text within the green zone to avoid
+                overlap with Instagram/TikTok UI overlays (captions, likes,
+                etc.).
+              </p>
+              <div className="inline-block px-2 py-1 bg-gray-100 rounded text-[9px] font-bold text-gray-500">
+                Applies to: Reels, TikTok, Shorts
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── SECTION 3: AI Prompt Generator ─── */}
+        <div className="pt-4 border-t border-gray-100">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+              <FaMagic /> AI Prompt Gen
+            </span>
+            <div className="flex bg-gray-100 rounded-lg p-0.5">
+              <button
+                onClick={() => setPromptType("midjourney")}
+                className={`px-2 py-0.5 text-[9px] font-bold rounded-md transition-all ${promptType === "midjourney" ? "bg-white text-indigo-600 shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+              >
+                Midjourney
+              </button>
+              <button
+                onClick={() => setPromptType("dalle")}
+                className={`px-2 py-0.5 text-[9px] font-bold rounded-md transition-all ${promptType === "dalle" ? "bg-white text-indigo-600 shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+              >
+                DALL-E
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-gray-900 rounded-xl p-3 relative group">
+            <p className="font-mono text-[10px] text-gray-300 leading-relaxed pr-6">
+              {prompts[promptType]}
             </p>
-            <p className="text-[11px] text-indigo-700/80 leading-snug">
-              {visualData.insight}
-            </p>
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <CopyButton text={prompts[promptType]} simple />
+            </div>
           </div>
         </div>
       </div>

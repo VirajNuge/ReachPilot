@@ -1,7 +1,8 @@
 // Shared Gemini analysis schema — used by both /api/analyze and /api/analyze-extension
 import { SchemaType, Schema } from "@google/generative-ai";
 
-export const analysisSchema: Schema = {
+// 1. CORE SCHEMA: Profile, content basics, and pillars
+export const coreSchema: Schema = {
   type: SchemaType.OBJECT,
   properties: {
     profile: {
@@ -22,10 +23,7 @@ export const analysisSchema: Schema = {
         properties: {
           headline: { type: SchemaType.STRING },
           description: { type: SchemaType.STRING },
-          tag: {
-            type: SchemaType.STRING,
-            enum: ["HIGH IMPACT", "MEDIUM IMPACT", "LOW IMPACT"],
-          } as any,
+          tag: { type: SchemaType.STRING },
         },
         required: ["headline", "description", "tag"],
       },
@@ -80,62 +78,6 @@ export const analysisSchema: Schema = {
         engagement: { type: SchemaType.STRING },
       },
       required: ["frequency", "contentMix", "engagement"],
-    },
-    valueLadder: {
-      type: SchemaType.OBJECT,
-      properties: {
-        products: {
-          type: SchemaType.OBJECT,
-          properties: {
-            Bait: {
-              type: SchemaType.OBJECT,
-              properties: {
-                name: { type: SchemaType.STRING },
-                price: { type: SchemaType.STRING },
-                type: { type: SchemaType.STRING },
-                intensity: {
-                  type: SchemaType.STRING,
-                  enum: ["Low", "Medium", "High"],
-                } as any,
-              },
-              required: ["name", "price", "type", "intensity"],
-            },
-            Tripwire: {
-              type: SchemaType.OBJECT,
-              properties: {
-                name: { type: SchemaType.STRING },
-                price: { type: SchemaType.STRING },
-                type: { type: SchemaType.STRING },
-                intensity: { type: SchemaType.STRING },
-              },
-              required: ["name", "price", "type", "intensity"],
-            },
-            Core: {
-              type: SchemaType.OBJECT,
-              properties: {
-                name: { type: SchemaType.STRING },
-                price: { type: SchemaType.STRING },
-                type: { type: SchemaType.STRING },
-                intensity: { type: SchemaType.STRING },
-              },
-              required: ["name", "price", "type", "intensity"],
-            },
-            "High-Ticket": {
-              type: SchemaType.OBJECT,
-              properties: {
-                name: { type: SchemaType.STRING },
-                price: { type: SchemaType.STRING },
-                type: { type: SchemaType.STRING },
-                intensity: { type: SchemaType.STRING },
-              },
-              required: ["name", "price", "type", "intensity"],
-            },
-          },
-        },
-        gap: { type: SchemaType.STRING },
-        insight: { type: SchemaType.STRING },
-      },
-      required: ["products", "gap", "insight"],
     },
     contentMetrics: {
       type: SchemaType.OBJECT,
@@ -208,354 +150,74 @@ export const analysisSchema: Schema = {
       },
     },
     pillarInsight: { type: SchemaType.STRING },
-    crowdPersonas: {
-      type: SchemaType.OBJECT,
-      properties: {
-        primaryArchetype: {
-          type: SchemaType.OBJECT,
-          properties: {
-            id: { type: SchemaType.STRING },
-            role: { type: SchemaType.STRING },
-            iconName: {
-              type: SchemaType.STRING,
-              enum: ["UserTie", "LaptopCode", "Bullhorn", "Rocket", "Users"],
-            } as any,
-            color: { type: SchemaType.STRING },
-            bio: { type: SchemaType.STRING },
-            percentage: { type: SchemaType.NUMBER },
-            triggers: {
-              type: SchemaType.ARRAY,
-              items: { type: SchemaType.STRING },
-            },
-            painPoints: {
-              type: SchemaType.ARRAY,
-              items: { type: SchemaType.STRING },
-            },
-          },
-          required: [
-            "id",
-            "role",
-            "iconName",
-            "color",
-            "bio",
-            "percentage",
-            "triggers",
-            "painPoints",
-          ],
-        },
-        secondaryArchetypes: {
-          type: SchemaType.ARRAY,
-          items: {
-            type: SchemaType.OBJECT,
-            properties: {
-              id: { type: SchemaType.STRING },
-              role: { type: SchemaType.STRING },
-              iconName: { type: SchemaType.STRING },
-              color: { type: SchemaType.STRING },
-              bio: { type: SchemaType.STRING },
-              percentage: { type: SchemaType.NUMBER },
-              triggers: {
-                type: SchemaType.ARRAY,
-                items: { type: SchemaType.STRING },
-              },
-              painPoints: {
-                type: SchemaType.ARRAY,
-                items: { type: SchemaType.STRING },
-              },
-            },
-            required: [
-              "id",
-              "role",
-              "iconName",
-              "color",
-              "bio",
-              "percentage",
-              "triggers",
-              "painPoints",
-            ],
-          },
-        },
-        insight: {
-          type: SchemaType.OBJECT,
-          properties: {
-            title: { type: SchemaType.STRING },
-            description: { type: SchemaType.STRING },
-            actionable: { type: SchemaType.STRING },
-          },
-          required: ["title", "description", "actionable"],
-        },
-      },
-      required: ["primaryArchetype", "secondaryArchetypes", "insight"],
-    },
-    // --- THE CROWD & BLUEPRINT DATA ---
-    crowdSentiment: {
-      type: SchemaType.OBJECT,
-      properties: {
-        totalComments: { type: SchemaType.NUMBER },
-        vibeScore: { type: SchemaType.NUMBER },
-        vibes: {
-          type: SchemaType.ARRAY,
-          items: {
-            type: SchemaType.OBJECT,
-            properties: {
-              type: {
-                type: SchemaType.STRING,
-                enum: ["Fanboys", "Seekers", "Skeptics", "Critics"],
-              } as any,
-              percentage: { type: SchemaType.NUMBER },
-              count: { type: SchemaType.NUMBER },
-              keywords: {
-                type: SchemaType.ARRAY,
-                items: { type: SchemaType.STRING },
-              },
-              color: { type: SchemaType.STRING },
-              description: { type: SchemaType.STRING },
-            },
-            required: [
-              "type",
-              "percentage",
-              "count",
-              "keywords",
-              "color",
-              "description",
-            ],
-          },
-        },
-        sentimentTrend: {
-          type: SchemaType.ARRAY,
-          items: {
-            type: SchemaType.OBJECT,
-            properties: {
-              post: { type: SchemaType.NUMBER },
-              score: { type: SchemaType.NUMBER },
-            },
-            required: ["post", "score"],
-          },
-        },
-      },
-      required: ["totalComments", "vibeScore", "vibes", "sentimentTrend"],
-    },
-    questionCloud: {
+    postDNA: {
       type: SchemaType.ARRAY,
       items: {
         type: SchemaType.OBJECT,
         properties: {
-          id: { type: SchemaType.STRING },
-          word: { type: SchemaType.STRING },
-          count: { type: SchemaType.NUMBER },
-          engagement: { type: SchemaType.NUMBER },
-          intent: {
-            type: SchemaType.STRING,
-            enum: ["Urgency", "Buying", "Educational"],
-          } as any,
-          sampleQuestions: {
-            type: SchemaType.ARRAY,
-            items: {
-              type: SchemaType.OBJECT,
-              properties: {
-                text: { type: SchemaType.STRING },
-                likes: { type: SchemaType.NUMBER },
-              },
-              required: ["text", "likes"],
-            },
-          },
+          hookType: { type: SchemaType.STRING },
+          format: { type: SchemaType.STRING },
+          topic: { type: SchemaType.STRING },
+          verdict: { type: SchemaType.STRING },
         },
-        required: [
-          "id",
-          "word",
-          "count",
-          "engagement",
-          "intent",
-          "sampleQuestions",
-        ],
+        required: ["hookType", "format", "topic", "verdict"],
       },
     },
-    activeHours: {
-      type: SchemaType.ARRAY,
-      items: {
-        type: SchemaType.OBJECT,
-        properties: {
-          hour: { type: SchemaType.NUMBER },
-          creatorPosts: { type: SchemaType.NUMBER },
-          audienceActivity: { type: SchemaType.NUMBER },
-        },
-        required: ["hour", "creatorPosts", "audienceActivity"],
-      },
-    },
-    leadMagnet: {
+    engagementVitals: {
       type: SchemaType.OBJECT,
       properties: {
-        type: {
-          type: SchemaType.STRING,
-          enum: [
-            "Checklist",
-            "Webinar",
-            "Free Trial",
-            "Discovery Call",
-            "Other",
-          ],
-        } as any,
-        title: { type: SchemaType.STRING },
-        hook: { type: SchemaType.STRING },
-        friction: {
-          type: SchemaType.STRING,
-          enum: ["Low", "Medium", "High"],
-        } as any,
-        temp: {
-          type: SchemaType.STRING,
-          enum: ["Cold", "Warm", "Hot"],
-        } as any,
-        suggestion: { type: SchemaType.STRING },
-        whyItWorks: { type: SchemaType.STRING },
+        engagementRate: { type: SchemaType.NUMBER },
+        benchmarkRate: { type: SchemaType.NUMBER },
+        reachEfficiency: { type: SchemaType.NUMBER },
+        interactionRatio: { type: SchemaType.NUMBER },
+        status: { type: SchemaType.STRING },
+        insight: { type: SchemaType.STRING },
       },
       required: [
-        "type",
-        "title",
-        "hook",
-        "friction",
-        "temp",
-        "suggestion",
-        "whyItWorks",
+        "engagementRate",
+        "benchmarkRate",
+        "reachEfficiency",
+        "interactionRatio",
+        "status",
+        "insight",
       ],
     },
-    ctaAnalysis: {
-      type: SchemaType.OBJECT,
-      properties: {
-        mix: {
-          type: SchemaType.ARRAY,
-          items: {
-            type: SchemaType.OBJECT,
-            properties: {
-              type: {
-                type: SchemaType.STRING,
-                enum: ["Engagement", "Bridge", "Conversion", "Conversation"],
-              } as any,
-              score: { type: SchemaType.NUMBER },
-              fullMark: { type: SchemaType.NUMBER },
-            },
-            required: ["type", "score", "fullMark"],
-          },
-        },
-        topTrigger: {
-          type: SchemaType.OBJECT,
-          properties: {
-            keyword: { type: SchemaType.STRING },
-            count: { type: SchemaType.NUMBER },
-          },
-          required: ["keyword", "count"],
-        },
-        urgencyScore: { type: SchemaType.NUMBER },
-        dominantStyle: {
-          type: SchemaType.STRING,
-          enum: ["Hunter-Killer", "Reach Hunter", "Community Builder"],
-        } as any,
-        placementHeatmap: {
-          type: SchemaType.ARRAY,
-          items: {
-            type: SchemaType.OBJECT,
-            properties: {
-              location: {
-                type: SchemaType.STRING,
-                enum: ["First Line", "Bottom", "P.S."],
-              } as any,
-              count: { type: SchemaType.NUMBER },
-            },
-            required: ["location", "count"],
-          },
-        },
-      },
-      required: [
-        "mix",
-        "topTrigger",
-        "urgencyScore",
-        "dominantStyle",
-        "placementHeatmap",
-      ],
-    },
-    techStack: {
-      type: SchemaType.OBJECT,
-      properties: {
-        tools: {
-          type: SchemaType.ARRAY,
-          items: {
-            type: SchemaType.OBJECT,
-            properties: {
-              category: {
-                type: SchemaType.STRING,
-                enum: [
-                  "Hosting",
-                  "Frontend",
-                  "Tracking",
-                  "Payment",
-                  "Marketing",
-                ],
-              } as any,
-              name: { type: SchemaType.STRING },
-              confidence: {
-                type: SchemaType.STRING,
-                enum: ["High", "Medium", "Low"],
-              } as any,
-            },
-            required: ["category", "name", "confidence"],
-          },
-        },
-        businessClass: {
-          type: SchemaType.STRING,
-          enum: ["Hobbyist", "Pro Creator", "SaaS / Agency", "Enterprise"],
-        } as any,
-        verdict: { type: SchemaType.STRING },
-      },
-      required: ["tools", "businessClass", "verdict"],
-    },
-    growthTasks: {
+    pulseHeartbeat: {
       type: SchemaType.ARRAY,
       items: {
         type: SchemaType.OBJECT,
         properties: {
-          id: { type: SchemaType.STRING },
-          title: { type: SchemaType.STRING },
-          category: {
-            type: SchemaType.STRING,
-            enum: ["Quick Win", "Big Bet", "Filler", "Money Pit"],
-          } as any,
-          impact: { type: SchemaType.NUMBER },
-          effort: { type: SchemaType.NUMBER },
-          type: {
-            type: SchemaType.STRING,
-            enum: ["Funnel", "Content", "Crowd"],
-          } as any,
-          status: {
-            type: SchemaType.STRING,
-            enum: ["Pending", "In Progress", "Completed"],
-          } as any,
-          reasoning: { type: SchemaType.STRING },
-          actionType: {
-            type: SchemaType.STRING,
-            enum: ["Bio", "Content", "Strategy", "Tech"],
-          } as any,
+          day: { type: SchemaType.STRING },
+          activityScore: { type: SchemaType.NUMBER },
+          postsCount: { type: SchemaType.NUMBER },
+          peakHour: { type: SchemaType.STRING },
+          trend: { type: SchemaType.STRING },
         },
-        required: [
-          "id",
-          "title",
-          "category",
-          "impact",
-          "effort",
-          "type",
-          "status",
-          "reasoning",
-          "actionType",
-        ],
+        required: ["day", "activityScore", "postsCount", "peakHour", "trend"],
       },
     },
-    hypeValueScore: {
-      type: SchemaType.OBJECT,
-      properties: {
-        hype: { type: SchemaType.NUMBER },
-        value: { type: SchemaType.NUMBER },
-      },
-      required: ["hype", "value"],
-    },
-    // --- THE LAB DATA ---
+  },
+  required: [
+    "profile",
+    "quickFixes",
+    "bioAnalysis",
+    "keywords",
+    "textAnalysis",
+    "contentMetrics",
+    "pulseHeartbeat",
+    "schedule",
+    "scheduleHighlight",
+    "csiScore",
+    "contentPillars",
+    "pillarInsight",
+    "postDNA",
+  ],
+};
+
+// 2. AUDIENCE SCHEMA: Deep dive into audience personas, sentiment, and behavior
+export const audienceSchema: Schema = {
+  type: SchemaType.OBJECT,
+  properties: {
     velocity: {
       type: SchemaType.OBJECT,
       properties: {
@@ -624,31 +286,6 @@ export const analysisSchema: Schema = {
         "weeklyImpact",
       ],
     },
-    competitorGap: {
-      type: SchemaType.OBJECT,
-      properties: {
-        metrics: {
-          type: SchemaType.ARRAY,
-          items: {
-            type: SchemaType.OBJECT,
-            properties: {
-              category: { type: SchemaType.STRING },
-              profileValue: { type: SchemaType.NUMBER },
-              benchmarkValue: { type: SchemaType.NUMBER },
-              gapType: { type: SchemaType.STRING },
-            },
-            required: ["category", "profileValue", "benchmarkValue", "gapType"],
-          },
-        },
-        topOpportunity: { type: SchemaType.STRING },
-        insight: { type: SchemaType.STRING },
-        recommendations: {
-          type: SchemaType.ARRAY,
-          items: { type: SchemaType.STRING },
-        },
-      },
-      required: ["metrics", "topOpportunity", "insight", "recommendations"],
-    },
     viralRecipe: {
       type: SchemaType.ARRAY,
       items: {
@@ -712,30 +349,168 @@ export const analysisSchema: Schema = {
       },
       required: ["personaName", "axes", "signatureWords", "insight"],
     },
-
-    // --- LEGACY/SHARED DATA ---
-    ideaBank: {
+    crowdPersonas: {
+      type: SchemaType.OBJECT,
+      properties: {
+        primaryArchetype: {
+          type: SchemaType.OBJECT,
+          properties: {
+            id: { type: SchemaType.STRING },
+            role: { type: SchemaType.STRING },
+            iconName: { type: SchemaType.STRING },
+            color: { type: SchemaType.STRING },
+            bio: { type: SchemaType.STRING },
+            percentage: { type: SchemaType.NUMBER },
+            triggers: {
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
+            },
+            painPoints: {
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
+            },
+          },
+          required: [
+            "id",
+            "role",
+            "iconName",
+            "color",
+            "bio",
+            "percentage",
+            "triggers",
+            "painPoints",
+          ],
+        },
+        secondaryArchetypes: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              id: { type: SchemaType.STRING },
+              role: { type: SchemaType.STRING },
+              iconName: { type: SchemaType.STRING },
+              color: { type: SchemaType.STRING },
+              bio: { type: SchemaType.STRING },
+              percentage: { type: SchemaType.NUMBER },
+              triggers: {
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.STRING },
+              },
+              painPoints: {
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.STRING },
+              },
+            },
+            required: [
+              "id",
+              "role",
+              "iconName",
+              "color",
+              "bio",
+              "percentage",
+              "triggers",
+              "painPoints",
+            ],
+          },
+        },
+        insight: {
+          type: SchemaType.OBJECT,
+          properties: {
+            title: { type: SchemaType.STRING },
+            description: { type: SchemaType.STRING },
+            actionable: { type: SchemaType.STRING },
+          },
+          required: ["title", "description", "actionable"],
+        },
+      },
+      required: ["primaryArchetype", "secondaryArchetypes", "insight"],
+    },
+    crowdSentiment: {
+      type: SchemaType.OBJECT,
+      properties: {
+        totalComments: { type: SchemaType.NUMBER },
+        vibeScore: { type: SchemaType.NUMBER },
+        vibes: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              type: { type: SchemaType.STRING },
+              percentage: { type: SchemaType.NUMBER },
+              count: { type: SchemaType.NUMBER },
+              keywords: {
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.STRING },
+              },
+              color: { type: SchemaType.STRING },
+              description: { type: SchemaType.STRING },
+            },
+            required: [
+              "type",
+              "percentage",
+              "count",
+              "keywords",
+              "color",
+              "description",
+            ],
+          },
+        },
+        sentimentTrend: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              post: { type: SchemaType.NUMBER },
+              score: { type: SchemaType.NUMBER },
+            },
+            required: ["post", "score"],
+          },
+        },
+      },
+      required: ["totalComments", "vibeScore", "vibes", "sentimentTrend"],
+    },
+    questionCloud: {
       type: SchemaType.ARRAY,
       items: {
         type: SchemaType.OBJECT,
         properties: {
-          concept: { type: SchemaType.STRING },
-          impact: { type: SchemaType.STRING },
+          id: { type: SchemaType.STRING },
+          word: { type: SchemaType.STRING },
+          count: { type: SchemaType.NUMBER },
+          engagement: { type: SchemaType.NUMBER },
+          intent: { type: SchemaType.STRING },
+          sampleQuestions: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                text: { type: SchemaType.STRING },
+                likes: { type: SchemaType.NUMBER },
+              },
+              required: ["text", "likes"],
+            },
+          },
         },
-        required: ["concept", "impact"],
+        required: [
+          "id",
+          "word",
+          "count",
+          "engagement",
+          "intent",
+          "sampleQuestions",
+        ],
       },
     },
-    postDNA: {
+    activeHours: {
       type: SchemaType.ARRAY,
       items: {
         type: SchemaType.OBJECT,
         properties: {
-          hookType: { type: SchemaType.STRING },
-          format: { type: SchemaType.STRING },
-          topic: { type: SchemaType.STRING },
-          verdict: { type: SchemaType.STRING },
+          hour: { type: SchemaType.NUMBER },
+          creatorPosts: { type: SchemaType.NUMBER },
+          audienceActivity: { type: SchemaType.NUMBER },
         },
-        required: ["hookType", "format", "topic", "verdict"],
+        required: ["hour", "creatorPosts", "audienceActivity"],
       },
     },
     tribes: {
@@ -760,36 +535,345 @@ export const analysisSchema: Schema = {
       },
       required: ["lurkersPercent", "engagersPercent", "insight"],
     },
+    audienceTemperature: {
+      type: SchemaType.OBJECT,
+      properties: {
+        tempScore: { type: SchemaType.NUMBER },
+        label: { type: SchemaType.STRING },
+        fanboyPercent: { type: SchemaType.NUMBER },
+        criticPercent: { type: SchemaType.NUMBER },
+        dominantEmotion: { type: SchemaType.STRING },
+        recommendation: { type: SchemaType.STRING },
+      },
+      required: [
+        "tempScore",
+        "label",
+        "fanboyPercent",
+        "criticPercent",
+        "dominantEmotion",
+        "recommendation",
+      ],
+    },
   },
   required: [
-    "profile",
-    "quickFixes",
-    "bioAnalysis",
-    "keywords",
-    "textAnalysis",
-    "contentMetrics",
-    "schedule",
-    "scheduleHighlight",
-    "csiScore",
-    "contentPillars",
-    "audiencePersonas",
-    "hypeValueScore",
-    "ideaBank",
-    "postDNA",
-    "tribes",
-    "shadowAudience",
     "velocity",
     "psychTriggers",
     "postFatigue",
-    "competitorGap",
     "viralRecipe",
     "voiceSpectrum",
+    "crowdPersonas",
     "crowdSentiment",
     "questionCloud",
     "activeHours",
+    "tribes",
+    "shadowAudience",
+    "audienceTemperature",
+  ],
+};
+
+// 3. STRATEGY SCHEMA: Growth, funnel, and competitor analysis
+export const strategySchema: Schema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    hypeValueScore: {
+      type: SchemaType.OBJECT,
+      properties: {
+        hype: { type: SchemaType.NUMBER },
+        value: { type: SchemaType.NUMBER },
+      },
+      required: ["hype", "value"],
+    },
+    ideaBank: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          concept: { type: SchemaType.STRING },
+          impact: { type: SchemaType.STRING },
+        },
+        required: ["concept", "impact"],
+      },
+    },
+    leadMagnet: {
+      type: SchemaType.OBJECT,
+      properties: {
+        type: { type: SchemaType.STRING },
+        title: { type: SchemaType.STRING },
+        hook: { type: SchemaType.STRING },
+        friction: { type: SchemaType.STRING },
+        temp: { type: SchemaType.STRING },
+        suggestion: { type: SchemaType.STRING },
+        whyItWorks: { type: SchemaType.STRING },
+      },
+      required: [
+        "type",
+        "title",
+        "hook",
+        "friction",
+        "temp",
+        "suggestion",
+        "whyItWorks",
+      ],
+    },
+    ctaAnalysis: {
+      type: SchemaType.OBJECT,
+      properties: {
+        mix: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              type: { type: SchemaType.STRING },
+              score: { type: SchemaType.NUMBER },
+              fullMark: { type: SchemaType.NUMBER },
+            },
+            required: ["type", "score", "fullMark"],
+          },
+        },
+        topTrigger: {
+          type: SchemaType.OBJECT,
+          properties: {
+            keyword: { type: SchemaType.STRING },
+            count: { type: SchemaType.NUMBER },
+          },
+          required: ["keyword", "count"],
+        },
+        urgencyScore: { type: SchemaType.NUMBER },
+        dominantStyle: { type: SchemaType.STRING },
+        placementHeatmap: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              location: { type: SchemaType.STRING },
+              count: { type: SchemaType.NUMBER },
+            },
+            required: ["location", "count"],
+          },
+        },
+      },
+      required: [
+        "mix",
+        "topTrigger",
+        "urgencyScore",
+        "dominantStyle",
+        "placementHeatmap",
+      ],
+    },
+    techStack: {
+      type: SchemaType.OBJECT,
+      properties: {
+        tools: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              category: { type: SchemaType.STRING },
+              name: { type: SchemaType.STRING },
+              confidence: { type: SchemaType.STRING },
+            },
+            required: ["category", "name", "confidence"],
+          },
+        },
+        businessClass: { type: SchemaType.STRING },
+        verdict: { type: SchemaType.STRING },
+      },
+      required: ["tools", "businessClass", "verdict"],
+    },
+    valueLadder: {
+      type: SchemaType.OBJECT,
+      properties: {
+        products: {
+          type: SchemaType.OBJECT,
+          properties: {
+            Bait: {
+              type: SchemaType.OBJECT,
+              properties: {
+                name: { type: SchemaType.STRING },
+                price: { type: SchemaType.STRING },
+                type: { type: SchemaType.STRING },
+                intensity: { type: SchemaType.STRING },
+              },
+              required: ["name", "price", "type", "intensity"],
+            },
+            Tripwire: {
+              type: SchemaType.OBJECT,
+              properties: {
+                name: { type: SchemaType.STRING },
+                price: { type: SchemaType.STRING },
+                type: { type: SchemaType.STRING },
+                intensity: { type: SchemaType.STRING },
+              },
+              required: ["name", "price", "type", "intensity"],
+            },
+            Core: {
+              type: SchemaType.OBJECT,
+              properties: {
+                name: { type: SchemaType.STRING },
+                price: { type: SchemaType.STRING },
+                type: { type: SchemaType.STRING },
+                intensity: { type: SchemaType.STRING },
+              },
+              required: ["name", "price", "type", "intensity"],
+            },
+            "High-Ticket": {
+              type: SchemaType.OBJECT,
+              properties: {
+                name: { type: SchemaType.STRING },
+                price: { type: SchemaType.STRING },
+                type: { type: SchemaType.STRING },
+                intensity: { type: SchemaType.STRING },
+              },
+              required: ["name", "price", "type", "intensity"],
+            },
+          },
+        },
+        gap: { type: SchemaType.STRING },
+        insight: { type: SchemaType.STRING },
+      },
+      required: ["products", "gap", "insight"],
+    },
+    growthTasks: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          id: { type: SchemaType.STRING },
+          title: { type: SchemaType.STRING },
+          category: { type: SchemaType.STRING },
+          impact: { type: SchemaType.NUMBER },
+          effort: { type: SchemaType.NUMBER },
+          type: { type: SchemaType.STRING },
+          status: { type: SchemaType.STRING },
+          reasoning: { type: SchemaType.STRING },
+          actionType: { type: SchemaType.STRING },
+        },
+        required: [
+          "id",
+          "title",
+          "category",
+          "impact",
+          "effort",
+          "type",
+          "status",
+          "reasoning",
+          "actionType",
+        ],
+      },
+    },
+    disruptor: {
+      type: SchemaType.OBJECT,
+      properties: {
+        score: { type: SchemaType.NUMBER },
+        focus: { type: SchemaType.STRING },
+        schedule: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              day: { type: SchemaType.STRING },
+              time: { type: SchemaType.STRING },
+              pillar: { type: SchemaType.STRING },
+              topic: { type: SchemaType.STRING },
+              hookStyle: { type: SchemaType.STRING },
+              suggestedHook: { type: SchemaType.STRING },
+              strategicReason: { type: SchemaType.STRING },
+            },
+            required: [
+              "day",
+              "time",
+              "pillar",
+              "topic",
+              "hookStyle",
+              "suggestedHook",
+              "strategicReason",
+            ],
+          },
+        },
+      },
+      required: ["score", "focus", "schedule"],
+    },
+    funnelTactics: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          id: { type: SchemaType.STRING },
+          title: { type: SchemaType.STRING },
+          problem: { type: SchemaType.STRING },
+          solution: { type: SchemaType.STRING },
+          impact: { type: SchemaType.STRING },
+          difficulty: { type: SchemaType.STRING },
+          status: { type: SchemaType.STRING },
+        },
+        required: [
+          "title",
+          "problem",
+          "solution",
+          "impact",
+          "difficulty",
+          "status",
+        ],
+      },
+    },
+    crowdTactics: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          id: { type: SchemaType.STRING },
+          title: { type: SchemaType.STRING },
+          audienceState: { type: SchemaType.STRING },
+          action: { type: SchemaType.STRING },
+          targetParams: { type: SchemaType.STRING },
+          status: { type: SchemaType.STRING },
+        },
+        required: [
+          "title",
+          "audienceState",
+          "action",
+          "targetParams",
+          "status",
+        ],
+      },
+    },
+    competitorGap: {
+      type: SchemaType.OBJECT,
+      properties: {
+        metrics: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              category: { type: SchemaType.STRING },
+              profileValue: { type: SchemaType.NUMBER },
+              benchmarkValue: { type: SchemaType.NUMBER },
+              gapType: { type: SchemaType.STRING },
+            },
+            required: ["category", "profileValue", "benchmarkValue", "gapType"],
+          },
+        },
+        topOpportunity: { type: SchemaType.STRING },
+        insight: { type: SchemaType.STRING },
+        recommendations: {
+          type: SchemaType.ARRAY,
+          items: { type: SchemaType.STRING },
+        },
+      },
+      required: ["metrics", "topOpportunity", "insight", "recommendations"],
+    },
+  },
+  required: [
+    "hypeValueScore",
+    "ideaBank",
     "leadMagnet",
     "ctaAnalysis",
     "techStack",
+    "valueLadder",
     "growthTasks",
+    "disruptor",
+    "funnelTactics",
+    "crowdTactics",
+    "competitorGap",
   ],
 };

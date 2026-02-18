@@ -1,595 +1,527 @@
 {
   "analysis": {
     "profile": {
-      "name": "Om Patel",
-      "headline": "16-year-old SaaS developer sharing startup insights and VC fund resources.",
-      "followers": 9790,
-      "projects": "bigideasdb.com, linkeddit.com",
-      "profileScore": 68.5,
-      "bio": "16 year old saas dev \n\ngrowing \nhttp://\nbigideasdb.com + \nhttp://\nlinkeddit.com\n\nbuilding cool stuff",
+      "name": "pc",
+      "headline": "Building and learning software engineer sharing insights on coding, AI, and SaaS development.",
+      "followers": 2851,
+      "projects": "Building and learning software engineering projects.",
+      "profileScore": 62.5,
+      "bio": "software engineer → building and learning | coding is my hobby",
       "pfp": "https://pbs.twimg.com/profile_images/2016089274761048064/U2uZ0b7t_bigger.jpg",
-      "banner": "https://pbs.twimg.com/profile_banners/1785824188281876480/1746235391/1080x360",
-      "followingCount": 241
+      "banner": "https://pbs.twimg.com/profile_banners/1973067820507549696/1767600386/1080x360",
+      "followingCount": 807
     },
     "quickFixes": [
       {
-        "headline": "Increase Posting Frequency to 3-5 Times Daily",
-        "description": "Currently posting only 2.3 times per day. Increasing frequency to align with the optimal range can boost visibility and engagement.",
+        "headline": "Diversify Content Formats",
+        "description": "Incorporate images, polls, and short videos to increase engagement beyond text-based posts.",
         "tag": "HIGH IMPACT"
       },
       {
-        "headline": "Diversify Content to Include More Visuals and Interactive Elements",
-        "description": "While images are used, introduce more video content, polls, and quote tweets to capture attention and encourage engagement.",
+        "headline": "Schedule Posts During Peak Audience Activity",
+        "description": "Prioritize posting between 9:00 AM and 10:00 AM to align with observed engagement patterns.",
         "tag": "HIGH IMPACT"
       },
       {
-        "headline": "Consistently Schedule Posts Around Peak Engagement Hours",
-        "description": "Leverage peak hours around 9 AM, 12 PM, 3 PM, and 6 PM to maximize reach and engagement.",
+        "headline": "Engage More Strategically with Top Commenters",
+        "description": "Foster deeper relationships by directly engaging with frequent commenters like Sagar Saini and Alex Cloudstar.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Actively Engage with Comments and Mentions",
-        "description": "Respond to comments promptly, participate in discussions, and initiate conversations to foster a stronger community.",
+        "headline": "Incorporate Relevant Industry Keywords",
+        "description": "Strategically weave in industry-specific keywords like 'full-stack', 'React', and 'DevOps' to enhance searchability and relevance.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Incorporate Relevant Hashtags",
-        "description": "Research and use relevant hashtags in posts to increase discoverability and reach a wider audience interested in SaaS and startups.",
+        "headline": "Experiment with Question Hooks",
+        "description": "Use compelling questions that immediately grab attention to boost initial interaction rates.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Optimize Profile Bio with Specific Keywords",
-        "description": "Enhance the bio with keywords related to SaaS development, startups, and the specific niche to improve searchability.",
-        "tag": "LOW IMPACT"
-      },
-      {
-        "headline": "Use Shorter, More Engaging Hooks",
-        "description": "Craft concise and curiosity-driven hooks to immediately grab attention and encourage users to engage with the content.",
+        "headline": "Craft Clearer Calls to Action",
+        "description": "Directly ask for specific actions (e.g., 'Share your thoughts', 'Retweet if you agree') to guide audience behavior.",
         "tag": "LOW IMPACT"
       }
     ],
     "bioAnalysis": {
       "clarityScore": 7,
       "keywordScore": 6,
-      "tone": "Informative, ambitious, slightly informal",
+      "tone": "Informative and conversational.",
       "strengths": [
-        "Clear niche as a young SaaS developer.",
-        "Shares actionable insights and resources.",
-        "Demonstrates a growth mindset.",
-        "Engages with the audience."
+        "Consistently focuses on software development and related topics.",
+        "Actively engages with audience questions and comments.",
+        "Demonstrates genuine curiosity and willingness to learn.",
+        "Shares practical tips and insights relevant to developers."
       ],
       "weaknesses": [
-        "Bio could be more optimized with relevant keywords.",
-        "Posting frequency is inconsistent.",
-        "Could leverage more diverse content formats.",
-        "Lacks a strong call to action in bio."
+        "Positioning could be more specific; lacks a strong, unique angle.",
+        "Misses opportunities to incorporate visual elements and multimedia.",
+        "Could include more X (Twitter)-specific keyword to increase reach.",
+        "Call to actions aren't explicit."
       ],
       "suggestions": [
-        "Refine bio with specific SaaS and startup keywords.",
-        "Establish a consistent posting schedule.",
-        "Incorporate more video content and polls.",
-        "Add a clear call to action in the bio (e.g., link to a newsletter)."
+        "Highlight a specific niche within software engineering.",
+        "Incorporate visuals like code snippets or diagrams in posts.",
+        "Include a specific call to action within posts (retweet, follow, etc).",
+        "Create a lead magnet."
       ]
     },
     "keywords": {
       "current": [
-        "SaaS",
-        "startups",
-        "MRR",
-        "VC funds",
-        "pre-seed",
-        "seed",
-        "users",
-        "Reddit",
+        "AI",
         "coding",
-        "engineering",
-        "YC",
-        "NGMI"
+        "SaaS",
+        "paywall",
+        "MRR",
+        "devs",
+        "marketing",
+        "backend",
+        "frontend",
+        "data structure",
+        "tools",
+        "vibe coding"
       ],
       "missing": [
-        "founder",
-        "build in public",
-        "indie hacker",
-        "no code",
-        "growth hacking",
-        "AI",
-        "ML",
-        "web3"
+        "full-stack",
+        "React",
+        "DevOps",
+        "API",
+        "cloud computing",
+        "cybersecurity",
+        "JavaScript",
+        "Python",
+        "Open Source"
       ]
     },
     "textAnalysis": {
-      "frequency": "Low",
-      "contentMix": "Moderate",
-      "engagement": "Average"
+      "frequency": "Posting frequency is slightly below optimal.",
+      "contentMix": "Content mix is homogenous, lacks variety.",
+      "engagement": "Engagement fluctuates significantly; inconsistent hook strength."
     },
     "contentMetrics": {
-      "frequencyScore": 45,
-      "contentMixScore": 60,
-      "engagementScore": 55
+      "frequencyScore": 66,
+      "contentMixScore": 20,
+      "engagementScore": 35
     },
     "schedule": [
       {
-        "day": "Monday",
+        "day": "MONDAY",
         "slots": [
           {
-            "id": "9AM",
-            "label": "9 AM",
+            "id": "monday_00:00-06:00",
+            "label": "12AM - 6AM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "12PM",
-            "label": "12 PM",
+            "id": "monday_06:00-12:00",
+            "label": "6AM - 12PM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "3PM",
-            "label": "3 PM",
+            "id": "monday_12:00-18:00",
+            "label": "12PM - 6PM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "6PM",
-            "label": "6 PM",
+            "id": "monday_18:00-24:00",
+            "label": "6PM - 12AM",
             "value": 0,
             "engagement": "Low"
           }
         ]
       },
       {
-        "day": "Tuesday",
+        "day": "TUESDAY",
         "slots": [
           {
-            "id": "9AM",
-            "label": "9 AM",
+            "id": "tuesday_00:00-06:00",
+            "label": "12AM - 6AM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "12PM",
-            "label": "12 PM",
+            "id": "tuesday_06:00-12:00",
+            "label": "6AM - 12PM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "3PM",
-            "label": "3 PM",
+            "id": "tuesday_12:00-18:00",
+            "label": "12PM - 6PM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "6PM",
-            "label": "6 PM",
+            "id": "tuesday_18:00-24:00",
+            "label": "6PM - 12AM",
             "value": 0,
             "engagement": "Low"
           }
         ]
       },
       {
-        "day": "Wednesday",
+        "day": "WEDNESDAY",
         "slots": [
           {
-            "id": "9AM",
-            "label": "9 AM",
+            "id": "wednesday_00:00-06:00",
+            "label": "12AM - 6AM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "12PM",
-            "label": "12 PM",
+            "id": "wednesday_06:00-12:00",
+            "label": "6AM - 12PM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "3PM",
-            "label": "3 PM",
+            "id": "wednesday_12:00-18:00",
+            "label": "12PM - 6PM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "6PM",
-            "label": "6 PM",
-            "value": 0,
-            "engagement": "Low"
+            "id": "wednesday_18:00-24:00",
+            "label": "6PM - 12AM",
+            "value": 65,
+            "engagement": "Medium"
           }
         ]
       },
       {
-        "day": "Thursday",
+        "day": "THURSDAY",
         "slots": [
           {
-            "id": "9AM",
-            "label": "9 AM",
+            "id": "thursday_00:00-06:00",
+            "label": "12AM - 6AM",
             "value": 0,
             "engagement": "Low"
           },
           {
-            "id": "12PM",
-            "label": "12 PM",
-            "value": 0,
-            "engagement": "Low"
-          },
-          {
-            "id": "3PM",
-            "label": "3 PM",
-            "value": 0,
-            "engagement": "Low"
-          },
-          {
-            "id": "6PM",
-            "label": "6 PM",
-            "value": 0,
-            "engagement": "Low"
-          }
-        ]
-      },
-      {
-        "day": "Friday",
-        "slots": [
-          {
-            "id": "9AM",
-            "label": "9 AM",
-            "value": 0,
-            "engagement": "Low"
-          },
-          {
-            "id": "12PM",
-            "label": "12 PM",
-            "value": 0,
-            "engagement": "Low"
-          },
-          {
-            "id": "3PM",
-            "label": "3 PM",
-            "value": 0,
-            "engagement": "Low"
-          },
-          {
-            "id": "6PM",
-            "label": "6 PM",
-            "value": 0,
-            "engagement": "Low"
-          }
-        ]
-      },
-      {
-        "day": "Saturday",
-        "slots": [
-          {
-            "id": "9AM",
-            "label": "9 AM",
-            "value": 0,
-            "engagement": "Low"
-          },
-          {
-            "id": "12PM",
-            "label": "12 PM",
-            "value": 0,
-            "engagement": "Low"
-          },
-          {
-            "id": "3PM",
-            "label": "3 PM",
-            "value": 0,
-            "engagement": "Low"
-          },
-          {
-            "id": "6PM",
-            "label": "6 PM",
-            "value": 0,
-            "engagement": "Low"
-          }
-        ]
-      },
-      {
-        "day": "Sunday",
-        "slots": [
-          {
-            "id": "9AM",
-            "label": "9 AM",
-            "value": 100,
+            "id": "thursday_06:00-12:00",
+            "label": "6AM - 12PM",
+            "value": 80,
             "engagement": "High"
           },
           {
-            "id": "12PM",
-            "label": "12 PM",
-            "value": 100,
+            "id": "thursday_12:00-18:00",
+            "label": "12PM - 6PM",
+            "value": 50,
+            "engagement": "Medium"
+          },
+          {
+            "id": "thursday_18:00-24:00",
+            "label": "6PM - 12AM",
+            "value": 40,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "FRIDAY",
+        "slots": [
+          {
+            "id": "friday_00:00-06:00",
+            "label": "12AM - 6AM",
+            "value": 0,
+            "engagement": "Low"
+          },
+          {
+            "id": "friday_06:00-12:00",
+            "label": "6AM - 12PM",
+            "value": 90,
             "engagement": "High"
           },
           {
-            "id": "3PM",
-            "label": "3 PM",
-            "value": 100,
-            "engagement": "High"
+            "id": "friday_12:00-18:00",
+            "label": "12PM - 6PM",
+            "value": 70,
+            "engagement": "Medium"
           },
           {
-            "id": "6PM",
-            "label": "6 PM",
+            "id": "friday_18:00-24:00",
+            "label": "6PM - 12AM",
+            "value": 0,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "SATURDAY",
+        "slots": [
+          {
+            "id": "saturday_00:00-06:00",
+            "label": "12AM - 6AM",
+            "value": 0,
+            "engagement": "Low"
+          },
+          {
+            "id": "saturday_06:00-12:00",
+            "label": "6AM - 12PM",
+            "value": 0,
+            "engagement": "Low"
+          },
+          {
+            "id": "saturday_12:00-18:00",
+            "label": "12PM - 6PM",
+            "value": 0,
+            "engagement": "Low"
+          },
+          {
+            "id": "saturday_18:00-24:00",
+            "label": "6PM - 12AM",
+            "value": 0,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "SUNDAY",
+        "slots": [
+          {
+            "id": "sunday_00:00-06:00",
+            "label": "12AM - 6AM",
+            "value": 0,
+            "engagement": "Low"
+          },
+          {
+            "id": "sunday_06:00-12:00",
+            "label": "6AM - 12PM",
+            "value": 0,
+            "engagement": "Low"
+          },
+          {
+            "id": "sunday_12:00-18:00",
+            "label": "12PM - 6PM",
+            "value": 0,
+            "engagement": "Low"
+          },
+          {
+            "id": "sunday_18:00-24:00",
+            "label": "6PM - 12AM",
             "value": 0,
             "engagement": "Low"
           }
         ]
       }
     ],
-    "scheduleHighlight": "Sunday mornings and early afternoons are peak engagement times. Try to schedule most posts for Sundays.",
-    "csiScore": 60,
+    "scheduleHighlight": "Peak engagement occurs between 9:00 AM and 10:00 AM, particularly on Fridays and Thursdays.",
+    "csiScore": 58,
     "contentPillars": [
       {
-        "name": "Startup Insights and Resources",
-        "percentage": 0.44,
-        "count": 4,
-        "avgEngagement": "High",
-        "description": "Posts sharing valuable information and resources for fellow founders and startups, including VC funds, Reddit communities, and growth strategies.",
+        "name": "Tech Question/Polls",
+        "percentage": 0.3,
+        "count": 3,
+        "avgEngagement": "Medium",
+        "description": "Posts posing questions or polls related to tech, data structures, and software development choices.",
         "topPosts": [
-          {
-            "id": "5",
-            "type": "Text",
-            "engagementRate": "High",
-            "captionSnippet": "Sharing a list of VC funds investing in pre-seed and seed rounds. This post provides actionable resources for startups seeking funding."
-          },
           {
             "id": "6",
             "type": "Text",
-            "engagementRate": "High",
-            "captionSnippet": "A list of subreddits to get initial users. This post offers practical advice on leveraging online communities for early traction."
-          }
-        ],
-        "color": "#8b5cf6"
-      },
-      {
-        "name": "Personal Achievements and Reflections",
-        "percentage": 0.22,
-        "count": 2,
-        "avgEngagement": "High",
-        "description": "Posts sharing personal milestones, achievements, and reflections on the journey as a young SaaS developer.",
-        "topPosts": [
-          {
-            "id": "1",
-            "type": "Carousel",
-            "engagementRate": "High",
-            "captionSnippet": "Sharing recent sales figures and MRR growth. This post reflects on personal achievements despite challenges and encourages others to pursue their goals."
+            "engagementRate": "Low",
+            "captionSnippet": "Asks about data structure usage for SaaS, engaging developers to share their preferences. The goal is to gather insights from fellow developers.",
+            "thumbnail": ""
           },
           {
-            "id": "4",
-            "type": "Image",
-            "engagementRate": "Low",
-            "captionSnippet": "Sharing the highest payout received for sharing valuable information. This post celebrates personal success and thanks the audience for their investment."
+            "id": "9",
+            "type": "Text",
+            "engagementRate": "High",
+            "captionSnippet": "Asks devs whether to build frontend or backend first to build their project. This type of discussion is focused on engaging with the dev community.",
+            "thumbnail": ""
           }
         ],
         "color": "#3b82f6"
       },
       {
-        "name": "YC and Industry Trends",
-        "percentage": 0.11,
-        "count": 1,
+        "name": "MRR/Monetization",
+        "percentage": 0.3,
+        "count": 3,
         "avgEngagement": "Medium",
-        "description": "Posts focused on analyzing trends in the startup industry, particularly those related to Y Combinator and B2B sectors.",
+        "description": "Posts focused on ways to generate monthly recurring revenue (MRR) through apps and development strategies.",
         "topPosts": [
           {
-            "id": "3",
+            "id": "2",
             "type": "Text",
             "engagementRate": "Medium",
-            "captionSnippet": "Analyzing the top industries in the Fall 2025 YC batch. This post provides insights into current investment trends and opportunities."
-          }
-        ],
-        "color": "#10b981"
-      },
-      {
-        "name": "Inspirational and Motivational Content",
-        "percentage": 0.22,
-        "count": 2,
-        "avgEngagement": "Low",
-        "description": "Posts designed to inspire and motivate followers, often sharing insights on perseverance, hope, and non-traditional paths to success.",
-        "topPosts": [
-          {
-            "id": "7",
-            "type": "Image",
-            "engagementRate": "Low",
-            "captionSnippet": "Sharing a story of someone who made $17k after failing many projects. The post highlights key strategies like talking to users, building in public, and focusing on product improvement."
+            "captionSnippet": "Suggests easy app ideas to make $10k/month, highlighting the gamification of various niches. It prompts discussions on effective strategies to get recurring monthly revenue.",
+            "thumbnail": ""
           },
           {
             "id": "8",
-            "type": "Image",
-            "engagementRate": "Low",
-            "captionSnippet": "Sharing a message emphasizing the importance of hope. The post highlights that success doesn't require advantages to start, only drive."
+            "type": "Text",
+            "engagementRate": "Medium",
+            "captionSnippet": "Highlights the possibility of reaching $10k MRR with a smaller audience paying a nominal monthly fee. It triggers a conversation on the feasibility and reach of specific monetization strategies.",
+            "thumbnail": ""
           }
         ],
-        "color": "#f59e0b"
+        "color": "#8b5cf6"
+      },
+      {
+        "name": "AI/Future Tech",
+        "percentage": 0.4,
+        "count": 4,
+        "avgEngagement": "High",
+        "description": "Posts on future technology, including AI and development trends. This covers AI marketing, AI wrappers, and vibe coding.",
+        "topPosts": [
+          {
+            "id": "1",
+            "type": "Text",
+            "engagementRate": "Low",
+            "captionSnippet": "Expresses love for vibe coding and hate for vibe debugging, highlighting the asymmetry in coding processes. This post sparked an discussion about coding and debugging.",
+            "thumbnail": ""
+          },
+          {
+            "id": "4",
+            "type": "Text",
+            "engagementRate": "High",
+            "captionSnippet": "Suggests building AI exclusively for marketing as a trillion-dollar idea. The post generated a lot of discussions about the potential application of AI in marketing.",
+            "thumbnail": ""
+          },
+          {
+            "id": "10",
+            "type": "Text",
+            "engagementRate": "Low",
+            "captionSnippet": "Predicts the end of AI wrappers and promotes building OpenClaw/Clawdbot wrappers instead. This post promotes new approaches in AI tech.",
+            "thumbnail": ""
+          }
+        ],
+        "color": "#10b981"
       }
     ],
-    "audiencePersonas": [
-      {
-        "name": "Aspiring Founders",
-        "description": "Individuals looking for actionable advice, resources, and inspiration to start their own companies.",
-        "percentage": 0.4
-      },
-      {
-        "name": "Early-Stage Startups",
-        "description": "Founders and teams working on early-stage startups, seeking insights on funding, user acquisition, and growth strategies.",
-        "percentage": 0.35
-      },
-      {
-        "name": "SaaS Enthusiasts",
-        "description": "Individuals interested in SaaS development, industry trends, and the latest tools and technologies.",
-        "percentage": 0.25
-      }
-    ],
-    "hypeValueScore": {
-      "hype": 35,
-      "value": 65
-    },
-    "ideaBank": [
-      {
-        "concept": "A thread breaking down the key SaaS metrics that every founder should track.",
-        "impact": "High"
-      },
-      {
-        "concept": "A video tutorial on how to use a specific tool for SaaS development.",
-        "impact": "Medium"
-      },
-      {
-        "concept": "A poll asking followers about their biggest challenges as startup founders.",
-        "impact": "Medium"
-      },
-      {
-        "concept": "A series of quote tweets sharing insights from successful SaaS founders.",
-        "impact": "Low"
-      },
-      {
-        "concept": "An infographic summarizing the top trends in the SaaS industry for 2026.",
-        "impact": "High"
-      }
-    ],
+    "pillarInsight": "High-engagement posts focus on AI and future tech; plain text tips alone are not as effective.",
     "postDNA": [
       {
-        "hookType": "Personal Achievement",
-        "format": "Carousel",
-        "topic": "Sales and MRR growth",
-        "verdict": "High engagement due to relatable content and a blend of personal and professional updates."
-      },
-      {
-        "hookType": "Direct Question",
+        "hookType": "Statement",
         "format": "Text",
-        "topic": "Startup opportunities",
-        "verdict": "Low engagement; too generic and lacks a specific call to action."
-      },
-      {
-        "hookType": "Informative",
-        "format": "Text",
-        "topic": "YC batch analysis",
-        "verdict": "Medium engagement; provides valuable industry insights but lacks visual appeal."
-      },
-      {
-        "hookType": "Personal Achievement",
-        "format": "Image",
-        "topic": "Payout announcement",
-        "verdict": "Low engagement; self-promotional without clear value for the audience."
+        "topic": "Vibe Coding",
+        "verdict": "Low engagement due to a niche topic with limited audience appeal and lack of clear value proposition."
       },
       {
         "hookType": "Listicle",
         "format": "Text",
-        "topic": "VC fund resources",
-        "verdict": "High engagement; offers actionable resources and addresses a common pain point."
+        "topic": "App Ideas",
+        "verdict": "Medium engagement due to providing actionable ideas, but the topic is relatively broad and lacks unique insight."
       },
       {
-        "hookType": "Listicle",
+        "hookType": "Question",
         "format": "Text",
-        "topic": "Reddit communities",
-        "verdict": "High engagement; provides practical advice for user acquisition."
+        "topic": "Paywall Strategy",
+        "verdict": "Medium engagement, indicating interest in monetization, but the question is somewhat generic and lacks specificity."
       },
       {
-        "hookType": "Story-driven",
-        "format": "Image",
-        "topic": "Success after failures",
-        "verdict": "Low engagement; lacks a strong hook and visual appeal."
+        "hookType": "Bold Claim",
+        "format": "Text",
+        "topic": "AI Marketing",
+        "verdict": "High engagement due to a provocative statement tapping into current interest in AI."
       },
       {
-        "hookType": "Inspirational",
-        "format": "Image",
-        "topic": "Hope and perseverance",
-        "verdict": "Low engagement; too generic and lacks a specific message."
+        "hookType": "Question",
+        "format": "Text",
+        "topic": "Ctrl+C/V",
+        "verdict": "Low engagement, indicating a need for more relatable and visually appealing content."
       },
       {
-        "hookType": "Informative",
-        "format": "Image",
-        "topic": "Claude Code updates",
-        "verdict": "Low engagement; too niche and lacks broader appeal."
+        "hookType": "Question",
+        "format": "Text",
+        "topic": "Data Structures",
+        "verdict": "Low engagement due to topic too technical and only suitable for niche audience."
+      },
+      {
+        "hookType": "Question",
+        "format": "Text",
+        "topic": "Dev Tools",
+        "verdict": "Low engagement, suggesting that the query is too general and tools are not immediately compelling."
+      },
+      {
+        "hookType": "Statement",
+        "format": "Text",
+        "topic": "MRR",
+        "verdict": "Medium engagement by appealing to the need for a side-income."
+      },
+      {
+        "hookType": "Question",
+        "format": "Text",
+        "topic": "Backend/Frontend",
+        "verdict": "High engagement due to eliciting opinionated answers from broad audience of developers."
+      },
+      {
+        "hookType": "Statement",
+        "format": "Text",
+        "topic": "AI wrappers",
+        "verdict": "Low engagement due to an opinionated statement."
       }
     ],
-    "tribes": [
-      {
-        "name": "Indie Hackers",
-        "size": 0.35,
-        "growth": "Stable",
-        "sentiment": "Positive"
-      },
-      {
-        "name": "SaaS Builders",
-        "size": 0.4,
-        "growth": "Growing",
-        "sentiment": "Enthusiastic"
-      },
-      {
-        "name": "Startup Enthusiasts",
-        "size": 0.25,
-        "growth": "Stable",
-        "sentiment": "Curious"
-      }
-    ],
-    "shadowAudience": {
-      "lurkersPercent": 0.9,
-      "engagersPercent": 0.1,
-      "insight": "The majority of the audience are lurkers. Focus on hooks, formats, and content that compels them to participate."
-    },
     "velocity": {
-      "hookRate": 65,
-      "category": "Momentum",
+      "hookRate": 2.5,
+      "category": "Pulse",
       "velocityGraph": [
         {
           "hour": "1h",
-          "engagement": 25
+          "engagement": 5
         },
         {
           "hour": "2h",
-          "engagement": 40
+          "engagement": 10
         },
         {
           "hour": "4h",
-          "engagement": 60
+          "engagement": 15
         },
         {
           "hour": "12h",
-          "engagement": 85
+          "engagement": 25
         },
         {
           "hour": "24h",
-          "engagement": 100
+          "engagement": 40
         }
       ],
-      "insight": "The initial hook is moderately effective, but engagement tapers off, indicating a need for stronger calls to action and sustained interest."
+      "insight": "Hooks need improvement; engagement plateaus quickly post initial interaction."
     },
     "psychTriggers": {
       "radarData": [
         {
           "trigger": "Urgency",
-          "score": 15,
+          "score": 10,
           "fullMark": 100
         },
         {
           "trigger": "Curiosity",
-          "score": 50,
+          "score": 60,
           "fullMark": 100
         },
         {
           "trigger": "Social Proof",
-          "score": 35,
-          "fullMark": 100
-        },
-        {
-          "trigger": "Authority",
-          "score": 65,
-          "fullMark": 100
-        },
-        {
-          "trigger": "FOMO",
           "score": 40,
           "fullMark": 100
         },
         {
+          "trigger": "Authority",
+          "score": 50,
+          "fullMark": 100
+        },
+        {
+          "trigger": "FOMO",
+          "score": 20,
+          "fullMark": 100
+        },
+        {
           "trigger": "Reciprocity",
-          "score": 75,
+          "score": 70,
           "fullMark": 100
         }
       ],
       "winningTrigger": "Reciprocity",
-      "insight": "Providing actionable tips and valuable resources is the most effective persuasion lever for this audience."
+      "insight": "Actionable tips and insights drive the strongest engagement."
     },
     "postFatigue": {
       "status": "Warning",
       "fatigueScore": 60,
-      "optimalFrequency": "Once per day",
-      "saturationPoint": 2,
+      "optimalFrequency": "3x per day",
+      "saturationPoint": 4,
       "weeklyImpact": [
         {
           "day": "Mon",
@@ -598,209 +530,854 @@
         },
         {
           "day": "Tue",
-          "posts": 1,
-          "impactScore": 1
+          "posts": 0,
+          "impactScore": 0.8
         },
         {
           "day": "Wed",
-          "posts": 0,
-          "impactScore": 0.8
+          "posts": 2,
+          "impactScore": 1.1
         },
         {
           "day": "Thu",
-          "posts": 0,
-          "impactScore": 0.8
-        },
-        {
-          "day": "Fri",
-          "posts": 2,
+          "posts": 4,
           "impactScore": 0.9
         },
         {
-          "day": "Sat",
+          "day": "Fri",
           "posts": 3,
+          "impactScore": 1
+        },
+        {
+          "day": "Sat",
+          "posts": 0,
           "impactScore": 0.7
         },
         {
           "day": "Sun",
-          "posts": 3,
-          "impactScore": 1.2
+          "posts": 0,
+          "impactScore": 0.7
         }
-      ]
-    },
-    "competitorGap": {
-      "metrics": [
-        {
-          "category": "Engagement Rate",
-          "profileValue": 0.01,
-          "benchmarkValue": 0.015,
-          "gapType": "Opportunity"
-        },
-        {
-          "category": "Post Frequency",
-          "profileValue": 2.3,
-          "benchmarkValue": 4,
-          "gapType": "Opportunity"
-        },
-        {
-          "category": "Content Quality",
-          "profileValue": 70,
-          "benchmarkValue": 80,
-          "gapType": "Opportunity"
-        },
-        {
-          "category": "Hook Strength",
-          "profileValue": 65,
-          "benchmarkValue": 75,
-          "gapType": "Opportunity"
-        }
-      ],
-      "topOpportunity": "Post Frequency",
-      "insight": "The largest gap lies in posting frequency. Competitors post more often, increasing their reach and engagement opportunities.",
-      "recommendations": [
-        "Increase posting frequency to 3-5 times daily.",
-        "Schedule posts in advance using a social media management tool.",
-        "Batch create content to maintain consistency."
       ]
     },
     "viralRecipe": [
       {
-        "id": "6",
-        "engagementMultiplier": "8.9x",
-        "hookType": "Listicle",
-        "hookText": "you're NGMI if you don't post on these subreddits to get your first users:",
+        "id": "Post 4",
+        "engagementMultiplier": "3.5x",
+        "hookType": "Idea",
+        "hookText": "Trillion dollar idea Build Ai only for marketing...",
         "ingredients": [
           {
-            "name": "Listicle",
-            "value": "Provides a concrete list of subreddits, which makes it easy to consume.",
+            "name": "Controversial",
+            "value": "Bold claim",
             "score": 9
           },
           {
-            "name": "Value",
-            "value": "Offers actionable advice for startups.",
+            "name": "Relatable",
+            "value": "Marketing struggles",
             "score": 8
           },
           {
-            "name": "Authority",
-            "value": "Uses specific subreddits backed up by community sizes, building trust.",
+            "name": "Simple",
+            "value": "Easy to understand",
             "score": 7
           }
         ],
-        "whyItWorked": "Listicles are inherently easy to digest and provide immediate value, and the 'NGMI' hook grabs attention, while the actionable advice resonates with the target audience seeking user acquisition strategies.",
+        "whyItWorked": "Bold ideas mixed with current issues are likeable, it created debate and shares.",
         "templateStructure": [
-          "1. Hook: [Address specific audience and pain point]",
-          "2. List: [Provide list of tips/resources]",
-          "3. Value: [Explain value of each item in the list]",
-          "4. CTA: [Encourage sharing or engagement]"
+          "1. Hook: State a HUGE problem",
+          "2. Solution: Suggest a bold idea (Ai).",
+          "3. Ask: Open-ended question (optional).",
+          "4. Engage: Reply to comments."
         ]
       }
     ],
     "voiceSpectrum": {
-      "personaName": "The Pragmatic Builder",
+      "personaName": "The Curious Coder",
       "axes": [
         {
-          "id": "formal",
+          "id": "formalCasual",
           "leftLabel": "Formal",
           "rightLabel": "Casual",
           "score": 40
         },
         {
-          "id": "technical",
+          "id": "technicalSimple",
           "leftLabel": "Technical",
           "rightLabel": "Simple",
-          "score": 20
+          "score": -20
         },
         {
-          "id": "serious",
+          "id": "seriousPlayful",
           "leftLabel": "Serious",
           "rightLabel": "Playful",
-          "score": 10
+          "score": -10
         },
         {
-          "id": "dataDriven",
+          "id": "dataDrivenStoryDriven",
           "leftLabel": "Data-driven",
           "rightLabel": "Story-driven",
-          "score": -20
+          "score": -30
         }
       ],
       "signatureWords": [
-        "NGMI",
+        "vibe coding",
         "MRR",
-        "subreddits",
-        "VC funds",
-        "paying customers"
+        "AI",
+        "devs",
+        "paywall"
       ],
-      "insight": "The slightly casual and simplified style with data-driven focus helps establish credibility and relatability with early-stage founders."
+      "insight": "A balance between technical and easy-to-understand terms captures an audience interested in coding and business."
+    },
+    "crowdPersonas": {
+      "primaryArchetype": {
+        "id": "dev_1",
+        "role": "The Aspiring Founder",
+        "iconName": "LaptopCode",
+        "color": "#3b82f6",
+        "bio": "A developer who wants to launch and scale their own SaaS business.",
+        "percentage": 50,
+        "triggers": [
+          "MRR",
+          "SaaS",
+          "AI"
+        ],
+        "painPoints": [
+          "Marketing",
+          "Growth"
+        ]
+      },
+      "secondaryArchetypes": [
+        {
+          "id": "dev_2",
+          "role": "The Mid-Level Dev",
+          "iconName": "UserTie",
+          "color": "#8b5cf6",
+          "bio": "A software engineer working at a company. They are interested in new technologies and industry trends.",
+          "percentage": 30,
+          "triggers": [
+            "Data Structures",
+            "AI",
+            "Coding Tools"
+          ],
+          "painPoints": [
+            "Staying Updated",
+            "Workflow Efficiency"
+          ]
+        },
+        {
+          "id": "indie_1",
+          "role": "The Indie Hacker",
+          "iconName": "Rocket",
+          "color": "#10b981",
+          "bio": "An independent developer who is building and launching side projects.",
+          "percentage": 20,
+          "triggers": [
+            "Paywalls",
+            "Free Trial",
+            "Frontend/Backend"
+          ],
+          "painPoints": [
+            "Monetization",
+            "User Acquisition"
+          ]
+        }
+      ],
+      "insight": {
+        "title": "Target Aspiring Founders",
+        "description": "The audience is composed of people who are building their own projects and scaling, focus on content on building business.",
+        "actionable": "Prioritize content about building SaaS and marketing tips for Indie Hackers."
+      }
     },
     "crowdSentiment": {
-      "positivePercent": 65,
-      "neutralPercent": 30,
-      "negativePercent": 5,
-      "dominantEmotion": "Educational",
-      "insight": "The audience generally feels educated and informed, with a positive sentiment towards the shared content."
+      "totalComments": 179,
+      "vibeScore": 7.5,
+      "vibes": [
+        {
+          "type": "Fanboys",
+          "percentage": 30,
+          "count": 54,
+          "keywords": [
+            "Good info",
+            "Yes",
+            "True",
+            "Agreed",
+            "Inspiring"
+          ],
+          "color": "#8b5cf6",
+          "description": "Social Proof & Loyalty"
+        },
+        {
+          "type": "Seekers",
+          "percentage": 40,
+          "count": 71,
+          "keywords": [
+            "How to",
+            "Which",
+            "Why",
+            "Better?",
+            "Name?"
+          ],
+          "color": "#3b82f6",
+          "description": "Unmet Demand (High Intent)"
+        },
+        {
+          "type": "Skeptics",
+          "percentage": 15,
+          "count": 27,
+          "keywords": [
+            "Depends",
+            "Guess",
+            "Worth",
+            "Trust?",
+            "Easy"
+          ],
+          "color": "#f59e0b",
+          "description": "Trust Barriers"
+        },
+        {
+          "type": "Critics",
+          "percentage": 15,
+          "count": 27,
+          "keywords": [
+            "Ban",
+            "Mistakes",
+            "Chaotic",
+            "Regretted",
+            "Die"
+          ],
+          "color": "#ef4444",
+          "description": "Vulnerabilities"
+        }
+      ],
+      "sentimentTrend": [
+        {
+          "post": 1,
+          "score": 7.2
+        },
+        {
+          "post": 2,
+          "score": 8.1
+        },
+        {
+          "post": 3,
+          "score": 7.8
+        },
+        {
+          "post": 4,
+          "score": 8.5
+        },
+        {
+          "post": 5,
+          "score": 7
+        }
+      ]
     },
     "questionCloud": [
       {
-        "text": "Product details",
-        "frequency": 0.25
+        "id": "kw_1",
+        "word": "Paywall",
+        "count": 5,
+        "engagement": 70,
+        "intent": "Buying",
+        "sampleQuestions": [
+          {
+            "text": "Which paywall will hit $10K MRR quickly?",
+            "likes": 2
+          },
+          {
+            "text": "Ok but which u would choose?",
+            "likes": 1
+          }
+        ]
       },
       {
-        "text": "Growth strategies",
-        "frequency": 0.2
+        "id": "kw_2",
+        "word": "AI Marketing",
+        "count": 7,
+        "engagement": 80,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "True but is it available in future?",
+            "likes": 0
+          },
+          {
+            "text": "Why not?",
+            "likes": 0
+          }
+        ]
       },
       {
-        "text": "Funding advice",
-        "frequency": 0.15
+        "id": "kw_3",
+        "word": "Data Structures",
+        "count": 3,
+        "engagement": 60,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "Which data structure have you been using for your SaaS?",
+            "likes": 1
+          },
+          {
+            "text": "Why not List?",
+            "likes": 1
+          }
+        ]
       },
       {
-        "text": "YC insights",
-        "frequency": 0.15
+        "id": "kw_4",
+        "word": "Coding Tools",
+        "count": 6,
+        "engagement": 50,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "Is it worth investing money in these tools?",
+            "likes": 2
+          },
+          {
+            "text": "To build better app need better promt?",
+            "likes": 2
+          }
+        ]
       },
       {
-        "text": "Community suggestions",
-        "frequency": 0.1
+        "id": "kw_5",
+        "word": "Frontend/Backend",
+        "count": 3,
+        "engagement": 75,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "Hey devs, I'm confused. Which should I build first?",
+            "likes": 1
+          },
+          {
+            "text": "Why?",
+            "likes": 1
+          }
+        ]
+      },
+      {
+        "id": "kw_6",
+        "word": "Marketing AI",
+        "count": 2,
+        "engagement": 40,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "Yes with using ai coding tool, how you will marketing?",
+            "likes": 0
+          },
+          {
+            "text": "How to do better?",
+            "likes": 0
+          }
+        ]
+      },
+      {
+        "id": "kw_7",
+        "word": "OpenClaw",
+        "count": 2,
+        "engagement": 30,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "How? Could u please give explanation",
+            "likes": 0
+          },
+          {
+            "text": "Do you have any interesting name that I can try?",
+            "likes": 0
+          }
+        ]
       }
     ],
     "activeHours": [
       {
-        "day": "Sunday",
-        "hours": [
-          9,
-          12,
-          3
-        ]
+        "hour": 0,
+        "creatorPosts": 0,
+        "audienceActivity": 5
+      },
+      {
+        "hour": 1,
+        "creatorPosts": 0,
+        "audienceActivity": 3
+      },
+      {
+        "hour": 2,
+        "creatorPosts": 0,
+        "audienceActivity": 2
+      },
+      {
+        "hour": 3,
+        "creatorPosts": 0,
+        "audienceActivity": 1
+      },
+      {
+        "hour": 4,
+        "creatorPosts": 0,
+        "audienceActivity": 1
+      },
+      {
+        "hour": 5,
+        "creatorPosts": 0,
+        "audienceActivity": 2
+      },
+      {
+        "hour": 6,
+        "creatorPosts": 0,
+        "audienceActivity": 5
+      },
+      {
+        "hour": 7,
+        "creatorPosts": 0,
+        "audienceActivity": 10
+      },
+      {
+        "hour": 8,
+        "creatorPosts": 0,
+        "audienceActivity": 20
+      },
+      {
+        "hour": 9,
+        "creatorPosts": 2,
+        "audienceActivity": 80
+      },
+      {
+        "hour": 10,
+        "creatorPosts": 1,
+        "audienceActivity": 70
+      },
+      {
+        "hour": 11,
+        "creatorPosts": 0,
+        "audienceActivity": 50
+      },
+      {
+        "hour": 12,
+        "creatorPosts": 1,
+        "audienceActivity": 60
+      },
+      {
+        "hour": 13,
+        "creatorPosts": 1,
+        "audienceActivity": 40
+      },
+      {
+        "hour": 14,
+        "creatorPosts": 0,
+        "audienceActivity": 30
+      },
+      {
+        "hour": 15,
+        "creatorPosts": 0,
+        "audienceActivity": 35
+      },
+      {
+        "hour": 16,
+        "creatorPosts": 2,
+        "audienceActivity": 90
+      },
+      {
+        "hour": 17,
+        "creatorPosts": 0,
+        "audienceActivity": 50
+      },
+      {
+        "hour": 18,
+        "creatorPosts": 0,
+        "audienceActivity": 60
+      },
+      {
+        "hour": 19,
+        "creatorPosts": 1,
+        "audienceActivity": 45
+      },
+      {
+        "hour": 20,
+        "creatorPosts": 1,
+        "audienceActivity": 55
+      },
+      {
+        "hour": 21,
+        "creatorPosts": 0,
+        "audienceActivity": 35
+      },
+      {
+        "hour": 22,
+        "creatorPosts": 1,
+        "audienceActivity": 45
+      },
+      {
+        "hour": 23,
+        "creatorPosts": 0,
+        "audienceActivity": 30
+      }
+    ],
+    "tribes": [
+      {
+        "name": "IndieDev",
+        "size": 40,
+        "growth": "Stable",
+        "sentiment": "Positive"
+      },
+      {
+        "name": "SaaSBuilders",
+        "size": 35,
+        "growth": "Stable",
+        "sentiment": "Positive"
+      },
+      {
+        "name": "BeginnerCoders",
+        "size": 25,
+        "growth": "Growing",
+        "sentiment": "Positive"
+      }
+    ],
+    "shadowAudience": {
+      "lurkersPercent": 90,
+      "engagersPercent": 10,
+      "insight": "Mostly lurkers."
+    },
+    "hypeValueScore": {
+      "hype": 35,
+      "value": 65
+    },
+    "ideaBank": [
+      {
+        "concept": "Create a series of short video explainers breaking down complex coding concepts in simple terms.",
+        "impact": "Improve audience understanding and attract new followers interested in learning to code."
+      },
+      {
+        "concept": "Share a detailed case study of a SaaS project you worked on, highlighting the challenges, solutions, and results.",
+        "impact": "Demonstrate your expertise and build trust with potential clients or collaborators."
+      },
+      {
+        "concept": "Host a live Q&A session on Twitter Spaces to answer questions about coding, SaaS development, and AI tools.",
+        "impact": "Engage directly with your audience, provide valuable insights, and establish yourself as a thought leader."
+      },
+      {
+        "concept": "Develop a free checklist or template related to SaaS development or marketing and offer it as a lead magnet.",
+        "impact": "Generate leads, build your email list, and provide tangible value to your audience."
+      },
+      {
+        "concept": "Run a poll asking your followers about their biggest challenges with coding or SaaS development.",
+        "impact": "Gather valuable feedback, identify content opportunities, and increase engagement."
       }
     ],
     "leadMagnet": {
-      "suggestion": "Ultimate List of VC Funds for Pre-Seed and Seed Rounds",
-      "type": "PDF",
-      "relevanceScore": 85,
-      "whyItWorks": "Addresses a common need for startups seeking funding, aligning with high-engagement content on VC resources."
+      "type": "Checklist",
+      "title": "SaaS Launch Checklist",
+      "hook": "Launch your SaaS with confidence and avoid costly mistakes.",
+      "friction": "Medium",
+      "temp": "Cold",
+      "suggestion": "Offer a companion video course to walk users through the checklist and provide more in-depth guidance.",
+      "whyItWorks": "Provides a tangible, actionable resource that addresses a specific pain point for SaaS developers."
     },
     "ctaAnalysis": {
-      "effectivenessScore": 50,
-      "commonPhrases": [
-        "ay appreciate it",
-        "will do"
+      "mix": [
+        {
+          "type": "Engagement",
+          "score": 70,
+          "fullMark": 100
+        },
+        {
+          "type": "Bridge",
+          "score": 10,
+          "fullMark": 100
+        },
+        {
+          "type": "Conversion",
+          "score": 5,
+          "fullMark": 100
+        },
+        {
+          "type": "Conversation",
+          "score": 15,
+          "fullMark": 100
+        }
       ],
-      "improvementSuggestion": "Incorporate more direct and specific calls to action, such as 'Download the free guide' or 'Join the newsletter.'"
+      "topTrigger": {
+        "keyword": "devs",
+        "count": 3
+      },
+      "urgencyScore": 5,
+      "dominantStyle": "Reach Hunter",
+      "placementHeatmap": [
+        {
+          "location": "First Line",
+          "count": 0
+        },
+        {
+          "location": "Bottom",
+          "count": 8
+        },
+        {
+          "location": "P.S.",
+          "count": 2
+        }
+      ]
     },
-    "techStack": [
+    "techStack": {
+      "tools": [
+        {
+          "category": "AI Tools",
+          "name": "Claude",
+          "confidence": "High"
+        },
+        {
+          "category": "AI Tools",
+          "name": "Cursor",
+          "confidence": "High"
+        },
+        {
+          "category": "AI Tools",
+          "name": "Replicate",
+          "confidence": "Medium"
+        }
+      ],
+      "businessClass": "SaaS / Agency",
+      "verdict": "He is experimenting with AI tools but does not have a mature revenue ecosystem in place yet."
+    },
+    "valueLadder": {
+      "products": {
+        "Bait": {
+          "name": "Free insights via X posts",
+          "price": "Free",
+          "type": "Content",
+          "intensity": "Low"
+        },
+        "Tripwire": {
+          "name": "SaaS Kit",
+          "price": "$29",
+          "type": "Template",
+          "intensity": "Low"
+        }
+      },
+      "gap": "Missing Core",
+      "insight": "They offer free content and potentially low-priced templates, but need a mid-tier offer like a course or community to increase revenue."
+    },
+    "growthTasks": [
       {
-        "tool": "Stripe",
-        "category": "Finance",
-        "confidence": "High"
+        "id": "gt_1",
+        "title": "Create a $99 SaaS Development Mini-Course",
+        "category": "Big Bet",
+        "impact": 7,
+        "effort": 6,
+        "type": "Funnel",
+        "status": "Pending",
+        "reasoning": "Provides a mid-tier offer to capture users who find value in the free content and are willing to invest further.",
+        "actionType": "Content"
       },
       {
-        "tool": "X",
-        "category": "Scheduling",
-        "confidence": "Low"
+        "id": "gt_2",
+        "title": "Run a Twitter Poll to Discover Audience's Biggest SaaS Pain Points",
+        "category": "Quick Win",
+        "impact": 6,
+        "effort": 2,
+        "type": "Content",
+        "status": "Pending",
+        "reasoning": "Helps in understanding audience needs and create tailored content.",
+        "actionType": "Content"
+      },
+      {
+        "id": "gt_3",
+        "title": "Convert Top-Performing X Posts Into Threaded Tutorials",
+        "category": "Big Bet",
+        "impact": 8,
+        "effort": 5,
+        "type": "Content",
+        "status": "Pending",
+        "reasoning": "Threads can increase reach and engagement compared to standalone tweets.",
+        "actionType": "Content"
+      },
+      {
+        "id": "gt_4",
+        "title": "Add a Clear Call-to-Action to Profile Bio Linking to Lead Magnet",
+        "category": "Quick Win",
+        "impact": 5,
+        "effort": 1,
+        "type": "Funnel",
+        "status": "Pending",
+        "reasoning": "Captures lost leads from bio traffic.",
+        "actionType": "Bio"
+      },
+      {
+        "id": "gt_5",
+        "title": "Experiment with Different Posting Times to Maximize Engagement",
+        "category": "Quick Win",
+        "impact": 4,
+        "effort": 3,
+        "type": "Crowd",
+        "status": "Pending",
+        "reasoning": "Optimize posting schedule to match peak audience activity.",
+        "actionType": "Strategy"
       }
     ],
-    "pillarInsight": "Double down on Startup Insights and Resources; they drive the most engagement."
+    "disruptor": {
+      "score": 70,
+      "focus": "Empathetic Storytelling",
+      "schedule": [
+        {
+          "day": "Monday",
+          "time": "08:00 AM",
+          "pillar": "Authority",
+          "topic": "Personal Struggle with Debugging",
+          "hookStyle": "Empathetic",
+          "suggestedHook": "I used to spend hours debugging, feeling like I was going crazy. Here's what I learned...",
+          "strategicReason": "They post boring tips on Mon, you post a relatable personal struggle."
+        },
+        {
+          "day": "Tuesday",
+          "time": "12:00 PM",
+          "pillar": "Educational",
+          "topic": "Behind-the-Scenes of Building a SaaS",
+          "hookStyle": "Story-driven",
+          "suggestedHook": "Let me show you the actual code I wrote last week for my SaaS project... (warts and all)",
+          "strategicReason": "They post theoretical tips; you show real-world application."
+        },
+        {
+          "day": "Wednesday",
+          "time": "03:00 PM",
+          "pillar": "Inspiration",
+          "topic": "Inspirational story of a coder who made it big",
+          "hookStyle": "Inspirational",
+          "suggestedHook": "Meet [Name], a coder who came from nothing and now runs a $1 million SaaS business.",
+          "strategicReason": "They post generalized tips; you humanize the success stories."
+        },
+        {
+          "day": "Thursday",
+          "time": "09:00 AM",
+          "pillar": "Tutorial",
+          "topic": "Quick Tip: How to debug your Saas",
+          "hookStyle": "Data-backed",
+          "suggestedHook": "Debugging is the biggest time suck of running a Saas. I have 3 tips for you...",
+          "strategicReason": "Beat them at their own game, but add clear value."
+        },
+        {
+          "day": "Friday",
+          "time": "05:00 PM",
+          "pillar": "Community",
+          "topic": "Controversial Topic In Coding",
+          "hookStyle": "Controversial",
+          "suggestedHook": "Who created copy and paste? Are they the real goats or an example of lazy coding?",
+          "strategicReason": "Ignite debate by talking about the hard issues."
+        },
+        {
+          "day": "Saturday",
+          "time": "07:00 PM",
+          "pillar": "Community",
+          "topic": "SaaS Community Highlight",
+          "hookStyle": "Empathetic",
+          "suggestedHook": "Shoutout to [Name] in the SaaS community for building something amazing.",
+          "strategicReason": "Foster community and get them to recognize your values."
+        },
+        {
+          "day": "Sunday",
+          "time": "01:00 PM",
+          "pillar": "Tutorial",
+          "topic": "Tutorial of A Saas Hack",
+          "hookStyle": "Data-backed",
+          "suggestedHook": "Did you know you can grow your MRR with this Saas Hack? Here is how.",
+          "strategicReason": "Sunday is chill, and can highlight how to improve your Saas."
+        }
+      ]
+    },
+    "funnelTactics": [
+      {
+        "title": "Add Tripwire",
+        "problem": "Missing mid-tier offer between free content and higher-priced services.",
+        "solution": "Create a $47 workshop or template to capture the middle.",
+        "impact": "+20% Conversion",
+        "difficulty": "Medium",
+        "status": "Pending",
+        "id": "ft_1"
+      },
+      {
+        "title": "Revamp Bio CTA",
+        "problem": "Unclear call-to-action in bio leading to low click-through rates.",
+        "solution": "Craft a compelling CTA that promises a specific benefit and links to a dedicated landing page.",
+        "impact": "+15% Click-through",
+        "difficulty": "Easy",
+        "status": "Pending",
+        "id": "ft_2"
+      },
+      {
+        "title": "Optimize Landing Page",
+        "problem": "Landing page is not optimized for conversions, leading to high bounce rates.",
+        "solution": "Improve the landing page design, add social proof, and clearly articulate the value proposition.",
+        "impact": "+10% Conversion",
+        "difficulty": "Medium",
+        "status": "Pending",
+        "id": "ft_3"
+      }
+    ],
+    "crowdTactics": [
+      {
+        "title": "Address Skepticism",
+        "audienceState": "Skeptical",
+        "action": "Reply to top 5 comments expressing doubt with case studies and testimonials.",
+        "targetParams": "Builds trust and credibility by providing evidence of success.",
+        "status": "Ready",
+        "id": "ct_1"
+      },
+      {
+        "title": "Solve Problems",
+        "audienceState": "Frustrated",
+        "action": "Identify common complaints and offer solutions or workarounds in comments and future content.",
+        "targetParams": "Demonstrates responsiveness and builds goodwill.",
+        "status": "Ready",
+        "id": "ct_2"
+      },
+      {
+        "title": "Vibe Matching",
+        "audienceState": "Engaged",
+        "action": "Engage with enthusiastic comments by asking follow-up questions and encouraging further discussion.",
+        "targetParams": "Reinforces positive sentiment and fosters a sense of community.",
+        "status": "Ready",
+        "id": "ct_3"
+      }
+    ],
+    "competitorGap": {
+      "metrics": [
+        {
+          "category": "Engagement Rate",
+          "profileValue": 0,
+          "benchmarkValue": 1.5,
+          "gapType": "Opportunity"
+        },
+        {
+          "category": "Post Frequency",
+          "profileValue": 3.3,
+          "benchmarkValue": 4,
+          "gapType": "Opportunity"
+        },
+        {
+          "category": "Content Quality",
+          "profileValue": 60,
+          "benchmarkValue": 75,
+          "gapType": "Opportunity"
+        },
+        {
+          "category": "Hook Strength",
+          "profileValue": 50,
+          "benchmarkValue": 70,
+          "gapType": "Opportunity"
+        }
+      ],
+      "topOpportunity": "Engagement Rate",
+      "insight": "The biggest opportunity lies in increasing engagement rate, indicating a need to create more compelling content that resonates with the target audience.",
+      "recommendations": [
+        "Experiment with different content formats (e.g., videos, polls, threads) to see what performs best.",
+        "Craft stronger hooks that immediately grab attention and entice users to engage.",
+        "Actively participate in conversations and respond to comments to foster a sense of community."
+      ]
+    }
   },
   "platform": "x",
-  "postCount": 9,
+  "postCount": 10,
   "source": "extension_scrape",
-  "timestamp": 1771314169707
+  "timestamp": 1771348637630
 }

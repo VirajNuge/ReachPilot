@@ -9,49 +9,21 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 // --- Types ---
-export interface FunnelTactic {
-  id: string;
-  title: string;
-  problem: string;
-  solution: string;
-  impact: string; // e.g., "+20% Conversion"
-  difficulty: "Easy" | "Medium" | "Hard";
-  status: "Pending" | "Active" | "Complete";
-}
+import { FunnelTactic } from "../../../../../lib/types/analysis";
 
 // --- Mock Data ---
-const MOCK_FUNNEL: FunnelTactic[] = [
-  {
-    id: "1",
-    title: "Upgrade 'List' Bait",
-    problem: "Competitor uses a simple PDF checklist.",
-    solution: "Launch a Free Mini-Course (3 Videos)",
-    impact: "+35% Leads",
-    difficulty: "Medium",
-    status: "Pending",
-  },
-  {
-    id: "2",
-    title: "CTA Shift",
-    problem: "Too many 'Engagement' CTAs (80%).",
-    solution: "Shift 30% of posts to 'DM Automation' CTAs.",
-    impact: "Start Conversations",
-    difficulty: "Easy",
-    status: "Pending",
-  },
-  {
-    id: "3",
-    title: "Pixel Implementation",
-    problem: "Landing page has no retargeting pixel.",
-    solution: "Install Meta Pixel for 'Seeker' retargeting.",
-    impact: "Recover 40% Traffic",
-    difficulty: "Hard",
-    status: "Active",
-  },
-];
 
-export default function FunnelOptimizer() {
+interface FunnelOptimizerProps {
+  funnelTactics?: FunnelTactic[];
+}
+
+export default function FunnelOptimizer({
+  funnelTactics,
+}: FunnelOptimizerProps) {
   const [activeTactic, setActiveTactic] = useState<string | null>(null);
+
+  // Use passed data or fallback to empty array
+  const tactics = funnelTactics || [];
 
   return (
     <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
@@ -80,7 +52,7 @@ export default function FunnelOptimizer() {
       </div>
 
       <div className="p-4 flex flex-col gap-3 overflow-y-auto custom-scrollbar flex-1">
-        {MOCK_FUNNEL.map((tactic) => (
+        {tactics.map((tactic) => (
           <motion.div
             key={tactic.id}
             layout

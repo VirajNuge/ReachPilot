@@ -9,45 +9,19 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 // --- Types ---
-export interface CrowdTactic {
-  id: string;
-  title: string;
-  audienceState: string; // e.g., "Skeptical"
-  action: string;
-  targetParams?: string; // e.g., "Use Case Study"
-  status: "Ready" | "Actioned";
-}
+import { CrowdTactic } from "../../../../../lib/types/analysis";
 
 // --- Mock Data ---
-const MOCK_CROWD: CrowdTactic[] = [
-  {
-    id: "1",
-    title: "Vibe Matching",
-    audienceState: "Skeptical",
-    action: "Post a Case Study with hard metrics.",
-    targetParams: "Trust Builder",
-    status: "Ready",
-  },
-  {
-    id: "2",
-    title: "Unmet Demand",
-    audienceState: "Frustrated",
-    action: "Answer top 3 ignored questions about 'Pricing'.",
-    targetParams: "Authority Win",
-    status: "Ready",
-  },
-  {
-    id: "3",
-    title: "Superfan Outreach",
-    audienceState: "Engaged",
-    action: "Reply to 'Top 5 Fans' on their latest post.",
-    targetParams: "Reciprocity",
-    status: "Ready",
-  },
-];
 
-export default function CrowdHijacker() {
+interface CrowdHijackerProps {
+  crowdTactics?: CrowdTactic[];
+}
+
+export default function CrowdHijacker({ crowdTactics }: CrowdHijackerProps) {
   const [activeTactic, setActiveTactic] = useState<string | null>(null);
+
+  // Use passed data or fallback to empty array
+  const tactics = crowdTactics || [];
 
   return (
     <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
@@ -74,7 +48,7 @@ export default function CrowdHijacker() {
       </div>
 
       <div className="p-4 flex flex-col gap-3 overflow-y-auto custom-scrollbar flex-1">
-        {MOCK_CROWD.map((tactic) => (
+        {tactics.map((tactic) => (
           <motion.div
             key={tactic.id}
             layout

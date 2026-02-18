@@ -100,8 +100,17 @@ const MOCK_DISRUPTOR: DisruptorData = {
 };
 
 // --- Component ---
-export default function ContentDisruptor() {
-  const data = MOCK_DISRUPTOR;
+interface ContentDisruptorProps {
+  disruptor: DisruptorData;
+}
+
+export default function ContentDisruptor({ disruptor }: ContentDisruptorProps) {
+  // Use passed data or fallback to empty state (handling null/undefined)
+  const data = disruptor || {
+    score: 0,
+    focus: "Pending Analysis",
+    schedule: [],
+  };
 
   const getHookColor = (style: string) => {
     switch (style) {

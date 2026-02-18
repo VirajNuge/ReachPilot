@@ -5,9 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Component imports
-import AccStatus from "../../../components/AccStatus/page";
-import QkFix from "../../../components/AccQkFix/page";
-import AccBio from "../../../components/AccBio/AccBio";
+
 import VelocityMeter from "../../../components/VelocityMeter/VelocityMeter";
 import PsychTriggers from "../../../components/PsychTriggers/PsychTriggers";
 import PostFatigue from "../../../components/PostFatigue/PostFatigue";
@@ -26,11 +24,15 @@ import GrowthCommand from "../../../components/GrowthCommand/GrowthCommand";
 import LoadingScreen from "../../../components/LoadingScreen/LoadingScreen";
 import { ErrorState } from "../../../components/ErrorState/ErrorState";
 import { AnalyzerTabs } from "../../../components/Shared/AnalyzerTabs";
-import CsiHealthBar from "../../../components/CsiHealthBar/CsiHealthBar";
-import StreakCounter from "../../../components/StreakCounter/StreakCounter";
-import OnboardingTour from "../../../components/OnboardingTour/OnboardingTour";
-import HypeValueMeter from "../../../components/HypeValueMeter/HypeValueMeter";
 
+import PulseScore from "../../../components/Pulse/PulseScore";
+import HeartbeatChart from "../../../components/Pulse/HeartbeatChart";
+import EngagementVitalsPanel from "../../../components/Pulse/EngagementVitals";
+import AudienceTemp from "../../../components/Pulse/AudienceTemp";
+import GrowthTrend from "../../../components/Pulse/GrowthTrend";
+import TriageStation from "../../../components/Pulse/TriageStation";
+
+import OnboardingTour from "../../../components/OnboardingTour/OnboardingTour";
 import "./analyzedAccount.css";
 
 import { useAnalysisData } from "../../../../../../hooks/useAnalysisData";
@@ -344,6 +346,48 @@ function AnalysisContent() {
                 actionType: "Content",
               },
             ],
+            disruptor: {
+              score: 0,
+              focus: "N/A",
+              schedule: [],
+            },
+            funnelTactics: [],
+            crowdTactics: [],
+            pulseHeartbeat: Array(7).fill({
+              day: "Mon",
+              activityScore: 50,
+              postsCount: 1,
+              peakHour: "12 PM",
+              trend: "Flat",
+            }),
+            engagementVitals: {
+              engagementRate: 2.5,
+              benchmarkRate: 2.0,
+              reachEfficiency: 80,
+              interactionRatio: 15.5,
+              status: "Healthy",
+              insight: "Engagement is 25% above average.",
+            },
+            audienceTemperature: {
+              tempScore: 75,
+              label: "Hot",
+              fanboyPercent: 40,
+              criticPercent: 5,
+              dominantEmotion: "Excited",
+              recommendation:
+                "Maintain momentum with more community challenges.",
+            },
+            growthTrajectory: {
+              direction: "Up",
+              changePercent: 12.5,
+              forecast: "On track for +10% growth in 30 days.",
+              sparkline: [
+                { week: 1, score: 60 },
+                { week: 2, score: 65 },
+                { week: 3, score: 75 },
+                { week: 4, score: 85 },
+              ],
+            },
           };
 
           setData(generatedData);
@@ -496,70 +540,34 @@ function AnalysisContent() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="grid grid-cols-1 lg:grid-cols-3 gap-6"
                   >
-                    <div className="flex gap-6">
-                      {/* Left Column (2/3): Hero Stats */}
-                      <div className="lg:col-span-2 flex flex-col gap-6">
-                        <div className="w-[750px]">
-                          <AccStatus
-                            name={data.profile?.name || "User"}
-                            title={
-                              data.profile?.bio || data.profile?.headline || ""
-                            }
-                            image={data.profile?.pfp || "/images/app/pp.jpg"}
-                            followers={data.profile?.followers || 0}
-                            following={data.profile?.followingCount}
-                            projects={data.profile?.projects || "0"}
-                            target={data.profile?.profileScore || 50}
-                          />
-                        </div>
-                        {/* Bio Analysis Card */}
-                        <div className="w-[700px]">
-                          <AccBio
-                            clarityScore={data.bioAnalysis?.clarityScore || 0}
-                            clarityTotal={10}
-                            keywordScore={data.bioAnalysis?.keywordScore || 0}
-                            keywordTotal={10}
-                            tone={data.bioAnalysis?.tone || "Neutral"}
-                            strengths={data.bioAnalysis?.strengths || []}
-                            weaknesses={data.bioAnalysis?.weaknesses || []}
-                            suggestions={data.bioAnalysis?.suggestions || []}
-                          />
-                        </div>
+                    {/* Left Column (Wide) - 2/3 width */}
+                    <div className="lg:col-span-2 flex flex-col gap-6">
+                      {/* Pulse Score - Top Hero */}
+                      <PulseScore data={data} />
+
+                      {/* Heartbeat Chart - Middle */}
+                      <HeartbeatChart data={data.pulseHeartbeat} />
+
+                      {/* Growth Trend - Bottom */}
+                      <div className="min-h-[200px]">
+                        <GrowthTrend data={data.growthTrajectory} />
                       </div>
+                    </div>
 
-                      {/* Right Column (1/3): Health & Streaks */}
-                      <div className="flex flex-col gap-6 ">
-                        <div className="soft-panel p-6 w-[370px]">
-                          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
-                            Content Fitness
-                          </h3>
+                    {/* Right Column (Narrow) - 1/3 width */}
+                    <div className="flex flex-col gap-6">
+                      {/* Engagement Vitals */}
+                      <EngagementVitalsPanel
+                        data={data.engagementVitals}
+                        contentMetrics={data.contentMetrics}
+                      />
 
-                          <CsiHealthBar score={data.csiScore || 78} />
+                      {/* Audience Temp */}
+                      <AudienceTemp data={data.audienceTemperature} />
 
-                          <div className="mt-6">
-                            <StreakCounter days={12} />
-                          </div>
-
-                          <div className="mt-6 border-t border-gray-100 pt-6">
-                            <HypeValueMeter score={data.hypeValueScore} />
-                          </div>
-                        </div>
-
-                        <div className="soft-panel p-6">
-                          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
-                            Quick Fixes
-                          </h3>
-                          <div className="space-y-3 max-h-[300px] overflow-y-auto custom-scroll pr-2">
-                            {data.quickFixes?.map((fix, i) => (
-                              <QkFix
-                                key={i}
-                                headline={fix.headline}
-                                description={fix.description}
-                                tag={fix.tag}
-                              />
-                            ))}
-                          </div>
-                        </div>
+                      {/* Triage Station - Bottom */}
+                      <div className="flex-1 min-h-[300px]">
+                        <TriageStation fixes={data.quickFixes} />
                       </div>
                     </div>
                   </motion.div>
@@ -872,7 +880,12 @@ function AnalysisContent() {
 
                     <div className="grid grid-cols-12 gap-5">
                       <div className="col-span-12 min-h-[400px]">
-                        <GrowthCommand />
+                        <GrowthCommand
+                          growthTasks={data.growthTasks}
+                          disruptor={data.disruptor}
+                          funnelTactics={data.funnelTactics}
+                          crowdTactics={data.crowdTactics}
+                        />
                       </div>
                     </div>
                   </motion.div>

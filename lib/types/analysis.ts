@@ -134,6 +134,46 @@ export interface ActiveHourData {
   audienceActivity: number; // 0-100 heat (based on comment timestamps)
 }
 
+export interface HeartbeatDay {
+  day: string;
+  activityScore: number;
+  postsCount: number;
+  peakHour: string;
+  trend: "Rising" | "Flat" | "Dropping";
+}
+
+export interface EngagementVitals {
+  engagementRate: number;
+  benchmarkRate: number;
+  reachEfficiency: number;
+  interactionRatio: number;
+  status: "Healthy" | "Warning" | "Critical";
+  insight: string;
+}
+
+export type AudienceTempLabel =
+  | "Ice Cold"
+  | "Cold"
+  | "Warm"
+  | "Hot"
+  | "On Fire";
+
+export interface AudienceTemperature {
+  tempScore: number;
+  label: AudienceTempLabel;
+  fanboyPercent: number;
+  criticPercent: number;
+  dominantEmotion: string;
+  recommendation: string;
+}
+
+export interface GrowthTrajectory {
+  direction: "Up" | "Flat" | "Down";
+  changePercent: number;
+  forecast: string;
+  sparkline: { week: number; score: number }[];
+}
+
 export interface SimpleCrowdPersona {
   name: string;
   description: string;
@@ -181,6 +221,18 @@ export interface TechStackData {
 
 // Alias for compatibility if needed, or use ViralRecipe directly
 export type ViralPostData = ViralRecipe;
+
+// Derived on frontend, not from API
+export interface PulseScoreBreakdown {
+  total: number; // 0-100 weighted composite
+  grade: "S" | "A" | "B" | "C" | "D" | "F";
+  components: {
+    profileHealth: number; // from profile.profileScore
+    contentFitness: number; // from csiScore
+    engagementPower: number; // from contentMetrics.engagementScore
+    streakBonus: number; // derived from postFatigue.fatigueScore (inverted)
+  };
+}
 
 export interface RawAnalysisData {
   profile: {
@@ -232,6 +284,10 @@ export interface RawAnalysisData {
   }[];
   scheduleHighlight: string;
   csiScore: number;
+  pulseHeartbeat: HeartbeatDay[];
+  engagementVitals: EngagementVitals;
+  audienceTemperature: AudienceTemperature;
+  growthTrajectory: GrowthTrajectory;
 
   // Lab Data uses extracted or existing interfaces
   contentPillars: PillarData[];
@@ -283,6 +339,9 @@ export interface RawAnalysisData {
   valueLadder: LadderData;
   growthTasks: GrowthTask[];
   crowdPersonas: CrowdPersonaData;
+  disruptor: DisruptorData;
+  funnelTactics: FunnelTactic[];
+  crowdTactics: CrowdTactic[];
 }
 
 // --- New Interfaces for UI Components ---
@@ -355,7 +414,48 @@ export interface GrowthSimulationResult {
   trajectory_graph: { day: number; value: number }[];
 }
 
+// Phase 4: Content Disruptor
+export interface DisruptorDay {
+  day: string;
+  time: string;
+  pillar: string;
+  topic: string;
+  hookStyle: "Empathetic" | "Controversial" | "Story-driven" | "Data-backed";
+  suggestedHook: string;
+  strategicReason: string;
+}
+
+export interface DisruptorData {
+  score: number;
+  focus: string;
+  schedule: DisruptorDay[];
+}
+
+// Phase 5: Funnel Optimizer
+export interface FunnelTactic {
+  id: string;
+  title: string;
+  problem: string;
+  solution: string;
+  impact: string;
+  difficulty: "Easy" | "Medium" | "Hard";
+  status: "Pending" | "Active" | "Complete";
+}
+
+// Phase 6: Crowd Hijacker
+export interface CrowdTactic {
+  id: string;
+  title: string;
+  audienceState: "Skeptical" | "Frustrated" | "Engaged";
+  action: string;
+  targetParams: string;
+  status: "Ready" | "Actioned";
+}
+
 export interface GrowthData {
   tasks: GrowthTask[];
   simulation: GrowthSimulationResult; // Initial state
+  disruptor: DisruptorData;
+  funnelTactics: FunnelTactic[];
+  crowdTactics: CrowdTactic[];
 }

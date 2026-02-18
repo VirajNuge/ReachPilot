@@ -86,10 +86,11 @@ REQUIREMENTS:
 
 3. **profile.followers**: Use the REAL follower count from the scraped profile info: ${profile.followers || "Unknown"}. If unknown, estimate from engagement.
 
-4. **quickFixes**: Generate 6-8 ${platformName}-specific fixes:
-   - 2-3 HIGH IMPACT (content strategy, posting cadence)
-   - 2-3 MEDIUM IMPACT (engagement tactics, format changes)
-   - 1-2 LOW IMPACT (minor optimizations)
+4. **quickFixes**: Generate 6-8 ${platformName}-specific fixes. IMPORTANT: Sort by impact — HIGH IMPACT fixes MUST come first.
+   The first 3 items will be displayed in the "Triage Station" on the Pulse Overview.
+    - headline: Short punchy title (max 5 words).
+    - description: One sentence calculation of impact (e.g. "Fixing this could add 200 followers/mo").
+    - tag: "HIGH IMPACT", "MEDIUM IMPACT", or "LOW IMPACT".
 
 5. **bioAnalysis**: Analyze their content voice and positioning:
    - clarityScore: 1-10 (how clear is their niche/value prop from posts)
@@ -400,6 +401,62 @@ REQUIREMENTS:
     - **reasoning**: One sentence on WHY this is high priority (e.g. "Captures lost leads from bio.").
     - Return a list of objects.
 
+32. **disruptor**: Create a "7-Day Content Disruptor" plan to counter their strategy.
+    - **score**: 0-100 "Disruptor Score" (how easy they are to outshine).
+    - **focus**: One phrase summary (e.g. "Empathetic Storytelling").
+    - **schedule**: Array of 7 days (Mon-Sun).
+      - **day**: "Monday", etc.
+      - **time**: Best time to post (e.g. "08:00 AM").
+      - **pillar**: Content category (e.g. "Authority").
+      - **topic**: Specific topic idea.
+      - **hookStyle**: "Empathetic", "Controversial", "Story-driven", "Data-backed".
+      - **suggestedHook**: Specific first line.
+      - **strategicReason**: Why this works against the competitor (e.g. "They post boring tips on Mon, you post a hot take.").
+
+33. **funnelTactics**: Identify 3 specific revenue leaks in their funnel (Zone 4) and suggest fixes.
+    - **title**: Short tactic name (e.g. "Add Tripwire").
+    - **problem**: What they are doing wrong (e.g. "Linktree has too many options").
+    - **solution**: The specific fix (e.g. "Replace with dedicated landing page").
+    - **impact**: Exp. Impact (e.g. "+20% Click-through").
+    - **difficulty**: "Easy", "Medium", "Hard".
+    - **status**: Always "Pending".
+
+34. **crowdTactics**: Identify 3 specific ways to hijack their audience (Zone 3) based on sentiment.
+    - **title**: Short tactic name (e.g. "Vibe Matching").
+    - **audienceState**: "Skeptical", "Frustrated", "Engaged".
+    - **action**: Specific action to take (e.g. "Reply to top 5 comments with case study").
+    - **targetParams**: Why this works (e.g. "Builds Trust").
+    - **status**: Always "Ready".
+
+35. **pulseHeartbeat**: 7-day activity ECG for the Pulse Overview.
+    - Return exactly 7 objects (Mon-Sun).
+    - day: "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+    - activityScore: 0-100 (100 = most active day based on post count + engagement)
+    - postsCount: Number of posts on that day
+    - peakHour: The hour with most engagement on that day (e.g. "9 AM")
+    - trend: "Rising" (engagement up vs prev week), "Flat", or "Dropping"
+
+36. **engagementVitals**: Medical-style engagement vitals for the Pulse Overview.
+    - engagementRate: Actual average engagement rate % from the scraped data.
+    - benchmarkRate: Platform average engagement rate % (use PLATFORM_BENCHMARKS).
+    - reachEfficiency: 0-100 score (how well posts reach beyond followers).
+    - interactionRatio: Avg likes ÷ avg comments (e.g. 15.3).
+    - status: "Healthy" if engagementRate > benchmarkRate, "Warning" if within 50%, "Critical" if below 50%.
+    - insight: One sentence explaining the most important engagement finding.
+
+37. **audienceTemperature**: Audience heat level for the Pulse Overview.
+    - tempScore: 0-100. Formula: (fanboyPercent * 1.0) + (seekerPercent * 0.5) - (criticPercent * 1.5). Clamp 0-100.
+    - label: "Ice Cold" (0-20), "Cold" (21-40), "Warm" (41-60), "Hot" (61-80), "On Fire" (81-100).
+    - fanboyPercent: % from crowdSentiment.vibes where type="Fanboys".
+    - criticPercent: % from crowdSentiment.vibes where type="Critics".
+    - dominantEmotion: The single most common emotion in comments (e.g. "Inspired", "Curious", "Frustrated").
+    - recommendation: One sentence on how to raise the temperature.
+
+38. **growthTrajectory**: Growth trend for the Pulse Overview.
+    - direction: "Up" if engagement is trending up, "Flat" if stable, "Down" if declining.
+    - changePercent: % change in avg engagement from first half to second half of scraped posts.
+    - forecast: One sentence prediction (e.g. "On track for +12% follower growth in 30 days").
+    - sparkline: 4 weekly data points (week 1-4) with a score 0-100 representing engagement health.
 
 Strictly follow the JSON schema. Base everything on the REAL scraped data provided.
   `.trim();

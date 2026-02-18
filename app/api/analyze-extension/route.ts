@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { analysisSchema } from "@/lib/analysisSchema";
+import {
+  coreSchema,
+  audienceSchema,
+  strategySchema,
+} from "@/lib/analysisSchema";
 import { formatExtensionData } from "./extensionDataFormatter";
 import { buildExtensionPrompt } from "./extensionPrompts";
 import fs from "fs/promises";
@@ -82,26 +86,61 @@ export async function POST(req: Request) {
     // 4. Build the extension-specific prompt
     const prompt = buildExtensionPrompt(formattedData, platform, profile);
 
-    // 5. Setup Gemini with structured output
+    // 5. Setup Gemini Models for Parallel Execution
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
+
+    const coreModel = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
       generationConfig: {
         responseMimeType: "application/json",
-        responseSchema: analysisSchema,
+        responseSchema: coreSchema,
       },
     });
 
-    console.log(`[analyze-extension] Sending to Gemini...`);
-    const result = await model.generateContent(prompt);
-    const analysisText = result.response.text();
+    const audienceModel = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: audienceSchema,
+      },
+    });
+
+    const strategyModel = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: strategySchema,
+      },
+    });
+
+    console.log(`[analyze-extension] Sending 3 parallel requests to Gemini...`);
+
+    // 6. Execute Parallel Requests
+    const [coreResult, audienceResult, strategyResult] = await Promise.all([
+      coreModel.generateContent(prompt),
+      audienceModel.generateContent(prompt),
+      strategyModel.generateContent(prompt),
+    ]);
+
+    const coreText = coreResult.response.text();
+    const audienceText = audienceResult.response.text();
+    const strategyText = strategyResult.response.text();
 
     console.log(
-      `[analyze-extension] Gemini response received (${analysisText.length} chars)`,
+      `[analyze-extension] Responses received: Core(${coreText.length}), Audience(${audienceText.length}), Strategy(${strategyText.length})`,
     );
 
-    // 6. Parse and cache the structured analysis
-    const analysis = JSON.parse(analysisText);
+    // 7. Parse and Merge Results
+    const coreData = JSON.parse(coreText);
+    const audienceData = JSON.parse(audienceText);
+    const strategyData = JSON.parse(strategyText);
+
+    // Merge into single analysis object
+    const analysis = {
+      ...coreData,
+      ...audienceData,
+      ...strategyData,
+    };
 
     // Overwrite analysis.profile with scraped profile data if available for better UI accuracy
     if (profile.name) analysis.profile.name = profile.name;

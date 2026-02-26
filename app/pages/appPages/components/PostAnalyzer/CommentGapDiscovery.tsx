@@ -6,36 +6,25 @@ import {
   FaExclamationCircle,
   FaComments,
 } from "react-icons/fa";
+import { CommentGapProps } from "@/lib/postAnalyzerTypes";
 
-export default function CommentGapDiscovery() {
-  // Mock Data based on user request
-  const gapData = [
-    {
-      gap: "Pricing/Cost",
-      frequency: 12,
-      strategy: "Create a 'Value vs. Cost' comparison post.",
-      icon: <FaFire className="text-orange-500" />,
-    },
-    {
-      gap: "Technical Setup",
-      frequency: 8,
-      strategy: "Post a 'Step-by-Step' technical guide.",
-      icon: <FaTools className="text-blue-500" />,
-    },
-    {
-      gap: "Alternative Tools",
-      frequency: 5,
-      strategy: "Create a 'Why [Your Tool] is better' post.",
-      icon: <FaRegLightbulb className="text-yellow-500" />,
-    },
-  ];
+const getIcon = (index: number) => {
+  switch (index) {
+    case 0:
+      return <FaFire className="text-orange-500" />;
+    case 1:
+      return <FaTools className="text-blue-500" />;
+    case 2:
+      return <FaRegLightbulb className="text-yellow-500" />;
+    default:
+      return <FaComments className="text-indigo-500" />;
+  }
+};
 
-  const confusionPoint = {
-    text: "Deployment Process",
-    sentiment: "Frustrated",
-    insight: "Users are stuck on the final 'Go Live' step.",
-  };
-
+export default function CommentGapDiscovery({
+  gapData,
+  confusionPoint,
+}: CommentGapProps) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow h-max flex flex-col">
       {/* Header */}
@@ -60,7 +49,7 @@ export default function CommentGapDiscovery() {
           </div>
         </div>
         <div className="px-2 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase rounded-full tracking-wide">
-          3 Opportunities Found
+          {gapData.length} Opportunities Found
         </div>
       </div>
 
@@ -77,7 +66,7 @@ export default function CommentGapDiscovery() {
                 className="flex items-start gap-3 p-3 bg-gray-50/50 rounded-xl border border-gray-100 hover:border-yellow-200 hover:bg-yellow-50/30 transition-colors group"
               >
                 <div className="mt-1 p-1 bg-white rounded-lg shadow-sm">
-                  {item.icon}
+                  {getIcon(index)}
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">

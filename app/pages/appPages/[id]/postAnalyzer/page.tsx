@@ -304,7 +304,9 @@ export default function PostAnalyzerPage() {
 
                   <ViralVelocity {...analysisData.analysis.viralVelocity} />
                   <SentimentVibe {...analysisData.analysis.sentiment} />
-                  <CompetitorBenchmarking />
+                  <CompetitorBenchmarking
+                    {...analysisData.analysis.competitor}
+                  />
                 </div>
               </div>
 

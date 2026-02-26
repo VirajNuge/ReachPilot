@@ -1,22 +1,20 @@
 import React from "react";
-import {
-  FaBalanceScale,
-  FaChartBar,
-  FaUserFriends,
-  FaExclamationTriangle,
-  FaCheckCircle,
-} from "react-icons/fa";
+import { FaBalanceScale, FaUserFriends, FaCheckCircle } from "react-icons/fa";
+import { CompetitorProps } from "@/lib/postAnalyzerTypes";
 
-export default function CompetitorBenchmarking() {
-  // Mock Data
-  const benchmarkData = {
-    engagementRate: 4.2, // %
-    accountAvg: 1.1, // %
-    nicheAvg: 1.5, // %
-    isOutlier: true,
-    botSignal: "Low", // Low, Medium, High
-    followers: "124K",
-  };
+export default function CompetitorBenchmarking({
+  benchmarkData,
+}: CompetitorProps) {
+  const perfMultiplier = (
+    benchmarkData.engagementRate / benchmarkData.accountAvg
+  ).toFixed(1);
+
+  const engagementLabel =
+    benchmarkData.engagementRate > benchmarkData.nicheAvg * 2
+      ? "Exceptional"
+      : benchmarkData.engagementRate > benchmarkData.nicheAvg
+        ? "Above Average"
+        : "Standard";
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
@@ -56,7 +54,7 @@ export default function CompetitorBenchmarking() {
             <span className="text-2xl font-black text-gray-900 flex items-baseline gap-1">
               {benchmarkData.engagementRate}%
               <span className="text-[10px] text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded font-bold uppercase">
-                Exceptional
+                {engagementLabel}
               </span>
             </span>
           </div>
@@ -72,10 +70,12 @@ export default function CompetitorBenchmarking() {
             {/* This Post Bar */}
             <div
               className="h-4 bg-orange-500 rounded-full relative z-20 shadow-sm"
-              style={{ width: "65%" }}
+              style={{
+                width: `${Math.min((benchmarkData.engagementRate / (benchmarkData.nicheAvg * 3)) * 100, 100)}%`,
+              }}
             ></div>
             <span className="absolute right-4 text-[9px] font-bold text-gray-400 z-10 w-full text-right pointer-events-none">
-              Outperforming Account by 3.8x
+              Outperforming Account by {perfMultiplier}x
             </span>
           </div>
         </div>
@@ -87,8 +87,10 @@ export default function CompetitorBenchmarking() {
               Niche Standard
             </p>
             <p className="text-sm font-bold text-gray-700">
-              1.5%{" "}
-              <span className="text-gray-400 font-normal text-xs">(SaaS)</span>
+              {benchmarkData.nicheAvg}%{" "}
+              <span className="text-gray-400 font-normal text-xs">
+                (Niche Avg)
+              </span>
             </p>
           </div>
           <div className="bg-orange-50 rounded-xl p-3 border border-orange-100">
@@ -110,7 +112,9 @@ export default function CompetitorBenchmarking() {
             <FaUserFriends size={14} />
           </div>
           <div className="flex-1">
-            <h4 className="text-xs font-bold text-gray-900">Bot Signal: Low</h4>
+            <h4 className="text-xs font-bold text-gray-900">
+              Bot Signal: {benchmarkData.botSignal}
+            </h4>
             <p className="text-[10px] text-gray-500">
               Engagement is human. Safe to model.
             </p>

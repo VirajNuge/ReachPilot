@@ -32,9 +32,9 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true });
   const count = useMotionValue(0);
-  const rounded = useTransform(count, (latest) => {
-    return decimals > 0 ? latest.toFixed(decimals) : Math.round(latest);
-  });
+  const rounded = useTransform(count, (latest) =>
+    decimals > 0 ? latest.toFixed(decimals) : String(Math.round(latest)),
+  );
 
   useEffect(() => {
     if (isInView) {

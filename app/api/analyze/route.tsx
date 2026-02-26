@@ -6,7 +6,7 @@ import {
   Platform,
   PLATFORM_BENCHMARKS,
 } from "./platformPrompts";
-import { analysisSchema } from "@/lib/analysisSchema";
+import { coreSchema } from "@/lib/analysisSchema";
 
 export async function POST(req: Request) {
   try {
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       model: "gemini-2.0-flash",
       generationConfig: {
         responseMimeType: "application/json",
-        responseSchema: analysisSchema,
+        responseSchema: coreSchema,
       },
     });
 

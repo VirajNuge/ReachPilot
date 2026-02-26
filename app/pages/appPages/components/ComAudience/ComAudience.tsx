@@ -28,6 +28,7 @@ interface AudienceStat {
 interface SeniorityData {
   name: string;
   value: number;
+  [key: string]: unknown;
 }
 
 interface IndustryData {

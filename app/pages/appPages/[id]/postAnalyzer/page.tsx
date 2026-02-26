@@ -275,14 +275,16 @@ export default function PostAnalyzerPage() {
                     {analysisData.postData.images &&
                       analysisData.postData.images.length > 0 && (
                         <div className="mt-3 grid grid-cols-1 gap-2">
-                          {analysisData.postData.images.map((img, i) => (
-                            <img
-                              key={i}
-                              src={img}
-                              alt="Post Content"
-                              className="rounded-xl border border-gray-100 max-h-64 object-cover w-full"
-                            />
-                          ))}
+                          {analysisData.postData.images.map(
+                            (img: string, i: number) => (
+                              <img
+                                key={i}
+                                src={img}
+                                alt="Post Content"
+                                className="rounded-xl border border-gray-100 max-h-64 object-cover w-full"
+                              />
+                            ),
+                          )}
                         </div>
                       )}
                   </div>

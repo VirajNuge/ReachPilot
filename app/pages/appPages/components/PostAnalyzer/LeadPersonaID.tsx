@@ -72,7 +72,9 @@ export default function LeadPersonaID({
               })}
             </svg>
             <div className="absolute inset-0 flex items-center justify-center flex-col text-center">
-              <span className="text-xl font-black text-gray-900">20%</span>
+              <span className="text-xl font-black text-gray-900">
+                {hotLeadPercent}%
+              </span>
               <span className="text-[8px] font-bold text-red-500 uppercase">
                 Hot Leads
               </span>

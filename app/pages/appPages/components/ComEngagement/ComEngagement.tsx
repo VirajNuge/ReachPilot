@@ -55,7 +55,7 @@ const EngagementComparisonTab: React.FC<EngagementComparisonTabProps> = ({
       transition: {
         delay: i * 0.1,
         duration: 0.35,
-        ease: "easeOut",
+        ease: "easeOut" as const,
       },
     }),
   };

@@ -36,7 +36,7 @@ export interface ClientPost {
   title: string;
   date: string;
   status: PostStatus;
-  platform: "LinkedIn" | "Twitter";
+  platform: "LinkedIn" | "Twitter" | "Instagram" | "Facebook";
 }
 
 // --- ⭐ NEW: INTELLIGENCE TYPES ---

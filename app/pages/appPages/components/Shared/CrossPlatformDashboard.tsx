@@ -82,7 +82,7 @@ export function CrossPlatformDashboard({
               className="card-value"
               style={{ color: platformColors[bestPlatform.platform] }}
             >
-              {getPlatformConfig(bestPlatform.platform).label}
+              {getPlatformConfig(bestPlatform.platform).name}
             </div>
             <div className="card-sub">
               {bestPlatform.followers.toLocaleString()} followers
@@ -117,7 +117,7 @@ export function CrossPlatformDashboard({
                   >
                     {React.createElement(config.icon, { size: 16 })}
                   </span>
-                  <span className="platform-name">{config.label}</span>
+                  <span className="platform-name">{config.name}</span>
                   <span className="platform-followers">
                     {profile.followers.toLocaleString()}
                   </span>

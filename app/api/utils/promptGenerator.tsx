@@ -1,6 +1,6 @@
 // utils/promptGenerator.js
 
-export const generatePrompt = (topic, type) => {
+export const generatePrompt = (topic: string, type: string) => {
   // 1. Common instructions for both types
   const baseRules = `
     You are an expert social media content creator. 

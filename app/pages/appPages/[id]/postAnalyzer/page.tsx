@@ -212,7 +212,12 @@ export default function PostAnalyzerPage() {
                     analysisData.postData.postedAt,
                   ).toLocaleDateString()}{" "}
                   •{" "}
-                  <span className="text-emerald-600">High Viral Potential</span>
+                  <span className="text-emerald-600">
+                    {
+                      analysisData.analysis.viralVelocity.velocityData
+                        .growthPrediction
+                    }
+                  </span>
                 </p>
               </div>
 

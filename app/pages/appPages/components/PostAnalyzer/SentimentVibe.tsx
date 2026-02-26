@@ -6,21 +6,9 @@ import {
   FaCheckCircle,
   FaRobot,
 } from "react-icons/fa";
+import { SentimentProps } from "@/lib/postAnalyzerTypes";
 
-export default function SentimentVibe() {
-  // Mock Data
-  const sentimentData = {
-    positive: 65, // Green
-    constructive: 15, // Blue
-    neutral: 10, // Gray
-    negative: 10, // Red
-    keywords: ["Inspiring", "Genuine", "Curious", "Funny", "Real"],
-    dominantEmotion: "Admiration",
-    trustScore: "High",
-    sarcasmLevel: "Low",
-    isControversial: false,
-  };
-
+export default function SentimentVibe({ sentimentData }: SentimentProps) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       {/* Header */}

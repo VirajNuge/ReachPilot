@@ -318,7 +318,7 @@ export default function PostAnalyzerPage() {
                     </span>
                     <div className="h-px bg-gray-200 flex-1"></div>
                   </div>
-                  <HookCTAScorecard />
+                  <HookCTAScorecard {...analysisData.analysis.hookCTA} />
                 </div>
 
                 {/* SECTION 2: RETENTION & VISUALS (Grid) */}

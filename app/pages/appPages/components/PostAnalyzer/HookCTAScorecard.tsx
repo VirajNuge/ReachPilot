@@ -13,7 +13,9 @@ import {
   FaLightbulb,
 } from "react-icons/fa";
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
+import { HookCTAProps } from "@/lib/postAnalyzerTypes";
+
+// ─── Trigger Metadata ───────────────────────────────────────────────────────
 
 const TRIGGER_META: Record<
   string,
@@ -59,21 +61,7 @@ const TRIGGER_META: Record<
   },
 };
 
-const mockData = {
-  trigger: "Curiosity Gap" as keyof typeof TRIGGER_META,
-  skeleton: "[Intriguing Claim] + [Disqualifier] + [Implied Secret]",
-  pivotA:
-    "Stop chasing follower counts. The one metric that actually predicts viral reach is hiding in plain sight.",
-  pivotB:
-    "How I 10x'd my reach in 30 days — without posting more, paying for ads, or going viral by accident.",
-  pivotC:
-    "Why does nobody talk about the real reason most posts die within the first 10 minutes of being published?",
-  ctaType: "Soft Engagement",
-  ctaTip:
-    "Ask a single, low-friction question. 'Which of these resonates with you?' outperforms 'Follow me for more' by 3x.",
-};
-
-// ─── Copy Button ──────────────────────────────────────────────────────────────
+// ─── Shared Components ───────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -116,8 +104,6 @@ function CopyButton({ text }: { text: string }) {
     </button>
   );
 }
-
-// ─── Pivot Card ───────────────────────────────────────────────────────────────
 
 const PIVOT_STYLES = {
   A: {
@@ -177,12 +163,18 @@ function PivotCard({
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Main Component ──────────────────────────────────────────────────────────
 
-export default function HookCTAScorecard() {
-  const { trigger, skeleton, pivotA, pivotB, pivotC, ctaType, ctaTip } =
-    mockData;
-  const triggerMeta = TRIGGER_META[trigger];
+export default function HookCTAScorecard({
+  trigger,
+  skeleton,
+  pivotA,
+  pivotB,
+  pivotC,
+  ctaType,
+  ctaTip,
+}: HookCTAProps) {
+  const triggerMeta = TRIGGER_META[trigger] || TRIGGER_META["Curiosity Gap"];
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">

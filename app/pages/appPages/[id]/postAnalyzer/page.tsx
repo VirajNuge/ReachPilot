@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   FaChrome,
@@ -9,6 +10,7 @@ import {
   FaMagic,
   FaShare,
   FaChevronRight,
+  FaSpinner,
 } from "react-icons/fa";
 import MotionBackground from "../../components/Shared/MotionBackground";
 import HookCTAScorecard from "../../components/PostAnalyzer/HookCTAScorecard";
@@ -22,24 +24,63 @@ import CompetitorBenchmarking from "../../components/PostAnalyzer/CompetitorBenc
 import RetentionHook from "../../components/PostAnalyzer/RetentionHook";
 
 export default function PostAnalyzerPage() {
-  const [hasAnalysis, setHasAnalysis] = useState(false); // Toggle for demo purposes
+  const params = useParams();
+  const id = params?.id as string;
+
+  const [analysisData, setAnalysisData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchAnalysis = async () => {
+      try {
+        const res = await fetch(`/api/analyze-post/${id}`);
+        if (!res.ok) throw new Error("Failed to load analysis");
+        const json = await res.json();
+        if (json.success && json.data) {
+          setAnalysisData(json.data);
+        } else {
+          setError(json.error || "Analysis not found");
+        }
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAnalysis();
+  }, [id]);
 
   return (
     <div className="relative min-h-screen bg-[#F9F9FB] font-sans text-gray-900 overflow-x-hidden">
       <MotionBackground />
 
       <div className="relative z-10 px-4 py-6 md:px-8 max-w-[1600px] mx-auto pb-24">
-        {/* Dev Toggle - Remove in production */}
-        <div className="absolute top-4 right-4 z-50">
-          <button
-            onClick={() => setHasAnalysis(!hasAnalysis)}
-            className="text-[10px] text-gray-300 hover:text-gray-500 bg-white/50 px-2 py-1 rounded border border-gray-100"
-          >
-            [Dev: Toggle View]
-          </button>
-        </div>
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            <FaSpinner className="animate-spin text-4xl text-violet-600 mb-4" />
+            <h2 className="text-xl font-bold text-gray-800">
+              Analyzing Post DNA...
+            </h2>
+            <p className="text-gray-500 text-sm mt-2">
+              Extracting hooks, retention metrics, and audience sentiment.
+            </p>
+          </div>
+        )}
 
-        {!hasAnalysis ? (
+        {error && (
+          <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 max-w-md text-center">
+              <h2 className="text-xl font-bold mb-2">Analysis Failed</h2>
+              <p>{error}</p>
+            </div>
+          </div>
+        )}
+
+        {!isLoading && !error && !analysisData && (
           /* --- STATE 1: GUIDE / LANDING (MATCH PROFILE ANALYZER STYLE) --- */
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -141,7 +182,8 @@ export default function PostAnalyzerPage() {
               </div>
             </div>
           </motion.div>
-        ) : (
+        )}
+        {analysisData && (
           /* --- STATE 2: ANALYSIS DASHBOARD (CONTROL CENTER LAYOUT) --- */
           <motion.div
             initial={{ opacity: 0 }}

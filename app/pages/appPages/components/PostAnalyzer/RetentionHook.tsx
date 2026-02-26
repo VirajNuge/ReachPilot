@@ -9,29 +9,7 @@ import {
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-
-const MOCK_DATA = {
-  segments: [
-    { text: "Stop trying to build a 'Personal Brand'. 🛑", retention: "high" },
-    {
-      text: "Most people think it's about colors and logos.",
-      retention: "high",
-    },
-    {
-      text: "It's actually about the reputation you build when you solve...",
-      retention: "low",
-      warning: true,
-      fix: "Shorten. Too wordy for line 3.",
-    },
-    { text: "Reputation > Brand.", retention: "medium" },
-  ],
-  seedComments: [
-    "This is the exact mindset shift I needed. We often overcomplicate 'branding' when it really just comes down to trust. 🔥",
-    "Agreed. Results are the only branding that matters in B2B. Everything else is just decoration.",
-    "Bold take, but inaccurate? I'd argue design IS trust. You wouldn't eat at a dirty restaurant even if the food was good.",
-  ],
-};
+import { RetentionProps } from "@/lib/postAnalyzerTypes";
 
 // ─── Components ───────────────────────────────────────────────────────────────
 
@@ -75,9 +53,10 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-export default function RetentionHook() {
-  const { segments, seedComments } = MOCK_DATA;
-
+export default function RetentionHook({
+  segments,
+  seedComments,
+}: RetentionProps) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       {/* ─── Header ─── */}

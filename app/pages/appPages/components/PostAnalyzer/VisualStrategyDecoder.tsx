@@ -11,18 +11,7 @@ import {
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-
-const MOCK_DATA = {
-  category: "Technical Screenshot",
-  colors: ["#1A1A2E", "#16213E", "#0F3460", "#E94560", "#533483"],
-  prompts: {
-    midjourney:
-      "Dark mode code editor screenshot, syntax highlighting in purple and cyan, minimal UI, no faces, high contrast, 4K, --ar 4:5 --v 6.0",
-    dalle:
-      "A high-quality, realistic screenshot of a modern code editor in dark mode, showing TypeScript code with vibrant purple and blue syntax highlighting. Clean interface, no clutter, professional software engineering aesthetic.",
-  },
-};
+import { VisualStrategyProps } from "@/lib/postAnalyzerTypes";
 
 // ─── Components ───────────────────────────────────────────────────────────────
 
@@ -88,11 +77,14 @@ function CopyButton({
   );
 }
 
-export default function VisualStrategyDecoder() {
+export default function VisualStrategyDecoder({
+  category,
+  colors,
+  prompts,
+}: VisualStrategyProps) {
   const [promptType, setPromptType] = useState<"midjourney" | "dalle">(
     "midjourney",
   );
-  const { category, colors, prompts } = MOCK_DATA;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">

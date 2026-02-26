@@ -331,7 +331,9 @@ export default function PostAnalyzerPage() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <RetentionHook {...analysisData.analysis.retention} />
-                    <VisualStrategyDecoder />
+                    <VisualStrategyDecoder
+                      {...analysisData.analysis.visualStrategy}
+                    />
                   </div>
                 </div>
 

@@ -1,36 +1,14 @@
 import React from "react";
-import {
-  FaUserTie,
-  FaUserGraduate,
-  FaRobot,
-  FaExternalLinkAlt,
-  FaUserFriends,
-} from "react-icons/fa";
+import { FaUserTie, FaExternalLinkAlt, FaUserFriends } from "react-icons/fa";
+import { LeadPersonaProps } from "@/lib/postAnalyzerTypes";
 
-export default function LeadPersonaID() {
-  // Mock Data
-  const audienceData = [
-    { label: "High-Intent (Leads)", value: 20, color: "#ef4444" }, // Red
-    { label: "Peers/Networkers", value: 50, color: "#3b82f6" }, // Blue
-    { label: "Casual/Bot", value: 30, color: "#9ca3af" }, // Gray
-  ];
-
-  const highIntentLeads = [
-    {
-      name: "Sarah J.",
-      role: "CTO @ TechFlow",
-      intent: "Asked about Pricing",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-    },
-    {
-      name: "Mike R.",
-      role: "Founder",
-      intent: "Requested Demo",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
-    },
-  ];
-
-  // Simple SVG Donut Chart Logic
+export default function LeadPersonaID({
+  audienceData,
+  highIntentLeads,
+  icpAlignment,
+}: LeadPersonaProps) {
+  const hotLeadPercent =
+    audienceData.find((a) => a.label.includes("High-Intent"))?.value || 0;
   let accumulatedAngle = 0;
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
@@ -59,7 +37,7 @@ export default function LeadPersonaID() {
           </div>
         </div>
         <div className="px-2 py-1 bg-violet-100 text-violet-700 text-[10px] font-bold uppercase rounded-full tracking-wide">
-          2 Hot Leads
+          {highIntentLeads.length} Hot Leads
         </div>
       </div>
 
@@ -129,11 +107,13 @@ export default function LeadPersonaID() {
               ICP Alignment
             </p>
             <p className="text-sm font-bold text-gray-900 flex items-center gap-1">
-              <FaUserTie className="text-gray-700" /> Startups & Founders
+              <FaUserTie className="text-gray-700" /> {icpAlignment.title}
             </p>
           </div>
           <div className="text-right">
-            <span className="text-2xl font-black text-violet-600">85%</span>
+            <span className="text-2xl font-black text-violet-600">
+              {icpAlignment.score}%
+            </span>
             <p className="text-[9px] text-gray-400">Match Score</p>
           </div>
         </div>

@@ -363,7 +363,7 @@ export default function PostAnalyzerPage() {
                     <div className="h-px bg-gray-200 flex-1"></div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <LeadPersonaID />
+                    <LeadPersonaID {...analysisData.analysis.leadPersona} />
                     <CommentGapDiscovery />
                   </div>
                 </div>

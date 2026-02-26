@@ -1,17 +1,14 @@
 import React from "react";
 import { FaRocket, FaClock, FaChartLine, FaFire } from "react-icons/fa";
+import { ViralVelocityProps } from "@/lib/postAnalyzerTypes";
 
-export default function ViralVelocity() {
-  // Mock Data
-  const velocityData = {
-    likesPerHour: 145,
-    trend: "Trending High", // Trending High, Stable, Decaying
-    peakTime: "Now", // Now, Passed, In 2h
-    accountAvg: 45, // LPH
-    growthPrediction: "Upward", // Upward, Plateau, Downward
-  };
-
+export default function ViralVelocity({ velocityData }: ViralVelocityProps) {
   const isViral = velocityData.likesPerHour > velocityData.accountAvg * 2;
+  const vsAvg = Math.round(
+    ((velocityData.likesPerHour - velocityData.accountAvg) /
+      velocityData.accountAvg) *
+      100,
+  );
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
@@ -62,7 +59,8 @@ export default function ViralVelocity() {
               Vs. Average
             </p>
             <div className="flex items-center justify-end gap-1 text-emerald-600 font-bold text-sm">
-              <FaChartLine /> +320%
+              <FaChartLine /> {vsAvg > 0 ? "+" : ""}
+              {vsAvg}%
             </div>
           </div>
         </div>
@@ -73,8 +71,8 @@ export default function ViralVelocity() {
             <span className="text-xs font-bold text-gray-500">
               Momentum Prediction
             </span>
-            <span className="text-[10px] font-bold text-emerald-600">
-              Peaking Now
+            <span className="text-[10px] font-bold text-emerald-600 uppercase">
+              {velocityData.peakTime}
             </span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden flex">
@@ -86,9 +84,15 @@ export default function ViralVelocity() {
             </div>
           </div>
           <p className="text-[10px] text-gray-400 mt-1.5 leading-snug">
-            Based on{" "}
-            <span className="font-bold text-gray-600">High Comment Vol</span>,
-            this post will stay active for ~14 more hours.
+            Trend:{" "}
+            <span className="font-bold text-gray-600">
+              {velocityData.trend}
+            </span>
+            . Growth Prediction:{" "}
+            <span className="font-bold text-gray-600">
+              {velocityData.growthPrediction}
+            </span>
+            .
           </p>
         </div>
 

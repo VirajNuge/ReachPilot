@@ -302,7 +302,7 @@ export default function PostAnalyzerPage() {
                     </span>
                   </div>
 
-                  <ViralVelocity />
+                  <ViralVelocity {...analysisData.analysis.viralVelocity} />
                   <SentimentVibe />
                   <CompetitorBenchmarking />
                 </div>

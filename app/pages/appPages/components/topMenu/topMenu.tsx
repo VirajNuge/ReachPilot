@@ -1,15 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  ChevronDown,
-  Coins,
-  Bell,
-  Search,
-  Sparkles,
-  LayoutGrid,
-  Zap,
-} from "lucide-react";
+import { ChevronDown, Coins, Bell, Sparkles, LayoutGrid } from "lucide-react";
 
 interface TopMenuProps {
   pageName: string;
@@ -19,9 +11,7 @@ interface TopMenuProps {
 }
 
 /**
- * TopMenu Component
- * Logic: Fixed height with shrink-0 prevents flex-box overflow.
- * Styling: Soft depth and Mirum Labs branding for a high-end AI Architect feel.
+ * TopMenu Component — Bright Bento Shell Style
  */
 const TopMenu: React.FC<TopMenuProps> = ({
   pageName,
@@ -30,88 +20,79 @@ const TopMenu: React.FC<TopMenuProps> = ({
   tokens = 2000,
 }) => {
   return (
-    <header className="w-full max-w-full h-[90px] flex items-center justify-between px-10 bg-[#F9F9FB]/80 backdrop-blur-md border-b border-gray-200/40 sticky top-0 z-40 shrink-0 overflow-hidden box-border">
-      {/* 1. LEFT: ARCHITECTURAL HIERARCHY */}
-      <div className="flex flex-col justify-center animate-in fade-in slide-in-from-left-4 duration-500">
-        <nav className="flex items-center gap-2 mb-1.5">
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+    <header className="w-full max-w-full flex items-center justify-between px-6 py-3 bg-[#E8ECF2] sticky top-0 z-40 shrink-0 overflow-hidden box-border">
+      {/* 1. LEFT: PAGE TITLE */}
+      <div className="flex flex-col justify-center">
+        <nav className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
             Overview
           </span>
-          <span className="text-gray-300 text-[10px] font-bold">/</span>
-          <span className="text-[10px] font-bold text-violet-500 uppercase tracking-[0.2em]">
+          <span className="text-slate-300 text-[10px]">/</span>
+          <span className="text-[10px] font-bold text-[#0052FF] uppercase tracking-widest">
             {pageName}
           </span>
         </nav>
-        <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+        <h1 className="text-2xl font-black text-[#1A1D23] tracking-tight flex items-center gap-2.5">
           {pageName}
-          <div className="flex items-center justify-center w-6 h-6 bg-violet-100 rounded-lg">
-            <Sparkles size={14} className="text-violet-600" />
+          <div className="flex items-center justify-center w-6 h-6 bg-[#0052FF]/10 rounded-lg">
+            <Sparkles size={13} className="text-[#0052FF]" />
           </div>
         </h1>
       </div>
-      <div className="">
-        {/* 2. RIGHT: GLOBAL UTILITIES & MIRUM LABS IDENTITY */}
-        <div className="flex items-center gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
-          {/* GLOBAL SEARCH & ALERTS */}
-          <div className="flex items-center gap-3">
-            <div className="relative group">
-              <button className="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-white rounded-xl transition-all shadow-sm border border-transparent hover:border-gray-100 active:scale-95">
-                <Bell size={18} strokeWidth={2.5} />
-              </button>
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 border-2 border-[#F9F9FB] rounded-full animate-pulse" />
-            </div>
+
+      {/* 2. RIGHT: GLOBAL UTILITIES */}
+      <div className="flex items-center gap-3">
+        {/* Bell */}
+        <div className="relative">
+          <button className="p-2.5 text-slate-400 hover:text-[#1A1D23] bg-white hover:shadow-md rounded-xl transition-all border border-white/60 shadow-sm active:scale-95">
+            <Bell size={17} strokeWidth={2.5} />
+          </button>
+          <span className="absolute top-2 right-2 w-2 h-2 bg-[#FF4D4D] border-2 border-[#E8ECF2] rounded-full animate-pulse" />
+        </div>
+
+        {/* Tokens pill */}
+        <div className="flex items-center gap-2.5 bg-white border border-white/60 rounded-2xl px-4 py-2.5 shadow-sm hover:shadow-md transition-all cursor-pointer">
+          <div className="w-7 h-7 bg-[#0052FF]/10 rounded-xl flex items-center justify-center text-[#0052FF]">
+            <Coins size={14} strokeWidth={2.5} />
           </div>
-
-          {/* CREDITS SYSTEM: Optimized for Viraj's SaaS Architecture */}
-          <div className="group flex items-center gap-3.5 bg-white border border-gray-100/80 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.02)] hover:shadow-lg hover:shadow-violet-500/5 transition-all cursor-pointer ring-1 ring-transparent hover:ring-violet-100">
-            <div className="w-9 h-9 bg-gradient-to-tr from-violet-50 to-indigo-50 rounded-xl flex items-center justify-center text-violet-600 transition-transform group-hover:rotate-12">
-              <Coins size={16} strokeWidth={2.5} />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">
-                Tokens
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-[15px] font-black text-gray-900 tabular-nums">
-                  {tokens.toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* AGENCY ACCOUNT DROP DOWN */}
-          <div className="flex items-center gap-4 pl-6 border-l border-gray-200/60">
-            <button className="flex items-center gap-3.5 px-1.5 py-1.5 rounded-2xl hover:bg-white hover:shadow-md hover:ring-1 hover:ring-gray-100 transition-all group">
-              <div className="relative">
-                <div className="w-11 h-11 rounded-xl bg-gray-900 text-white flex items-center justify-center font-bold text-sm shadow-xl shadow-gray-200 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-violet-600/30 via-transparent to-transparent opacity-60" />
-                  <span className="relative z-10 tracking-tighter">ML</span>
-                </div>
-                <div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 bg-white rounded-lg shadow-sm border border-gray-50 flex items-center justify-center">
-                  <LayoutGrid
-                    size={10}
-                    className="text-violet-500"
-                    strokeWidth={3}
-                  />
-                </div>
-              </div>
-
-              <div className="text-left hidden xl:block">
-                <p className="text-[13px] font-black text-gray-900 group-hover:text-violet-600 transition-colors leading-tight">
-                  {userName}
-                </p>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.1em] mt-0.5">
-                  {userTier}
-                </p>
-              </div>
-              <ChevronDown
-                size={14}
-                strokeWidth={3}
-                className="text-gray-300 group-hover:text-violet-500 transition-all group-hover:translate-y-0.5 ml-1"
-              />
-            </button>
+          <div className="flex flex-col">
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+              Tokens
+            </span>
+            <span className="text-[14px] font-black text-[#1A1D23] tabular-nums leading-none">
+              {tokens.toLocaleString()}
+            </span>
           </div>
         </div>
+
+        {/* Divider */}
+        <div className="w-px h-8 bg-slate-300/40" />
+
+        {/* User */}
+        <button className="flex items-center gap-3 px-3 py-2 rounded-2xl bg-white shadow-sm hover:shadow-md border border-white/60 transition-all group">
+          <div className="relative">
+            <div className="w-9 h-9 rounded-xl bg-[#1A1D23] text-white flex items-center justify-center font-bold text-xs shadow-sm overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#0052FF]/30 to-transparent" />
+              <span className="relative z-10">ML</span>
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-md shadow-sm border border-slate-100 flex items-center justify-center">
+              <LayoutGrid size={8} className="text-[#0052FF]" strokeWidth={3} />
+            </div>
+          </div>
+          <div className="text-left hidden xl:block">
+            <p className="text-[13px] font-black text-[#1A1D23] group-hover:text-[#0052FF] transition-colors leading-tight">
+              {userName}
+            </p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+              {userTier}
+            </p>
+          </div>
+          <ChevronDown
+            size={13}
+            strokeWidth={3}
+            className="text-slate-300 group-hover:text-[#0052FF] transition-all ml-1"
+          />
+        </button>
       </div>
     </header>
   );

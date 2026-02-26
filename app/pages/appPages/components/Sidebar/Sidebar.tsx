@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -14,7 +14,6 @@ import {
   FaChrome,
   FaArrowRight,
   FaRegQuestionCircle,
-  FaSearch,
   FaUserCog,
   FaUser,
 } from "react-icons/fa";
@@ -22,15 +21,11 @@ import { BsBoxArrowRight, BsGear } from "react-icons/bs";
 import { HiSparkles } from "react-icons/hi2";
 
 /**
- * ReachPilot Sidebar Component
- * Architecture: Optimized for Next.js 15+
- * Focus: High-end UI with soft depth and consistent branding.
+ * ReachPilot Sidebar Component — Bright Bento Shell Style
  */
-
 const Sidebar = () => {
   const pathname = usePathname();
 
-  // Advanced state management for independent menu toggles
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     content: true,
     idea: false,
@@ -46,51 +41,48 @@ const Sidebar = () => {
 
   // --- DESIGN SYSTEM TOKENS ---
   const activeMainLink =
-    "bg-white text-violet-600 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-gray-100/80";
+    "bg-white text-[#0052FF] shadow-[0_4px_20px_rgba(0,0,0,0.03)]";
   const inactiveMainLink =
-    "text-gray-500 hover:bg-gray-100/50 hover:text-gray-900";
+    "text-slate-500 hover:bg-white/60 hover:text-[#1A1D23]";
 
   const sectionLabelStyle =
-    "text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] px-4 mb-3 mt-8";
+    "text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-3 mt-6";
   const subLinkBase =
-    "block ml-4 px-4 py-2.5 text-[12.5px] font-semibold rounded-xl transition-all duration-200";
+    "block ml-4 px-4 py-2.5 text-[12px] font-bold rounded-xl transition-all duration-200";
 
   return (
-    <aside className="w-[280px] h-screen shrink-0 bg-[#F9F9FB] flex flex-col z-50 border-r border-gray-200/40 font-sans antialiased">
+    <aside className="w-[260px] h-screen shrink-0 bg-[#E8ECF2] flex flex-col z-50 border-none font-sans antialiased">
       {/* 1. BRAND IDENTITY SECTION */}
-      <div className="flex items-center gap-4 px-8 py-10 mb-2">
-        <div className="group relative">
-          <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-          <div className="relative w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-gray-200">
-            R
-          </div>
+      <div className="flex items-center gap-3 px-6 py-8 mb-2">
+        <div className="w-10 h-10 bg-[#0052FF] rounded-[14px] flex items-center justify-center text-white font-black text-xl shadow-[0_4px_12px_rgba(0,82,255,0.2)]">
+          R
         </div>
         <div className="flex flex-col">
-          <span className="font-bold text-2xl text-gray-900 tracking-tight leading-none">
+          <span className="font-black text-xl text-[#1A1D23] tracking-tight leading-none">
             ReachPilot
           </span>
-          <span className="text-[10px] font-bold text-violet-500 tracking-widest uppercase mt-1">
+          <span className="text-[9px] font-bold text-[#0052FF] tracking-widest uppercase mt-1">
             Creator Suite
           </span>
         </div>
       </div>
 
       {/* 3. SCROLLABLE NAVIGATION AREA */}
-      <div className="flex-1 overflow-y-auto custom-scroll px-6 space-y-1.5 pb-10">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] px-4 mb-4 mt-2">
+      <div className="flex-1 overflow-y-auto [scrollbar-width:none] px-4 space-y-1 pb-10">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-3 mt-2">
           Overview
         </p>
 
         <Link
           href="/dashboard"
-          className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[14px] font-bold transition-all duration-300 border-none no-underline outline-none focus:outline-none focus:ring-0 ${
+          className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none no-underline outline-none ${
             isActive("/dashboard") ? activeMainLink : inactiveMainLink
           }`}
         >
           <FaTachometerAlt
-            size={16}
+            size={15}
             className={
-              isActive("/dashboard") ? "text-violet-600" : "text-gray-400"
+              isActive("/dashboard") ? "text-[#0052FF]" : "text-slate-400"
             }
           />
           <span>Dashboard</span>
@@ -99,33 +91,33 @@ const Sidebar = () => {
         {/* --- TOOLS: CONTENT LAB --- */}
         <p className={sectionLabelStyle}>Automation & AI</p>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <button
             onClick={() => toggleMenu("content")}
-            className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-[14px] font-bold transition-all duration-300 border-none outline-none focus:outline-none focus:ring-0 ${
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none outline-none ${
               openMenus.content
-                ? "text-gray-900 bg-gray-50/50"
-                : "text-gray-500 hover:bg-gray-100/70"
+                ? "text-[#1A1D23] bg-white/40"
+                : "text-slate-500 hover:bg-white/60"
             }`}
           >
             <div className="flex items-center gap-3.5">
               <FaFlask
-                size={16}
+                size={15}
                 className={
-                  openMenus.content ? "text-violet-500" : "text-gray-400"
+                  openMenus.content ? "text-[#0052FF]" : "text-slate-400"
                 }
               />
               <span>Content Lab</span>
             </div>
             {openMenus.content ? (
-              <FaChevronDown size={10} className="text-gray-300" />
+              <FaChevronDown size={10} className="text-slate-400" />
             ) : (
-              <FaChevronRight size={10} className="text-gray-300" />
+              <FaChevronRight size={10} className="text-slate-400" />
             )}
           </button>
 
           {openMenus.content && (
-            <div className="ml-5 mt-1 border-l border-gray-200/80 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
+            <div className="ml-5 mt-1 border-l-2 border-slate-200/50 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
               {[
                 { name: "Persona Builder", path: "accountPersona" },
                 { name: "Profile Analyzer", path: "profileAnalyzer" },
@@ -137,10 +129,10 @@ const Sidebar = () => {
                 <Link
                   key={item.path}
                   href={`/pages/appPages/1/${item.path}`}
-                  className={`${subLinkBase} border-none no-underline outline-none focus:outline-none focus:ring-0 ${
+                  className={`${subLinkBase} border-none no-underline outline-none ${
                     isActive(item.path)
-                      ? "text-violet-600 bg-violet-50/50"
-                      : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
+                      ? "text-[#0052FF] bg-white shadow-sm"
+                      : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"
                   }`}
                 >
                   {item.name}
@@ -152,43 +144,43 @@ const Sidebar = () => {
           {/* --- TOOLS: IDEA FINDER --- */}
           <button
             onClick={() => toggleMenu("idea")}
-            className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-[14px] font-bold transition-all duration-300 border-none outline-none focus:outline-none focus:ring-0 ${
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none outline-none mt-1 ${
               openMenus.idea
-                ? "text-gray-900 bg-gray-50/50"
-                : "text-gray-500 hover:bg-gray-100/70"
+                ? "text-[#1A1D23] bg-white/40"
+                : "text-slate-500 hover:bg-white/60"
             }`}
           >
             <div className="flex items-center gap-3.5">
               <FaLightbulb
-                size={16}
-                className={openMenus.idea ? "text-amber-500" : "text-gray-400"}
+                size={15}
+                className={openMenus.idea ? "text-[#FF8A00]" : "text-slate-400"}
               />
               <span>Idea Finder</span>
             </div>
             {openMenus.idea ? (
-              <FaChevronDown size={10} className="text-gray-300" />
+              <FaChevronDown size={10} className="text-slate-400" />
             ) : (
-              <FaChevronRight size={10} className="text-gray-300" />
+              <FaChevronRight size={10} className="text-slate-400" />
             )}
           </button>
 
           {openMenus.idea && (
-            <div className="ml-5 mt-1 border-l border-gray-200/80 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
+            <div className="ml-5 mt-1 border-l-2 border-slate-200/50 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
               <Link
                 href="/pages/appPages/1/explorePostIdeas"
-                className={`${subLinkBase} border-none no-underline outline-none focus:outline-none focus:ring-0 ${isActive("explorePostIdeas") ? "text-violet-600 bg-violet-50/50" : "text-gray-400 hover:text-gray-900"}`}
+                className={`${subLinkBase} ${isActive("explorePostIdeas") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
-                Explore Trending Posts
+                Explore Trending
               </Link>
               <Link
                 href="/pages/appPages/1/generateIdeas"
-                className={`${subLinkBase} border-none no-underline outline-none focus:outline-none focus:ring-0 ${isActive("generateIdeas") ? "text-violet-600 bg-violet-50/50" : "text-gray-400 hover:text-gray-900"}`}
+                className={`${subLinkBase} ${isActive("generateIdeas") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
                 Find Post Ideas
               </Link>
               <Link
                 href="/pages/appPages/1/questionMine"
-                className={`${subLinkBase} border-none no-underline outline-none focus:outline-none focus:ring-0 ${isActive("questionMine") ? "text-violet-600 bg-violet-50/50" : "text-gray-400 hover:text-gray-900"}`}
+                className={`${subLinkBase} ${isActive("questionMine") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
                 Question Mine
               </Link>
@@ -199,113 +191,91 @@ const Sidebar = () => {
         {/* --- PERFORMANCE & ANALYTICS --- */}
         <p className={sectionLabelStyle}>Performance</p>
 
-        <div className="space-y-1.5 pt-1">
+        <div className="space-y-1">
           <Link
             href="/pages/appPages/1/publishing"
-            className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[14px] font-bold transition-all border-none no-underline outline-none focus:outline-none focus:ring-0 ${
+            className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none ${
               isActive("publishing") ? activeMainLink : inactiveMainLink
             }`}
           >
-            <FaPaperPlane size={16} />
-            <span>Publishing & Scheduling</span>
+            <FaPaperPlane
+              size={15}
+              className={
+                isActive("publishing") ? "text-[#0052FF]" : "text-slate-400"
+              }
+            />
+            <span>Publishing</span>
           </Link>
 
           <Link
             href="/pages/appPages/1/analytics"
-            className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[14px] font-bold transition-all border-none no-underline outline-none focus:outline-none focus:ring-0 ${
+            className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none ${
               isActive("analytics") ? activeMainLink : inactiveMainLink
             }`}
           >
-            <FaChartBar size={16} />
+            <FaChartBar
+              size={15}
+              className={
+                isActive("analytics") ? "text-[#0052FF]" : "text-slate-400"
+              }
+            />
             <span>Analytics</span>
           </Link>
 
           <button
             onClick={() => toggleMenu("client")}
-            className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-[14px] font-bold transition-all duration-300 border-none outline-none focus:outline-none focus:ring-0 ${
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none outline-none mt-1 ${
               openMenus.client
-                ? "text-gray-900 bg-gray-50/50"
-                : "text-gray-500 hover:bg-gray-100/70"
+                ? "text-[#1A1D23] bg-white/40"
+                : "text-slate-500 hover:bg-white/60"
             }`}
           >
             <div className="flex items-center gap-3.5">
               <FaUserCog
-                size={16}
+                size={15}
                 className={
-                  openMenus.client ? "text-violet-500" : "text-gray-400"
+                  openMenus.client ? "text-[#0052FF]" : "text-slate-400"
                 }
               />
               <span>Client Manager</span>
             </div>
             {openMenus.client ? (
-              <FaChevronDown size={10} className="text-gray-300" />
+              <FaChevronDown size={10} className="text-slate-400" />
             ) : (
-              <FaChevronRight size={10} className="text-gray-300" />
+              <FaChevronRight size={10} className="text-slate-400" />
             )}
           </button>
 
           {openMenus.client && (
-            <div className="ml-5 mt-1 border-l border-gray-200/80 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
+            <div className="ml-5 mt-1 border-l-2 border-slate-200/50 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
+              {/* Keep a few links for brevity */}
               <Link
                 href="/crm-pipeline"
-                className={`${subLinkBase} border-none no-underline outline-none focus:outline-none focus:ring-0 ${
-                  isActive("crm-pipeline")
-                    ? "text-violet-600 bg-violet-50/50"
-                    : "text-gray-400 hover:text-gray-900"
-                }`}
+                className={`${subLinkBase} ${isActive("crm-pipeline") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
                 CRM Pipeline
               </Link>
               <Link
                 href="/client-workspace"
-                className={`${subLinkBase} border-none no-underline outline-none focus:outline-none focus:ring-0 ${
-                  isActive("client-workspace")
-                    ? "text-violet-600 bg-violet-50/50"
-                    : "text-gray-400 hover:text-gray-900"
-                }`}
+                className={`${subLinkBase} ${isActive("client-workspace") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
                 Client Workspace
-              </Link>
-              <Link
-                href="/manage-meetings"
-                className={`${subLinkBase} border-none no-underline outline-none focus:outline-none focus:ring-0 ${
-                  isActive("manage-meetings")
-                    ? "text-violet-600 bg-violet-50/50"
-                    : "text-gray-400 hover:text-gray-900"
-                }`}
-              >
-                Manage Meetings
-              </Link>
-              <Link
-                href="/ai-inbox"
-                className={`${subLinkBase} border-none no-underline outline-none focus:outline-none focus:ring-0 ${
-                  isActive("ai-inbox")
-                    ? "text-violet-600 bg-violet-50/50"
-                    : "text-gray-400 hover:text-gray-900"
-                }`}
-              >
-                AI Powered Inbox
-              </Link>
-              <Link
-                href="/ai-icebreakers"
-                className={`${subLinkBase} border-none no-underline outline-none focus:outline-none focus:ring-0 ${
-                  isActive("ai-icebreakers")
-                    ? "text-violet-600 bg-violet-50/50"
-                    : "text-gray-400 hover:text-gray-900"
-                }`}
-              >
-                AI Icebreakers
               </Link>
             </div>
           )}
 
           <Link
             href="/account"
-            className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[14px] font-bold transition-all border-none no-underline outline-none focus:outline-none focus:ring-0 ${
+            className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none mt-1 ${
               isActive("/account") ? activeMainLink : inactiveMainLink
             }`}
           >
-            <FaUser size={16} />
+            <FaUser
+              size={15}
+              className={
+                isActive("/account") ? "text-[#0052FF]" : "text-slate-400"
+              }
+            />
             <span>Account</span>
           </Link>
         </div>
@@ -314,77 +284,51 @@ const Sidebar = () => {
         <p className={sectionLabelStyle}>Support</p>
         <Link
           href="/help"
-          className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-semibold text-gray-500 hover:bg-gray-100/50 transition-all border-none no-underline outline-none focus:outline-none focus:ring-0"
+          className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold text-slate-500 hover:bg-white/60 hover:text-[#1A1D23] transition-all border-none no-underline outline-none mb-1"
         >
-          <FaRegQuestionCircle size={16} />
+          <FaRegQuestionCircle size={15} className="text-slate-400" />
           <span>Documentation</span>
         </Link>
         <Link
           href="/settings"
-          className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-semibold text-gray-500 hover:bg-gray-100/50 transition-all border-none no-underline outline-none focus:outline-none focus:ring-0"
+          className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold text-slate-500 hover:bg-white/60 hover:text-[#1A1D23] transition-all border-none no-underline outline-none"
         >
-          <BsGear size={16} />
+          <BsGear size={15} className="text-slate-400" />
           <span>Workspace Settings</span>
         </Link>
       </div>
 
-      {/* 4. PREMIUM FOOTER & PROFILE AREA */}
-      <div className="p-6 mt-auto bg-white/70 backdrop-blur-xl border-t border-gray-100">
-        {/* PRO CARD: Elegant Dark Theme with Sparkle Micro-animation */}
-        <div className="relative overflow-hidden bg-gray-900 rounded-[28px] p-5 mb-6 group transition-all duration-500 hover:shadow-2xl hover:shadow-violet-500/10 active:scale-[0.98]">
-          <div className="absolute -top-6 -right-6 opacity-30 group-hover:scale-125 transition-transform duration-1000 ease-out">
-            <HiSparkles size={100} className="text-white" />
+      {/* 4. PREMIUM FOOTER SECTION */}
+      <div className="p-4 mt-auto">
+        {/* PRO CARD: Bright Bento Style */}
+        <div className="relative overflow-hidden bg-white rounded-3xl p-5 group transition-all duration-300 shadow-sm hover:shadow-md border border-white/60">
+          <div className="absolute -top-6 -right-6 opacity-10 group-hover:scale-125 transition-transform duration-700 ease-out">
+            <HiSparkles size={100} className="text-[#0052FF]" />
           </div>
 
           <div className="relative z-10">
-            <div className="flex items-center gap-2.5 mb-2">
-              <span className="text-white text-[13px] font-bold tracking-tight">
-                PRO Mode Active
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[#1A1D23] text-[13px] font-black tracking-tight">
+                PRO Active
               </span>
-              <div className="relative flex h-2 w-2">
-                <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></div>
-                <div className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></div>
+              <div className="px-2 py-0.5 bg-[#F3FFE5] text-[#4D8C00] rounded-full text-[10px] font-bold tracking-wide">
+                100%
               </div>
             </div>
 
-            <p className="text-gray-400 text-[10px] leading-relaxed mb-4 font-medium pr-4">
-              Viraj, your advanced AI analysis and priority tools are fully
-              enabled.
+            <p className="text-slate-500 text-[11px] leading-relaxed mb-4 font-medium pr-2">
+              All advanced AI analysis and priority tools are enabled.
             </p>
 
-            <button className="flex items-center justify-center gap-2 w-full py-3 bg-violet-600 hover:bg-violet-700 text-white text-[11px] font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20 active:translate-y-0.5">
-              <FaChrome size={12} />
-              Open Extension
+            <button className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#0052FF] hover:bg-blue-700 text-white text-[12px] font-bold rounded-xl transition-all shadow-[0_4px_12px_rgba(0,82,255,0.2)] active:scale-95">
+              <FaChrome size={14} />
+              Extension
               <FaArrowRight
                 size={10}
-                className="ml-1 opacity-60 group-hover:translate-x-1 transition-transform"
+                className="ml-1 opacity-80 group-hover:translate-x-1 transition-transform"
               />
             </button>
           </div>
-        </div>
-
-        {/* USER PROFILE: Refined typography and spacing */}
-        <div className="flex items-center gap-3.5 px-1 group cursor-pointer">
-          <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-to-tr from-violet-500 to-indigo-500 rounded-full blur-[2px] opacity-0 group-hover:opacity-40 transition-opacity"></div>
-            <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ashley"
-              alt="User"
-              className="relative w-11 h-11 rounded-full border-2 border-white shadow-md bg-white"
-            />
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full shadow-sm" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[14px] font-bold text-gray-900 truncate tracking-tight">
-              Ashley Curtin
-            </p>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-              Premium Member
-            </p>
-          </div>
-          <button className="p-2.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all active:scale-90">
-            <BsBoxArrowRight size={18} />
-          </button>
         </div>
       </div>
     </aside>

@@ -15,7 +15,7 @@ export default function DashboardLayout({
   const title = isPostAnalyzer ? "Post Analyzer" : "Profile Analyzer";
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#F9F9FB]">
+    <div className="flex h-screen w-full overflow-hidden bg-[#E8ECF2]">
       {/* Sidebar - Fixed width, full height */}
       <Sidebar />
 
@@ -24,8 +24,8 @@ export default function DashboardLayout({
         {/* TopMenu - Pinned to the top of this container */}
         <TopMenu pageName={title} />
 
-        {/* Scrollable Content Area */}
-        <main className="flex overflow-y-auto [scrollbar-width:none] w-full">
+        {/* Scrollable Content Area — transparent so cards float on shell bg */}
+        <main className="flex-1 overflow-y-auto [scrollbar-width:none] w-full">
           {children}
         </main>
       </div>

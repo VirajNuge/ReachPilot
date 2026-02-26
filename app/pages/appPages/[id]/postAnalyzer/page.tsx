@@ -196,7 +196,9 @@ export default function PostAnalyzerPage() {
                 <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                   <span>Analyzed Accounts</span>
                   <FaChevronRight size={8} />
-                  <span className="text-violet-600">@alex_hormozi_fan</span>
+                  <span className="text-violet-600">
+                    {analysisData.postData.handle}
+                  </span>
                   <FaChevronRight size={8} />
                   <span>Post Analysis</span>
                 </div>
@@ -204,7 +206,12 @@ export default function PostAnalyzerPage() {
                   Post Vital Signs
                 </h1>
                 <p className="text-sm text-gray-500 font-medium mt-1">
-                  Scanned 124K followers • 2h ago •{" "}
+                  Scanned {analysisData.postData.metrics.views.toLocaleString()}{" "}
+                  views •{" "}
+                  {new Date(
+                    analysisData.postData.postedAt,
+                  ).toLocaleDateString()}{" "}
+                  •{" "}
                   <span className="text-emerald-600">High Viral Potential</span>
                 </p>
               </div>
@@ -238,18 +245,18 @@ export default function PostAnalyzerPage() {
                   {/* Header */}
                   <div className="p-4 flex items-center gap-3 border-b border-gray-50 bg-gray-50/30">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-500 p-[2px]">
-                      <img
-                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-                        alt="Profile"
-                        className="w-full h-full rounded-full border-2 border-white bg-white"
-                      />
+                      <div className="w-full h-full rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-gray-500 overflow-hidden text-xs font-bold">
+                        {analysisData.postData.author
+                          .substring(0, 2)
+                          .toUpperCase()}
+                      </div>
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900 text-sm leading-tight">
-                        alex_hormozi_fan
+                        {analysisData.postData.author}
                       </h4>
                       <p className="text-[10px] text-gray-400 font-medium">
-                        Productivity Guru
+                        {analysisData.postData.handle}
                       </p>
                     </div>
                     <div className="ml-auto text-gray-300 text-xs">•••</div>
@@ -257,39 +264,35 @@ export default function PostAnalyzerPage() {
 
                   {/* Post Content */}
                   <div className="p-4 bg-white">
-                    <p className="text-sm text-gray-800 leading-relaxed font-medium">
-                      <span className="bg-yellow-100 px-0.5">
-                        Stop trying to build a 'Personal Brand'.
-                      </span>{" "}
-                      🛑
-                      <br />
-                      <br />
-                      Build a <span className="font-bold">reputation</span>{" "}
-                      instead.
-                      <br />
-                      <br />
-                      Brand is what you say about you. Reputation is what *they*
-                      say when you leave.
-                      <br />
-                      <br />
-                      1. Do hard things.
-                      <br />
-                      2. Keep promises.
-                      <br />
-                      3. Give away secrets.
-                      <br />
-                      <br />
-                      That's it. 👇
+                    <p className="text-sm text-gray-800 leading-relaxed font-medium whitespace-pre-wrap">
+                      {analysisData.postData.content}
                     </p>
-                    <div className="mt-3 text-blue-600 text-xs font-medium">
-                      #marketing #branding
-                    </div>
+                    {analysisData.postData.images &&
+                      analysisData.postData.images.length > 0 && (
+                        <div className="mt-3 grid grid-cols-1 gap-2">
+                          {analysisData.postData.images.map((img, i) => (
+                            <img
+                              key={i}
+                              src={img}
+                              alt="Post Content"
+                              className="rounded-xl border border-gray-100 max-h-64 object-cover w-full"
+                            />
+                          ))}
+                        </div>
+                      )}
                   </div>
 
-                  {/* Fake Metrics Footer */}
+                  {/* Metrics Footer */}
                   <div className="p-3 border-t border-gray-50 bg-gray-50/50 flex justify-between text-xs text-gray-500 font-bold">
-                    <span>1,245 Likes</span>
-                    <span>342 Comments</span>
+                    <span>
+                      {analysisData.postData.metrics.likes.toLocaleString()}{" "}
+                      Likes
+                    </span>
+                    <span>
+                      {analysisData.postData.commentCount?.toLocaleString() ||
+                        analysisData.postData.metrics.replies.toLocaleString()}{" "}
+                      Comments
+                    </span>
                   </div>
                 </div>
 

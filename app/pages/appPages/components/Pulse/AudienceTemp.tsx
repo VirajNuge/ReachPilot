@@ -1,131 +1,127 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { AudienceTemperature } from "../../../../../lib/types/analysis";
+import {
+  FaFire,
+  FaSun,
+  FaLeaf,
+  FaSnowflake,
+  FaCube,
+  FaLightbulb,
+  FaThermometerHalf,
+} from "react-icons/fa";
 
 interface AudienceTempProps {
   data: AudienceTemperature;
 }
 
 export default function AudienceTemp({ data }: AudienceTempProps) {
-  const [fillHeight, setFillHeight] = useState(0);
-
-  useEffect(() => {
-    // Delay animation slightly
-    const timer = setTimeout(() => setFillHeight(data.tempScore), 200);
-    return () => clearTimeout(timer);
-  }, [data.tempScore]);
-
-  // Color mapping based on score
-  const getColor = (s: number) => {
+  const getTempDetails = (s: number) => {
     if (s >= 80)
       return {
-        main: "#EF4444",
-        bg: "bg-red-500",
-        text: "text-red-600",
-        emoji: "🔥",
+        label: "Hot",
+        color: "#EF4444",
+        bgClass: "bg-[#EF4444]/10",
+        textClass: "text-[#EF4444]",
+        icon: <FaFire />,
       };
     if (s >= 60)
       return {
-        main: "#F97316",
-        bg: "bg-orange-500",
-        text: "text-orange-600",
-        emoji: "☀️",
+        label: "Warm",
+        color: "#0052FF",
+        bgClass: "bg-[#0052FF]/10",
+        textClass: "text-[#0052FF]",
+        icon: <FaSun />,
       };
     if (s >= 40)
       return {
-        main: "#10B981",
-        bg: "bg-emerald-500",
-        text: "text-emerald-600",
-        emoji: "🌿",
+        label: "Cool",
+        color: "#0052FF",
+        bgClass: "bg-[#0052FF]/10",
+        textClass: "text-[#0052FF]",
+        icon: <FaLeaf />,
       };
     if (s >= 20)
       return {
-        main: "#06B6D4",
-        bg: "bg-cyan-500",
-        text: "text-cyan-600",
-        emoji: "❄️",
+        label: "Cold",
+        color: "#1A1D23",
+        bgClass: "bg-[#1A1D23]/10",
+        textClass: "text-[#1A1D23]",
+        icon: <FaSnowflake />,
       };
     return {
-      main: "#3B82F6",
-      bg: "bg-blue-500",
-      text: "text-blue-600",
-      emoji: "🧊",
+      label: "Freezing",
+      color: "#1A1D23",
+      bgClass: "bg-[#1A1D23]/10",
+      textClass: "text-[#1A1D23]",
+      icon: <FaCube />,
     };
   };
 
-  const theme = getColor(data.tempScore);
+  const tempDetails = getTempDetails(data.tempScore);
 
   return (
-    <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-6 flex items-center gap-6 relative overflow-hidden">
-      {/* Background glow */}
-      <div
-        className="absolute -right-10 -bottom-10 w-32 h-32 rounded-full blur-[50px] opacity-20 pointer-events-none"
-        style={{ backgroundColor: theme.main }}
-      />
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6">
+      {/* Section Label */}
+      <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">
+        Audience Temperature
+      </h3>
 
-      {/* Thermometer Visual */}
-      <div className="relative h-[120px] w-8 bg-slate-100 rounded-full flex items-end justify-center p-1 shadow-inner shrink-0">
-        {/* Bulb */}
+      {/* Temperature Label Row */}
+      <div className="flex items-center gap-3 mb-5">
         <div
-          className={`absolute -bottom-1 w-10 h-10 rounded-full border-4 border-white shadow-md z-10 ${theme.bg}`}
-        />
-
-        {/* Stem Fill */}
-        <div
-          className={`w-full rounded-t-full transition-all duration-1000 ease-out relative z-0 ${theme.bg}`}
-          style={{ height: `${fillHeight}%` }}
+          className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${tempDetails.bgClass} ${tempDetails.textClass}`}
         >
-          {/* Bubbles animation */}
-          <div className="absolute inset-0 w-full h-full overflow-hidden opacity-30">
-            <div className="absolute bottom-0 left-1/2 w-1 h-1 bg-white rounded-full animate-[float_2s_infinite]" />
-            <div className="absolute bottom-2 left-1/4 w-1.5 h-1.5 bg-white rounded-full animate-[float_3s_infinite_delay-100ms]" />
-          </div>
+          {tempDetails.icon}
         </div>
-
-        {/* Tick marks */}
-        <div className="absolute right-0 top-0 h-full w-full flex flex-col justify-between py-2 px-2 pointer-events-none opacity-30">
-          <div className="w-1.5 h-[1px] bg-slate-400 self-end" />
-          <div className="w-2.5 h-[1px] bg-slate-400 self-end" />
-          <div className="w-1.5 h-[1px] bg-slate-400 self-end" />
-          <div className="w-2.5 h-[1px] bg-slate-400 self-end" />
-          <div className="w-1.5 h-[1px] bg-slate-400 self-end" />
+        <div>
+          <div className="text-2xl font-black text-[#1A1D23] leading-none mb-0.5">
+            {tempDetails.label}
+          </div>
+          <div className="text-sm text-slate-500 font-medium">
+            Driven by {data.dominantEmotion}
+          </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col justify-center">
-        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">
-          Audience Temp
-        </h3>
-
-        <div className="flex items-center gap-3 mb-3">
-          <span className="text-4xl">{theme.emoji}</span>
-          <div>
-            <div className={`text-2xl font-black tracking-tight ${theme.text}`}>
-              {data.label}
-            </div>
-            <div className="text-xs font-semibold text-slate-400 opacity-80">
-              Driven by {data.dominantEmotion}
-            </div>
-          </div>
+      {/* Stats Row (3-column grid) */}
+      <div className="grid grid-cols-3 gap-4 py-5 border-y border-slate-100 my-4">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Score
+          </span>
+          <span className="text-2xl font-black text-[#1A1D23]">
+            {data.tempScore}
+          </span>
         </div>
-
-        <div className="flex gap-4 text-xs">
-          <div className="flex flex-col">
-            <span className="font-bold text-slate-700">
-              {data.fanboyPercent}%
-            </span>
-            <span className="text-slate-400 scale-90 origin-left">Fanboys</span>
-          </div>
-          <div className="w-[1px] h-8 bg-slate-100" />
-          <div className="flex flex-col">
-            <span className="font-bold text-slate-700">
-              {data.criticPercent}%
-            </span>
-            <span className="text-slate-400 scale-90 origin-left">Critics</span>
-          </div>
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Fanboys
+          </span>
+          <span className="text-2xl font-black text-[#1A1D23]">
+            {data.fanboyPercent}%
+          </span>
         </div>
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Critics
+          </span>
+          <span className="text-2xl font-black text-[#1A1D23]">
+            {data.criticPercent}%
+          </span>
+        </div>
+      </div>
+
+      {/* Recommendation Box */}
+      <div className="bg-[#F5F6FA] rounded-2xl border border-slate-100 p-4 mt-4">
+        <div className="text-[10px] font-bold text-[#0052FF] uppercase tracking-widest mb-1 flex items-center gap-1.5">
+          <FaLightbulb className="text-[#0052FF]" />
+          Insight
+        </div>
+        <p className="text-sm text-slate-500 font-medium leading-relaxed">
+          {data.recommendation}
+        </p>
       </div>
     </div>
   );

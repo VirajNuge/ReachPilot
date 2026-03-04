@@ -2,82 +2,103 @@
 
 import React from "react";
 import { RawAnalysisData } from "../../../../../lib/types/analysis";
-import { FaUsers, FaMapMarkerAlt, FaLink } from "react-icons/fa";
+import { FaUsers, FaChartLine, FaMedal, FaUser } from "react-icons/fa";
 
 interface PulseHeaderProps {
   profile: RawAnalysisData["profile"];
+  profileScore?: number;
 }
 
-export default function PulseHeader({ profile }: PulseHeaderProps) {
-  // Format followers count (e.g. 12000 -> 12k)
+export default function PulseHeader({
+  profile,
+  profileScore,
+}: PulseHeaderProps) {
   const formatFollowers = (count: number) => {
     if (count >= 1000000) return (count / 1000000).toFixed(1) + "M";
     if (count >= 1000) return (count / 1000).toFixed(1) + "k";
     return count.toLocaleString();
   };
 
+  const score = profileScore ?? profile.profileScore ?? 72;
+
   return (
-    <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden mb-6 relative group">
-      {/* Banner Image */}
-      <div className="h-32 w-full bg-slate-100 relative">
-        {profile.banner ? (
-          <img
-            src={profile.banner}
-            alt="Profile Banner"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 opacity-20" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60" />
-      </div>
-
-      <div className="px-8 pb-6 relative flex flex-col md:flex-row items-center md:items-end gap-6 -mt-12">
-        {/* Profile Picture */}
-        <div className="relative shrink-0">
-          <div className="w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-white">
-            {profile.pfp ? (
-              <img
-                src={profile.pfp}
-                alt={profile.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl">
-                👤
-              </div>
-            )}
-          </div>
-          <div className="absolute bottom-1 right-1 w-6 h-6 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <div className="w-2 h-2 bg-white rounded-full relative z-10"></div>
-          </div>
-        </div>
-
-        {/* Profile Info */}
-        <div className="flex-1 text-center md:text-left pt-2 md:pt-0">
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">
-            {profile.name}
-          </h1>
-          <p className="text-sm font-medium text-slate-500 mb-2 max-w-2xl">
-            {profile.headline || profile.bio}
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-semibold text-slate-400">
-            <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100 text-slate-600">
-              <FaUsers className="text-violet-500" />
-              <span>{formatFollowers(profile.followers)} Followers</span>
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] overflow-hidden mb-6 relative">
+      <div className="px-6 py-6 relative">
+        {/* Profile picture + name row */}
+        <div className="flex items-end gap-4 mb-4">
+          <div className="relative shrink-0">
+            <div className="w-20 h-20 rounded-full border-4 border-white shadow-[0_4px_16px_rgba(0,82,255,0.15)] overflow-hidden bg-white">
+              {profile.pfp ? (
+                <img
+                  src={profile.pfp}
+                  alt={profile.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-[#F5F6FA] flex items-center justify-center">
+                  <FaUser className="text-3xl text-slate-300" />
+                </div>
+              )}
             </div>
+            {/* Online dot */}
+            <div className="absolute bottom-1 right-1 w-4 h-4 bg-[#0052FF] border-2 border-white rounded-full" />
+          </div>
 
-            {profile.projects && (
-              <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100 text-slate-600">
-                <span>🚀 {profile.projects} Projects</span>
-              </div>
-            )}
+          <div className="flex-1 pb-1">
+            <h1 className="text-xl font-black text-[#1A1D23] tracking-tight leading-none mb-1">
+              {profile.name}
+            </h1>
+            <p className="text-xs font-medium text-slate-500 leading-snug max-w-md line-clamp-2">
+              {profile.headline || profile.bio}
+            </p>
+          </div>
+
+          {/* Profile Score Badge (top-right style blue icon badge) */}
+          <div className="p-2.5 bg-[#0052FF] text-white rounded-2xl shadow-sm shrink-0 flex flex-col items-center justify-center min-w-[52px]">
+            <span className="text-xl font-black leading-none">{score}</span>
+            <span className="text-[8px] font-bold uppercase tracking-widest opacity-80 mt-0.5">
+              Score
+            </span>
           </div>
         </div>
 
-        {/* Quick Stats / Actions could go here */}
+        {/* Inline stat pills row */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 bg-[#F5F6FA] px-3 py-1.5 rounded-full border border-slate-100">
+            <FaUsers className="text-[#0052FF] text-[10px]" />
+            <span className="text-[11px] font-black text-[#1A1D23] uppercase tracking-wider">
+              {formatFollowers(profile.followers)}
+            </span>
+            <span className="text-[10px] font-medium text-slate-400">
+              Followers
+            </span>
+          </div>
+
+          {profile.projects && (
+            <div className="inline-flex items-center gap-1.5 bg-[#F5F6FA] px-3 py-1.5 rounded-full border border-slate-100">
+              <FaChartLine className="text-[#0052FF] text-[10px]" />
+              <span className="text-[11px] font-black text-[#1A1D23] uppercase tracking-wider">
+                {profile.projects}
+              </span>
+              <span className="text-[10px] font-medium text-slate-400">
+                Projects
+              </span>
+            </div>
+          )}
+
+          <div className="inline-flex items-center gap-1.5 bg-[#B6FF33]/20 px-3 py-1.5 rounded-full border border-[#B6FF33]/30">
+            <FaMedal className="text-[#1A1D23] text-[10px]" />
+            <span className="text-[11px] font-black text-[#1A1D23] uppercase tracking-wider">
+              {score >= 80
+                ? "Elite"
+                : score >= 65
+                  ? "Strong"
+                  : score >= 50
+                    ? "Active"
+                    : "Growing"}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

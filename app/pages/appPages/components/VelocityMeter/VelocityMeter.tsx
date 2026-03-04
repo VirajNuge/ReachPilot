@@ -5,7 +5,6 @@ import {
   BarChart,
   Bar,
   XAxis,
-  YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
@@ -56,141 +55,77 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
       "This competitor has a high Hook-Rate. They rely on controversial openings.",
   };
 
-  // Visual Config based on Category
-  const getCategoryConfig = (cat: VelocityCategory) => {
-    switch (cat) {
-      case "Pulse":
-        return {
-          icon: <FaHeartbeat />,
-          color: "text-gray-500",
-          bg: "bg-gray-100",
-          gradient: ["#9ca3af", "#6b7280"], // Gray
-          description: "Steady Engagement",
-        };
-      case "Momentum":
-        return {
-          icon: <FaFire />,
-          color: "text-rose-500",
-          bg: "bg-rose-100",
-          gradient: ["#f43f5e", "#e11d48"], // Rose
-          description: "Consistent Growth",
-        };
-      case "Growth":
-        return {
-          icon: <FaBolt />,
-          color: "text-amber-500",
-          bg: "bg-amber-100",
-          gradient: ["#f59e0b", "#d97706"], // Amber
-          description: "Rapid Trajectory",
-        };
-      case "Viral":
-        return {
-          icon: <FaFire />,
-          color: "text-indigo-500",
-          bg: "bg-indigo-100",
-          gradient: ["#6366f1", "#4f46e5"], // Indigo
-          description: "Massive Reach",
-        };
-      default:
-        return {
-          icon: <FaHeartbeat />,
-          color: "text-rose-500",
-          bg: "bg-rose-100",
-          gradient: ["#f43f5e", "#e11d48"], // Rose
-          description: "Balanced Growth",
-        };
-    }
-  };
-
-  const config = getCategoryConfig(safeData.category);
-
   return (
-    <div className="flex flex-col h-full w-full bg-white relative overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 pb-2">
-        <div className="flex gap-3 items-center">
-          <div className="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
-            <BsSpeedometer size={18} />
-          </div>
-          <div>
-            <div className="relative group cursor-help">
-              <h4 className="font-bold text-lg text-gray-900 leading-tight inline-block">
-                Engagement Velocity
-              </h4>
-              {/* Tooltip */}
-              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                <div className="font-bold mb-1 text-indigo-300">
-                  Why this matters:
-                </div>
-                Measures how quickly your audience reacts. High velocity means
-                your hooks are stopping the scroll effectively.
-                <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 font-medium">
-              Hook Rate: {safeData.hookRate}%
-            </p>
-          </div>
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
+      {/* Header Row */}
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Engagement Velocity
+          </h4>
+          <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+            Hook Rate: {safeData.hookRate}%
+          </h2>
+          <p className="text-xs font-medium text-slate-500">
+            Category: {safeData.category}
+          </p>
         </div>
-        <div
-          className={`flex items-center gap-2 px-3 py-1 rounded-full border ${config.bg} ${config.color} border-current/20`}
-        >
-          {config.icon}
-          <span className="text-[10px] uppercase font-bold tracking-wider">
-            {safeData.category}
-          </span>
+
+        {/* Top Right Icon Badge matching reference */}
+        <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0">
+          <BsSpeedometer size={18} />
         </div>
       </div>
 
-      <div className="flex flex-col flex-1 p-6 gap-6">
-        {/* Main Gauge / Chart Area */}
+      <div className="flex flex-col flex-1 gap-6">
+        {/* Main Chart Area */}
         <div className="flex-1 w-full min-h-[150px] relative">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={safeData.velocityGraph}>
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
-                stroke="#f3f4f6"
+                stroke="#f4f8fb"
               />
               <XAxis
                 dataKey="hour"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 10, fill: "#9ca3af" }}
+                tick={{ fontSize: 10, fill: "#64748b", fontWeight: 500 }}
+                dy={10}
               />
               <Tooltip
                 cursor={{ fill: "transparent" }}
                 contentStyle={{
+                  backgroundColor: "#000100",
+                  color: "white",
                   borderRadius: "12px",
                   border: "none",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  padding: "6px 10px",
                 }}
+                itemStyle={{ color: "white" }}
               />
-              <Bar dataKey="engagement" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="engagement" radius={[6, 6, 6, 6]} barSize={32}>
                 {safeData.velocityGraph.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={
-                      index < 2
-                        ? config.gradient[0]
-                        : "#e5e7eb" /* Highlight first 2 hours for Hook Rate */
-                    }
+                    fill={index < 2 ? "#caee55" : "#074ed5"}
                   />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
           {/* Label Helper */}
-          <div className="absolute top-2 right-2 flex flex-col items-end">
-            <span className="text-[10px] text-gray-400 font-medium">
-              First 2h Impact
-            </span>
-            <div className="flex items-center gap-1">
+          <div className="absolute -top-1 right-0 flex flex-col items-end">
+            <div className="flex items-center gap-1.5 bg-[#f4f8fb] px-2.5 py-1 rounded-full border border-slate-100">
               <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: config.gradient[0] }}
+                className="w-2h h-2 rounded-full bg-[#caee55]"
+                style={{ width: "8px", height: "8px" }}
               />
-              <span className="text-xs font-bold text-gray-700">
+              <span className="text-[10px] font-bold text-[#000100] uppercase tracking-wider">
                 Hook Phase
               </span>
             </div>
@@ -198,12 +133,13 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
         </div>
 
         {/* Insight Box */}
-        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 relative">
-          <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-            AI Observation
-          </h5>
-          <p className="text-sm text-gray-600 font-medium leading-relaxed">
-            "{safeData.insight}"
+        <div className="bg-[#f4f8fb] rounded-2xl border border-slate-100 p-4">
+          <h4 className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest mb-1 flex items-center gap-1.5">
+            <FaFire className="text-[#074ed5] shrink-0" size={10} /> AI
+            Observation
+          </h4>
+          <p className="text-sm text-slate-500 font-medium leading-relaxed">
+            {safeData.insight}
           </p>
         </div>
 
@@ -213,9 +149,9 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
             setShowMatchModal(true);
             onMatchVelocity?.();
           }}
-          className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98]"
+          className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)] active:scale-[0.98]"
         >
-          <FaBolt className="text-yellow-300" />
+          <FaBolt />
           Match this Velocity
         </button>
       </div>
@@ -227,28 +163,28 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col p-6"
+            className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col p-6 rounded-3xl"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <FaBolt className="text-amber-500" /> Velocity Matcher
+              <h3 className="text-lg font-bold text-[#000100] flex items-center gap-2">
+                <FaBolt className="text-[#074ed5]" /> Velocity Matcher
               </h3>
               <button
                 onClick={() => setShowMatchModal(false)}
-                className="text-xs font-bold text-gray-500 hover:text-gray-900 underline"
+                className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-[#000100] transition-colors"
               >
                 Close
               </button>
             </div>
 
             <div className="flex-1 flex flex-col justify-center items-center text-center gap-4">
-              <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-2 animate-bounce">
-                <FaFire className="text-indigo-600 text-2xl" />
+              <div className="p-3 bg-[#074ed5]/10 text-[#074ed5] rounded-2xl mb-2 animate-bounce">
+                <FaFire size={24} />
               </div>
-              <h4 className="text-xl font-bold text-gray-800">
+              <h4 className="text-xl font-black text-[#000100]">
                 Generating 3 Hooks...
               </h4>
-              <p className="text-sm text-gray-500 max-w-[250px]">
+              <p className="text-sm text-slate-500 font-medium max-w-[250px]">
                 Analyzing {safeData.category} patterns to give your next post
                 immediate traction.
               </p>

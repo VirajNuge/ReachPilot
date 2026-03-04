@@ -3,7 +3,13 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-
+import {
+  FaCompass,
+  FaFlask,
+  FaUserFriends,
+  FaMap,
+  FaRocket,
+} from "react-icons/fa";
 // Component imports
 
 import VelocityMeter from "../../../components/VelocityMeter/VelocityMeter";
@@ -501,27 +507,27 @@ function AnalysisContent() {
                   {
                     id: "Pulse",
                     label: "Pulse Overview",
-                    icon: <span>🧭</span>,
+                    icon: <FaCompass />,
                   },
                   {
                     id: "Lab",
                     label: "The Lab",
-                    icon: <span>🧪</span>,
+                    icon: <FaFlask />,
                   },
                   {
                     id: "Crowd",
                     label: "The Crowd",
-                    icon: <span>👥</span>,
+                    icon: <FaUserFriends />,
                   },
                   {
                     id: "Blueprint",
                     label: "The Blueprint",
-                    icon: <span>🗺️</span>,
+                    icon: <FaMap />,
                   },
                   {
                     id: "Growth",
                     label: "Growth Command",
-                    icon: <span>🚀</span>,
+                    icon: <FaRocket />,
                   },
                 ]}
                 activeTab={activeTab}
@@ -543,16 +549,22 @@ function AnalysisContent() {
                     {/* Header Summary */}
                     <PulseHeader profile={data.profile} />
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                       {/* Left Column (Wide) - 2/3 width */}
-                      <div className="lg:col-span-2 flex flex-col gap-6">
-                        {/* Pulse Score - Top Hero */}
-                        <PulseScore data={data} />
+                      <div className="xl:col-span-2 flex flex-col gap-6">
+                        {/* Engagement Vitals - Top row stats */}
+                        <EngagementVitalsPanel
+                          data={data.engagementVitals}
+                          contentMetrics={data.contentMetrics}
+                        />
 
-                        {/* Heartbeat Chart - Middle */}
+                        {/* Heartbeat Chart - Main wide chart */}
                         <HeartbeatChart data={data.pulseHeartbeat} />
 
-                        {/* Growth Trend - Bottom */}
+                        {/* Audience Temp - Wide 3-col breakdown */}
+                        <AudienceTemp data={data.audienceTemperature} />
+
+                        {/* Growth Trend - Bottom chart */}
                         <div className="min-h-[200px]">
                           <GrowthTrend data={data.growthTrajectory} />
                         </div>
@@ -560,16 +572,10 @@ function AnalysisContent() {
 
                       {/* Right Column (Narrow) - 1/3 width */}
                       <div className="flex flex-col gap-6">
-                        {/* Engagement Vitals */}
-                        <EngagementVitalsPanel
-                          data={data.engagementVitals}
-                          contentMetrics={data.contentMetrics}
-                        />
+                        {/* Pulse Score - Vertical rating card */}
+                        <PulseScore data={data} />
 
-                        {/* Audience Temp */}
-                        <AudienceTemp data={data.audienceTemperature} />
-
-                        {/* Triage Station - Bottom */}
+                        {/* Triage Station - Vertical list */}
                         <div className="flex-1 min-h-[300px]">
                           <TriageStation fixes={data.quickFixes} />
                         </div>
@@ -588,106 +594,79 @@ function AnalysisContent() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="flex flex-col gap-6"
                   >
-                    {/* Lab Header */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">🔬</span>
-                        <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
-                          Strategy Lab
-                        </h3>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="px-3 py-1 bg-violet-50 text-violet-700 border border-violet-100 rounded-full text-xs font-bold shadow-sm">
-                          Deep Dive
-                        </span>
-                      </div>
-                    </div>
-
                     {/* --- Dashboard Grid Layout (12 Columns) --- */}
-                    <div className="grid grid-cols-12 gap-5">
-                      {/* Row 1: Engagement Velocity, Psych Triggers, Content Pillars */}
-                      <div className="col-span-12 md:col-span-6 lg:col-span-5 min-h-[380px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.velocity ? (
-                            <VelocityMeter data={data.velocity as any} />
-                          ) : (
-                            <div className="p-4 text-center text-gray-400">
-                              No Velocity Data
-                            </div>
-                          )}
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6">
+                      {/* Row 1: Engagement Velocity, Psych Triggers */}
+                      <div className="xl:col-span-5 flex flex-col">
+                        {data.velocity ? (
+                          <VelocityMeter data={data.velocity as any} />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Velocity Data
+                          </div>
+                        )}
                       </div>
-                      <div className="col-span-12 md:col-span-6 lg:col-span-7 min-h-[380px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.psychTriggers ? (
-                            <PsychTriggers data={data.psychTriggers} />
-                          ) : (
-                            <div className="p-4 text-center text-gray-400">
-                              No Psych Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="xl:col-span-7 flex flex-col">
+                        {data.psychTriggers ? (
+                          <PsychTriggers data={data.psychTriggers} />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Psych Data
+                          </div>
+                        )}
                       </div>
-                      <div className="col-span-12 lg:col-span-12 min-h-[380px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          <ContentPillars
-                            pillars={mapPillars(data.contentPillars)}
-                            aiSummary={
-                              data.pillarInsight || "Analyzing pillars..."
-                            }
-                            onGenerateFormula={() =>
-                              alert("Creating your custom formula...")
-                            }
-                          />
-                        </div>
+
+                      {/* Content Pillars (Full width) */}
+                      <div className="xl:col-span-12 flex flex-col">
+                        <ContentPillars
+                          pillars={mapPillars(data.contentPillars)}
+                          aiSummary={
+                            data.pillarInsight || "Analyzing pillars..."
+                          }
+                          onGenerateFormula={() =>
+                            alert("Creating your custom formula...")
+                          }
+                        />
                       </div>
 
                       {/* Row 2: Post Fatigue, Content Gap */}
-                      <div className="col-span-12 md:col-span-6 lg:col-span-4 min-h-[360px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.postFatigue ? (
-                            <PostFatigue data={data.postFatigue as any} />
-                          ) : (
-                            <div className="p-4 text-center text-gray-400">
-                              No Fatigue Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="xl:col-span-4 flex flex-col">
+                        {data.postFatigue ? (
+                          <PostFatigue data={data.postFatigue as any} />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Fatigue Data
+                          </div>
+                        )}
                       </div>
-                      <div className="col-span-12 md:col-span-6 lg:col-span-8 min-h-[360px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.competitorGap ? (
-                            <CompetitorGap data={data.competitorGap as any} />
-                          ) : (
-                            <div className="p-4 text-center text-gray-400">
-                              No Competitor Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="xl:col-span-8 flex flex-col">
+                        {data.competitorGap ? (
+                          <CompetitorGap data={data.competitorGap as any} />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Competitor Data
+                          </div>
+                        )}
                       </div>
 
                       {/* Row 3: Viral Recipe, Brand Voice */}
-                      <div className="col-span-12 lg:col-span-6 min-h-[400px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.viralRecipe && data.viralRecipe.length > 0 ? (
-                            <ViralRecipe data={data.viralRecipe[0]} />
-                          ) : (
-                            <div className="p-4 text-center text-gray-400">
-                              No Viral Recipe
-                            </div>
-                          )}
-                        </div>
+                      <div className="xl:col-span-6 flex flex-col">
+                        {data.viralRecipe && data.viralRecipe.length > 0 ? (
+                          <ViralRecipe data={data.viralRecipe[0]} />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Viral Recipe
+                          </div>
+                        )}
                       </div>
-                      <div className="col-span-12 lg:col-span-6 min-h-[400px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.voiceSpectrum ? (
-                            <VoiceSpectrum data={data.voiceSpectrum} />
-                          ) : (
-                            <div className="p-4 text-center text-gray-400">
-                              No Voice Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="xl:col-span-6 flex flex-col">
+                        {data.voiceSpectrum ? (
+                          <VoiceSpectrum data={data.voiceSpectrum} />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Voice Data
+                          </div>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -703,83 +682,60 @@ function AnalysisContent() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="flex flex-col gap-6"
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">👥</span>
-                        <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
-                          Audience Intelligence
-                        </h3>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="px-3 py-1 bg-pink-50 text-pink-700 border border-pink-100 rounded-full text-xs font-bold shadow-sm">
-                          Deep Dive
-                        </span>
-                      </div>
-                    </div>
-
                     {/* Placeholder for future content */}
-                    {/* --- Crowd Grid Layout (12 Columns) --- */}
-                    <div className="grid grid-cols-12 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6">
                       {/* 1. Sentiment Map (Vibe Decoder) */}
-                      <div className="col-span-12 md:col-span-6 lg:col-span-6 min-h-[400px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.crowdSentiment ? (
-                            <SentimentMap data={data.crowdSentiment as any} />
-                          ) : (
-                            <div className="p-4 text-center">
-                              No Sentiment Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="xl:col-span-6 flex flex-col">
+                        {data.crowdSentiment ? (
+                          <SentimentMap data={data.crowdSentiment as any} />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Sentiment Data
+                          </div>
+                        )}
                       </div>
 
                       {/* 2. Active Hours (Clock Map) */}
-                      <div className="col-span-12 md:col-span-6 lg:col-span-6 min-h-[400px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.activeHours ? (
-                            <ActiveHours data={data.activeHours as any} />
-                          ) : (
-                            <div className="p-4 text-center">
-                              No Active Hours Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="xl:col-span-6 flex flex-col">
+                        {data.activeHours ? (
+                          <ActiveHours data={data.activeHours as any} />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Active Hours Data
+                          </div>
+                        )}
                       </div>
 
                       {/* Row 2: Top Fan Archetypes */}
-                      <div className="col-span-12 lg:col-span-6 min-h-[400px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {/* Crowd Personas Component */}
-                          {data.crowdPersonas ? (
-                            <CrowdPersonas data={data.crowdPersonas} />
-                          ) : (
-                            <div className="p-4 text-center">
-                              No Persona Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="xl:col-span-5 flex flex-col">
+                        {/* Crowd Personas Component */}
+                        {data.crowdPersonas ? (
+                          <CrowdPersonas data={data.crowdPersonas} />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Persona Data
+                          </div>
+                        )}
                       </div>
 
                       {/* 2. Headline Keyword Cloud */}
-                      <div className="col-span-12 lg:col-span-6 min-h-[400px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.questionCloud ? (
-                            <QuestionCloud
-                              data={data.questionCloud.map((q) => ({
-                                id: q.id || Math.random().toString(),
-                                word: q.word || (q as any).text || "Question",
-                                count: q.count || (q as any).frequency || 0,
-                                engagement: q.engagement || 0,
-                                intent: q.intent || "Educational",
-                                sampleQuestions: q.sampleQuestions || [],
-                              }))}
-                            />
-                          ) : (
-                            <div className="p-4 text-center">
-                              No Question Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="xl:col-span-7 flex flex-col">
+                        {data.questionCloud ? (
+                          <QuestionCloud
+                            data={data.questionCloud.map((q) => ({
+                              id: q.id || Math.random().toString(),
+                              word: q.word || (q as any).text || "Question",
+                              count: q.count || (q as any).frequency || 0,
+                              engagement: q.engagement || 0,
+                              intent: q.intent || "Educational",
+                              sampleQuestions: q.sampleQuestions || [],
+                            }))}
+                          />
+                        ) : (
+                          <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
+                            No Question Data
+                          </div>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -794,23 +750,9 @@ function AnalysisContent() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="flex flex-col gap-6"
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">🗺️</span>
-                        <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
-                          The Blueprint
-                        </h3>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full text-xs font-bold shadow-sm">
-                          Strategic Roadmap
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-12 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
                       {/* Row 1: Ethical Bribe (Lead Magnet) */}
-                      <div className="col-span-12 md:col-span-6 lg:col-span-5 min-h-[400px]">
+                      <div className="col-span-1 lg:col-span-5 flex flex-col">
                         {data.leadMagnet ? (
                           <EthicalBribe data={data.leadMagnet} />
                         ) : (
@@ -821,40 +763,34 @@ function AnalysisContent() {
                       </div>
 
                       {/* Row 1: CTA Command Center */}
-                      <div className="col-span-12 md:col-span-6 lg:col-span-7 min-h-[400px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.ctaAnalysis ? (
-                            <CTACommand data={data.ctaAnalysis} />
-                          ) : (
-                            <div className="p-4 text-center">No CTA Data</div>
-                          )}
-                        </div>
+                      <div className="col-span-1 lg:col-span-7 flex flex-col">
+                        {data.ctaAnalysis ? (
+                          <CTACommand data={data.ctaAnalysis} />
+                        ) : (
+                          <div className="p-4 text-center">No CTA Data</div>
+                        )}
                       </div>
 
                       {/* Row 2: Stack Fingerprinting */}
-                      <div className="col-span-12 md:col-span-4 min-h-[300px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.techStack ? (
-                            <StackFingerprint data={data.techStack} />
-                          ) : (
-                            <div className="p-4 text-center">
-                              No Tech Stack Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="col-span-1 lg:col-span-4 flex flex-col">
+                        {data.techStack ? (
+                          <StackFingerprint data={data.techStack} />
+                        ) : (
+                          <div className="p-4 text-center">
+                            No Tech Stack Data
+                          </div>
+                        )}
                       </div>
 
                       {/* Row 2: Value Ladder Reconstruction */}
-                      <div className="col-span-12 md:col-span-8 min-h-[300px]">
-                        <div className="h-full bg-white rounded-[20px] border border-gray-100 shadow-sm">
-                          {data.valueLadder ? (
-                            <ValueLadder data={data.valueLadder} />
-                          ) : (
-                            <div className="p-4 text-center">
-                              No Value Ladder Data
-                            </div>
-                          )}
-                        </div>
+                      <div className="col-span-1 lg:col-span-8 flex flex-col">
+                        {data.valueLadder ? (
+                          <ValueLadder data={data.valueLadder} />
+                        ) : (
+                          <div className="p-4 text-center">
+                            No Value Ladder Data
+                          </div>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -869,22 +805,8 @@ function AnalysisContent() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="flex flex-col gap-6"
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">🚀</span>
-                        <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
-                          Growth Command
-                        </h3>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-xs font-bold shadow-sm">
-                          Simulation & Execution
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-12 gap-5">
-                      <div className="col-span-12 min-h-[400px]">
+                    <div>
+                      <div>
                         <GrowthCommand
                           growthTasks={data.growthTasks}
                           disruptor={data.disruptor}

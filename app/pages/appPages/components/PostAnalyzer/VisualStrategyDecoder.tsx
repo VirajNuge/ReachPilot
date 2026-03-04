@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  FaEye,
   FaPalette,
   FaRobot,
   FaImage,
@@ -34,11 +33,11 @@ function CopyButton({
     return (
       <button
         onClick={handleCopy}
-        className="text-gray-400 hover:text-white transition-colors"
+        className="text-slate-400 hover:text-white transition-colors p-1 bg-slate-800 rounded-md"
         title="Copy"
       >
         {copied ? (
-          <FaCheck size={10} className="text-green-500" />
+          <FaCheck size={10} className="text-[#B6FF33]" />
         ) : (
           <FaCopy size={10} />
         )}
@@ -49,7 +48,11 @@ function CopyButton({
   return (
     <button
       onClick={handleCopy}
-      className="p-1.5 bg-gray-200 hover:bg-indigo-600 hover:text-white text-gray-500 rounded-lg transition-colors"
+      className={`relative overflow-hidden shrink-0 px-2.5 py-1.5 rounded-lg font-bold text-[10px] transition-all flex items-center justify-center min-w-[65px] active:scale-95 border ${
+        copied
+          ? "bg-[#B6FF33]/20 text-[#4D8C00] border-[#B6FF33]/50"
+          : "bg-white text-slate-500 border-slate-200 hover:bg-[#0052FF] hover:text-white hover:border-[#0052FF]"
+      }`}
       title="Copy to Clipboard"
     >
       <AnimatePresence mode="wait">
@@ -59,8 +62,9 @@ function CopyButton({
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.5, opacity: 0 }}
+            className="flex items-center gap-1"
           >
-            <FaCheck size={12} />
+            <FaCheck size={9} /> Copied
           </motion.div>
         ) : (
           <motion.div
@@ -68,8 +72,9 @@ function CopyButton({
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.5, opacity: 0 }}
+            className="flex items-center gap-1"
           >
-            <FaCopy size={12} />
+            <FaCopy size={9} /> Copy
           </motion.div>
         )}
       </AnimatePresence>
@@ -87,49 +92,54 @@ export default function VisualStrategyDecoder({
   );
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col h-full">
       {/* ─── Header ─── */}
-      <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
-            <FaImage size={16} />
-          </div>
-          <div className="relative group cursor-help">
-            <h3 className="font-bold text-gray-900 inline-block leading-tight">
-              Visual DNA
+      <div className="px-5 pt-5 pb-4 flex justify-between items-start">
+        <div className="flex-1">
+          <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest mb-1">
+            Visual DNA
+          </p>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xl font-bold text-[#1A1D23] leading-none">
+              Aesthetic Analysis
             </h3>
-            <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-              <div className="font-bold mb-1 text-indigo-300">
-                Why this matters:
-              </div>
-              Analyzes the visual elements (colors, layout) so you can replicate
-              the aesthetic.
-              <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45" />
-            </div>
+            <span className="text-[11px] font-semibold bg-slate-100 text-slate-500 px-3 py-1 rounded-xl flex items-center gap-1">
+              <FaRobot className="text-[#0052FF]" size={10} /> {category}
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold uppercase rounded-full tracking-wide">
-          <FaRobot size={10} /> {category}
+
+        <div className="p-2.5 bg-[#0052FF] text-white rounded-xl shrink-0 cursor-help relative group">
+          <FaImage size={16} />
+          {/* Tooltip */}
+          <div className="absolute right-0 top-full mt-2 w-64 p-3 bg-[#1A1D23] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+            <div className="font-bold mb-1 text-[#0052FF]">
+              Why this matters:
+            </div>
+            Analyzes the visual elements (colors, layout) so you can replicate
+            the aesthetic.
+            <div className="absolute right-4 -top-1 w-2 h-2 bg-[#1A1D23] transform rotate-45" />
+          </div>
         </div>
       </div>
 
-      <div className="p-5 space-y-6">
+      <div className="px-5 pb-5 space-y-6 flex-1 flex flex-col">
         {/* ─── SECTION 1: Vibe Palette (Hex Codes) ─── */}
-        <div>
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 block flex items-center gap-2">
-            <FaPalette /> Vibe Palette
+        <div className="border-b border-slate-100 pb-5">
+          <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest block mb-3 flex items-center gap-1.5">
+            <FaPalette className="text-[#0052FF]" /> Color Identity
           </span>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {colors.map((color, i) => (
               <div key={i} className="group relative">
                 <div
-                  className="w-10 h-10 rounded-full border-2 border-white shadow-sm cursor-pointer hover:scale-110 transition-transform"
+                  className="w-12 h-12 rounded-full border border-slate-200 shadow-sm cursor-pointer hover:border-[#0052FF] hover:scale-105 transition-all"
                   style={{ backgroundColor: color }}
                   onClick={() => navigator.clipboard.writeText(color)}
                   title={`Copy ${color}`}
                 />
-                <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 text-[9px] font-mono text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white px-1 rounded shadow-sm border border-gray-100">
-                  {color}
+                <div className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                  {color.toUpperCase()}
                 </div>
               </div>
             ))}
@@ -138,72 +148,65 @@ export default function VisualStrategyDecoder({
 
         {/* ─── SECTION 2: Text Overlay Zone ─── */}
         <div>
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 block flex items-center gap-2">
-            <FaLayerGroup /> Text Safe Zone
+          <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest block mb-3 flex items-center gap-1.5">
+            <FaLayerGroup className="text-[#0052FF]" /> UI Safe Zone
           </span>
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center bg-[#F4F7FA] p-3.5 rounded-2xl border border-slate-100">
             {/* Diagram */}
-            <div className="w-24 h-32 bg-gray-100 border border-gray-200 rounded-lg relative overflow-hidden flex flex-col">
-              {/* Top UI Chrome Buffer */}
-              <div className="h-[20%] w-full bg-red-500/10 border-b border-red-500/20 flex items-center justify-center">
-                <span className="text-[8px] text-red-400 font-bold">UI</span>
-              </div>
+            <div className="w-16 h-28 bg-white border border-slate-300 rounded-lg relative overflow-hidden flex flex-col shrink-0">
               {/* Safe Zone */}
-              <div className="flex-1 w-full bg-green-500/10 flex items-center justify-center border-y border-green-500/20">
-                <span className="text-[8px] text-green-600 font-bold">
-                  Safe Zone
+              <div className="flex-1 w-full bg-[#B6FF33]/20 flex items-center justify-center border-y border-[#B6FF33]/40 absolute top-1/4 bottom-1/4 left-0 right-0">
+                <span className="text-[8px] text-[#4D8C00] font-black uppercase text-center leading-tight">
+                  Safe
+                  <br />
+                  Zone
                 </span>
-              </div>
-              {/* Bottom UI Chrome Buffer */}
-              <div className="h-[20%] w-full bg-red-500/10 border-t border-red-500/20 flex items-center justify-center">
-                <span className="text-[8px] text-red-400 font-bold">UI</span>
               </div>
             </div>
 
             {/* Explanation */}
-            <div className="flex-1 py-1">
-              <h4 className="font-bold text-gray-800 text-xs mb-1">
-                Center 60% Rule
+            <div className="flex-1">
+              <h4 className="font-bold text-[#1A1D23] text-[13px] mb-1">
+                Center 50% Rule
               </h4>
-              <p className="text-[10px] text-gray-500 leading-relaxed mb-2">
-                Keep your hook and key text within the green zone to avoid
-                overlap with Instagram/TikTok UI overlays (captions, likes,
-                etc.).
+              <p className="text-[11px] text-slate-500 leading-relaxed mb-2">
+                Keep key text within the green zone to avoid overlap with
+                Instagram/TikTok sidebars and captions.
               </p>
-              <div className="inline-block px-2 py-1 bg-gray-100 rounded text-[9px] font-bold text-gray-500">
+              <span className="text-[9px] font-bold bg-white text-slate-500 px-2.5 py-1 rounded-md border border-slate-200 uppercase tracking-wide inline-block">
                 Applies to: Reels, TikTok, Shorts
-              </div>
+              </span>
             </div>
           </div>
         </div>
 
         {/* ─── SECTION 3: AI Prompt Generator ─── */}
-        <div className="pt-4 border-t border-gray-100">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-              <FaMagic /> AI Prompt Gen
+        <div className="pt-2 mt-auto">
+          <div className="flex justify-between items-end mb-3">
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest block flex items-center gap-1.5">
+              <FaMagic className="text-[#0052FF]" /> Prompt Generator
             </span>
-            <div className="flex bg-gray-100 rounded-lg p-0.5">
+            <div className="flex bg-slate-100 rounded-2xl p-1 gap-1 border border-slate-200">
               <button
                 onClick={() => setPromptType("midjourney")}
-                className={`px-2 py-0.5 text-[9px] font-bold rounded-md transition-all ${promptType === "midjourney" ? "bg-white text-indigo-600 shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+                className={`px-3 py-1 text-[10px] font-bold rounded-xl transition-all ${promptType === "midjourney" ? "bg-[#0052FF] text-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23]"}`}
               >
                 Midjourney
               </button>
               <button
                 onClick={() => setPromptType("dalle")}
-                className={`px-2 py-0.5 text-[9px] font-bold rounded-md transition-all ${promptType === "dalle" ? "bg-white text-indigo-600 shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+                className={`px-3 py-1 text-[10px] font-bold rounded-xl transition-all ${promptType === "dalle" ? "bg-[#0052FF] text-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23]"}`}
               >
                 DALL-E
               </button>
             </div>
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-3 relative group">
-            <p className="font-mono text-[10px] text-gray-300 leading-relaxed pr-6">
+          <div className="bg-[#1A1D23] rounded-2xl p-4 relative group shadow-inner">
+            <p className="font-mono text-[11px] text-slate-300 leading-relaxed pr-6 line-clamp-4">
               {prompts[promptType]}
             </p>
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
               <CopyButton text={prompts[promptType]} simple />
             </div>
           </div>

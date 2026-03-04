@@ -77,42 +77,36 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-white relative overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 pb-2">
-        <div className="flex gap-3 items-center">
-          <div className="bg-pink-50 p-2.5 rounded-xl text-pink-600">
-            <FaBrain size={18} />
-          </div>
-          <div>
-            <div className="relative group cursor-help">
-              <h4 className="font-bold text-lg text-gray-900 leading-tight inline-block">
-                Psychological Triggers
-              </h4>
-              {/* Tooltip */}
-              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                <div className="font-bold mb-1 text-pink-300">
-                  Why this matters:
-                </div>
-                Identifies the psychological levers used (e.g., FOMO, Authority)
-                to understand *why* people are compelled to engage.
-                <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
-              </div>
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
+      {/* Header Row */}
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Psychological Triggers
+          </h4>
+          <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+            Intent Analysis
+          </h2>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-xs font-medium text-slate-500">
+              Top Lever:
+            </span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#caee55]/20 rounded-full border border-[#caee55]/30 text-[#000100]">
+              <BsStars className="text-[#074ed5]" size={10} />
+              <span className="text-[10px] uppercase font-bold tracking-wider">
+                {safeData.winningTrigger}
+              </span>
             </div>
-            <p className="text-xs text-gray-500 font-medium">
-              Intent Analysis (The "Why")
-            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1 bg-pink-100/50 rounded-full border border-pink-100 text-pink-700">
-          <BsStars />
-          <span className="text-[10px] uppercase font-bold tracking-wider">
-            {safeData.winningTrigger}
-          </span>
+
+        {/* Top Right Icon Badge */}
+        <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0">
+          <FaBrain size={18} />
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row flex-1 p-6 gap-6 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 gap-6 overflow-hidden">
         {/* Left: Radar Chart */}
         <div className="w-full lg:w-1/2 min-h-[250px] relative">
           <ResponsiveContainer width="100%" height="100%">
@@ -122,10 +116,10 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
               outerRadius="70%"
               data={safeData.radarData}
             >
-              <PolarGrid stroke="#e5e7eb" />
+              <PolarGrid stroke="#e2e8f0" />
               <PolarAngleAxis
                 dataKey="trigger"
-                tick={{ fill: "#6b7280", fontSize: 10, fontWeight: 600 }}
+                tick={{ fill: "#64748b", fontSize: 10, fontWeight: 600 }}
               />
               <PolarRadiusAxis
                 angle={30}
@@ -136,17 +130,23 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
               <Radar
                 name="Psych Profile"
                 dataKey="score"
-                stroke="#db2777"
+                stroke="#074ed5"
                 strokeWidth={2}
-                fill="#db2777"
-                fillOpacity={0.4}
+                fill="#074ed5"
+                fillOpacity={0.12}
               />
               <Tooltip
                 contentStyle={{
+                  backgroundColor: "#000100",
+                  color: "white",
                   borderRadius: "12px",
                   border: "none",
-                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  padding: "6px 10px",
                 }}
+                itemStyle={{ color: "white" }}
                 cursor={false}
               />
             </RadarChart>
@@ -154,21 +154,22 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
         </div>
 
         {/* Right: Insight & Action */}
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="flex-1 flex flex-col gap-5 justify-between">
           {/* Insight Box */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-            <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-              AI Observation
-            </h5>
-            <p className="text-sm text-gray-600 font-medium leading-relaxed">
-              "{safeData.insight}"
+          <div className="bg-[#f4f8fb] rounded-2xl border border-slate-100 p-4">
+            <h4 className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest mb-1 flex items-center gap-1.5">
+              <FaBrain className="text-[#074ed5] shrink-0" size={10} /> AI
+              Observation
+            </h4>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+              {safeData.insight}
             </p>
           </div>
 
           <div className="mt-auto">
             <button
               onClick={() => setShowSwapModal(true)}
-              className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98]"
+              className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)] active:scale-[0.98]"
             >
               <FaExchangeAlt />
               Trigger Swap
@@ -184,15 +185,15 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col p-6"
+            className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col p-6 rounded-3xl"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <FaExchangeAlt className="text-pink-500" /> Trigger Swap
+              <h3 className="text-lg font-bold text-[#000100] flex items-center gap-2">
+                <FaExchangeAlt className="text-[#074ed5]" /> Trigger Swap
               </h3>
               <button
                 onClick={() => setShowSwapModal(false)}
-                className="text-xs font-bold text-gray-500 hover:text-gray-900 underline"
+                className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-[#000100] transition-colors"
               >
                 Close
               </button>
@@ -200,19 +201,19 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
 
             <div className="flex flex-col gap-4 flex-1 overflow-y-auto custom-scroll pr-1">
               <div>
-                <label className="text-xs font-bold text-gray-500 block mb-1">
+                <label className="text-xs font-bold text-slate-500 block mb-1">
                   Your Draft Caption
                 </label>
                 <textarea
                   value={userCaption}
                   onChange={(e) => setUserCaption(e.target.value)}
                   placeholder="I have a new web development course available now..."
-                  className="w-full p-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/20 bg-gray-50 resize-none h-24"
+                  className="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#074ed5]/20 bg-[#f4f8fb] resize-none h-24 text-[#000100] font-medium"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-gray-500 block mb-1">
+                <label className="text-xs font-bold text-slate-500 block mb-1">
                   Target Trigger
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -220,7 +221,11 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
                     <button
                       key={t}
                       onClick={() => setSelectedTrigger(t)}
-                      className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${selectedTrigger === t ? "bg-pink-50 border-pink-200 text-pink-700" : "bg-white border-gray-100 text-gray-600 hover:bg-gray-50"}`}
+                      className={`px-3 py-2 rounded-lg text-xs font-bold border transition-all ${
+                        selectedTrigger === t
+                          ? "bg-[#074ed5]/10 border-[#074ed5]/30 text-[#074ed5]"
+                          : "bg-white border-slate-100 text-slate-600 hover:bg-[#f4f8fb]"
+                      }`}
                     >
                       {t}
                     </button>
@@ -231,12 +236,16 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
               <button
                 onClick={handleGenerateSwap}
                 disabled={!userCaption || isGenerating}
-                className={`w-full py-3 mt-2 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md ${!userCaption || isGenerating ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-900 hover:bg-black text-white active:scale-[0.98]"}`}
+                className={`w-full py-3 mt-2 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm ${
+                  !userCaption || isGenerating
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-[#000100] hover:bg-black text-white active:scale-[0.98]"
+                }`}
               >
                 {isGenerating ? (
-                  <BsStars className="animate-spin" />
+                  <BsStars className="animate-spin text-[#caee55]" />
                 ) : (
-                  <FaRobot />
+                  <FaRobot className="text-[#caee55]" />
                 )}
                 {isGenerating ? "Rewriting..." : "AI Rewrite"}
               </button>

@@ -5,14 +5,12 @@ import {
   AreaChart,
   Area,
   XAxis,
-  YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
 import {
-  FaBatteryFull,
   FaBatteryQuarter,
   FaExclamationTriangle,
   FaCheckCircle,
@@ -58,79 +56,87 @@ const PostFatigue: React.FC<PostFatigueProps> = ({ data }) => {
     switch (status) {
       case "Healthy":
         return {
-          text: "text-emerald-500",
-          bg: "bg-emerald-50",
-          bar: "#10b981",
+          text: "text-[#074ed5]",
+          bg: "bg-[#074ed5]/10",
+          bar: "#074ed5",
+          border: "border-[#074ed5]/20",
         };
       case "Warning":
-        return { text: "text-amber-500", bg: "bg-amber-50", bar: "#f59e0b" };
+        return {
+          text: "text-[#000100]",
+          bg: "bg-[#caee55]/20",
+          bar: "#caee55",
+          border: "border-[#caee55]/30",
+        };
       case "Critical":
-        return { text: "text-rose-500", bg: "bg-rose-50", bar: "#e11d48" };
+        return {
+          text: "text-white",
+          bg: "bg-[#000100]",
+          bar: "#000100",
+          border: "border-transparent",
+        };
       default:
-        return { text: "text-gray-500", bg: "bg-gray-50", bar: "#9ca3af" };
+        return {
+          text: "text-slate-500",
+          bg: "bg-slate-100",
+          bar: "#9ca3af",
+          border: "border-slate-200",
+        };
     }
   };
 
   const colors = getStatusColor(safeData.status);
 
   return (
-    <div className="flex flex-col h-full w-full bg-white relative overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 pb-2">
-        <div className="flex gap-3 items-center">
-          <div className="bg-orange-50 p-2.5 rounded-xl text-orange-600">
-            <BsActivity size={18} />
-          </div>
-          <div>
-            <div className="relative group cursor-help">
-              <h4 className="font-bold text-lg text-gray-900 leading-tight inline-block">
-                Fatigue Predictor
-              </h4>
-              {/* Tooltip */}
-              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                <div className="font-bold mb-1 text-orange-300">
-                  Why this matters:
-                </div>
-                Predicts when your audience gets tired of hearing from you.
-                Helps optimize posting frequency to avoid burnout.
-                <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
-              </div>
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
+      {/* Header Row */}
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Fatigue Predictor
+          </h4>
+          <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+            Audience Saturation
+          </h2>
+          <div className="flex items-center gap-2 mt-2">
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${colors.bg} ${colors.text} ${colors.border}`}
+            >
+              {safeData.status === "Critical" ||
+              safeData.status === "Warning" ? (
+                <FaExclamationTriangle size={10} className={colors.text} />
+              ) : (
+                <FaCheckCircle size={10} className={colors.text} />
+              )}
+              <span className="text-[10px] uppercase font-bold tracking-wider">
+                {safeData.status}
+              </span>
             </div>
-            <p className="text-xs text-gray-500 font-medium">
-              Audience Saturation
-            </p>
           </div>
         </div>
-        <div
-          className={`flex items-center gap-2 px-3 py-1 rounded-full border ${colors.bg} ${colors.text} border-current/20`}
-        >
-          {safeData.status === "Critical" || safeData.status === "Warning" ? (
-            <FaExclamationTriangle />
-          ) : (
-            <FaCheckCircle />
-          )}
-          <span className="text-[10px] uppercase font-bold tracking-wider">
-            {safeData.status}
-          </span>
+
+        {/* Top Right Icon Badge */}
+        <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0">
+          <BsActivity size={18} />
         </div>
       </div>
 
-      <div className="flex flex-col flex-1 p-6 gap-4">
+      <div className="flex flex-col flex-1 gap-6">
         {/* Saturation Gauge / Stats */}
         <div className="flex items-center justify-between gap-4">
-          <div className="flex-1 bg-gray-50 rounded-xl p-3 border border-gray-100">
-            <span className="text-[10px] text-gray-400 font-bold uppercase block mb-1">
+          <div className="flex-1 bg-[#f4f8fb] rounded-2xl p-4 border border-slate-100">
+            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-1">
               Optimal Freq
             </span>
-            <span className="text-sm font-bold text-gray-800">
+            <span className="text-sm font-black text-[#000100]">
               {safeData.optimalFrequency}
             </span>
           </div>
-          <div className="flex-1 bg-gray-50 rounded-xl p-3 border border-gray-100">
-            <span className="text-[10px] text-gray-400 font-bold uppercase block mb-1">
+          <div className="flex-1 bg-[#f4f8fb] rounded-2xl p-4 border border-slate-100">
+            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest block mb-1">
               Stop At
             </span>
-            <span className="text-sm font-bold text-gray-800">
+            <span className="text-sm font-black text-[#000100]">
               {safeData.saturationPoint} posts
             </span>
           </div>
@@ -149,30 +155,38 @@ const PostFatigue: React.FC<PostFatigueProps> = ({ data }) => {
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
-                stroke="#f3f4f6"
+                stroke="#f4f8fb"
               />
               <XAxis
                 dataKey="day"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 10, fill: "#9ca3af" }}
+                tick={{ fontSize: 10, fill: "#64748b", fontWeight: 500 }}
+                dy={10}
               />
               <Tooltip
                 contentStyle={{
+                  backgroundColor: "#000100",
+                  color: "white",
                   borderRadius: "12px",
                   border: "none",
-                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  padding: "6px 10px",
                 }}
+                itemStyle={{ color: "white" }}
               />
               <ReferenceLine
                 y={1}
-                stroke="#9ca3af"
+                stroke="#64748b"
                 strokeDasharray="3 3"
                 label={{
                   position: "top",
                   value: "Baseline",
                   fontSize: 10,
-                  fill: "#9ca3af",
+                  fill: "#64748b",
+                  fontWeight: 600,
                 }}
               />
               <Area
@@ -181,32 +195,35 @@ const PostFatigue: React.FC<PostFatigueProps> = ({ data }) => {
                 stroke={colors.bar}
                 fillOpacity={1}
                 fill="url(#colorImpact)"
-                strokeWidth={2}
+                strokeWidth={3}
               />
             </AreaChart>
           </ResponsiveContainer>
-          <div className="absolute bottom-0 right-0 bg-white/80 px-2 py-1 text-[10px] text-gray-400 font-medium backdrop-blur-sm rounded">
-            Engagement Impact
-          </div>
         </div>
 
-        {/* Insight */}
+        {/* Insight Box */}
         <div className="mt-auto">
-          <div className="flex items-start gap-2 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
-            <div className="mt-0.5 text-orange-400">
-              <FaBatteryQuarter />
-            </div>
-            <p className="font-medium leading-relaxed">
-              "Posting more than {safeData.saturationPoint} times causes a{" "}
+          <div className="bg-[#f4f8fb] rounded-2xl border border-slate-100 p-4">
+            <h4 className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest mb-1 flex items-center gap-1.5">
+              <FaBatteryQuarter className="text-[#074ed5] shrink-0" size={10} />{" "}
+              AI Observation
+            </h4>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+              Posting more than {safeData.saturationPoint} times causes a{" "}
               {Math.round(
                 (1 -
                   (safeData.weeklyImpact.find((d) => d.posts > 1)
                     ?.impactScore || 0.6)) *
                   100,
               )}
-              % drop in engagement. Stick to the 'Sweet Spot'."
+              % drop in engagement. Stick to the 'Sweet Spot'.
             </p>
           </div>
+
+          {/* Action Button */}
+          <button className="w-full mt-2 py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)] active:scale-[0.98]">
+            Optimize Schedule
+          </button>
         </div>
       </div>
     </div>

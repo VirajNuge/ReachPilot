@@ -58,7 +58,7 @@ const MOCK_CROWD_DATA: CrowdAnalysisData = {
       percentage: 45,
       count: 225,
       keywords: ["amazing", "obsessed", "need this", "fire", "love"],
-      color: "#8b5cf6", // Violet-500
+      color: "#074ed5", // Primary blue
       icon: <FaFire />,
       description: "Social Proof & Loyalty",
     },
@@ -67,7 +67,7 @@ const MOCK_CROWD_DATA: CrowdAnalysisData = {
       percentage: 25,
       count: 125,
       keywords: ["price?", "shipping?", "compatible with X?", "how to"],
-      color: "#3b82f6", // Blue-500
+      color: "#caee55", // Lime highlight
       icon: <FaQuestionCircle />,
       description: "Unmet Demand (High Intent)",
     },
@@ -76,7 +76,7 @@ const MOCK_CROWD_DATA: CrowdAnalysisData = {
       percentage: 20,
       count: 100,
       keywords: ["is this real", "competitor is cheaper", "reviews?"],
-      color: "#f59e0b", // Amber-500
+      color: "#000100", // Dark text
       icon: <FaSearchDollar />,
       description: "Trust Barriers",
     },
@@ -85,7 +85,7 @@ const MOCK_CROWD_DATA: CrowdAnalysisData = {
       percentage: 10,
       count: 50,
       keywords: ["broken", "slow shipping", "no response", "bad service"],
-      color: "#ef4444", // Red-500
+      color: "#f4f8fb", // Inset bg (looks light gray)
       icon: <FaExclamationTriangle />,
       description: "Vulnerabilities",
     },
@@ -102,6 +102,7 @@ export default function SentimentMap({
   const [activeVibe, setActiveVibe] = useState<VibeType | null>(null);
   const [filterMode, setFilterMode] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [contentIdeas, setContentIdeas] = useState<string[]>([]);
 
   // Find the 'Seeker' data for the "Intent Hotspot"
   const safeVibes = data?.vibes || [];
@@ -111,65 +112,58 @@ export default function SentimentMap({
   const handleGenerateContent = () => {
     setIsGenerating(true);
     setTimeout(() => {
-      alert(
-        "🚀 Content Ideas Generated:\n1. 'Yes, it works with Shopify!' (Reel)\n2. 'Price Breakdown: Why it's worth it.' (Carousel)\n3. 'Installation Guide in 30s' (Short)",
-      );
+      setContentIdeas([
+        "'Yes, it works with Shopify!' (Reel)",
+        "'Price Breakdown: Why it's worth it.' (Carousel)",
+        "'Installation Guide in 30s' (Short)",
+      ]);
       setIsGenerating(false);
     }, 1500);
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-white relative">
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 pb-2">
-        <div className="flex gap-3 items-center">
-          <div className="bg-pink-50 p-2.5 rounded-xl text-pink-600">
-            <FaFire size={18} />
-          </div>
-          <div>
-            <div className="relative group cursor-help">
-              <h4 className="font-bold text-lg text-gray-900 leading-tight inline-block">
-                Sentiment Map
-              </h4>
-              {/* Tooltip */}
-              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                <div className="font-bold mb-1 text-pink-300">
-                  Why this matters:
-                </div>
-                Decodes the "Vibe" of the audience. Moving beyond
-                positive/negative to understand Intent (Buying vs. Browsing).
-                <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Crowd Intelligence
+          </h4>
+          <div className="relative group cursor-help inline-block">
+            <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+              Sentiment Map
+            </h2>
+            {/* Tooltip */}
+            <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-[#000100] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+              <div className="font-bold mb-1 text-[#caee55]">
+                Why this matters:
               </div>
+              Decodes the "Vibe" of the audience. Moving beyond
+              positive/negative to understand Intent (Buying vs. Browsing).
+              <div className="absolute left-4 -top-1 w-2 h-2 bg-[#000100] transform rotate-45"></div>
             </div>
-            <p className="text-xs text-gray-500 font-medium">
-              Audience Vibe Decoder
-            </p>
           </div>
+          <p className="text-xs font-medium text-slate-500">
+            Audience Vibe Decoder
+          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setFilterMode(!filterMode)}
-            className={`p-2 rounded-lg transition-colors border ${
-              filterMode
-                ? "bg-amber-50 text-amber-600 border-amber-200"
-                : "bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100"
-            }`}
-            title="Skeptic Filter: See only objections"
-          >
-            <FaFilter size={14} />
-          </button>
-          <div className="text-right">
-            <div className="text-2xl font-bold text-gray-900 leading-none">
+
+        <div className="flex gap-3 items-start">
+          <div className="text-right mt-1 mr-2">
+            <div className="text-2xl font-bold text-[#000100] leading-none">
               {data.vibeScore}
             </div>
-            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               Vibe Score
             </div>
           </div>
+          {/* Top Right Icon Badge */}
+          <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0 flex items-center justify-center">
+            <FaFire size={18} />
+          </div>
         </div>
       </div>
-
-      <div className="p-6 pt-2 flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col gap-6 flex-1 overflow-y-auto custom-scroll">
         {/* Top Section: Donut + Legend */}
         <div className="flex flex-col md:flex-row gap-6 items-center">
           {/* Donut Chart */}
@@ -210,7 +204,7 @@ export default function SentimentMap({
                     if (active && payload && payload.length) {
                       const data = payload[0].payload as VibeData;
                       return (
-                        <div className="bg-gray-900 text-white text-xs p-2 rounded-lg shadow-xl">
+                        <div className="bg-[#000100] text-white text-xs p-2 rounded-lg shadow-xl">
                           <span className="font-bold">{data.type}</span>:{" "}
                           {data.percentage}%
                         </div>
@@ -223,10 +217,10 @@ export default function SentimentMap({
             </ResponsiveContainer>
             {/* Center Label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-2xl font-bold text-gray-900">
+              <span className="text-2xl font-bold text-[#000100]">
                 {data.totalComments}
               </span>
-              <span className="text-[10px] text-gray-400 uppercase font-bold">
+              <span className="text-[10px] text-slate-400 uppercase font-bold">
                 Comments
               </span>
             </div>
@@ -237,27 +231,36 @@ export default function SentimentMap({
             {safeVibes.map((v) => (
               <motion.div
                 key={v.type}
-                className={`p-2 rounded-xl border border-gray-100 bg-gray-50/50 cursor-pointer transition-all ${
+                className={`p-2 rounded-xl border transition-all ${
                   activeVibe === v.type ? "ring-2 ring-offset-1" : ""
                 }`}
                 style={{
-                  borderColor: activeVibe === v.type ? v.color : "transparent",
-                  backgroundColor: activeVibe === v.type ? `${v.color}10` : "",
+                  borderColor: activeVibe === v.type ? "#074ed5" : "#f1f5f9",
+                  backgroundColor:
+                    activeVibe === v.type
+                      ? "rgba(7, 78, 213, 0.05)"
+                      : "#f4f8fb",
                 }}
                 onMouseEnter={() => setActiveVibe(v.type)}
                 onMouseLeave={() => setActiveVibe(null)}
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <span style={{ color: v.color }}>{v.icon}</span>
-                  <span className="text-xs font-bold text-gray-700">
+                  <span
+                    style={{
+                      color: v.color === "#f4f8fb" ? "#94a3b8" : v.color,
+                    }}
+                  >
+                    {v.icon}
+                  </span>
+                  <span className="text-xs font-bold text-[#000100]">
                     {v.type}
                   </span>
                 </div>
                 <div className="flex items-end justify-between">
-                  <span className="text-sm font-bold text-gray-900">
+                  <span className="text-sm font-bold text-[#000100]">
                     {v.percentage}%
                   </span>
-                  <span className="text-[10px] text-gray-400">{v.count}</span>
+                  <span className="text-[10px] text-slate-400">{v.count}</span>
                 </div>
               </motion.div>
             ))}
@@ -267,32 +270,51 @@ export default function SentimentMap({
         {/* Intent Hotspot & Sparkline */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* Intent Hotspot (Seekers focus) */}
-          <div className="p-3 bg-blue-50/50 border border-blue-100 rounded-xl relative overflow-hidden group">
-            <div className="flex justify-between items-start mb-1">
-              <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1">
-                <FaQuestionCircle /> Intent Hotspot
-              </span>
-              <span className="text-[10px] text-blue-300 font-mono">
-                {seekers?.percentage}% Vol
-              </span>
+          <div className="p-4 bg-[#f4f8fb] border border-slate-100 rounded-2xl relative overflow-hidden group flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-start mb-1">
+                <span className="text-[10px] font-bold text-[#074ed5] uppercase tracking-wider flex items-center gap-1">
+                  <FaQuestionCircle /> Intent Hotspot
+                </span>
+                <span className="text-[10px] text-[#074ed5] font-mono font-bold">
+                  {seekers?.percentage}% Vol
+                </span>
+              </div>
+              <div className="text-slate-500 font-medium text-sm leading-snug mb-3 pr-2">
+                "Most Seekers are asking about{" "}
+                <span className="font-bold text-[#000100] underline decoration-[#caee55] decoration-2">
+                  {topSeekerQuestion}
+                </span>
+                "
+              </div>
             </div>
-            <div className="text-blue-900 font-medium text-sm leading-snug mb-3 pr-2">
-              "Most Seekers are asking about{" "}
-              <span className="font-bold underline decoration-blue-300 decoration-2">
-                {topSeekerQuestion}
-              </span>
-              "
-            </div>
+
+            {contentIdeas.length > 0 && (
+              <div className="mb-3 text-xs text-[#000100] bg-white p-2 rounded-xl border border-slate-200">
+                <div className="font-bold text-[#074ed5] mb-1 text-[10px] uppercase">
+                  Generated ideas:
+                </div>
+                <ul className="list-disc pl-4 space-y-1">
+                  {contentIdeas.map((idea, idx) => (
+                    <li key={idx}>{idea}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Convert Button */}
             <button
               onClick={handleGenerateContent}
-              disabled={isGenerating}
-              className="w-full py-1.5 px-3 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm shadow-blue-200"
+              disabled={isGenerating || contentIdeas.length > 0}
+              className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(7,78,213,0.39)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-auto"
             >
               {isGenerating ? (
                 <>
                   <FaRobot className="animate-spin" /> Analyzing...
+                </>
+              ) : contentIdeas.length > 0 ? (
+                <>
+                  <FaRobot /> Strategy Generated
                 </>
               ) : (
                 <>
@@ -302,34 +324,49 @@ export default function SentimentMap({
             </button>
           </div>
 
-          {/* Sentiment Sparkline */}
-          <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                Vibe Trend (Last 5)
-              </span>
-              {/* Mini Indicator */}
-              <span className="text-green-500 text-xs font-bold flex items-center gap-0.5">
-                <FaArrowRight className="-rotate-45" size={10} /> +12%
-              </span>
+          {/* Sentiment Sparkline & Skeptic Filter */}
+          <div className="flex flex-col gap-3">
+            <div className="p-4 bg-[#f4f8fb] border border-slate-100 rounded-2xl flex flex-col justify-between flex-1">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Vibe Trend (Last 5)
+                </span>
+                {/* Mini Indicator */}
+                <span className="text-[#000100] bg-[#caee55]/30 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-0.5">
+                  <FaArrowRight className="-rotate-45" size={10} /> +12%
+                </span>
+              </div>
+              <div className="h-[50px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data.sentimentTrend}>
+                    <Line
+                      type="monotone"
+                      dataKey="score"
+                      stroke="#074ed5"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={true}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="text-[10px] text-slate-400 text-center mt-2 font-medium">
+                Critics are shrinking. Quality content is working.
+              </div>
             </div>
-            <div className="h-[40px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data.sentimentTrend}>
-                  <Line
-                    type="monotone"
-                    dataKey="score"
-                    stroke="#8b5cf6"
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={true}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="text-[10px] text-gray-400 text-center mt-1">
-              Critics are shrinking 📉
-            </div>
+
+            {/* Better Filter Button Design */}
+            <button
+              onClick={() => setFilterMode(!filterMode)}
+              className={`p-3 rounded-2xl text-xs font-bold transition-all border w-full flex items-center justify-center gap-2 ${
+                filterMode
+                  ? "bg-[#074ed5]/10 text-[#074ed5] border-[#074ed5]/30"
+                  : "bg-white text-slate-500 border-slate-200 hover:bg-[#f4f8fb]"
+              }`}
+            >
+              <FaFilter size={12} />
+              {filterMode ? "Disable Skeptic Filter" : "Enable Skeptic Filter"}
+            </button>
           </div>
         </div>
 
@@ -340,20 +377,20 @@ export default function SentimentMap({
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="bg-amber-50 rounded-xl p-3 border border-amber-100 overflow-hidden"
+              className="bg-[#f4f8fb] rounded-2xl p-4 border border-slate-100 overflow-hidden"
             >
-              <div className="flex items-center gap-2 mb-2 text-amber-700">
-                <FaFilter size={12} />
-                <span className="text-xs font-bold">
+              <div className="flex items-center gap-2 mb-3 text-[#074ed5]">
+                <FaFilter size={14} />
+                <span className="text-xs font-bold uppercase tracking-wider">
                   Skeptic Content Filter Active
                 </span>
               </div>
               <ul className="space-y-2">
-                <li className="text-xs bg-white p-2 rounded border border-amber-100 text-gray-600 italic">
+                <li className="text-sm bg-white p-3 rounded-xl border border-slate-100 text-slate-500 font-medium italic">
                   "I saw a review saying the battery life is terrible. Is that
                   fixed?"
                 </li>
-                <li className="text-xs bg-white p-2 rounded border border-amber-100 text-gray-600 italic">
+                <li className="text-sm bg-white p-3 rounded-xl border border-slate-100 text-slate-500 font-medium italic">
                   "Seems expensive for just a PDF wrapper..."
                 </li>
               </ul>

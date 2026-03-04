@@ -7,153 +7,132 @@ interface PulseScoreProps {
   data: RawAnalysisData;
 }
 
-interface BreakdownBar {
-  label: string;
-  value: number; // 0-100
-  color: string;
-}
-
 export default function PulseScore({ data }: PulseScoreProps) {
-  // 1. Calculate weighted score (0-100)
-  const profileHealth = data.profile?.profileScore || 50;
-  const contentFitness = data.csiScore || 50;
-  const engagementPower = data.contentMetrics?.engagementScore || 50;
+  const profileHealth = data.profile?.profileScore ?? 58;
+  const contentFitness = data.csiScore ?? 65;
+  const engagementPower = data.contentMetrics?.engagementScore ?? 35;
 
-  // Weights: Profile 20%, Fitness 40%, Engagement 40%
   const totalScore = Math.round(
     profileHealth * 0.2 + contentFitness * 0.4 + engagementPower * 0.4,
   );
 
-  // 2. Determine Grade
-  const getGrade = (s: number) => {
-    if (s >= 95) return { grade: "S", color: "#F59E0B" }; // Gold
-    if (s >= 85) return { grade: "A", color: "#10B981" }; // Green
-    if (s >= 70) return { grade: "B", color: "#06B6D4" }; // Cyan
-    if (s >= 55) return { grade: "C", color: "#EAB308" }; // Yellow
-    if (s >= 40) return { grade: "D", color: "#F97316" }; // Orange
-    return { grade: "F", color: "#EF4444" }; // Red
-  };
-
-  const { grade, color } = getGrade(totalScore);
-
-  // 3. Breakdown Bars
-  const breakdown: BreakdownBar[] = [
-    { label: "Profile Health", value: profileHealth, color: "#8B5CF6" }, // Violet
-    { label: "Content Fitness", value: contentFitness, color: "#EC4899" }, // Pink
-    { label: "Engagement Power", value: engagementPower, color: "#10B981" }, // Emerald
-  ];
-
-  // Animation State
-  const [animatedScore, setAnimatedScore] = useState(0);
+  const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setAnimatedScore(totalScore), 300);
+    const timer = setTimeout(() => setAnimated(true), 400);
     return () => clearTimeout(timer);
-  }, [totalScore]);
+  }, []);
 
-  // SVG Calculation
-  const radius = 80;
-  const stroke = 12;
-  const normalizedRadius = radius - stroke * 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset =
-    circumference - (animatedScore / 100) * circumference;
+  const getGrade = (s: number) => {
+    if (s >= 90) return { label: "S", color: "#B6FF33" }; // lime — top tier
+    if (s >= 80) return { label: "A", color: "#0052FF" }; // blue — strong
+    if (s >= 65) return { label: "B", color: "#0052FF" }; // blue — good
+    if (s >= 50) return { label: "C", color: "#1A1D23" }; // dark — average
+    if (s >= 35) return { label: "D", color: "#EF4444" }; // red — weak
+    return { label: "F", color: "#EF4444" }; // red — fail
+  };
+
+  const { label: gradeLabel, color: gradeColor } = getGrade(totalScore);
+
+  const segments = [
+    {
+      label: "Profile Health",
+      short: "Health",
+      value: profileHealth,
+      color: "#0052FF",
+      bg: "bg-[#0052FF]",
+    },
+    {
+      label: "Content",
+      short: "Content",
+      value: contentFitness,
+      color: "#B6FF33",
+      bg: "bg-[#B6FF33]",
+    },
+    {
+      label: "Engagement",
+      short: "Engage",
+      value: engagementPower,
+      color: "#1A1D23",
+      bg: "bg-[#1A1D23]",
+    },
+  ];
+
+  const totalBarWeight = profileHealth + contentFitness + engagementPower || 1;
 
   return (
-    <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-6 relative overflow-hidden group hover:shadow-md transition-all duration-300">
-      {/* Background Glow */}
-      <div
-        className="absolute top-0 right-0 w-[200px] h-[200px] bg-gradient-to-br from-transparent to-slate-50 rounded-full blur-3xl opacity-50 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at center, ${color}15, transparent 70%)`,
-        }}
-      />
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 flex flex-col">
+      {/* Top Row: Label + Grade Badge */}
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Pulse Score
+          </p>
+          <h3 className="text-xl font-black text-[#1A1D23]">Overall Grade</h3>
+        </div>
 
-      <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
-        {/* Radial Gauge */}
-        <div className="relative w-[180px] h-[180px] flex items-center justify-center shrink-0">
-          <svg
-            height={radius * 2}
-            width={radius * 2}
-            className="transform -rotate-90"
+        {/* Grade Badge — matches blue icon badge in reference */}
+        <div
+          className="flex flex-col items-center justify-center w-12 h-12 rounded-2xl shrink-0"
+          style={{
+            background: `${gradeColor}18`,
+            border: `1.5px solid ${gradeColor}40`,
+          }}
+        >
+          <span
+            className="text-xl font-black leading-none"
+            style={{ color: gradeColor }}
           >
-            {/* Track */}
-            <circle
-              stroke="#F1F5F9"
-              strokeWidth={stroke}
-              fill="transparent"
-              r={normalizedRadius}
-              cx={radius}
-              cy={radius}
-            />
-            {/* Progress */}
-            <circle
-              stroke={color}
-              strokeWidth={stroke}
-              strokeDasharray={circumference + " " + circumference}
-              style={{
-                strokeDashoffset,
-                transition: "stroke-dashoffset 1.5s ease-out",
-              }}
-              strokeLinecap="round"
-              fill="transparent"
-              r={normalizedRadius}
-              cx={radius}
-              cy={radius}
-            />
-          </svg>
+            {gradeLabel}
+          </span>
+          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
+            Grade
+          </span>
+        </div>
+      </div>
 
-          {/* Center Content */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span
-              className="text-5xl font-black tracking-tighter"
-              style={{ color }}
-            >
-              {grade}
-            </span>
-            <span className="text-sm font-medium text-slate-400 mt-1 uppercase tracking-wider">
-              Grade
-            </span>
-          </div>
+      {/* Big Score Number */}
+      <div className="flex items-baseline gap-1.5 mb-5">
+        <span className="text-4xl font-black text-[#1A1D23] tracking-tight leading-none">
+          {totalScore}
+        </span>
+        <span className="text-lg text-slate-400 font-medium">/100</span>
+      </div>
 
-          {/* Pulse Effect Ping */}
+      {/* Segment percentages above bar — like HR reference */}
+      <div className="flex items-end justify-between mb-1.5 px-0.5">
+        {segments.map((seg, i) => (
+          <span key={i} className="text-xs font-black text-[#1A1D23]">
+            {Math.round((seg.value / totalBarWeight) * 100)}%
+          </span>
+        ))}
+      </div>
+
+      {/* Stacked Bar */}
+      <div className="flex h-2.5 w-full rounded-full overflow-hidden gap-0.5 mb-5">
+        {segments.map((seg, i) => (
           <div
-            className="absolute inset-0 rounded-full animate-ping opacity-10 pointer-events-none"
-            style={{ backgroundColor: color }}
+            key={i}
+            className="h-full rounded-full transition-all duration-1000 ease-out"
+            style={{
+              width: animated ? `${(seg.value / totalBarWeight) * 100}%` : "0%",
+              backgroundColor: seg.color,
+              transitionDelay: `${i * 200}ms`,
+            }}
           />
-        </div>
+        ))}
+      </div>
 
-        {/* Breakdown Panel */}
-        <div className="flex-1 w-full flex flex-col gap-4">
-          <div className="flex items-baseline justify-between mb-1">
-            <h2 className="text-xl font-bold text-slate-800">Pulse Score</h2>
-            <span className="text-3xl font-bold text-slate-900">
-              {animatedScore}
-              <span className="text-lg text-slate-400 font-normal">/100</span>
+      {/* Legend */}
+      <div className="flex items-center gap-4 pt-4 border-t border-slate-100 flex-wrap">
+        {segments.map((seg, i) => (
+          <div key={i} className="flex items-center gap-1.5">
+            <span className={`w-2 h-2 rounded-full shrink-0 ${seg.bg}`} />
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              {seg.short}
             </span>
           </div>
-
-          <div className="space-y-4">
-            {breakdown.map((item, i) => (
-              <div key={i} className="flex flex-col gap-1">
-                <div className="flex justify-between text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  <span>{item.label}</span>
-                  <span>{item.value}%</span>
-                </div>
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-1000 ease-out"
-                    style={{
-                      width: `${animatedScore > 0 ? item.value : 0}%`,
-                      backgroundColor: item.color,
-                      transitionDelay: `${i * 150}ms`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

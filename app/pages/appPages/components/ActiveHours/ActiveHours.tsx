@@ -37,6 +37,7 @@ const MOCK_HOURS: ActiveHourData[] = Array.from({ length: 24 }, (_, i) => {
 export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
   const [hoveredHour, setHoveredHour] = useState<ActiveHourData | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isSynced, setIsSynced] = useState(false);
 
   // Identifying the "Strategic Delta"
   // Simple logic: Find max audience activity hour
@@ -54,9 +55,7 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
   const handleSync = () => {
     setIsSyncing(true);
     setTimeout(() => {
-      alert(
-        `📅 Schedule Synced! Added slots for ${formatHour(bestHour.hour)} (Golden Window)`,
-      );
+      setIsSynced(true);
       setIsSyncing(false);
     }, 1500);
   };
@@ -75,9 +74,9 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
     const x2 = CENTER + RADIUS * Math.cos(endAngle);
     const y2 = CENTER + RADIUS * Math.sin(endAngle);
 
-    // Heatmap Color scaling (Violet to Orange)
+    // Heatmap Color scaling (Blue to Light Blue)
     const intensity = d.audienceActivity / 100;
-    const color = `rgba(139, 92, 246, ${0.2 + intensity * 0.8})`; // Violet base with opacity
+    const color = `rgba(7, 78, 213, ${0.1 + intensity * 0.9})`; // Primary blue base with opacity
 
     return {
       path: `M ${CENTER} ${CENTER} L ${x1} ${y1} A ${RADIUS} ${RADIUS} 0 0 1 ${x2} ${y2} Z`,
@@ -87,47 +86,51 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
   });
 
   return (
-    <div className="flex flex-col h-full w-full bg-white relative">
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 pb-2">
-        <div className="flex gap-3 items-center">
-          <div className="bg-violet-50 p-2.5 rounded-xl text-violet-600">
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Timing Intel
+          </h4>
+          <div className="relative group cursor-help inline-block">
+            <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+              Active Hours
+            </h2>
+            {/* Tooltip */}
+            <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-[#000100] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+              <div className="font-bold mb-1 text-[#caee55]">
+                Why this matters:
+              </div>
+              Identifies the "Golden Window" when the audience is awake and
+              engaging. Comparing this to posting times reveals lost
+              opportunities.
+              <div className="absolute left-4 -top-1 w-2 h-2 bg-[#000100] transform rotate-45"></div>
+            </div>
+          </div>
+          <p className="text-xs font-medium text-slate-500">
+            Response Velocity Map
+          </p>
+        </div>
+
+        <div className="flex gap-3 items-start">
+          {/* Hijack Alert Badge */}
+          <div
+            className="flex items-center gap-2 mt-1 mr-2 bg-[#caee55]/20 text-[#000100] px-3 py-1.5 rounded-full border border-[#caee55]/30 cursor-pointer hover:bg-[#caee55]/30 transition-colors"
+            title="Crowd Hijack Opportunity!"
+          >
+            <FaBolt size={12} className="text-[#074ed5]" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">
+              Hijack: Now
+            </span>
+          </div>
+          {/* Top Right Icon Badge */}
+          <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0 flex items-center justify-center">
             <FaClock size={18} />
           </div>
-          <div>
-            <div className="relative group cursor-help">
-              <h4 className="font-bold text-lg text-gray-900 leading-tight inline-block">
-                Active Hours
-              </h4>
-              {/* Tooltip */}
-              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                <div className="font-bold mb-1 text-violet-300">
-                  Why this matters:
-                </div>
-                Identifies the "Golden Window" when the audience is awake and
-                engaging. Comparing this to posting times reveals lost
-                opportunities.
-                <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 font-medium">
-              Response Velocity Map
-            </p>
-          </div>
-        </div>
-        {/* Hijack Alert Badge */}
-        <div
-          className="flex items-center gap-2 bg-red-50 text-red-600 px-3 py-1 rounded-full border border-red-100 animate-pulse cursor-pointer hover:bg-red-100 transition-colors"
-          title="Crowd Hijack Opportunity!"
-        >
-          <FaBolt size={12} />
-          <span className="text-[10px] font-bold uppercase tracking-wider">
-            Hijack: Now
-          </span>
         </div>
       </div>
-
-      <div className="p-6 pt-2 flex flex-col md:flex-row gap-6 h-full items-center justify-center">
+      <div className="flex flex-col md:flex-row gap-6 h-full items-center justify-center flex-1 overflow-y-auto custom-scroll">
         {/* 1. Clock Map */}
         <div className="relative w-[300px] h-[300px] flex-shrink-0">
           <svg
@@ -136,8 +139,7 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
           >
             {" "}
             {/* Rotate so 0 is at top? No, we calculated -90 in angles */}
-            {/* Background Circle */}
-            <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="#F3F4F6" />
+            <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="#f4f8fb" />
             {/* Heatmap Slices */}
             {pieSlices.map((slice, i) => (
               <path
@@ -162,8 +164,8 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
                   key={`post-${i}`}
                   cx={x}
                   cy={y}
-                  r={4}
-                  fill="#111827" // Gray-900
+                  r={5}
+                  fill="#000100" // Dark border indicator
                   stroke="white"
                   strokeWidth={2}
                 />
@@ -179,12 +181,12 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
               <div className="w-full h-full rounded-full bg-white shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center transform rotate-90">
                 {" "}
                 {/* Counter-rotate text */}
-                <div className="text-[10px] font-bold text-gray-400 uppercase">
+                <div className="text-[10px] font-bold text-slate-400 uppercase">
                   Golden
                   <br />
                   Window
                 </div>
-                <div className="text-xl font-bold text-violet-600 leading-none mt-1">
+                <div className="text-xl font-bold text-[#074ed5] leading-none mt-1">
                   {formatHour(bestHour.hour)}
                 </div>
               </div>
@@ -194,7 +196,7 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
           {/* Hover Tooltip Overlay */}
           {hoveredHour && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 w-full text-center mt-[160px]">
-              <div className="inline-block bg-gray-900 text-white text-xs py-1 px-3 rounded-full shadow-lg">
+              <div className="inline-block bg-[#000100] text-white text-xs py-1.5 px-3 rounded-xl shadow-lg font-bold">
                 {formatHour(hoveredHour.hour)}: {hoveredHour.audienceActivity}%
                 Activity
               </div>
@@ -205,53 +207,72 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
         {/* 2. Strategy Panel */}
         <div className="flex-1 w-full flex flex-col justify-center gap-4">
           {/* Insight Card */}
-          <div className="p-4 bg-violet-50/50 border border-violet-100 rounded-2xl">
+          <div className="p-4 bg-[#f4f8fb] border border-slate-100 rounded-2xl">
             <div className="flex justify-between items-start mb-2">
-              <span className="text-[10px] font-bold text-violet-400 uppercase tracking-wider flex items-center gap-1">
-                <FaBolt /> Strategy: Midnight Debate
+              <span className="text-[10px] font-bold text-[#074ed5] uppercase tracking-wider flex items-center gap-1.5">
+                <FaBolt size={10} className="text-[#074ed5]" /> Strategy:
+                Midnight Debate
               </span>
             </div>
-            <div className="text-gray-900 text-sm font-medium leading-relaxed">
-              "The creator posts at <span className="font-bold">9 AM</span>, but
-              the Crowd is most active at{" "}
-              <span className="font-bold">{formatHour(bestHour.hour)}</span>.
-              This implies an 'After-Hours' audience who loves to debate at
+            <div className="text-slate-500 text-sm font-medium leading-relaxed">
+              "The creator posts at{" "}
+              <span className="font-bold text-[#000100]">9 AM</span>, but the
+              Crowd is most active at{" "}
+              <span className="font-bold text-[#000100]">
+                {formatHour(bestHour.hour)}
+              </span>
+              . This implies an 'After-Hours' audience who loves to debate at
               night."
             </div>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-              <div className="text-[10px] text-gray-400 uppercase font-bold">
+          <div className="grid grid-cols-2 gap-3 pb-2">
+            <div className="p-3 bg-[#f4f8fb] rounded-xl border border-slate-100">
+              <div className="text-[10px] text-slate-400 uppercase font-bold mb-1">
                 Response Velocity
               </div>
-              <div className="text-lg font-bold text-gray-900">High ⚡</div>
+              <div className="text-lg font-bold text-[#000100]">High ⚡</div>
             </div>
-            <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-              <div className="text-[10px] text-gray-400 uppercase font-bold">
+            <div className="p-3 bg-[#f4f8fb] rounded-xl border border-slate-100">
+              <div className="text-[10px] text-slate-400 uppercase font-bold mb-1">
                 Engagement Lag
               </div>
-              <div className="text-lg font-bold text-gray-900">~8 Hours</div>
+              <div className="text-lg font-bold text-[#000100]">~8 Hours</div>
             </div>
           </div>
 
           {/* Action Button */}
-          <button
-            onClick={handleSync}
-            disabled={isSyncing}
-            className="w-full py-2 px-4 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl shadow-lg shadow-gray-200 transition-all flex items-center justify-center gap-2 active:scale-95"
-          >
-            {isSyncing ? (
-              <>
-                <FaSync className="animate-spin" /> Syncing Queue...
-              </>
-            ) : (
-              <>
-                <FaSync /> Sync to My Schedule
-              </>
+          <div className="mt-auto flex flex-col gap-2">
+            <button
+              onClick={handleSync}
+              disabled={isSyncing || isSynced}
+              className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(7,78,213,0.39)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSyncing ? (
+                <>
+                  <FaSync className="animate-spin" /> Syncing Queue...
+                </>
+              ) : isSynced ? (
+                <>
+                  <FaSync /> Schedule Synced ✅
+                </>
+              ) : (
+                <>
+                  <FaSync /> Sync to My Schedule
+                </>
+              )}
+            </button>
+            {isSynced && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center text-xs font-bold text-[#000100] bg-[#caee55]/40 py-2 rounded-xl"
+              >
+                Added slots for {formatHour(bestHour.hour)} (Golden Window)
+              </motion.div>
             )}
-          </button>
+          </div>
         </div>
       </div>
     </div>

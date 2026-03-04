@@ -16,7 +16,7 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-6 h-[200px] flex items-center justify-center text-slate-400">
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-[200px] flex items-center justify-center text-slate-400">
         No Activity Data
       </div>
     );
@@ -42,37 +42,33 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
   const trend = data[data.length - 1].trend;
   const trendColor =
     trend === "Rising"
-      ? "#10B981"
+      ? "#0052FF"
       : trend === "Dropping"
         ? "#EF4444"
-        : "#F59E0B";
+        : "#1A1D23";
 
   return (
-    <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-6 relative overflow-hidden">
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 relative overflow-hidden">
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">
+          <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
             Activity Heartbeat
           </h3>
           <div className="flex items-center gap-2">
-            <span className="flex h-3 w-3 relative">
-              <span
-                className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                style={{ backgroundColor: trendColor }}
-              ></span>
-              <span
-                className="relative inline-flex rounded-full h-3 w-3"
-                style={{ backgroundColor: trendColor }}
-              ></span>
+            <span
+              className="rounded-full h-2.5 w-2.5"
+              style={{ backgroundColor: trendColor }}
+            ></span>
+            <span className="text-base font-black text-[#1A1D23]">
+              {trend} Activity
             </span>
-            <span className="font-bold text-slate-700">{trend} Activity</span>
           </div>
         </div>
         <div className="text-right">
-          <span className="text-2xl font-bold text-slate-800">
+          <span className="text-4xl font-black text-[#1A1D23] tracking-tight">
             {data.reduce((acc, curr) => acc + curr.postsCount, 0)}
           </span>
-          <span className="text-xs text-slate-400 block font-medium uppercase">
+          <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-widest mt-1">
             Posts this week
           </span>
         </div>
@@ -88,7 +84,7 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
           {/* Gradient Definition */}
           <defs>
             <linearGradient id="line-gradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={trendColor} stopOpacity="0.5" />
+              <stop offset="0%" stopColor={trendColor} stopOpacity="0.15" />
               <stop offset="100%" stopColor={trendColor} stopOpacity="0" />
             </linearGradient>
           </defs>
@@ -97,7 +93,6 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
           <path
             d={`${pathD} L ${width - padding},${height} L ${padding},${height} Z`}
             fill="url(#line-gradient)"
-            opacity="0.2"
           />
 
           {/* The Line */}
@@ -105,7 +100,7 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
             d={pathD}
             fill="none"
             stroke={trendColor}
-            strokeWidth="4"
+            strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
             className={mounted ? "animate-draw" : ""}
@@ -142,7 +137,7 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
                   height="40"
                   className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
                 >
-                  <div className="bg-slate-800 text-white text-[10px] rounded px-2 py-1 text-center shadow-lg">
+                  <div className="bg-[#1A1D23] text-white text-xs px-2.5 py-1.5 rounded-xl text-center shadow-xl w-max mx-auto">
                     {d.day}: {d.postsCount} posts
                   </div>
                 </foreignObject>
@@ -155,7 +150,10 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
       {/* X-Axis Labels */}
       <div className="flex justify-between mt-2 px-2">
         {data.map((d, i) => (
-          <span key={i} className="text-xs font-medium text-slate-400">
+          <span
+            key={i}
+            className="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+          >
             {d.day}
           </span>
         ))}

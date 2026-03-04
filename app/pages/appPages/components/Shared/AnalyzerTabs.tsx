@@ -28,9 +28,8 @@ const AnalyzerTabs: React.FC<AnalyzerTabsProps> = ({
   return (
     <div
       className={`
-        relative flex w-fit max-w-full items-center p-1 gap-2
-        bg-gray-100/80 backdrop-blur-lg rounded-full 
-        overflow-x-auto no-scrollbar ${className}
+        relative flex w-fit max-w-full items-center gap-3
+        overflow-x-auto no-scrollbar py-2 ${className}
       `}
     >
       {tabs.map((tab) => {
@@ -40,10 +39,10 @@ const AnalyzerTabs: React.FC<AnalyzerTabsProps> = ({
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={`
-              relative flex items-center gap-2 px-4 py-1.5 
-              rounded-full text-xs font-semibold tracking-wide
-              transition-all duration-200 ease-out z-10 whitespace-nowrap border-none outline-none ring-0
-              ${isActive ? "text-white" : "text-slate-500 hover:text-slate-800"}
+              relative flex items-center gap-2 px-5 py-2.5 
+              rounded-full text-[13px] font-bold tracking-wide
+              transition-all duration-200 ease-out z-10 whitespace-nowrap border-none outline-none overflow-hidden
+              ${isActive ? "text-white shadow-sm shadow-[#074ed5]/30" : "text-slate-500 hover:text-slate-800 bg-[#f4f8fb] hover:bg-slate-200"}
             `}
             style={{ WebkitTapHighlightColor: "transparent" }}
           >
@@ -51,9 +50,9 @@ const AnalyzerTabs: React.FC<AnalyzerTabsProps> = ({
             {isActive && (
               <motion.div
                 layoutId="activeTabPill"
-                className="absolute inset-0 bg-indigo-600 rounded-full"
+                className="absolute inset-0 bg-[#074ed5] rounded-full"
                 initial={false}
-                transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                transition={{ type: "spring", stiffness: 450, damping: 30 }}
                 style={{ zIndex: -1 }}
               />
             )}
@@ -61,7 +60,7 @@ const AnalyzerTabs: React.FC<AnalyzerTabsProps> = ({
             {/* Icon - Styled to be smaller and subtle */}
             {tab.icon && (
               <span
-                className={`transition-transform duration-200 ${isActive ? "scale-110" : "opacity-70"}`}
+                className={`transition-transform duration-200 flex items-center justify-center ${isActive ? "scale-110" : ""}`}
               >
                 {React.cloneElement(
                   tab.icon as React.ReactElement<{

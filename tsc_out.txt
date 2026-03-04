@@ -1,1 +1,0 @@
-﻿app/api/scan/linkedin/route.ts(123,1): error TS1472: 'catch' or 'finally' expected.

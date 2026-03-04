@@ -14,6 +14,7 @@ import {
 import { FaBullseye, FaLightbulb, FaRocket, FaGem } from "react-icons/fa";
 import { BsGraphUpArrow } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
+import { IoMdClose } from "react-icons/io";
 
 // --- Types ---
 export interface GapMetric {
@@ -80,87 +81,87 @@ const CompetitorGap: React.FC<CompetitorGapProps> = ({ data }) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-white relative overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 pb-4">
-        <div className="flex gap-3 items-center">
-          <div className="bg-teal-50 p-2.5 rounded-xl text-teal-600">
-            <FaBullseye size={18} />
-          </div>
-          <div>
-            <div className="relative group cursor-help">
-              <h4 className="font-bold text-lg text-gray-900 leading-tight inline-block">
-                Content Gap Discovery
-              </h4>
-              {/* Tooltip */}
-              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                <div className="font-bold mb-1 text-teal-300">
-                  Why this matters:
-                </div>
-                Highlights content formats your competitors are missing (e.g.,
-                Carousels). These are your opportunities to steal market share.
-                <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 font-medium">
-              Market Arbitrage & Benchmarking
-            </p>
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
+      {/* Header Row */}
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Market Arbitrage
+          </h4>
+          <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+            Competitor Gap Discovery
+          </h2>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#caee55]/20 text-[#000100] border border-[#caee55]/30 rounded-full mt-2 inline-flex w-fit">
+            <FaGem className="text-[#074ed5]" size={10} />
+            <span className="text-[10px] uppercase font-bold tracking-wider">
+              Opportunity: {safeData.topOpportunity}
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full">
-          <FaGem />
-          <span className="text-[10px] uppercase font-bold tracking-wider">
-            Gold Mine: {safeData.topOpportunity}
-          </span>
+
+        {/* Top Right Icon Badge */}
+        <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0">
+          <FaBullseye size={18} />
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row flex-1 p-6 pt-0 gap-6">
+      <div className="flex flex-col lg:flex-row flex-1 gap-6">
         {/* Chart Area */}
-        <div className="flex-1 min-h-[200px] relative">
+        <div className="flex-1 min-h-[220px] relative">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={safeData.metrics}
               layout="vertical"
-              margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+              margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
                 horizontal={false}
-                stroke="#f3f4f6"
+                stroke="#f4f8fb"
               />
               <XAxis type="number" hide />
               <YAxis
                 dataKey="category"
                 type="category"
-                tick={{ fontSize: 11, fontWeight: 600, fill: "#4b5563" }}
-                width={80}
+                tick={{ fontSize: 10, fontWeight: 600, fill: "#64748b" }}
+                width={90}
                 axisLine={false}
                 tickLine={false}
               />
               <Tooltip
                 cursor={{ fill: "transparent" }}
                 contentStyle={{
+                  backgroundColor: "#000100",
+                  color: "white",
                   borderRadius: "12px",
                   border: "none",
-                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  padding: "6px 10px",
                 }}
+                itemStyle={{ color: "white" }}
               />
               <Legend
                 iconType="circle"
-                wrapperStyle={{ fontSize: "10px", paddingTop: "10px" }}
+                wrapperStyle={{
+                  fontSize: "10px",
+                  fontWeight: "bold",
+                  color: "#64748b",
+                  paddingTop: "10px",
+                }}
               />
               <Bar
                 dataKey="profileValue"
                 name="Competitor"
-                fill="#9ca3af"
+                fill="#000100" // Dark standard for competitor
                 radius={[0, 4, 4, 0]}
                 barSize={12}
               />
               <Bar
                 dataKey="benchmarkValue"
                 name="Industry Avg"
-                fill="#14b8a6"
+                fill="#074ed5" // Blue standard for average
                 radius={[0, 4, 4, 0]}
                 barSize={12}
               />
@@ -169,17 +170,15 @@ const CompetitorGap: React.FC<CompetitorGapProps> = ({ data }) => {
         </div>
 
         {/* Insight & Action */}
-        <div className="w-full lg:w-[40%] flex flex-col gap-4">
-          {/* Strategic Brief */}
-          <div className="bg-teal-50/50 rounded-xl p-4 border border-teal-100/50">
-            <div className="flex items-center gap-2 mb-2">
-              <BsGraphUpArrow className="text-teal-600 text-xs" />
-              <h5 className="text-[10px] font-bold text-teal-800 uppercase tracking-wider">
-                The Attack Plan
-              </h5>
-            </div>
-            <p className="text-sm text-gray-700 font-medium leading-relaxed">
-              "{safeData.insight}"
+        <div className="w-full lg:w-[40%] flex flex-col justify-between gap-5">
+          {/* Strategic Brief Insight Box */}
+          <div className="bg-[#f4f8fb] rounded-2xl border border-slate-100 p-4">
+            <h4 className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest mb-1 flex items-center gap-1.5">
+              <BsGraphUpArrow className="text-[#074ed5] shrink-0" size={10} />{" "}
+              The Attack Plan
+            </h4>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+              {safeData.insight}
             </p>
           </div>
 
@@ -189,7 +188,7 @@ const CompetitorGap: React.FC<CompetitorGapProps> = ({ data }) => {
                 setShowPlanModal(true);
                 handleGeneratePlan();
               }}
-              className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98]"
+              className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)] active:scale-[0.98]"
             >
               <FaRocket />
               Fill this Gap
@@ -205,54 +204,52 @@ const CompetitorGap: React.FC<CompetitorGapProps> = ({ data }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col p-6"
+            className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col p-6 rounded-3xl"
           >
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <div className="bg-teal-100 p-2 rounded-lg text-teal-700">
-                  <FaLightbulb />
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-[#caee55] text-[#000100] rounded-2xl">
+                  <FaLightbulb size={18} />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-xl font-black text-[#000100]">
                   Gap Content Opportunities
                 </h3>
               </div>
               <button
                 onClick={() => setShowPlanModal(false)}
-                className="text-xs font-bold text-gray-500 hover:text-gray-900 underline"
+                className="p-2 hover:bg-[#f4f8fb] rounded-full transition-colors"
               >
-                Close
+                <IoMdClose size={24} className="text-slate-400" />
               </button>
             </div>
 
             {isGenerating ? (
-              <div className="flex-1 flex flex-col items-center justify-center gap-3">
-                <FaRocket className="text-teal-500 text-3xl animate-bounce" />
-                <p className="font-bold text-gray-600">
+              <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                <FaRocket className="text-[#074ed5] text-4xl animate-bounce" />
+                <p className="font-bold text-slate-500 uppercase tracking-widest text-xs">
                   Analyzing Market Void...
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-3 overflow-y-auto custom-scroll pr-1 pb-4">
+              <div className="flex flex-col gap-3 overflow-y-auto custom-scroll pr-1 pb-4 flex-1">
                 {safeData.recommendations.map((idea, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+                    className="p-4 bg-[#f4f8fb] border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer group flex items-start gap-4"
                   >
-                    <div className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-500 group-hover:bg-teal-500 group-hover:text-white transition-colors">
-                        {i + 1}
-                      </span>
-                      <p className="text-sm font-medium text-gray-800 leading-snug">
-                        {idea}
-                      </p>
-                    </div>
+                    <span className="flex-shrink-0 w-8 h-8 bg-[#f4f8fb] rounded-xl flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-[#074ed5] group-hover:text-white transition-colors">
+                      {i + 1}
+                    </span>
+                    <p className="text-sm font-medium text-[#000100] leading-relaxed pt-1">
+                      {idea}
+                    </p>
                   </motion.div>
                 ))}
 
-                <button className="mt-4 w-full py-2.5 border-2 border-dashed border-gray-200 text-gray-400 font-bold text-xs rounded-xl hover:bg-gray-50 transition-colors">
+                <button className="mt-4 w-full py-4 border-2 border-dashed border-slate-200 text-slate-400 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-[#f4f8fb] hover:text-[#074ed5] hover:border-[#074ed5]/30 transition-colors">
                   + Generate More Ideas
                 </button>
               </div>

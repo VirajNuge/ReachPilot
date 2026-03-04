@@ -191,6 +191,7 @@ export default function QuestionCloud({
     null,
   );
   const [isGenerating, setIsGenerating] = useState(false);
+  const [draftedFAQ, setDraftedFAQ] = useState<string | null>(null);
 
   // Helper to determine size based on count/engagement
   const getSize = (node: KeywordNode) => {
@@ -199,28 +200,32 @@ export default function QuestionCloud({
     return Math.min(baseSize + sizeMultiplier, 32); // Cap at 32px
   };
 
-  // Helper for color based on intent
   const getColor = (intent: IntentType) => {
     switch (intent) {
       case "Urgency":
-        return "#ef4444"; // Red
+        return "#000100"; // Dark Text
       case "Buying":
-        return "#10b981"; // Green
+        return "#074ed5"; // Primary Blue
       case "Educational":
-        return "#3b82f6"; // Blue
+        return "#caee55"; // Lime
       default:
-        return "#6b7280";
+        return "#94a3b8"; // Slate
     }
   };
 
   const handleGenerateFAQ = () => {
     setIsGenerating(true);
     setTimeout(() => {
-      alert(
-        "📝 FAQ Generated!\n\nQ: Is there a lifetime deal?\nA: Yes, limited time only.\n\nQ: Does it support Next.js?\nA: Full App Router support.",
+      setDraftedFAQ(
+        "A: Yes! We fully support the App Router in Next.js 14, along with Server Actions for optimized data fetching.",
       );
       setIsGenerating(false);
     }, 1500);
+  };
+
+  const handleClosePanel = () => {
+    setSelectedKeyword(null);
+    setDraftedFAQ(null);
   };
 
   // Fisher-Yates shuffle to randomize cloud layout visually
@@ -231,37 +236,38 @@ export default function QuestionCloud({
   const displayData = data;
 
   return (
-    <div className="flex flex-col h-full w-full bg-white relative">
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 pb-2">
-        <div className="flex gap-3 items-center">
-          <div className="bg-teal-50 p-2.5 rounded-xl text-teal-600">
-            <FaCloud size={18} />
-          </div>
-          <div>
-            <div className="relative group cursor-help">
-              <h4 className="font-bold text-lg text-gray-900 leading-tight inline-block">
-                Keyword Cloud
-              </h4>
-              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                <div className="font-bold mb-1 text-teal-300">
-                  Why this matters:
-                </div>
-                Visualizes the most common questions. Green = Buying Intent,
-                Blue = Learning, Red = Complaints.
-                <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Comment Intelligence
+          </h4>
+          <div className="relative group cursor-help inline-block">
+            <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+              Keyword Cloud
+            </h2>
+            <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-[#000100] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+              <div className="font-bold mb-1 text-[#caee55]">
+                Why this matters:
               </div>
+              Visualizes the most common questions. Blue = Buying Intent, Lime =
+              Learning, Dark = Complaints/Urgency.
+              <div className="absolute left-4 -top-1 w-2 h-2 bg-[#000100] transform rotate-45"></div>
             </div>
-            <p className="text-xs text-gray-500 font-medium">
-              Common Questions & Gaps
-            </p>
           </div>
+          <p className="text-xs font-medium text-slate-500">
+            Common Questions & Gaps
+          </p>
+        </div>
+        <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0 flex items-center justify-center">
+          <FaCloud size={18} />
         </div>
       </div>
 
-      <div className="p-6 pt-2 flex flex-col h-full overflow-hidden relative">
+      <div className="flex flex-col h-full overflow-hidden flex-1 relative">
         {/* The Cloud Container */}
-        <div className="flex-1 rounded-2xl bg-gray-50/30 border border-gray-100 p-6 relative overflow-hidden flex flex-wrap content-center justify-center gap-x-6 gap-y-3">
+        <div className="flex-1 rounded-2xl bg-[#f4f8fb] border border-slate-100 p-6 relative overflow-hidden flex flex-wrap content-center justify-center gap-x-6 gap-y-3">
           {/* Background Decoration */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none flex items-center justify-center">
             <FaCloud size={200} />
@@ -300,7 +306,7 @@ export default function QuestionCloud({
             >
               {node.word}
               {node.engagement > 20 && (
-                <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-red-400 rounded-full animate-ping pointer-events-none"></span>
+                <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-[#caee55] rounded-full animate-ping pointer-events-none"></span>
               )}
             </motion.button>
           ))}
@@ -314,29 +320,29 @@ export default function QuestionCloud({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] rounded-t-2xl p-6 z-20"
+              className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border border-slate-100 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] rounded-2xl p-6 z-20 m-2"
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gray-100">
+                  <div className="p-2.5 rounded-xl bg-[#f4f8fb]">
                     <FaSearch
                       size={14}
                       style={{ color: getColor(selectedKeyword.intent) }}
                     />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg text-gray-900 leading-none">
+                    <h4 className="font-bold text-lg text-[#000100] leading-none mb-1">
                       "{selectedKeyword.word}"
                     </h4>
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                       {selectedKeyword.count} mentions •{" "}
-                      {selectedKeyword.intent} Intent
+                      {selectedKeyword.intent}
                     </span>
                   </div>
                 </div>
                 <button
-                  onClick={() => setSelectedKeyword(null)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors border-none"
+                  onClick={handleClosePanel}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f4f8fb] hover:bg-slate-200 text-slate-500 transition-colors border-none cursor-pointer"
                 >
                   ✕
                 </button>
@@ -346,33 +352,55 @@ export default function QuestionCloud({
                 {selectedKeyword.sampleQuestions.map((q, i) => (
                   <div
                     key={i}
-                    className="flex gap-3 items-start p-3 bg-white border border-gray-100 rounded-xl shadow-sm"
+                    className="flex gap-3 items-start p-3 bg-white border border-slate-100 rounded-xl shadow-sm"
                   >
-                    <FaComments className="text-gray-300 flex-shrink-0 mt-1" />
+                    <FaComments className="text-[#074ed5] flex-shrink-0 mt-1" />
                     <div className="flex-1">
-                      <p className="text-sm text-gray-800 font-medium leading-snug">
+                      <p className="text-sm text-slate-600 font-medium leading-snug">
                         "{q.text}"
                       </p>
-                      <div className="flex items-center gap-1 mt-1.5 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                        <span>🔥 {q.likes} likes</span>
+                      <div className="flex items-center gap-1 mt-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                        <span className="text-[#caee55]">🔥</span> {q.likes}{" "}
+                        likes
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
 
+              {draftedFAQ && (
+                <div className="mb-4 bg-[#f4f8fb] border border-[#074ed5]/20 p-4 rounded-xl relative">
+                  <div className="absolute -top-3 left-4 bg-[#f4f8fb] px-2 text-[10px] font-bold text-[#074ed5] uppercase tracking-wider flex items-center gap-1">
+                    <FaQuoteLeft size={10} /> AI Draft
+                  </div>
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed mt-1">
+                    <span className="font-bold text-[#000100]">Q:</span>{" "}
+                    {selectedKeyword.sampleQuestions[0]?.text}
+                    <br />
+                    <span className="font-bold text-[#000100]">A:</span>{" "}
+                    {draftedFAQ.replace("A: ", "")}
+                  </p>
+                </div>
+              )}
+
               <button
                 onClick={handleGenerateFAQ}
-                disabled={isGenerating}
-                className="w-full py-2.5 px-4 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 border-none"
+                disabled={isGenerating || draftedFAQ !== null}
+                className="w-full py-3 bg-[#000100] hover:bg-black text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed border-none"
               >
                 {isGenerating ? (
                   <>
-                    <FaPencilAlt className="animate-spin" /> Drafting Answer...
+                    <FaPencilAlt className="animate-spin text-[#caee55]" />{" "}
+                    Drafting Answer...
+                  </>
+                ) : draftedFAQ !== null ? (
+                  <>
+                    <FaPencilAlt className="text-[#caee55]" /> Draft Complete
                   </>
                 ) : (
                   <>
-                    <FaPencilAlt /> Draft Content for "{selectedKeyword.word}"
+                    <FaPencilAlt className="text-[#caee55]" /> Draft Content for
+                    "{selectedKeyword.word}"
                   </>
                 )}
               </button>

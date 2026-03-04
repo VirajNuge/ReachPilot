@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { LeadMagnetData } from "../../../../../lib/types/analysis";
 import {
   FaMagnet,
-  FaThermometerHalf,
   FaUnlockAlt,
   FaFilePdf,
   FaVideo,
@@ -12,7 +11,7 @@ import {
   FaCheckCircle,
   FaExclamationTriangle,
 } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 // --- Types ---
 
@@ -87,24 +86,24 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
   const getIcon = (type: MagnetType) => {
     switch (type) {
       case "Checklist":
-        return <FaFilePdf className="text-red-500" />;
+        return <FaFilePdf className="text-[#074ed5]" />;
       case "Webinar":
-        return <FaVideo className="text-blue-500" />;
+        return <FaVideo className="text-[#074ed5]" />;
       case "Free Trial":
-        return <FaRocket className="text-purple-500" />;
+        return <FaRocket className="text-[#074ed5]" />;
       case "Discovery Call":
-        return <FaCalendarCheck className="text-green-500" />;
+        return <FaCalendarCheck className="text-[#074ed5]" />;
     }
   };
 
   const getFrictionColor = (level: FrictionLevel) => {
     switch (level) {
       case "Low":
-        return "text-green-500 bg-green-50 border-green-200";
+        return "text-[#000100] bg-[#caee55]/20 border-[#caee55]/30";
       case "Medium":
-        return "text-yellow-600 bg-yellow-50 border-yellow-200";
+        return "text-[#074ed5] bg-[#074ed5]/10 border-[#074ed5]/20";
       case "High":
-        return "text-red-500 bg-red-50 border-red-200";
+        return "text-[#000100] bg-slate-200 border-slate-300";
     }
   };
 
@@ -136,41 +135,44 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
   };
 
   return (
-    <div className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col relative">
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
       {/* Header */}
-      <div className="p-6 pb-4 border-b border-gray-50 flex justify-between items-start">
-        <div className="flex gap-3">
-          <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl h-fit">
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Blueprint Intel
+          </h4>
+          <div className="relative group cursor-help inline-block">
+            <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+              Ethical Bribe Decoder
+            </h2>
+            <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-[#000100] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+              Analyzes the competitor's "Lead Magnet" strategy. It checks the
+              type (e.g., PDF, Webinar), the friction level (how many fields),
+              and the temperature of the lead it attracts.
+              <div className="absolute left-4 -top-1 w-2 h-2 bg-[#000100] transform rotate-45"></div>
+            </div>
+          </div>
+          <p className="text-xs font-medium text-slate-500">
+            Analyzing competitor's entry point
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div
+            className={`px-3 py-1.5 rounded-full text-xs font-bold border ${getFrictionColor(data.friction)} flex items-center gap-1.5 h-fit`}
+          >
+            <FaUnlockAlt size={10} />
+            {data.friction} Friction
+          </div>
+          <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0 flex items-center justify-center">
             <FaMagnet size={18} />
           </div>
-          <div>
-            <div className="relative group cursor-help">
-              <h3 className="font-bold text-gray-900 text-lg border-b border-dashed border-gray-300 inline-block">
-                Ethical Bribe Decoder
-              </h3>
-              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                Analyzes the competitor's "Lead Magnet" strategy. It checks the
-                type (e.g., PDF, Webinar), the friction level (how many fields),
-                and the temperature of the lead it attracts.
-                <div className="absolute -top-1 left-4 w-2 h-2 bg-gray-900 rotate-45"></div>
-              </div>
-            </div>
-            <p className="text-sm text-gray-500">
-              Analyzing competitor's entry point
-            </p>
-          </div>
-        </div>
-        <div
-          className={`px-3 py-1 rounded-full text-xs font-bold border ${getFrictionColor(data.friction)} flex items-center gap-1.5`}
-        >
-          <FaUnlockAlt size={10} />
-          {data.friction} Friction
         </div>
       </div>
 
-      <div className="p-6 pt-4 flex-1 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col h-full overflow-hidden flex-1 relative gap-6">
         {/* The Lead Magnet Card */}
-        <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 relative group transition-all hover:shadow-md">
+        <div className="bg-[#f4f8fb] rounded-xl p-5 border border-slate-100 relative group transition-all hover:shadow-md">
           <div
             className="absolute top-4 right-4 text-2xl"
             title={`${data.temp} Leads`}
@@ -186,11 +188,11 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
           </div>
 
           <h4 className="text-xl font-bold text-gray-900 mb-2 leading-tight">
-            "{data.title}"
+            {data.title}
           </h4>
 
-          <div className="bg-white p-3 rounded-lg border border-dashed border-gray-300 text-sm text-gray-600 italic">
-            <span className="not-italic font-bold text-indigo-600 mr-2">
+          <div className="bg-white p-3 rounded-lg border border-dashed border-[#074ed5]/20 text-sm text-gray-600 italic">
+            <span className="not-italic font-bold text-[#074ed5] mr-2">
               🪝 THE HOOK:
             </span>
             {data.hook}
@@ -200,7 +202,7 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
             {data.fields.map((field) => (
               <span
                 key={field}
-                className="text-[10px] font-bold px-2 py-1 bg-gray-200 text-gray-600 rounded uppercase"
+                className="text-[10px] font-bold px-2 py-1 bg-[#f4f8fb] text-[#000100] border border-slate-200 rounded uppercase"
               >
                 {field}
               </span>
@@ -210,22 +212,22 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
 
         {/* Diagnostic Metrics */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl bg-orange-50 border border-orange-100">
-            <div className="flex items-center gap-2 mb-1 text-orange-700 font-bold text-xs uppercase">
+          <div className="p-4 rounded-xl bg-[#f4f8fb] border border-slate-100">
+            <div className="flex items-center gap-2 mb-1 text-[#074ed5] font-bold text-xs uppercase">
               <FaExclamationTriangle />
               Risk Factor
             </div>
-            <p className="text-sm text-orange-900 font-medium leading-snug">
+            <p className="text-sm text-[#000100] font-medium leading-snug">
               Competitor creates <strong>Low Barriers</strong>. They will likely
               have a larger, less qualified list.
             </p>
           </div>
-          <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
-            <div className="flex items-center gap-2 mb-1 text-blue-700 font-bold text-xs uppercase">
+          <div className="p-4 rounded-xl bg-[#f4f8fb] border border-slate-100">
+            <div className="flex items-center gap-2 mb-1 text-[#074ed5] font-bold text-xs uppercase">
               <FaCheckCircle />
               Opportunity
             </div>
-            <p className="text-sm text-blue-900 font-medium leading-snug">
+            <p className="text-sm text-[#000100] font-medium leading-snug">
               Checklist users are often <strong>looking for shortcuts</strong>.
               Offer a "Done-For-You" template.
             </p>
@@ -238,15 +240,17 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
             <button
               onClick={generateCounter}
               disabled={isCountering}
-              className="w-full py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 disabled:opacity-70"
+              className="w-full py-3 bg-[#000100] hover:bg-black text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] active:scale-[0.98] disabled:opacity-70"
             >
               {isCountering ? (
                 <>
-                  <FaRocket className="animate-spin" /> Analyzing Funnel...
+                  <FaRocket className="animate-spin text-[#caee55]" /> Analyzing
+                  Funnel...
                 </>
               ) : (
                 <>
-                  <FaReply /> Generate Counter-Strategy
+                  <FaRocket className="text-[#caee55]" /> Generate
+                  Counter-Strategy
                 </>
               )}
             </button>
@@ -254,13 +258,13 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-indigo-600 text-white p-5 rounded-xl shadow-lg relative overflow-hidden"
+              className="bg-[#000100] text-white p-5 rounded-xl shadow-lg relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-3 opacity-10">
                 <FaRocket size={80} />
               </div>
               <div className="relative z-10">
-                <div className="text-xs font-bold text-indigo-200 uppercase mb-1 tracking-wide">
+                <div className="text-xs font-bold text-[#caee55] uppercase mb-1 tracking-wide">
                   Recommened Strategy
                 </div>
                 <p className="font-medium text-lg leading-snug">
@@ -268,7 +272,7 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
                     i % 2 === 1 ? (
                       <span
                         key={i}
-                        className="font-black text-white bg-indigo-500 px-1 rounded"
+                        className="font-black text-white bg-[#074ed5] px-1 rounded mx-0.5"
                       >
                         {part}
                       </span>
@@ -279,7 +283,7 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
                 </p>
                 <button
                   onClick={() => setCounterStrategy(null)}
-                  className="mt-3 text-xs font-bold text-indigo-200 hover:text-white flex items-center gap-1"
+                  className="mt-3 text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1"
                 >
                   <FaReply /> Reset
                 </button>

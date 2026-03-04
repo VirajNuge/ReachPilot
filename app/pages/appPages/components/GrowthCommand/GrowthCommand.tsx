@@ -103,22 +103,32 @@ export default function GrowthCommand({
         </div>
 
         {/* 2. Growth Trajectory (Simulator) */}
-        <div className="col-span-12 lg:col-span-5 h-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-6 pb-2 border-b border-gray-50">
-            <div className="flex gap-3 items-center">
-              <span className="text-xl">📈</span>
-              <h3 className="font-bold text-gray-900 text-lg">
-                Trajectory Predictor
-              </h3>
+        <div className="col-span-12 lg:col-span-5 h-full bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+          <div className="p-6 pb-4 border-b border-slate-100">
+            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+              Growth Command
+            </h4>
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+                  Trajectory Predictor
+                </h2>
+                <p className="text-xs font-medium text-slate-500">
+                  30-Day Projection Simulator
+                </p>
+              </div>
+              <div className="p-2.5 bg-[#caee55] text-[#000100] rounded-2xl shadow-sm shrink-0 flex items-center justify-center">
+                <FaChartLine size={16} />
+              </div>
             </div>
           </div>
-          <div className="p-6 flex-1 flex flex-col gap-6">
+          <div className="p-6 flex-1 flex flex-col gap-5">
             {/* Sliders */}
             <div className="space-y-4">
               <div>
-                <div className="flex justify-between text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
+                <div className="flex justify-between text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">
                   <span>Authority Signal</span>
-                  <span className="text-indigo-600">{simulationValue}%</span>
+                  <span className="text-[#074ed5]">{simulationValue}%</span>
                 </div>
                 <input
                   type="range"
@@ -126,13 +136,15 @@ export default function GrowthCommand({
                   max="100"
                   value={simulationValue}
                   onChange={(e) => setSimulationValue(Number(e.target.value))}
-                  className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-[#074ed5]"
                 />
               </div>
               <div>
-                <div className="flex justify-between text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">
+                <div className="flex justify-between text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">
                   <span>Consistency</span>
-                  <span className="text-emerald-600">{consistencyValue}%</span>
+                  <span className="text-[#000100] font-black">
+                    {consistencyValue}%
+                  </span>
                 </div>
                 <input
                   type="range"
@@ -140,26 +152,26 @@ export default function GrowthCommand({
                   max="100"
                   value={consistencyValue}
                   onChange={(e) => setConsistencyValue(Number(e.target.value))}
-                  className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-[#caee55]"
                 />
               </div>
             </div>
 
             {/* Result Display */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-center">
-                <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1">
+              <div className="p-3 bg-[#074ed5]/5 border border-[#074ed5]/15 rounded-xl text-center">
+                <div className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest mb-1">
                   Engagement
                 </div>
-                <div className="text-2xl font-black text-indigo-700">
+                <div className="text-2xl font-black text-[#074ed5]">
                   +{simulationResult?.outcome.engagement}%
                 </div>
               </div>
-              <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-center">
-                <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">
+              <div className="p-3 bg-[#caee55]/10 border border-[#caee55]/30 rounded-xl text-center">
+                <div className="text-[10px] font-bold text-[#000100] uppercase tracking-widest mb-1">
                   Revenue Pot.
                 </div>
-                <div className="text-2xl font-black text-emerald-700">
+                <div className="text-2xl font-black text-[#000100]">
                   $
                   {simulationResult?.outcome.revenue_potential.toLocaleString()}
                 </div>
@@ -181,25 +193,26 @@ export default function GrowthCommand({
                       >
                         <stop
                           offset="5%"
-                          stopColor="#6366f1"
-                          stopOpacity={0.3}
+                          stopColor="#074ed5"
+                          stopOpacity={0.25}
                         />
                         <stop
                           offset="95%"
-                          stopColor="#6366f1"
+                          stopColor="#074ed5"
                           stopOpacity={0}
                         />
                       </linearGradient>
                     </defs>
                     <Tooltip
                       contentStyle={{
-                        borderRadius: "8px",
+                        borderRadius: "12px",
                         border: "none",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                        background: "#000100",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
                       }}
-                      labelStyle={{ color: "#6b7280", fontSize: "10px" }}
+                      labelStyle={{ color: "#94a3b8", fontSize: "10px" }}
                       itemStyle={{
-                        color: "#4f46e5",
+                        color: "#caee55",
                         fontWeight: "bold",
                         fontSize: "12px",
                       }}
@@ -211,7 +224,7 @@ export default function GrowthCommand({
                     <Area
                       type="monotone"
                       dataKey="value"
-                      stroke="#6366f1"
+                      stroke="#074ed5"
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorValue)"
@@ -230,14 +243,14 @@ export default function GrowthCommand({
       </div>
 
       {/* Bottom Row: Funnel Optimizer & Crowd Hijacker */}
-      <div className="grid grid-cols-12 gap-6 h-[400px]">
+      <div className="grid grid-cols-12 gap-6">
         {/* Funnel Optimizer */}
-        <div className="col-span-12 md:col-span-6 h-full">
+        <div className="col-span-12 md:col-span-6">
           <FunnelOptimizer funnelTactics={funnelTactics} />
         </div>
 
         {/* Crowd Hijacker */}
-        <div className="col-span-12 md:col-span-6 h-full">
+        <div className="col-span-12 md:col-span-6">
           <CrowdHijacker crowdTactics={crowdTactics} />
         </div>
       </div>

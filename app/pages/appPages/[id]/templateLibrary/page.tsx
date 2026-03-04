@@ -19,9 +19,10 @@ import TopMenu from "../../components/topMenu/topMenu";
 export default function TemplateLibraryPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
+  const { id } = React.use(params);
 
   // --- State ---
   const [selectedFolderId, setSelectedFolderId] = useState<string>("f1");
@@ -30,7 +31,7 @@ export default function TemplateLibraryPage({
 
   // Filter States
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | "All">(
-    "All"
+    "All",
   );
   const [selectedType, setSelectedType] = useState<AssetType | "All">("All");
 
@@ -49,7 +50,7 @@ export default function TemplateLibraryPage({
         selectedPlatform === "All" || t.platforms.includes(selectedPlatform);
       const matchesType = selectedType === "All" || t.type === selectedType;
       return matchesSearch && matchesPlatform && matchesType;
-    }
+    },
   );
 
   const selectedFolderName =
@@ -58,7 +59,7 @@ export default function TemplateLibraryPage({
   // --- Actions ---
   const handleUseTemplate = (template: ReachPilotTemplate) => {
     router.push(
-      `/appPages/${params.id}/postGenerator?templateId=${template.id}&folder=${selectedFolderId}`
+      `/appPages/${id}/postGenerator?templateId=${template.id}&folder=${selectedFolderId}`,
     );
   };
 

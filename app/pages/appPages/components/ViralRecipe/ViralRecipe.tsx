@@ -10,8 +10,9 @@ import {
   FaLayerGroup,
   FaMicroscope,
 } from "react-icons/fa";
-import { BsStars, BsGraphUpArrow, BsEmojiSmile } from "react-icons/bs";
+import { BsStars, BsGraphUpArrow } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
+import { IoMdClose } from "react-icons/io";
 
 // --- Types ---
 export interface ViralIngredient {
@@ -95,84 +96,75 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data }) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-white relative overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 pb-2">
-        <div className="flex gap-3 items-center">
-          <div className="bg-purple-50 p-2.5 rounded-xl text-purple-600">
-            <FaMicroscope size={18} />
-          </div>
-          <div>
-            <div className="relative group cursor-help">
-              <h4 className="font-bold text-lg text-gray-900 leading-tight inline-block">
-                Viral Recipe Replicator
-              </h4>
-              {/* Tooltip */}
-              <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                <div className="font-bold mb-1 text-purple-300">
-                  Why this matters:
-                </div>
-                Deconstructs outlier posts to find the exact ingredients (hooks,
-                emojis, length) that caused them to go viral.
-                <div className="absolute left-4 -top-1 w-2 h-2 bg-gray-900 transform rotate-45"></div>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 font-medium">
-              Outlier Forensics
-            </p>
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
+      {/* Header Row */}
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            Outlier Forensics
+          </h4>
+          <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+            Viral Recipe Replicator
+          </h2>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#caee55]/20 rounded-full border border-[#caee55]/30 text-[#000100] mt-2 inline-flex w-fit">
+            <FaFire className="text-[#074ed5]" size={10} />
+            <span className="text-[10px] uppercase font-bold tracking-wider">
+              {safeData.engagementMultiplier} Impact
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1 bg-purple-100/50 rounded-full border border-purple-100 text-purple-700">
-          <FaFire className="text-orange-500" />
-          <span className="text-[10px] uppercase font-bold tracking-wider">
-            {safeData.engagementMultiplier} Avg
-          </span>
+
+        {/* Top Right Icon Badge */}
+        <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0">
+          <FaMicroscope size={18} />
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row flex-1 p-6 pt-0 gap-6">
+      <div className="flex flex-col lg:flex-row flex-1 gap-6">
         {/* Left: Decomposition Card */}
         <div className="w-full lg:w-1/2 flex flex-col gap-4">
           {/* The Hook Analysis */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-2 opacity-50">
-              <FaQuoteLeft className="text-gray-200 text-4xl transform rotate-12" />
+          <div className="bg-[#f4f8fb] rounded-2xl p-4 border border-slate-100 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-2 opacity-30">
+              <FaQuoteLeft className="text-slate-300 text-4xl transform rotate-12" />
             </div>
-            <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+            <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
               The Hook ({safeData.hookType})
             </h5>
-            <p className="text-sm font-bold text-gray-800 italic leading-relaxed relative z-10">
+            <p className="text-sm font-black text-[#000100] leading-relaxed relative z-10 italic">
               "{safeData.hookText}"
             </p>
           </div>
 
           {/* Ingredients List */}
           <div className="flex flex-col gap-2">
-            <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
               Key Ingredients
             </h5>
             {safeData.ingredients.map((ing, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg shadow-sm"
+                className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-2xl shadow-sm"
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 text-[10px] font-bold">
+                  <span className="w-6 h-6 rounded-full bg-[#f4f8fb] flex items-center justify-center text-slate-500 text-[10px] font-black">
                     {i + 1}
                   </span>
                   <div>
-                    <p className="text-xs font-bold text-gray-700">
+                    <p className="text-xs font-bold text-[#000100]">
                       {ing.name}
                     </p>
-                    <p className="text-[10px] text-gray-500">{ing.value}</p>
+                    <p className="text-[10px] font-medium text-slate-500">
+                      {ing.value}
+                    </p>
                   </div>
                 </div>
-                <div className="flex gap-0.5">
+                <div className="flex gap-1">
                   {[...Array(Math.min(ing.score > 7 ? 3 : 2, 3))].map(
                     (_, idx) => (
                       <div
                         key={idx}
-                        className="w-1 h-3 bg-green-400 rounded-full"
+                        className="w-1.5 h-3 bg-[#caee55] rounded-full"
                       />
                     ),
                   )}
@@ -183,43 +175,48 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data }) => {
         </div>
 
         {/* Right: Insight & Action */}
-        <div className="w-full lg:w-1/2 flex flex-col gap-4">
-          {/* Simple Analysis */}
-          <div className="bg-purple-50/50 rounded-xl p-4 border border-purple-100/50">
-            <div className="flex items-center gap-2 mb-2">
-              <BsGraphUpArrow className="text-purple-600 text-xs" />
-              <h5 className="text-[10px] font-bold text-purple-800 uppercase tracking-wider">
+        <div className="w-full lg:w-1/2 flex flex-col justify-between gap-5">
+          {/* Why It Worked Insight Box */}
+          <div className="bg-[#f4f8fb] rounded-2xl p-4 border border-slate-100">
+            <div className="flex items-center gap-1.5 mb-2">
+              <BsGraphUpArrow className="text-[#074ed5]" size={10} />
+              <h5 className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest">
                 Why It Worked
               </h5>
             </div>
-            <p className="text-xs text-gray-700 font-medium leading-relaxed">
-              "{safeData.whyItWorked}"
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+              {safeData.whyItWorked}
             </p>
           </div>
 
           {/* Template Preview */}
-          <div className="flex-1 bg-gray-900 rounded-xl p-4 text-gray-300 font-mono text-[10px] leading-6 overflow-hidden relative">
-            <div className="absolute top-2 right-2 text-gray-600">
-              <FaLayerGroup />
+          <div className="flex-1 bg-[#000100] rounded-2xl p-5 text-slate-300 font-mono text-[10px] leading-6 overflow-hidden relative shadow-inner">
+            <div className="absolute top-3 right-3 text-slate-600">
+              <FaLayerGroup size={14} />
             </div>
             {safeData.templateStructure.map((line, i) => (
-              <div key={i} className="border-l-2 border-purple-500 pl-2 mb-1">
+              <div
+                key={i}
+                className="border-l-2 border-[#074ed5] pl-3 mb-2 font-medium tracking-wide"
+              >
                 {line}
               </div>
             ))}
-            <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-gray-900 to-transparent" />
+            <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#000100] to-transparent pointer-events-none" />
           </div>
 
-          <button
-            onClick={() => {
-              setShowReplicateModal(true);
-              handleReplicate();
-            }}
-            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98]"
-          >
-            <FaMagic />
-            Replicate Recipe
-          </button>
+          <div className="mt-auto">
+            <button
+              onClick={() => {
+                setShowReplicateModal(true);
+                handleReplicate();
+              }}
+              className="w-full py-3 bg-[#000100] hover:bg-black text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(26,29,35,0.2)] active:scale-[0.98]"
+            >
+              <FaMagic className="text-[#caee55]" />
+              Replicate Recipe
+            </button>
+          </div>
         </div>
       </div>
 
@@ -230,47 +227,51 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col p-6"
+            className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col p-6 rounded-3xl"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="bg-purple-100 p-2 rounded-lg text-purple-700">
-                  <FaMagic />
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-[#caee55] text-[#000100] rounded-2xl">
+                  <FaMagic size={18} />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-xl font-black text-[#000100]">
                   Template Generator
                 </h3>
               </div>
               <button
                 onClick={() => setShowReplicateModal(false)}
-                className="text-xs font-bold text-gray-500 hover:text-gray-900 underline"
+                className="p-2 hover:bg-[#f4f8fb] rounded-full transition-colors"
               >
-                Close
+                <IoMdClose size={24} className="text-slate-400" />
               </button>
             </div>
 
             {isGenerating ? (
-              <div className="flex-1 flex flex-col items-center justify-center gap-3">
-                <BsStars className="text-purple-500 text-3xl animate-spin" />
-                <p className="font-bold text-gray-600">
+              <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                <BsStars className="text-[#074ed5] text-4xl animate-spin" />
+                <p className="font-bold text-slate-500 uppercase tracking-widest text-xs">
                   Extracting Viral DNA...
                 </p>
               </div>
             ) : (
               <div className="flex flex-col gap-4 flex-1">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-slate-500 font-medium">
                   Here is a structure based on the outlier post. Fill in the
                   blanks with your topic.
                 </p>
-                <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-4 font-mono text-sm text-gray-700 whitespace-pre-wrap overflow-y-auto custom-scroll">
+                <div className="flex-1 bg-[#f4f8fb] border border-slate-200 rounded-2xl p-5 font-mono text-sm text-[#000100] whitespace-pre-wrap overflow-y-auto custom-scroll shadow-inner">
                   {generatedDraft}
                 </div>
                 <button
                   onClick={copyToClipboard}
-                  className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${copied ? "bg-green-500 text-white" : "bg-gray-900 text-white hover:bg-black"}`}
+                  className={`w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm ${
+                    copied
+                      ? "bg-[#caee55] text-[#000100]"
+                      : "bg-[#074ed5] text-white hover:bg-[#0041CC] shadow-[0_4px_14px_0_rgba(0,82,255,0.39)]"
+                  }`}
                 >
                   {copied ? <FaCheck /> : <FaCopy />}
-                  {copied ? "Copied!" : "Copy Template"}
+                  {copied ? "Copied to Clipboard!" : "Copy Template"}
                 </button>
               </div>
             )}

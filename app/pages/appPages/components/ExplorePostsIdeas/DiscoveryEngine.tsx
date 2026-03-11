@@ -28,7 +28,7 @@ export default function DiscoveryEngine() {
 
       {/* === PRIMARY TRIGGER === */}
       <div className="pt-6 border-t border-gray-100 sticky bottom-0 bg-white pb-4">
-        <button className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm uppercase tracking-wide rounded-xl shadow-lg shadow-indigo-200 transition-all transform active:scale-[0.98] flex items-center justify-center gap-3 group">
+        <button className="w-full py-4 px-6 font-bold uppercase tracking-wide rounded-xl transition-all transform flex items-center justify-center gap-3 group bg-[#000100] hover:bg-black text-white">
           <Telescope
             size={20}
             className="group-hover:rotate-12 transition-transform"

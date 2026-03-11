@@ -19,14 +19,12 @@ interface TemplatePreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   template: ReachPilotTemplate | null;
-  onUse: (template: ReachPilotTemplate) => void;
 }
 
 const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
   isOpen,
   onClose,
   template,
-  onUse,
 }) => {
   const [activeTab, setActiveTab] = useState<Platform>("LinkedIn");
   const [personaActive, setPersonaActive] = useState(false);
@@ -218,15 +216,6 @@ const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
               </div>
             </div>
           )}
-
-          <div className="mt-auto pt-6 border-t border-slate-200">
-            <button
-              onClick={() => onUse(template)}
-              className="w-full bg-slate-900 hover:bg-purple-600 text-white font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
-            >
-              <Check size={18} /> Use Template
-            </button>
-          </div>
         </aside>
 
         {/* Content Area */}
@@ -249,7 +238,7 @@ const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
             </div>
             <button
               onClick={onClose}
-              className="text-slate-400 hover:text-slate-600"
+              className="bg-[#000100] hover:bg-black text-white"
             >
               <X size={20} />
             </button>

@@ -18,7 +18,6 @@ import {
 interface SmartTemplateCardProps {
   template: ReachPilotTemplate;
   onPreview: (template: ReachPilotTemplate) => void;
-  onUse: (template: ReachPilotTemplate) => void;
 }
 
 // --- Helper: Platform Icons ---
@@ -49,7 +48,7 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
 // ==========================================
 // 1. VISUAL CARD (Fixed: Buttons Moved to Center)
 // ==========================================
-const VisualCard = ({ template, onPreview, onUse }: SmartTemplateCardProps) => (
+const VisualCard = ({ template, onPreview }: SmartTemplateCardProps) => (
   <div
     className="group relative w-full h-[340px] rounded-2xl overflow-hidden cursor-pointer bg-slate-900 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 isolate"
     onClick={() => onPreview(template)}
@@ -78,15 +77,6 @@ const VisualCard = ({ template, onPreview, onUse }: SmartTemplateCardProps) => (
     {/* --- HOVER ACTIONS (Centered - No longer blocking text) --- */}
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 bg-black/40 backdrop-blur-[2px]">
       {/* Primary Action */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onUse(template);
-        }}
-        className="flex items-center gap-2 bg-white text-slate-900 px-6 py-2.5 rounded-full font-bold text-sm shadow-xl hover:scale-105 transition-transform"
-      >
-        <Zap size={16} className="fill-current" /> Use Template
-      </button>
 
       {/* Secondary Action */}
       <button
@@ -128,7 +118,7 @@ const VisualCard = ({ template, onPreview, onUse }: SmartTemplateCardProps) => (
 // ==========================================
 // 2. TEXT CARD (Fixed: Alignment & Layout)
 // ==========================================
-const TextCard = ({ template, onPreview, onUse }: SmartTemplateCardProps) => (
+const TextCard = ({ template, onPreview }: SmartTemplateCardProps) => (
   <div
     className="
       group flex flex-col h-[295px]
@@ -208,22 +198,6 @@ const TextCard = ({ template, onPreview, onUse }: SmartTemplateCardProps) => (
           className="xl:hidden p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200"
         >
           <Eye size={16} />
-        </button>
-
-        {/* Use Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onUse(template);
-          }}
-          className="
-                flex items-center gap-2 px-4 py-2 rounded-lg
-                bg-slate-900 text-white text-xs font-semibold
-                hover:bg-violet-600 hover:shadow-lg hover:shadow-violet-200/50 
-                transition-all active:scale-95 whitespace-nowrap
-            "
-        >
-          Use This <ArrowRight size={12} />
         </button>
       </div>
     </div>

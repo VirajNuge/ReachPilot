@@ -115,7 +115,7 @@ export const ComponentError: React.FC<{
     {onRetry && (
       <button
         onClick={onRetry}
-        className="text-xs text-red-600 hover:text-red-700 font-medium mt-2 underline"
+        className="font-medium mt-2 underline bg-[#000100] hover:bg-black text-white"
       >
         Try again
       </button>
@@ -148,7 +148,7 @@ export const ConnectionError: React.FC<{
       {onRetry && (
         <button
           onClick={onRetry}
-          className="bg-gray-900 text-white px-6 py-3 rounded-xl font-medium inline-flex items-center gap-2 hover:bg-gray-800 transition-colors"
+          className="px-6 py-3 rounded-xl font-medium inline-flex items-center gap-2 transition-colors bg-[#000100] hover:bg-black text-white"
         >
           <BsArrowClockwise size={18} />
           Reconnect

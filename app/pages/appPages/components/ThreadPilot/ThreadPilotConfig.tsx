@@ -34,7 +34,7 @@ export default function ThreadPilotConfig() {
 
       {/* === PRIMARY ACTION === */}
       <div className="pt-6 border-t border-gray-100">
-        <button className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm uppercase tracking-wide rounded-xl shadow-md hover:shadow-lg transition-all transform active:scale-[0.98] flex items-center justify-center gap-3">
+        <button className="w-full py-4 px-6 font-bold uppercase tracking-wide rounded-xl transition-all transform flex items-center justify-center gap-3 bg-[#000100] hover:bg-black text-white">
           <Play size={18} fill="currentColor" />
           Save Config & Start Engine
         </button>

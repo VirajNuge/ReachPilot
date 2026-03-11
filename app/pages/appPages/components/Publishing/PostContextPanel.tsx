@@ -134,7 +134,7 @@ export default function PostContextPanel({
             </div>
           )}
         </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+        <button onClick={onClose} className="bg-[#000100] hover:bg-black text-white">
           <X size={18} />
         </button>
       </div>
@@ -208,14 +208,14 @@ export default function PostContextPanel({
                     <button
                       onClick={prevSlide}
                       disabled={currentSlide === 0}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full disabled:opacity-0 hover:bg-black/70 transition-all"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full disabled:opacity-0 transition-all bg-[#000100] hover:bg-black text-white"
                     >
                       <ChevronLeft size={16} />
                     </button>
                     <button
                       onClick={nextSlide}
                       disabled={currentSlide === post.media.length - 1}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full disabled:opacity-0 hover:bg-black/70 transition-all"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full disabled:opacity-0 transition-all bg-[#000100] hover:bg-black text-white"
                     >
                       <ChevronRight size={16} />
                     </button>
@@ -239,7 +239,7 @@ export default function PostContextPanel({
       <div className="p-5 border-t border-gray-100 bg-gray-50/30 space-y-3">
         <button
           onClick={handleSave}
-          className="w-full py-3 bg-gray-900 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-black transition-all flex items-center justify-center gap-2"
+          className="w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-[#000100] hover:bg-black text-white"
         >
           <Save size={16} /> Save Updates
         </button>

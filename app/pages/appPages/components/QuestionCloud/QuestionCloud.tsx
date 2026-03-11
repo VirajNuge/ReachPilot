@@ -5,6 +5,7 @@ import {
   FaListUl,
   FaPencilAlt,
   FaComments,
+  FaQuoteLeft,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -342,7 +343,7 @@ export default function QuestionCloud({
                 </div>
                 <button
                   onClick={handleClosePanel}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f4f8fb] hover:bg-slate-200 text-slate-500 transition-colors border-none cursor-pointer"
+                  className="w-8 h-8 flex items-center justify-center rounded-full transition-colors cursor-pointer bg-[#000100] hover:bg-black text-white"
                 >
                   ✕
                 </button>
@@ -386,7 +387,7 @@ export default function QuestionCloud({
               <button
                 onClick={handleGenerateFAQ}
                 disabled={isGenerating || draftedFAQ !== null}
-                className="w-full py-3 bg-[#000100] hover:bg-black text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed border-none"
+                className="w-full py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-[#000100] hover:bg-black text-white"
               >
                 {isGenerating ? (
                   <>

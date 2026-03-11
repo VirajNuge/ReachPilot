@@ -55,7 +55,7 @@ export default function StagingSidebar({
 
         <button
           onClick={onCreateNew}
-          className="w-full py-2.5 bg-white border border-gray-300 shadow-sm rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-all flex items-center justify-center gap-2"
+          className="w-full py-2.5 rounded-lg font-bold transition-all flex items-center justify-center gap-2 bg-[#000100] hover:bg-black text-white"
         >
           <Plus size={14} /> Create Manual Post
         </button>

@@ -212,7 +212,7 @@ export default function CrowdPersonas({
                   </div>
                 </div>
               </div>
-              <button className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(7,78,213,0.39)] active:scale-[0.98]">
+              <button className="w-full py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-[#000100] hover:bg-black text-white">
                 Target this Persona
               </button>
             </div>

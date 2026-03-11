@@ -1,61 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthFromCookies } from "@/lib/auth";
+import { upsertConnection } from "@/lib/models/connection";
 
-// X (Twitter) OAuth Callback - Exchanges code for access token
-// GET /api/auth/x/callback?code=xxx&state=xxx
-
-const X_TOKEN_URL = "https://api.twitter.com/2/oauth2/token";
-
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const code = searchParams.get("code");
-  const stateParam = searchParams.get("state");
-  const error = searchParams.get("error");
-
-  if (error) {
+export async function GET(req: NextRequest) {
+  // 1. Get auth user from cookie
+  const auth = await getAuthFromCookies();
+  if (!auth) {
     return NextResponse.redirect(
+      new URL("/login", req.url)
+    );
+  }
+
+  // 2. Get accountId and code verifier from cookies
+  const accountId = req.cookies.get("rp_oauth_account")?.value;
+  const codeVerifier = req.cookies.get("rp_x_verifier")?.value;
+
+  if (!accountId || !codeVerifier) {
+    return NextResponse.json(
+      { error: "Missing accountId or code verifier from OAuth state" },
+      { status: 400 }
+    );
+  }
+
+  // 3. Extract code from URL
+  const code = req.nextUrl.searchParams.get("code");
+  const error = req.nextUrl.searchParams.get("error");
+
+  if (error || !code) {
+    const response = NextResponse.redirect(
       new URL(
-        "/pages/appPages/1/profileAnalyzer?error=auth_denied",
-        request.url,
-      ),
+        `/${accountId}/accountPersona?error=auth_denied`,
+        req.url
+      )
     );
-  }
-
-  if (!code || !stateParam) {
-    return NextResponse.json(
-      { success: false, error: "Missing authorization code or state" },
-      { status: 400 },
-    );
-  }
-
-  // Decode state to get code verifier
-  let state: { codeVerifier: string; profileUrl: string };
-  try {
-    state = JSON.parse(Buffer.from(stateParam, "base64url").toString());
-  } catch (e) {
-    return NextResponse.json(
-      { success: false, error: "Invalid state parameter" },
-      { status: 400 },
-    );
-  }
-
-  const clientId = process.env.X_CLIENT_ID;
-  const clientSecret = process.env.X_CLIENT_SECRET;
-  const redirectUri = process.env.X_REDIRECT_URI;
-
-  if (!clientId || !clientSecret || !redirectUri) {
-    return NextResponse.json(
-      { success: false, error: "X API credentials not configured" },
-      { status: 503 },
-    );
+    response.cookies.delete("rp_oauth_account");
+    response.cookies.delete("rp_x_verifier");
+    return response;
   }
 
   try {
-    // Exchange code for access token
-    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
-      "base64",
-    );
+    // 4. Exchange code for access token with PKCE
+    const credentials = Buffer.from(
+      `${process.env.X_CLIENT_ID}:${process.env.X_CLIENT_SECRET}`
+    ).toString("base64");
 
-    const tokenResponse = await fetch(X_TOKEN_URL, {
+    const tokenResponse = await fetch("https://api.twitter.com/2/oauth2/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -64,8 +53,8 @@ export async function GET(request: NextRequest) {
       body: new URLSearchParams({
         code,
         grant_type: "authorization_code",
-        redirect_uri: redirectUri,
-        code_verifier: state.codeVerifier,
+        redirect_uri: process.env.X_REDIRECT_URI!,
+        code_verifier: codeVerifier,
       }).toString(),
     });
 
@@ -73,48 +62,54 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok || tokenData.error) {
       throw new Error(
-        tokenData.error_description ||
-          tokenData.error ||
-          "Token exchange failed",
+        tokenData.error_description || tokenData.error || "Token exchange failed"
       );
     }
 
-    // Store tokens in cookies
-    const response = NextResponse.redirect(
-      new URL(
-        "/pages/appPages/1/profileAnalyzer?platform=twitter&auth=success",
-        request.url,
-      ),
-    );
+    // 5. Fetch platform user profile
+    const userResponse = await fetch("https://api.twitter.com/2/users/me", {
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`,
+      },
+    });
+    const userData = await userResponse.json();
 
-    response.cookies.set("x_access_token", tokenData.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: tokenData.expires_in || 7200, // Default 2 hours
-      path: "/",
+    // Calculate token expiration
+    const tokenExpiresAt = tokenData.expires_in
+      ? new Date(Date.now() + tokenData.expires_in * 1000)
+      : undefined;
+
+    // 6. Upsert connection
+    await upsertConnection(auth.userId, accountId, "x", {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      tokenExpiresAt,
+      platformUserId: userData.data?.id,
+      platformUsername: userData.data?.username,
+      scope: "tweet.read tweet.write users.read offline.access",
     });
 
-    if (tokenData.refresh_token) {
-      response.cookies.set("x_refresh_token", tokenData.refresh_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 30, // 30 days
-        path: "/",
-      });
-    }
+    // 7. Clear OAuth cookies
+    const response = NextResponse.redirect(
+      new URL(
+        `/${accountId}/accountPersona?connected=x`,
+        req.url
+      )
+    );
+    response.cookies.delete("rp_oauth_account");
+    response.cookies.delete("rp_x_verifier");
 
     return response;
   } catch (error) {
     console.error("X OAuth error:", error);
-    return NextResponse.redirect(
+    const response = NextResponse.redirect(
       new URL(
-        `/pages/appPages/1/profileAnalyzer?error=auth_failed&message=${encodeURIComponent(
-          error instanceof Error ? error.message : "Unknown error",
-        )}`,
-        request.url,
-      ),
+        `/${accountId}/accountPersona?error=auth_failed`,
+        req.url
+      )
     );
+    response.cookies.delete("rp_oauth_account");
+    response.cookies.delete("rp_x_verifier");
+    return response;
   }
 }

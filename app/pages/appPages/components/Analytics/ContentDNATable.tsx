@@ -102,7 +102,7 @@ export default function ContentDNATable({ platform }: ContentDNATableProps) {
 
             {/* 4. Action Button */}
             <div className="col-span-2 text-right">
-              <button className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 ml-auto group/btn">
+              <button className="font-bold flex items-center gap-1 ml-auto group/btn bg-[#000100] hover:bg-black text-white">
                 {item.action}
                 <ArrowRight
                   size={12}

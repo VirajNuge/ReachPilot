@@ -134,7 +134,7 @@ const IdeaPlanner: React.FC<IdeaPlannerProps> = ({ initialIdeas = [] }) => {
             />
             <button
               type="submit"
-              className="absolute right-2 top-2 bg-gray-900 hover:bg-black text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-105 shadow-md disabled:opacity-0"
+              className="absolute right-2 top-2 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-105 disabled:opacity-0 bg-[#000100] hover:bg-black text-white"
               disabled={!newIdeaInput.trim()}
             >
               <BsPlusLg size={12} />

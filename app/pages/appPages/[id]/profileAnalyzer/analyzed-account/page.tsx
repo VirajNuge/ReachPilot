@@ -21,7 +21,7 @@ import VoiceSpectrum from "../../../components/VoiceSpectrum/VoiceSpectrum";
 import SentimentMap from "../../../components/SentimentMap/SentimentMap";
 import ActiveHours from "../../../components/ActiveHours/ActiveHours";
 import CrowdPersonas from "../../../components/CrowdPersonas/CrowdPersonas";
-import QuestionCloud from "../../../components/QuestionCloud/QuestionCloud";
+import QuestionCloud from "../../../components/QuestionCloud/QuestionCloud"; 
 import EthicalBribe from "../../../components/EthicalBribe/EthicalBribe";
 import CTACommand from "../../../components/CTACommand/CTACommand";
 import StackFingerprint from "../../../components/StackFingerprint/StackFingerprint";
@@ -44,6 +44,7 @@ import "./analyzedAccount.css";
 
 import { useAnalysisData } from "../../../../../../hooks/useAnalysisData";
 import { saveAnalysis, getAnalysisById } from "../../../../../../lib/storage";
+import { useAuth } from "../../../../../contexts/AuthContext";
 import {
   RawAnalysisData,
   VelocityData,
@@ -111,6 +112,7 @@ function AnalysisContent() {
   const searchParams = useSearchParams();
   const loadId = searchParams.get("loadId");
   const link = searchParams.get("link"); // existing
+  const { user } = useAuth();
 
   // Hook logic
   const {
@@ -408,7 +410,7 @@ function AnalysisContent() {
       // 2. Load from History if ID present
       if (loadId) {
         console.log("Loading from history:", loadId);
-        const session = getAnalysisById(loadId);
+        const session = getAnalysisById(loadId, user?.id);
         if (session) {
           setData(session.data);
           setLoading(false);
@@ -425,7 +427,7 @@ function AnalysisContent() {
         setLoading(false);
         // Auto-save only if it's a fresh analysis (no loadId and no manual data)
         if (!loadId && !manualDataParam) {
-          saveAnalysis(apiData);
+          saveAnalysis(apiData, user?.id);
         }
       } else if (apiError) {
         setError(apiError);

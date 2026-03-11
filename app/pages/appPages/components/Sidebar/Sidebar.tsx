@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import {
   FaFlask,
   FaLightbulb,
@@ -16,15 +16,21 @@ import {
   FaRegQuestionCircle,
   FaUserCog,
   FaUser,
+  FaRocket,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { BsBoxArrowRight, BsGear } from "react-icons/bs";
 import { HiSparkles } from "react-icons/hi2";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 /**
  * ReachPilot Sidebar Component — Bright Bento Shell Style
  */
 const Sidebar = () => {
   const pathname = usePathname();
+  const params = useParams();
+  const accountId = params?.id ?? "1";
+  const { user, logout } = useAuth();
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     content: true,
@@ -54,8 +60,8 @@ const Sidebar = () => {
     <aside className="w-[260px] h-screen shrink-0 bg-[#E8ECF2] flex flex-col z-50 border-none font-sans antialiased">
       {/* 1. BRAND IDENTITY SECTION */}
       <div className="flex items-center gap-3 px-6 py-8 mb-2">
-        <div className="w-10 h-10 bg-[#0052FF] rounded-[14px] flex items-center justify-center text-white font-black text-xl shadow-[0_4px_12px_rgba(0,82,255,0.2)]">
-          R
+        <div className="w-10 h-10 bg-[#0052FF] rounded-[14px] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(0,82,255,0.2)]">
+          <FaRocket size={20} />
         </div>
         <div className="flex flex-col">
           <span className="font-black text-xl text-[#1A1D23] tracking-tight leading-none">
@@ -128,7 +134,7 @@ const Sidebar = () => {
               ].map((item) => (
                 <Link
                   key={item.path}
-                  href={`/pages/appPages/1/${item.path}`}
+                  href={`/${accountId}/${item.path}`}
                   className={`${subLinkBase} border-none no-underline outline-none ${
                     isActive(item.path)
                       ? "text-[#0052FF] bg-white shadow-sm"
@@ -167,19 +173,19 @@ const Sidebar = () => {
           {openMenus.idea && (
             <div className="ml-5 mt-1 border-l-2 border-slate-200/50 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
               <Link
-                href="/pages/appPages/1/explorePostIdeas"
+                href={`/${accountId}/explorePostIdeas`}
                 className={`${subLinkBase} ${isActive("explorePostIdeas") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
                 Explore Trending
               </Link>
               <Link
-                href="/pages/appPages/1/generateIdeas"
+                href={`/${accountId}/generateIdeas`}
                 className={`${subLinkBase} ${isActive("generateIdeas") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
                 Find Post Ideas
               </Link>
               <Link
-                href="/pages/appPages/1/questionMine"
+                href={`/${accountId}/questionMine`}
                 className={`${subLinkBase} ${isActive("questionMine") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
                 Question Mine
@@ -193,7 +199,7 @@ const Sidebar = () => {
 
         <div className="space-y-1">
           <Link
-            href="/pages/appPages/1/publishing"
+            href={`/${accountId}/publishing`}
             className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none ${
               isActive("publishing") ? activeMainLink : inactiveMainLink
             }`}
@@ -208,7 +214,7 @@ const Sidebar = () => {
           </Link>
 
           <Link
-            href="/pages/appPages/1/analytics"
+            href={`/${accountId}/analytics`}
             className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none ${
               isActive("analytics") ? activeMainLink : inactiveMainLink
             }`}
@@ -298,35 +304,34 @@ const Sidebar = () => {
         </Link>
       </div>
 
-      {/* 4. PREMIUM FOOTER SECTION */}
+      {/* 4. USER FOOTER SECTION */}
       <div className="p-4 mt-auto">
-        {/* PRO CARD: Bright Bento Style */}
         <div className="relative overflow-hidden bg-white rounded-3xl p-5 group transition-all duration-300 shadow-sm hover:shadow-md border border-white/60">
-          <div className="absolute -top-6 -right-6 opacity-10 group-hover:scale-125 transition-transform duration-700 ease-out">
-            <HiSparkles size={100} className="text-[#0052FF]" />
-          </div>
-
           <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[#1A1D23] text-[13px] font-black tracking-tight">
-                PRO Active
-              </span>
-              <div className="px-2 py-0.5 bg-[#F3FFE5] text-[#4D8C00] rounded-full text-[10px] font-bold tracking-wide">
-                100%
+            {/* User Info */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-[#0052FF] rounded-xl flex items-center justify-center text-white text-[14px] font-black shrink-0">
+                {user
+                  ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
+                  : "?"}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[#1A1D23] text-[13px] font-black tracking-tight truncate">
+                  {user ? `${user.firstName} ${user.lastName}` : "Guest"}
+                </span>
+                <span className="text-slate-400 text-[11px] font-medium truncate">
+                  {user?.email || "Not signed in"}
+                </span>
               </div>
             </div>
 
-            <p className="text-slate-500 text-[11px] leading-relaxed mb-4 font-medium pr-2">
-              All advanced AI analysis and priority tools are enabled.
-            </p>
-
-            <button className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#0052FF] hover:bg-blue-700 text-white text-[12px] font-bold rounded-xl transition-all shadow-[0_4px_12px_rgba(0,82,255,0.2)] active:scale-95">
-              <FaChrome size={14} />
-              Extension
-              <FaArrowRight
-                size={10}
-                className="ml-1 opacity-80 group-hover:translate-x-1 transition-transform"
-              />
+            {/* Logout Button */}
+            <button
+              onClick={logout}
+              className="flex items-center justify-center gap-2 w-full py-2.5 font-bold rounded-xl transition-all bg-[#F1F5F9] hover:bg-red-50 text-slate-500 hover:text-red-500 text-[13px]"
+            >
+              <FaSignOutAlt size={14} />
+              Sign Out
             </button>
           </div>
         </div>

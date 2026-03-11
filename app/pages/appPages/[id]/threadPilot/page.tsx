@@ -16,8 +16,6 @@ export default function ThreadPilotPage() {
       <div className="flex-shrink-0">
         <TopMenu
           pageName="ThreadPilot Auto-Pilot"
-          userName="Robert Downey Jr."
-          userTier="Free Tier"
           tokens={2000}
         />
       </div>

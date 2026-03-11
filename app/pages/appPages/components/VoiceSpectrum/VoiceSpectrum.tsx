@@ -181,7 +181,7 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
             <button
               onClick={handleMimic}
               disabled={isMimicking}
-              className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)] active:scale-[0.98]"
+              className="w-full py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-[#000100] hover:bg-black text-white"
             >
               {isMimicking ? (
                 <BsLightningChargeFill className="animate-pulse text-[#caee55]" />

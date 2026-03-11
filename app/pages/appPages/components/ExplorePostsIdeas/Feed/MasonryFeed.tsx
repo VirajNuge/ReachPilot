@@ -182,7 +182,7 @@ export default function MasonryFeed({ onRemixRequest }: MasonryFeedProps) {
       <div className="flex flex-col items-center justify-center h-[400px] text-gray-400">
         <Ghost size={48} className="mb-4 opacity-50" />
         <p className="text-sm font-medium">No trends found for this topic.</p>
-        <button className="mt-4 text-indigo-600 font-bold text-xs hover:underline">
+        <button className="mt-4 font-bold hover:underline bg-[#000100] hover:bg-black text-white">
           Reset Filters
         </button>
       </div>

@@ -191,7 +191,7 @@ export function CrossPlatformDashboard({
 
       {onAddPlatform && (
         <motion.button
-          className="add-platform-btn"
+          className="add-platform-btn bg-[#000100] hover:bg-black text-white"
           onClick={onAddPlatform}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}

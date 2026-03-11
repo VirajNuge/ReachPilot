@@ -226,9 +226,6 @@ export default function PostAnalyzerPage() {
                 <button className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm">
                   <FaSearch /> Find Similar
                 </button>
-                <button className="px-4 py-2 bg-[#1A1D23] text-white rounded-xl text-xs font-bold hover:bg-black transition-colors flex items-center gap-2 shadow-sm">
-                  <FaMagic /> Generate Ideas
-                </button>
                 <button className="p-2 bg-white text-slate-500 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
                   <FaShare />
                 </button>

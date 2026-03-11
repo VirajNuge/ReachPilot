@@ -172,7 +172,7 @@ export default function LeadPersonaID({
           </div>
 
           <div className="mt-auto pt-4">
-            <button className="w-full mt-3 py-3 border border-slate-200 text-[#1A1D23] rounded-2xl text-[13px] font-bold hover:bg-slate-50 transition-colors">
+            <button className="w-full mt-3 py-3 rounded-2xl font-bold transition-colors bg-[#000100] hover:bg-black text-white">
               Export Prospects (.CSV)
             </button>
           </div>

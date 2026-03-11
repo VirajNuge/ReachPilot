@@ -26,8 +26,6 @@ export default function TrendScoutPage() {
       <div className="flex-shrink-0">
         <TopMenu
           pageName="Trend Scout"
-          userName="Robert Downey Jr."
-          userTier="Free Tier"
           tokens={2000}
         />
       </div>

@@ -57,11 +57,6 @@ export default function TemplateLibraryPage({
     MOCK_FOLDERS.find((f) => f.id === selectedFolderId)?.name || "Library";
 
   // --- Actions ---
-  const handleUseTemplate = (template: ReachPilotTemplate) => {
-    router.push(
-      `/appPages/${id}/postGenerator?templateId=${template.id}&folder=${selectedFolderId}`,
-    );
-  };
 
   const handlePreview = (template: ReachPilotTemplate) => {
     setSelectedTemplate(template);
@@ -73,9 +68,7 @@ export default function TemplateLibraryPage({
   return (
     <>
       <TopMenu
-        pageName="Profile Comparison"
-        userName="Robert Downey Jr."
-        userTier="Free Tier"
+        pageName="Template Library"
         tokens={2000}
       />
       <div className="flex h-[calc(100vh-64px)] bg-[#fbfaff]">
@@ -159,7 +152,6 @@ export default function TemplateLibraryPage({
                     key={template.id}
                     template={template}
                     onPreview={handlePreview}
-                    onUse={handleUseTemplate}
                   />
                 ))}
               </div>
@@ -195,7 +187,6 @@ export default function TemplateLibraryPage({
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             template={selectedTemplate}
-            onUse={handleUseTemplate}
           />
         )}
       </div>

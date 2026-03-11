@@ -74,7 +74,7 @@ const AccQkFix: React.FC<AccQkFixProps> = ({ headline, description, tag }) => {
             <div
               className={`scale-75 opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100`}
             >
-              <button className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-900">
+              <button className="flex h-6 w-6 items-center justify-center rounded-full bg-[#000100] hover:bg-black text-white">
                 <BsX size={14} />
               </button>
             </div>
@@ -91,7 +91,7 @@ const AccQkFix: React.FC<AccQkFixProps> = ({ headline, description, tag }) => {
               {tag}
             </span>
 
-            <button className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-indigo-600 hover:text-indigo-700 transition-colors">
+            <button className="flex items-center gap-1 font-bold uppercase tracking-wider transition-colors bg-[#000100] hover:bg-black text-white">
               Fix Now <BsArrowRightShort size={14} />
             </button>
           </div>

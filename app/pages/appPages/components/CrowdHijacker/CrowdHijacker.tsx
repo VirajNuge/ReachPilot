@@ -87,7 +87,7 @@ export default function CrowdHijacker({ crowdTactics }: CrowdHijackerProps) {
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-[#f4f8fb] px-2 py-1 rounded-lg border border-slate-100">
                       {tactic.targetParams}
                     </span>
-                    <button className="px-4 py-2 bg-[#000100] hover:bg-black text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.29)]">
+                    <button className="px-4 py-2 font-bold rounded-xl flex items-center gap-2 transition-all bg-[#000100] hover:bg-black text-white">
                       <FaRocket className="text-[#caee55]" /> Execute Now
                     </button>
                   </div>

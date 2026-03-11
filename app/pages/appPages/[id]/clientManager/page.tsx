@@ -47,8 +47,6 @@ export default function ClientManagerPage() {
       <div className="flex-shrink-0">
         <TopMenu
           pageName="CRM Pipeline"
-          userName="Robert Downey Jr."
-          userTier="Agency"
           tokens={2000}
         />
       </div>

@@ -273,7 +273,7 @@ export default function PriorityHeatmap({
                 </div>
               </div>
 
-              <button className="w-full mt-4 py-3 bg-[#000100] hover:bg-black text-white rounded-2xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_4px_14px_0_rgba(0,0,0,0.39)]">
+              <button className="w-full mt-4 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-[#000100] hover:bg-black text-white">
                 <FaRocket className="text-[#caee55]" /> Start Execution
               </button>
             </motion.div>

@@ -63,7 +63,7 @@ const GhostDraftModal: React.FC<GhostDraftModalProps> = ({ idea, onClose }) => {
               <div className="absolute top-0 right-0 p-4 z-20">
                 <button
                   onClick={onClose}
-                  className="bg-white/20 hover:bg-white/30 text-white rounded-full p-2 transition-all backdrop-blur-sm"
+                  className="rounded-full p-2 transition-all backdrop-blur-sm bg-[#000100] hover:bg-black text-white"
                 >
                   <BsX size={20} />
                 </button>
@@ -149,7 +149,7 @@ const GhostDraftModal: React.FC<GhostDraftModalProps> = ({ idea, onClose }) => {
 
                   <button
                     onClick={onClose}
-                    className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors"
+                    className="w-full py-3 font-bold rounded-xl transition-colors bg-[#000100] hover:bg-black text-white"
                   >
                     Save to Clipboard
                   </button>

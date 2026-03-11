@@ -538,8 +538,6 @@ export default function Comparison() {
       {/* Top Menu Component */}
       <TopMenu
         pageName="Profile Comparison"
-        userName="Robert Downey Jr."
-        userTier="Free Tier"
         tokens={2000}
       />
       <div className="flex gap-3 mt-[12px] mb-[12px]">

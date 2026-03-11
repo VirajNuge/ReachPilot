@@ -1,0 +1,1397 @@
+{
+  "analysis": {
+    "profile": {
+      "name": "Mahesh Chulet",
+      "headline": "SaaS & Digital Marketing Insights",
+      "followers": 944,
+      "projects": "http://logitia.com",
+      "profileScore": 45,
+      "bio": "scaling software services business of \nhttp://\nlogitia.com,  deeply into building SaaS & digital marketing",
+      "pfp": "https://pbs.twimg.com/profile_images/2016089274761048064/U2uZ0b7t_bigger.jpg",
+      "banner": "https://pbs.twimg.com/profile_banners/18550300/1664652853/1080x360",
+      "followingCount": 498
+    },
+    "quickFixes": [
+      {
+        "headline": "Optimize Posting Times",
+        "description": "Posting during peak hours (9 AM, 12 PM, 3 PM, 6 PM) could boost engagement significantly.",
+        "tag": "HIGH IMPACT"
+      },
+      {
+        "headline": "Incorporate Visual Content",
+        "description": "Adding images or videos could increase engagement by 2-3x.",
+        "tag": "HIGH IMPACT"
+      },
+      {
+        "headline": "Engage in Conversations",
+        "description": "Actively participate in relevant conversations to build community.",
+        "tag": "HIGH IMPACT"
+      },
+      {
+        "headline": "Refine Profile Bio",
+        "description": "A clearer bio can attract more relevant followers.",
+        "tag": "MEDIUM IMPACT"
+      },
+      {
+        "headline": "Add Relevant Keywords",
+        "description": "Using industry-specific keywords can improve searchability.",
+        "tag": "MEDIUM IMPACT"
+      },
+      {
+        "headline": "Experiment with Polls",
+        "description": "Polls can be a great way to increase audience interaction.",
+        "tag": "LOW IMPACT"
+      },
+      {
+        "headline": "Share User Success Stories",
+        "description": "Highlighting user achievements can build trust and credibility.",
+        "tag": "LOW IMPACT"
+      }
+    ],
+    "bioAnalysis": {
+      "clarityScore": 6,
+      "keywordScore": 7,
+      "tone": "Informative and question-oriented",
+      "strengths": [
+        "Focus on SaaS and digital marketing",
+        "Asks engaging questions to prompt discussion",
+        "Shares advice for founders"
+      ],
+      "weaknesses": [
+        "Profile bio could be more specific",
+        "Lacks visual content",
+        "Engagement is inconsistent"
+      ],
+      "suggestions": [
+        "Clearly define target audience in bio",
+        "Incorporate relevant hashtags in posts",
+        "Use images/videos to enhance content"
+      ]
+    },
+    "keywords": {
+      "current": [
+        "founder",
+        "SaaS",
+        "digital marketing",
+        "build in public",
+        "advice",
+        "paying user",
+        "solo founder",
+        "consistent"
+      ],
+      "missing": [
+        "growth hacking",
+        "marketing automation",
+        "lead generation",
+        "customer acquisition",
+        "SEO",
+        "content marketing",
+        "social media marketing",
+        "startup"
+      ]
+    },
+    "textAnalysis": {
+      "frequency": "3.3 posts/day, which is within the optimal range.",
+      "contentMix": "100% text-based content. Lacks variety.",
+      "engagement": "Engagement is inconsistent with spikes in Post 3, but generally low."
+    },
+    "contentMetrics": {
+      "frequencyScore": 85,
+      "contentMixScore": 20,
+      "engagementScore": 30
+    },
+    "pulseHeartbeat": [
+      {
+        "day": "Mon",
+        "activityScore": 10,
+        "postsCount": 0,
+        "peakHour": "N/A",
+        "trend": "Flat"
+      },
+      {
+        "day": "Tue",
+        "activityScore": 10,
+        "postsCount": 0,
+        "peakHour": "N/A",
+        "trend": "Flat"
+      },
+      {
+        "day": "Wed",
+        "activityScore": 10,
+        "postsCount": 0,
+        "peakHour": "N/A",
+        "trend": "Flat"
+      },
+      {
+        "day": "Thu",
+        "activityScore": 50,
+        "postsCount": 3,
+        "peakHour": "6 PM",
+        "trend": "Flat"
+      },
+      {
+        "day": "Fri",
+        "activityScore": 60,
+        "postsCount": 3,
+        "peakHour": "6 PM",
+        "trend": "Flat"
+      },
+      {
+        "day": "Sat",
+        "activityScore": 70,
+        "postsCount": 3,
+        "peakHour": "2 PM",
+        "trend": "Flat"
+      },
+      {
+        "day": "Sun",
+        "activityScore": 10,
+        "postsCount": 0,
+        "peakHour": "N/A",
+        "trend": "Flat"
+      }
+    ],
+    "schedule": [
+      {
+        "day": "MONDAY",
+        "slots": [
+          {
+            "id": "09:00",
+            "label": "9 AM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "12:00",
+            "label": "12 PM",
+            "value": 25,
+            "engagement": "Low"
+          },
+          {
+            "id": "15:00",
+            "label": "3 PM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "18:00",
+            "label": "6 PM",
+            "value": 20,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "TUESDAY",
+        "slots": [
+          {
+            "id": "09:00",
+            "label": "9 AM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "12:00",
+            "label": "12 PM",
+            "value": 25,
+            "engagement": "Low"
+          },
+          {
+            "id": "15:00",
+            "label": "3 PM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "18:00",
+            "label": "6 PM",
+            "value": 20,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "WEDNESDAY",
+        "slots": [
+          {
+            "id": "09:00",
+            "label": "9 AM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "12:00",
+            "label": "12 PM",
+            "value": 25,
+            "engagement": "Low"
+          },
+          {
+            "id": "15:00",
+            "label": "3 PM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "18:00",
+            "label": "6 PM",
+            "value": 20,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "THURSDAY",
+        "slots": [
+          {
+            "id": "09:00",
+            "label": "9 AM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "12:00",
+            "label": "12 PM",
+            "value": 50,
+            "engagement": "Medium"
+          },
+          {
+            "id": "15:00",
+            "label": "3 PM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "18:00",
+            "label": "6 PM",
+            "value": 60,
+            "engagement": "Medium"
+          }
+        ]
+      },
+      {
+        "day": "FRIDAY",
+        "slots": [
+          {
+            "id": "09:00",
+            "label": "9 AM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "12:00",
+            "label": "12 PM",
+            "value": 25,
+            "engagement": "Low"
+          },
+          {
+            "id": "15:00",
+            "label": "3 PM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "18:00",
+            "label": "6 PM",
+            "value": 60,
+            "engagement": "Medium"
+          }
+        ]
+      },
+      {
+        "day": "SATURDAY",
+        "slots": [
+          {
+            "id": "09:00",
+            "label": "9 AM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "12:00",
+            "label": "12 PM",
+            "value": 60,
+            "engagement": "Medium"
+          },
+          {
+            "id": "15:00",
+            "label": "3 PM",
+            "value": 50,
+            "engagement": "Medium"
+          },
+          {
+            "id": "18:00",
+            "label": "6 PM",
+            "value": 20,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "SUNDAY",
+        "slots": [
+          {
+            "id": "09:00",
+            "label": "9 AM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "12:00",
+            "label": "12 PM",
+            "value": 25,
+            "engagement": "Low"
+          },
+          {
+            "id": "15:00",
+            "label": "3 PM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "18:00",
+            "label": "6 PM",
+            "value": 20,
+            "engagement": "Low"
+          }
+        ]
+      }
+    ],
+    "scheduleHighlight": "Post most frequently on Thursday, Friday, and Saturday. Prioritize posting at 6 PM and 12 PM for higher engagement.",
+    "csiScore": 55,
+    "contentPillars": [
+      {
+        "name": "Founder Advice",
+        "percentage": 0.4,
+        "count": 4,
+        "avgEngagement": "Low",
+        "description": "Posts offering tips and insights for founders, often phrased as questions.",
+        "topPosts": [
+          {
+            "id": "4",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "As a solo founder, how long did you wait before you got your first paying user after launch?",
+            "thumbnail": ""
+          },
+          {
+            "id": "5",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "Biggest solo founder advantage: speed. Biggest solo founder weakness: no mirror.",
+            "thumbnail": ""
+          }
+        ],
+        "color": "#8b5cf6"
+      },
+      {
+        "name": "Product Sharing",
+        "percentage": 0.1,
+        "count": 1,
+        "avgEngagement": "High",
+        "description": "Posts specifically designed to get audience members to share their product links.",
+        "topPosts": [
+          {
+            "id": "3",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "share your Product Link.",
+            "thumbnail": ""
+          }
+        ],
+        "color": "#3b82f6"
+      },
+      {
+        "name": "General Questions",
+        "percentage": 0.3,
+        "count": 3,
+        "avgEngagement": "Low",
+        "description": "Open-ended questions about business and engineering.",
+        "topPosts": [
+          {
+            "id": "2",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "What matters more in engineering? - Code quality - Speed of delivery - Scalability - Simplicity",
+            "thumbnail": ""
+          },
+          {
+            "id": "10",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "What do you build first? 1. MVP 2. Landing page 3. Audience 4. Waitlist",
+            "thumbnail": ""
+          }
+        ],
+        "color": "#10b981"
+      },
+      {
+        "name": "Personal Branding",
+        "percentage": 0.1,
+        "count": 1,
+        "avgEngagement": "Low",
+        "description": "Posts about building a personal brand",
+        "topPosts": [
+          {
+            "id": "7",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "Build a strong personal brand: → Choose your passion → Show your expertise → Be consistent in posting → Engage genuinely → Show your face",
+            "thumbnail": ""
+          }
+        ],
+        "color": "#f59e0b"
+      },
+      {
+        "name": "Contrarian Advice",
+        "percentage": 0.1,
+        "count": 1,
+        "avgEngagement": "Low",
+        "description": "Advice that goes against common wisdom.",
+        "topPosts": [
+          {
+            "id": "6",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "\"Just be consistent\" Is a bullsh*t advice. Consistency in the wrong direction can waste all the efforts and time.",
+            "thumbnail": ""
+          }
+        ],
+        "color": "#ef4444"
+      }
+    ],
+    "pillarInsight": "The 'Product Sharing' pillar drives the highest engagement. Leverage this by creating more prompts for users to share their products.",
+    "postDNA": [
+      {
+        "hookType": "Direct Question",
+        "format": "Text",
+        "topic": "Link Sharing",
+        "verdict": "Post 3 performed well due to a direct call to action to share product links, resulting in high replies."
+      },
+      {
+        "hookType": "Open Question",
+        "format": "Text",
+        "topic": "Engineering",
+        "verdict": "Post 2 had low engagement due to a broad topic and lack of visual appeal."
+      },
+      {
+        "hookType": "Statement",
+        "format": "Text",
+        "topic": "Solo Founder Advice",
+        "verdict": "Post 5 performed poorly due to the lack of a specific question or call to action."
+      },
+      {
+        "hookType": "Contrarian",
+        "format": "Text",
+        "topic": "Consistency",
+        "verdict": "Post 6 did not resonate well due to its negative and confrontational tone."
+      },
+      {
+        "hookType": "Direct Question",
+        "format": "Text",
+        "topic": "Product Development",
+        "verdict": "Post 10 had moderate engagement because it asked a relevant question to founders."
+      }
+    ],
+    "engagementVitals": {
+      "engagementRate": 0,
+      "benchmarkRate": 1.5,
+      "reachEfficiency": 10,
+      "interactionRatio": 6.08,
+      "status": "Critical",
+      "insight": "Engagement rates are significantly below platform benchmarks due to a lack of impressions data, indicating low visibility and reach."
+    },
+    "velocity": {
+      "hookRate": 15,
+      "category": "Pulse",
+      "velocityGraph": [
+        {
+          "hour": "1h",
+          "engagement": 1
+        },
+        {
+          "hour": "2h",
+          "engagement": 2
+        },
+        {
+          "hour": "4h",
+          "engagement": 3
+        },
+        {
+          "hour": "12h",
+          "engagement": 6
+        },
+        {
+          "hour": "24h",
+          "engagement": 10
+        }
+      ],
+      "insight": "Hooks lack immediate intrigue, causing low initial interaction rates."
+    },
+    "psychTriggers": {
+      "radarData": [
+        {
+          "trigger": "Urgency",
+          "score": 5,
+          "fullMark": 100
+        },
+        {
+          "trigger": "Curiosity",
+          "score": 65,
+          "fullMark": 100
+        },
+        {
+          "trigger": "Social Proof",
+          "score": 10,
+          "fullMark": 100
+        },
+        {
+          "trigger": "Authority",
+          "score": 30,
+          "fullMark": 100
+        },
+        {
+          "trigger": "FOMO",
+          "score": 10,
+          "fullMark": 100
+        },
+        {
+          "trigger": "Reciprocity",
+          "score": 40,
+          "fullMark": 100
+        }
+      ],
+      "winningTrigger": "Curiosity",
+      "insight": "Questions pique interest, leading to higher engagement compared to other triggers."
+    },
+    "postFatigue": {
+      "status": "Warning",
+      "fatigueScore": 60,
+      "optimalFrequency": "Once a day",
+      "saturationPoint": 2,
+      "weeklyImpact": [
+        {
+          "day": "Mon",
+          "posts": 0,
+          "impactScore": 0.8
+        },
+        {
+          "day": "Tue",
+          "posts": 0,
+          "impactScore": 0.8
+        },
+        {
+          "day": "Wed",
+          "posts": 0,
+          "impactScore": 0.8
+        },
+        {
+          "day": "Thu",
+          "posts": 3,
+          "impactScore": 0.9
+        },
+        {
+          "day": "Fri",
+          "posts": 3,
+          "impactScore": 0.9
+        },
+        {
+          "day": "Sat",
+          "posts": 3,
+          "impactScore": 1.2
+        },
+        {
+          "day": "Sun",
+          "posts": 0,
+          "impactScore": 0.7
+        }
+      ]
+    },
+    "viralRecipe": [
+      {
+        "id": "3",
+        "engagementMultiplier": "12.6x",
+        "hookType": "Call to Action",
+        "hookText": "|￣￣￣￣￣￣￣￣￣￣￣￣￣￣|\n|     share your Product Link.        |\n|＿＿＿＿＿＿＿＿＿＿＿＿＿＿|",
+        "ingredients": [
+          {
+            "name": "Direct Ask",
+            "value": "Clear request for product links",
+            "score": 9
+          },
+          {
+            "name": "Visual Element",
+            "value": "Text-based graphic",
+            "score": 7
+          },
+          {
+            "name": "Simplicity",
+            "value": "Easy to understand prompt",
+            "score": 8
+          }
+        ],
+        "whyItWorked": "Direct ask combined with visual cue triggered a strong response.",
+        "templateStructure": [
+          "1. Hook: [Clear call to share]",
+          "2. Graphic: [Simple visual]",
+          "3. Incentive: [Community involvement]",
+          "4. Result: [Product sharing]"
+        ]
+      }
+    ],
+    "voiceSpectrum": {
+      "personaName": "The SaaS Guide",
+      "axes": [
+        {
+          "id": "formal",
+          "leftLabel": "Formal",
+          "rightLabel": "Casual",
+          "score": 30
+        },
+        {
+          "id": "technical",
+          "leftLabel": "Technical",
+          "rightLabel": "Simple",
+          "score": 40
+        },
+        {
+          "id": "serious",
+          "leftLabel": "Serious",
+          "rightLabel": "Playful",
+          "score": 10
+        },
+        {
+          "id": "dataDriven",
+          "leftLabel": "Data-driven",
+          "rightLabel": "Story-driven",
+          "score": -20
+        }
+      ],
+      "signatureWords": [
+        "founder",
+        "build",
+        "advantage",
+        "consistent",
+        "advice"
+      ],
+      "insight": "A balanced voice, leaning slightly towards casual and simple, helps connect with a broader audience."
+    },
+    "crowdPersonas": {
+      "primaryArchetype": {
+        "id": "saas_founder",
+        "role": "The Aspiring Founder",
+        "iconName": "Rocket",
+        "color": "#3b82f6",
+        "bio": "Early-stage entrepreneurs seeking actionable advice on building and launching SaaS products.",
+        "percentage": 50,
+        "triggers": [
+          "MVP",
+          "Launch",
+          "Paying users"
+        ],
+        "painPoints": [
+          "Acquiring first users",
+          "Validating product ideas"
+        ]
+      },
+      "secondaryArchetypes": [
+        {
+          "id": "indie_hacker",
+          "role": "The Indie Hacker",
+          "iconName": "LaptopCode",
+          "color": "#8b5cf6",
+          "bio": "Independent developers focused on building and scaling side projects.",
+          "percentage": 30,
+          "triggers": [
+            "Build in public",
+            "Personal brand",
+            "Consistency"
+          ],
+          "painPoints": [
+            "Balancing speed and quality",
+            "Staying motivated solo"
+          ]
+        },
+        {
+          "id": "experienced_founder",
+          "role": "The Seasoned Founder",
+          "iconName": "UserTie",
+          "color": "#10b981",
+          "bio": "Experienced entrepreneurs offering advice and insights based on their past ventures.",
+          "percentage": 20,
+          "triggers": [
+            "Founder advice",
+            "Engineering",
+            "Product link"
+          ],
+          "painPoints": [
+            "Finding new opportunities",
+            "Giving back to community"
+          ]
+        }
+      ],
+      "insight": {
+        "title": "Focus on Early-Stage Advice",
+        "description": "The audience is primarily aspiring founders and indie hackers seeking practical advice. Provide content that directly addresses their challenges.",
+        "actionable": "Create more content focused on MVP development, user acquisition, and validation strategies."
+      }
+    },
+    "crowdSentiment": {
+      "totalComments": 204,
+      "vibeScore": 7,
+      "vibes": [
+        {
+          "type": "Fanboys",
+          "percentage": 10,
+          "count": 20,
+          "keywords": [
+            "amazing",
+            "love this",
+            "fire",
+            "need this",
+            "obsessed",
+            "great"
+          ],
+          "color": "#8b5cf6",
+          "description": "Social Proof & Loyalty"
+        },
+        {
+          "type": "Seekers",
+          "percentage": 60,
+          "count": 122,
+          "keywords": [
+            "share link",
+            "product link",
+            "how long",
+            "wait before",
+            "best advice",
+            "build first"
+          ],
+          "color": "#3b82f6",
+          "description": "Unmet Demand (High Intent)"
+        },
+        {
+          "type": "Skeptics",
+          "percentage": 20,
+          "count": 41,
+          "keywords": [
+            "wrong answers",
+            "what matters more",
+            "consistent",
+            "bullshit",
+            "solo founder",
+            "biggest"
+          ],
+          "color": "#f59e0b",
+          "description": "Trust Barriers"
+        },
+        {
+          "type": "Critics",
+          "percentage": 10,
+          "count": 21,
+          "keywords": [
+            "in engineering",
+            "solo founder",
+            "what do you build",
+            "consistency in the wrong direction",
+            "share your product link",
+            "just be consistent"
+          ],
+          "color": "#ef4444",
+          "description": "Vulnerabilities"
+        }
+      ],
+      "sentimentTrend": [
+        {
+          "post": 1,
+          "score": 6.5
+        },
+        {
+          "post": 2,
+          "score": 7.2
+        },
+        {
+          "post": 3,
+          "score": 8.1
+        },
+        {
+          "post": 4,
+          "score": 6.8
+        },
+        {
+          "post": 5,
+          "score": 6.2
+        }
+      ]
+    },
+    "questionCloud": [
+      {
+        "id": "kw_1",
+        "word": "Product Link",
+        "count": 183,
+        "engagement": 75,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "share your Product Link",
+            "likes": 69
+          }
+        ]
+      },
+      {
+        "id": "kw_2",
+        "word": "Solo Founder",
+        "count": 6,
+        "engagement": 55,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "As a solo founder, how long did you wait before you got your first paying user after launch?",
+            "likes": 7
+          },
+          {
+            "text": "Biggest solo founder advantage: speed.",
+            "likes": 3
+          }
+        ]
+      },
+      {
+        "id": "kw_3",
+        "word": "Engineering",
+        "count": 3,
+        "engagement": 60,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "What matters more in engineering?",
+            "likes": 7
+          }
+        ]
+      },
+      {
+        "id": "kw_4",
+        "word": "Founder Advice",
+        "count": 6,
+        "engagement": 50,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "As a founder, whats your best advice to new founders?",
+            "likes": 6
+          }
+        ]
+      },
+      {
+        "id": "kw_5",
+        "word": "MVP",
+        "count": 3,
+        "engagement": 50,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "What do you build first?",
+            "likes": 10
+          }
+        ]
+      }
+    ],
+    "activeHours": [
+      {
+        "hour": 0,
+        "creatorPosts": 0,
+        "audienceActivity": 5
+      },
+      {
+        "hour": 1,
+        "creatorPosts": 0,
+        "audienceActivity": 5
+      },
+      {
+        "hour": 2,
+        "creatorPosts": 0,
+        "audienceActivity": 5
+      },
+      {
+        "hour": 3,
+        "creatorPosts": 0,
+        "audienceActivity": 5
+      },
+      {
+        "hour": 4,
+        "creatorPosts": 0,
+        "audienceActivity": 5
+      },
+      {
+        "hour": 5,
+        "creatorPosts": 0,
+        "audienceActivity": 5
+      },
+      {
+        "hour": 6,
+        "creatorPosts": 0,
+        "audienceActivity": 10
+      },
+      {
+        "hour": 7,
+        "creatorPosts": 0,
+        "audienceActivity": 10
+      },
+      {
+        "hour": 8,
+        "creatorPosts": 0,
+        "audienceActivity": 15
+      },
+      {
+        "hour": 9,
+        "creatorPosts": 0,
+        "audienceActivity": 20
+      },
+      {
+        "hour": 10,
+        "creatorPosts": 0,
+        "audienceActivity": 25
+      },
+      {
+        "hour": 11,
+        "creatorPosts": 0,
+        "audienceActivity": 30
+      },
+      {
+        "hour": 12,
+        "creatorPosts": 1,
+        "audienceActivity": 50
+      },
+      {
+        "hour": 13,
+        "creatorPosts": 0,
+        "audienceActivity": 40
+      },
+      {
+        "hour": 14,
+        "creatorPosts": 2,
+        "audienceActivity": 60
+      },
+      {
+        "hour": 15,
+        "creatorPosts": 0,
+        "audienceActivity": 40
+      },
+      {
+        "hour": 16,
+        "creatorPosts": 0,
+        "audienceActivity": 30
+      },
+      {
+        "hour": 17,
+        "creatorPosts": 0,
+        "audienceActivity": 40
+      },
+      {
+        "hour": 18,
+        "creatorPosts": 3,
+        "audienceActivity": 70
+      },
+      {
+        "hour": 19,
+        "creatorPosts": 0,
+        "audienceActivity": 60
+      },
+      {
+        "hour": 20,
+        "creatorPosts": 2,
+        "audienceActivity": 80
+      },
+      {
+        "hour": 21,
+        "creatorPosts": 0,
+        "audienceActivity": 70
+      },
+      {
+        "hour": 22,
+        "creatorPosts": 0,
+        "audienceActivity": 40
+      },
+      {
+        "hour": 23,
+        "creatorPosts": 1,
+        "audienceActivity": 30
+      }
+    ],
+    "tribes": [
+      {
+        "name": "Aspiring Founders",
+        "size": 40,
+        "growth": "Stable",
+        "sentiment": "Positive"
+      },
+      {
+        "name": "Indie Hackers",
+        "size": 30,
+        "growth": "Growing",
+        "sentiment": "Neutral"
+      },
+      {
+        "name": "Seasoned Entrepreneurs",
+        "size": 20,
+        "growth": "Declining",
+        "sentiment": "Positive"
+      },
+      {
+        "name": "Engineering Professionals",
+        "size": 10,
+        "growth": "Stable",
+        "sentiment": "Neutral"
+      }
+    ],
+    "shadowAudience": {
+      "lurkersPercent": 80,
+      "engagersPercent": 20,
+      "insight": "A small fraction of the audience actively engages; focus on drawing out silent observers."
+    },
+    "audienceTemperature": {
+      "tempScore": 58,
+      "label": "Warm",
+      "fanboyPercent": 10,
+      "criticPercent": 10,
+      "dominantEmotion": "Curious",
+      "recommendation": "Incorporate strong calls to action to convert curious followers into active engagers."
+    },
+    "hypeValueScore": {
+      "hype": 35,
+      "value": 65
+    },
+    "ideaBank": [
+      {
+        "concept": "Share a detailed case study of a SaaS business you helped scale.",
+        "impact": "Showcase expertise and attract potential clients."
+      },
+      {
+        "concept": "Create a poll asking founders about their biggest challenges in the first year.",
+        "impact": "Increase engagement and gather valuable audience insights."
+      },
+      {
+        "concept": "Offer a free checklist for building a strong personal brand for founders.",
+        "impact": "Generate leads and provide valuable content."
+      },
+      {
+        "concept": "Run a 'wrong answers only' thread about common SaaS startup mistakes.",
+        "impact": "Boost engagement and inject humor into your content."
+      },
+      {
+        "concept": "Share a personal story about a time you failed as a founder and what you learned.",
+        "impact": "Build trust and connect with your audience on a human level."
+      }
+    ],
+    "leadMagnet": {
+      "type": "Checklist",
+      "title": "SaaS Growth Checklist",
+      "hook": "Scale your SaaS business to the next level.",
+      "friction": "Low",
+      "temp": "Cold",
+      "suggestion": "Offer a free email course on SaaS growth.",
+      "whyItWorks": "Provides actionable steps for SaaS growth."
+    },
+    "ctaAnalysis": {
+      "mix": [
+        {
+          "type": "Engagement",
+          "score": 60,
+          "fullMark": 100
+        },
+        {
+          "type": "Bridge",
+          "score": 10,
+          "fullMark": 100
+        },
+        {
+          "type": "Conversion",
+          "score": 5,
+          "fullMark": 100
+        },
+        {
+          "type": "Conversation",
+          "score": 25,
+          "fullMark": 100
+        }
+      ],
+      "topTrigger": {
+        "keyword": "Share",
+        "count": 2
+      },
+      "urgencyScore": 5,
+      "dominantStyle": "Reach Hunter",
+      "placementHeatmap": [
+        {
+          "location": "First Line",
+          "count": 2
+        },
+        {
+          "location": "Bottom",
+          "count": 5
+        },
+        {
+          "location": "P.S.",
+          "count": 0
+        }
+      ]
+    },
+    "techStack": {
+      "tools": [
+        {
+          "category": "Hosting",
+          "name": "Unknown",
+          "confidence": "Low"
+        },
+        {
+          "category": "Marketing",
+          "name": "Unknown",
+          "confidence": "Low"
+        },
+        {
+          "category": "Payment",
+          "name": "Unknown",
+          "confidence": "Low"
+        }
+      ],
+      "businessClass": "Hobbyist",
+      "verdict": "Appears to be a standard marketing setup with low overhead."
+    },
+    "valueLadder": {
+      "products": {
+        "Bait": {
+          "name": "Socialjobs.in",
+          "price": "Free",
+          "type": "Job board",
+          "intensity": "Low"
+        },
+        "Tripwire": {
+          "name": "SaaS Marketing Checklist",
+          "price": "$29",
+          "type": "Template",
+          "intensity": "Low"
+        }
+      },
+      "gap": "Missing Core",
+      "insight": "Consider developing a $199 SaaS Marketing Course to bridge the gap."
+    },
+    "growthTasks": [
+      {
+        "id": "task_1",
+        "title": "Create a $27 SaaS Template",
+        "category": "Quick Win",
+        "impact": 7,
+        "effort": 3,
+        "type": "Funnel",
+        "status": "To Do",
+        "reasoning": "Captures lost leads from bio.",
+        "actionType": "Content"
+      },
+      {
+        "id": "task_2",
+        "title": "Schedule Tweets for Peak Hours",
+        "category": "Quick Win",
+        "impact": 6,
+        "effort": 2,
+        "type": "Content",
+        "status": "To Do",
+        "reasoning": "Improves visibility.",
+        "actionType": "Strategy"
+      },
+      {
+        "id": "task_3",
+        "title": "Run a Poll Asking About Biggest Challenges",
+        "category": "Big Bet",
+        "impact": 8,
+        "effort": 5,
+        "type": "Crowd",
+        "status": "To Do",
+        "reasoning": "Generate leads.",
+        "actionType": "Content"
+      },
+      {
+        "id": "task_4",
+        "title": "Automate Engagement with Hypefury",
+        "category": "Big Bet",
+        "impact": 7,
+        "effort": 6,
+        "type": "Content",
+        "status": "To Do",
+        "reasoning": "Scale content.",
+        "actionType": "Tech"
+      },
+      {
+        "id": "task_5",
+        "title": "Rewrite Profile Bio",
+        "category": "Quick Win",
+        "impact": 7,
+        "effort": 2,
+        "type": "Funnel",
+        "status": "To Do",
+        "reasoning": "Optimize for conversions.",
+        "actionType": "Bio"
+      }
+    ],
+    "disruptor": {
+      "score": 65,
+      "focus": "Data-backed Thought Leadership",
+      "schedule": [
+        {
+          "day": "Monday",
+          "time": "08:00 AM",
+          "pillar": "Authority",
+          "topic": "SaaS Growth Hacks",
+          "hookStyle": "Data-backed",
+          "suggestedHook": "3 little-known SaaS growth hacks that actually work.",
+          "strategicReason": "Start the week with actionable insights."
+        },
+        {
+          "day": "Tuesday",
+          "time": "12:00 PM",
+          "pillar": "Educational",
+          "topic": "SaaS Marketing Automation",
+          "hookStyle": "Story-driven",
+          "suggestedHook": "I spent years automating my marketing, here is what I learned.",
+          "strategicReason": "Share personal failures."
+        },
+        {
+          "day": "Wednesday",
+          "time": "06:00 PM",
+          "pillar": "Community",
+          "topic": "SaaS Founder Challenges",
+          "hookStyle": "Empathetic",
+          "suggestedHook": "What is the hardest thing about running a SaaS startup?",
+          "strategicReason": "Engage users."
+        },
+        {
+          "day": "Thursday",
+          "time": "09:00 AM",
+          "pillar": "Authority",
+          "topic": "SaaS Pricing Strategies",
+          "hookStyle": "Data-backed",
+          "suggestedHook": "What is the best SaaS Pricing Structure?",
+          "strategicReason": "Data Driven."
+        },
+        {
+          "day": "Friday",
+          "time": "12:00 PM",
+          "pillar": "Educational",
+          "topic": "SaaS Customer Acquisition",
+          "hookStyle": "Story-driven",
+          "suggestedHook": "My journey of acquiring my first 100 SaaS Customers.",
+          "strategicReason": "Share lessons."
+        },
+        {
+          "day": "Saturday",
+          "time": "02:00 PM",
+          "pillar": "Community",
+          "topic": "SaaS Founder Q&A",
+          "hookStyle": "Empathetic",
+          "suggestedHook": "Ask Me Anything: SaaS edition.",
+          "strategicReason": "Engage users."
+        },
+        {
+          "day": "Sunday",
+          "time": "06:00 PM",
+          "pillar": "Authority",
+          "topic": "SaaS Marketing Trends",
+          "hookStyle": "Data-backed",
+          "suggestedHook": "Three SaaS trends you need to know now.",
+          "strategicReason": "Strategic Data."
+        }
+      ]
+    },
+    "funnelTactics": [
+      {
+        "title": "Dedicated Landing Page",
+        "problem": "Linktree is too generic.",
+        "solution": "Create a landing page for your lead magnet.",
+        "impact": "+20% Click-through",
+        "difficulty": "Medium",
+        "status": "Pending",
+        "id": "funnel_1"
+      },
+      {
+        "title": "Email Course for SaaS Marketing",
+        "problem": "Current checklist is not enough.",
+        "solution": "Offer an email course for deeper value.",
+        "impact": "+15% Conversion",
+        "difficulty": "Medium",
+        "status": "Pending",
+        "id": "funnel_2"
+      },
+      {
+        "title": "Personalized Follow-up",
+        "problem": "Missing personal touches.",
+        "solution": "Automated email sequence.",
+        "impact": "+10% Engagement",
+        "difficulty": "Easy",
+        "status": "Pending",
+        "id": "funnel_3"
+      }
+    ],
+    "crowdTactics": [
+      {
+        "title": "Address Skepticism",
+        "audienceState": "Skeptical",
+        "action": "Case studies in comments.",
+        "targetParams": "Builds Trust",
+        "status": "Ready",
+        "id": "crowd_1"
+      },
+      {
+        "title": "Vibe Matching",
+        "audienceState": "Engaged",
+        "action": "Add a giveaway in the thread.",
+        "targetParams": "Improve Community",
+        "status": "Ready",
+        "id": "crowd_2"
+      },
+      {
+        "title": "Solve Frustrations",
+        "audienceState": "Frustrated",
+        "action": "Provide quick tips in comments.",
+        "targetParams": "Add Value",
+        "status": "Ready",
+        "id": "crowd_3"
+      }
+    ],
+    "competitorGap": {
+      "metrics": [
+        {
+          "category": "Engagement Rate",
+          "profileValue": 0.0001,
+          "benchmarkValue": 0.015,
+          "gapType": "Opportunity"
+        },
+        {
+          "category": "Post Frequency",
+          "profileValue": 3.3,
+          "benchmarkValue": 4,
+          "gapType": "Opportunity"
+        },
+        {
+          "category": "Content Quality",
+          "profileValue": 50,
+          "benchmarkValue": 70,
+          "gapType": "Opportunity"
+        },
+        {
+          "category": "Hook Strength",
+          "profileValue": 30,
+          "benchmarkValue": 60,
+          "gapType": "Opportunity"
+        }
+      ],
+      "topOpportunity": "Engagement Rate",
+      "insight": "Low engagement rate is a critical weak point, indicating a disconnect between content and audience interests.",
+      "recommendations": [
+        "Incorporate more visuals (images/videos) to enhance engagement.",
+        "Experiment with different hook styles to capture audience attention.",
+        "Run contests/giveaways to boost interaction and increase followers."
+      ]
+    }
+  },
+  "platform": "x",
+  "postCount": 10,
+  "source": "extension_scrape",
+  "timestamp": 1772899085480
+}

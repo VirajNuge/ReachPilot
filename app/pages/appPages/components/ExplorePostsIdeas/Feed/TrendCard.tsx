@@ -217,7 +217,7 @@ export default function TrendCard({ post, onRemix }: TrendCardProps) {
           <Wand2 size={18} />
           Remix with AI
         </button>
-        <button className="text-xs font-semibold text-gray-500 flex items-center gap-1 hover:text-gray-900 transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 delay-75">
+        <button className="font-semibold flex items-center gap-1 transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 delay-75 bg-[#000100] hover:bg-black text-white">
           View Original <ExternalLink size={12} />
         </button>
       </div>

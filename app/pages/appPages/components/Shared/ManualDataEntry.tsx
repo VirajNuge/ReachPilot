@@ -172,7 +172,7 @@ export function ManualDataEntry({
       >
         <div className="manual-entry-header">
           <h2>Enter Profile Data Manually</h2>
-          <button onClick={onCancel} className="close-btn">
+          <button onClick={onCancel} className="close-btn bg-[#000100] hover:bg-black text-white">
             <BsX size={24} />
           </button>
         </div>
@@ -277,12 +277,12 @@ export function ManualDataEntry({
         )}
 
         <div className="manual-entry-actions">
-          <button onClick={onCancel} className="btn-secondary">
+          <button onClick={onCancel} className="btn-secondary bg-[#000100] hover:bg-black text-white">
             Cancel
           </button>
           <button
             onClick={inputMode === "form" ? handleFormSubmit : handleJsonSubmit}
-            className="btn-primary"
+            className="btn-primary bg-[#000100] hover:bg-black text-white"
           >
             <BsCheckCircle /> Analyze This Data
           </button>

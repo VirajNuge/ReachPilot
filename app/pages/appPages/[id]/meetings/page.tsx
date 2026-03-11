@@ -65,8 +65,6 @@ export default function MeetingPage() {
       <div className="flex-shrink-0">
         <TopMenu
           pageName="Meetings"
-          userName="Robert Downey Jr."
-          userTier="Agency"
           tokens={2000}
         />
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import TopMenu from "../../../components/topMenu/topMenu";
 import { ManualDataEntry } from "../../../components/Shared/ManualDataEntry";
 import type { ManualProfileData } from "../../../components/Shared/ManualDataEntry";
@@ -10,7 +10,9 @@ import type { Platform } from "../../../components/Shared/PlatformSelector";
 export default function ManualEntryPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
   const platform = (searchParams.get("platform") as Platform) || "linkedin";
+  const accountId = (params?.id as string) || "1";
 
   const handleSubmit = (data: ManualProfileData) => {
     // Save to localStorage to avoid URL length limits
@@ -18,20 +20,18 @@ export default function ManualEntryPage() {
       localStorage.setItem("reachpilot_manual_data", JSON.stringify(data));
     }
     router.push(
-      `/pages/appPages/1/profileAnalyzer/analyzed-account?platform=${platform}&source=manual_storage`,
+      `/pages/appPages/${accountId}/profileAnalyzer/analyzed-account?platform=${platform}&source=manual_storage`,
     );
   };
 
   const handleCancel = () => {
-    router.push("/pages/appPages/1/profileAnalyzer");
+    router.push(`/pages/appPages/${accountId}/profileAnalyzer`);
   };
 
   return (
     <>
       <TopMenu
         pageName="Manual Entry"
-        userName="Robert Downey Jr."
-        userTier="Free Tier"
         tokens={2000}
       />
       <div

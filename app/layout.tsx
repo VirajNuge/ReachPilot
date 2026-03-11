@@ -2,6 +2,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Chatbot from "./components/Chatbot/Chatbot";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "ReachPilot",
@@ -16,8 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        {children}
-        <Chatbot />
+        <Providers>
+          {children}
+          <Chatbot />
+        </Providers>
       </body>
     </html>
   );

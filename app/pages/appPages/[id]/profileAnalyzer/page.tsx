@@ -41,11 +41,11 @@ export default function UnifiedAnalyzerPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-8 py-4 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-[0_4px_14px_0_rgba(7,78,213,0.39)] hover:scale-[1.02] active:scale-[0.98]">
+                <button className="px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-[1.02] bg-[#000100] hover:bg-black text-white">
                   <FaChrome size={20} />
                   Download Extension
                 </button>
-                <button className="px-8 py-4 bg-white text-[#000100] border border-slate-200 hover:bg-slate-50 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all">
+                <button className="px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-[#000100] hover:bg-black text-white">
                   Watch Demo <FaArrowRight size={12} />
                 </button>
               </div>

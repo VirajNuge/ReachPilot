@@ -14,8 +14,6 @@ export default function Comparison() {
     <>
       <TopMenu
         pageName="Profile Comparison"
-        userName="Robert Downey Jr."
-        userTier="Free Tier"
         tokens={2000}
       />
       <div className="profileAnalyzerContainer">

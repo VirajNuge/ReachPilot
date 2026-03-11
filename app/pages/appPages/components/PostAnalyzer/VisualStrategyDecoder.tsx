@@ -33,7 +33,7 @@ function CopyButton({
     return (
       <button
         onClick={handleCopy}
-        className="text-slate-400 hover:text-white transition-colors p-1 bg-slate-800 rounded-md"
+        className="transition-colors p-1 rounded-md bg-[#000100] hover:bg-black text-white"
         title="Copy"
       >
         {copied ? (

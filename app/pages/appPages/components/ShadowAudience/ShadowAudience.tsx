@@ -85,7 +85,7 @@ const ShadowAudience: React.FC<ShadowAudienceProps> = ({
           </div>
         </div>
 
-        <button className="mt-5 w-full py-3 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+        <button className="mt-5 w-full py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2 bg-[#000100] hover:bg-black text-white">
           <FaGhost size={12} />
           Activate Lurker Strategy
         </button>

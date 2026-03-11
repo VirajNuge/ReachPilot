@@ -95,7 +95,7 @@ const OnboardingTour: React.FC = () => {
             <div className="relative z-10">
               <button
                 onClick={handleClose}
-                className="absolute top-0 right-0 text-gray-400 hover:text-gray-600"
+                className="absolute top-0 right-0 bg-[#000100] hover:bg-black text-white"
               >
                 <BsX size={24} />
               </button>
@@ -141,7 +141,7 @@ const OnboardingTour: React.FC = () => {
                 {/* Next Button */}
                 <button
                   onClick={handleNext}
-                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors shadow-lg shadow-indigo-200"
+                  className="flex items-center gap-2 px-5 py-2 rounded-lg font-bold transition-colors bg-[#000100] hover:bg-black text-white"
                 >
                   {currentStep === TOUR_STEPS.length - 1
                     ? "Get Started"

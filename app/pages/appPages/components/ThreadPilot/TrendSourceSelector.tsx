@@ -92,7 +92,7 @@ export default function TrendSourceSelector() {
           />
           <button
             onClick={addKeyword}
-            className="p-2.5 bg-white border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2.5 rounded-lg transition-colors bg-[#000100] hover:bg-black text-white"
           >
             <Plus size={18} />
           </button>

@@ -35,8 +35,6 @@ export default function ClientWorkspacesPage() {
       <div className="flex-shrink-0">
         <TopMenu
           pageName="Brand Studio"
-          userName="Robert Downey Jr."
-          userTier="Agency"
           tokens={2000}
         />
       </div>

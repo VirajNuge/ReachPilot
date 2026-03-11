@@ -90,7 +90,7 @@ export default function TrendFeed() {
               <span className="text-[10px] text-gray-400 font-medium">
                 {trend.volume}
               </span>
-              <button className="text-xs flex items-center gap-1 text-indigo-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity hover:underline">
+              <button className="flex items-center gap-1 font-bold opacity-0 group-hover:opacity-100 transition-opacity hover:underline bg-[#000100] hover:bg-black text-white">
                 Draft Post <ArrowRight size={12} />
               </button>
             </div>

@@ -249,7 +249,7 @@ const CompetitorGap: React.FC<CompetitorGapProps> = ({ data }) => {
                   </motion.div>
                 ))}
 
-                <button className="mt-4 w-full py-4 border-2 border-dashed border-slate-200 text-slate-400 font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-[#f4f8fb] hover:text-[#074ed5] hover:border-[#074ed5]/30 transition-colors">
+                <button className="mt-4 w-full py-4 font-bold uppercase tracking-widest rounded-2xl hover: transition-colors bg-[#000100] hover:bg-black text-white">
                   + Generate More Ideas
                 </button>
               </div>

@@ -31,8 +31,6 @@ export default function AnalyticsPage() {
       <div className="flex-shrink-0">
         <TopMenu
           pageName="Analytics"
-          userName="Robert Downey Jr."
-          userTier="Pro"
           tokens={2000}
         />
       </div>

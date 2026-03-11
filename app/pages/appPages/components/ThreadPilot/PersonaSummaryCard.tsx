@@ -34,7 +34,7 @@ export default function PersonaSummaryCard() {
               </span>
             </p>
           </div>
-          <button className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+          <button className="p-2 rounded-lg transition-all bg-[#000100] hover:bg-black text-white">
             <Edit2 size={16} />
           </button>
         </div>

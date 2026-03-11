@@ -132,12 +132,7 @@ const AssetFolderTree: React.FC<AssetFolderTreeProps> = ({
 
         {/* Minimal 'Add' Button */}
         <button
-          className="
-            flex items-center justify-center w-6 h-6 rounded-md
-            text-slate-400 transition-all duration-200
-            hover:text-violet-600 hover:bg-violet-100
-            focus:outline-none focus:ring-2 focus:ring-violet-200 border-none cursor-pointer
-          "
+          className="flex items-center justify-center w-6 h-6 rounded-md transition-all duration-200 cursor-pointer bg-[#000100] hover:bg-black text-white"
           title="New Workspace"
         >
           <Plus size={16} strokeWidth={2.5} />

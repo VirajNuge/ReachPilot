@@ -247,7 +247,7 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
             <button
               onClick={handleSync}
               disabled={isSyncing || isSynced}
-              className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(7,78,213,0.39)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-[#000100] hover:bg-black text-white"
             >
               {isSyncing ? (
                 <>

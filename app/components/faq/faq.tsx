@@ -11,7 +11,7 @@ const faqs: FAQItem[] = [
   {
     question: "What is ReachPilot?",
     answer:
-      "ReachPilot is an AI-powered social media growth and client management platform designed to help professionals, freelancers, and agencies grow their personal brands, automate content creation, and manage clients — all in one place.",
+      "ReachPilot is an AI-powered social media growth and client management platform designed to help professionals, freelancers, and agencies grow their personal brands, analyze content strategy, and manage clients — all in one place.",
   },
   {
     question: "Who can use ReachPilot?",
@@ -21,22 +21,12 @@ const faqs: FAQItem[] = [
   {
     question: "How is ReachPilot different from other social media tools?",
     answer:
-      "Unlike traditional schedulers, ReachPilot integrates AI-driven post generation, analytics, and client management. It doesn’t just schedule — it helps you grow and convert your audience into clients.",
-  },
-  {
-    question: "How does the AI Post Generator work?",
-    answer:
-      "The AI analyzes your tone, niche, and audience engagement to generate content ideas, captions, hashtags, and complete posts tailored to your style.",
-  },
-  {
-    question: "Can I customize AI-generated content?",
-    answer:
-      "Absolutely. You can edit, rephrase, and visually design your post using our built-in Content Lab Editor with templates and AI-assisted suggestions.",
+      "Unlike traditional schedulers, ReachPilot integrates AI-driven content analysis, social media analytics, and client management. It doesn’t just show data — it helps you understand growth and convert your audience into clients.",
   },
   {
     question: "Does ReachPilot automatically post for me?",
     answer:
-      "Yes. You can create posts in advance and schedule them for LinkedIn, Twitter (X), or email newsletters using the smart calendar and auto-queue system.",
+      "Yes. You can schedule your content for LinkedIn, Twitter (X), or email newsletters using the smart calendar and auto-queue system.",
   },
   {
     question: "What kind of analytics does ReachPilot provide?",

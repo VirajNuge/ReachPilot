@@ -58,7 +58,7 @@ export default function BookingModal({
           </h2>
           <button
             onClick={onClose}
-            className="hover:bg-white/20 p-1 rounded-full transition-colors"
+            className="p-1 rounded-full transition-colors bg-[#000100] hover:bg-black text-white"
           >
             <X size={20} />
           </button>
@@ -166,7 +166,7 @@ export default function BookingModal({
               </label>
               <button
                 onClick={generateAgenda}
-                className="text-[10px] font-bold text-indigo-600 flex items-center gap-1 hover:bg-indigo-50 px-2 py-0.5 rounded transition-colors"
+                className="font-bold flex items-center gap-1 px-2 py-0.5 rounded transition-colors bg-[#000100] hover:bg-black text-white"
               >
                 {isGenerating ? (
                   <Sparkles size={10} className="animate-spin" />

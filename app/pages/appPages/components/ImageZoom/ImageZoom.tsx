@@ -51,7 +51,7 @@ export default function ImageZoomModal({
         >
           {/* Close Button */}
           <button
-            className="absolute top-6 right-6 text-white/60 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors z-50"
+            className="absolute top-6 right-6 p-2 rounded-full transition-colors z-50 bg-[#000100] hover:bg-black text-white"
             onClick={(e) => {
               e.stopPropagation();
               setIsOpen(false);

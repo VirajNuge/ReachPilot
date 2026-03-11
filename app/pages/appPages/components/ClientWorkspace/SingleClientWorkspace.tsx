@@ -42,7 +42,7 @@ export default function SingleClientWorkspace({
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-700"
+            className="p-2 rounded-full transition-colors bg-[#000100] hover:bg-black text-white"
           >
             <ArrowLeft size={18} />
           </button>
@@ -234,13 +234,13 @@ export default function SingleClientWorkspace({
                       <p className="text-xs text-gray-500 mb-3">
                         {comp.recentActivity}
                       </p>
-                      <button className="w-full py-1.5 bg-white border border-gray-200 text-gray-600 text-[10px] font-bold rounded-lg hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 transition-colors">
+                      <button className="w-full py-1.5 font-bold rounded-lg hover: transition-colors bg-[#000100] hover:bg-black text-white">
                         Generate Counter-Post
                       </button>
                     </div>
                   ))}
 
-                  <button className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 text-xs font-bold hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-2">
+                  <button className="w-full py-3 rounded-xl font-bold hover: transition-all flex items-center justify-center gap-2 bg-[#000100] hover:bg-black text-white">
                     <Plus size={14} /> Track New Competitor
                   </button>
                 </div>
@@ -258,7 +258,7 @@ export default function SingleClientWorkspace({
                 <h4 className="font-bold text-gray-800 flex items-center gap-2">
                   <FileText size={18} /> Smart Notebook
                 </h4>
-                <button className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-700">
+                <button className="px-3 py-1.5 rounded-lg font-bold bg-[#000100] hover:bg-black text-white">
                   + New Note
                 </button>
               </div>

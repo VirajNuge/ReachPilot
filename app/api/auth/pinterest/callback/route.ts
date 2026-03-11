@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   if (error) {
     return NextResponse.redirect(
       new URL(
-        "/pages/appPages/1/profileAnalyzer?error=auth_denied",
+        "/1/profileAnalyzer?error=auth_denied",
         request.url,
       ),
     );
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     // Store tokens in cookies
     const response = NextResponse.redirect(
       new URL(
-        "/pages/appPages/1/profileAnalyzer?platform=pinterest&auth=success",
+        "/1/profileAnalyzer?platform=pinterest&auth=success",
         request.url,
       ),
     );
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
     console.error("Pinterest OAuth error:", error);
     return NextResponse.redirect(
       new URL(
-        `/pages/appPages/1/profileAnalyzer?error=auth_failed&message=${encodeURIComponent(
+        `/1/profileAnalyzer?error=auth_failed&message=${encodeURIComponent(
           error instanceof Error ? error.message : "Unknown error",
         )}`,
         request.url,

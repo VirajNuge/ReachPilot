@@ -56,7 +56,7 @@ export default function DraftQueue() {
                   Based on: {draft.trigger}
                 </span>
               </div>
-              <button className="text-gray-300 hover:text-gray-500">
+              <button className="bg-[#000100] hover:bg-black text-white">
                 <MoreHorizontal size={14} />
               </button>
             </div>
@@ -70,13 +70,13 @@ export default function DraftQueue() {
 
             {/* Action Bar */}
             <div className="px-2 py-2 border-t border-gray-100 flex gap-2">
-              <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors">
+              <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-bold transition-colors bg-[#000100] hover:bg-black text-white">
                 <Check size={14} /> Approve
               </button>
-              <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold transition-colors">
+              <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-bold transition-colors bg-[#000100] hover:bg-black text-white">
                 <Clock size={14} /> Edit
               </button>
-              <button className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+              <button className="p-2 rounded-lg transition-colors bg-[#000100] hover:bg-black text-white">
                 <X size={16} />
               </button>
             </div>

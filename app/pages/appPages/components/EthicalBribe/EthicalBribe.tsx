@@ -240,7 +240,7 @@ export default function EthicalBribe({ data: apiData }: EthicalBribeProps) {
             <button
               onClick={generateCounter}
               disabled={isCountering}
-              className="w-full py-3 bg-[#000100] hover:bg-black text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] active:scale-[0.98] disabled:opacity-70"
+              className="w-full py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-70 bg-[#000100] hover:bg-black text-white"
             >
               {isCountering ? (
                 <>

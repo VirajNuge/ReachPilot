@@ -116,7 +116,7 @@ const KeyAcc: React.FC<KeyAccProps> = ({ alignmentTags, statusData }) => {
         </p>
 
         <button
-          className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-xs font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-700 hover:shadow-lg"
+          className="flex items-center justify-center gap-2 rounded-xl py-3 font-bold transition-all bg-[#000100] hover:bg-black text-white"
           onClick={() => {
             const context = `Current keywords: ${alignmentTags.join(", ")}\nCurrent skills: ${statusData.current.keywords}\nMissing keywords: ${statusData.missing.keywords}`;
             triggerChatbot(

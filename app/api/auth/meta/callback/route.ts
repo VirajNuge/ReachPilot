@@ -1,63 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthFromCookies } from "@/lib/auth";
+import { upsertConnection } from "@/lib/models/connection";
 
-// Meta OAuth Callback - Exchanges code for access token
-// GET /api/auth/meta/callback?code=xxx&state=xxx
-
-const META_TOKEN_URL = "https://graph.facebook.com/v18.0/oauth/access_token";
-
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const code = searchParams.get("code");
-  const stateParam = searchParams.get("state");
-  const error = searchParams.get("error");
-
-  if (error) {
-    // User denied access
+export async function GET(req: NextRequest) {
+  // 1. Get auth user from cookie
+  const auth = await getAuthFromCookies();
+  if (!auth) {
     return NextResponse.redirect(
+      new URL("/login", req.url)
+    );
+  }
+
+  // 2. Get accountId from cookie
+  const accountId = req.cookies.get("rp_oauth_account")?.value;
+  if (!accountId) {
+    return NextResponse.json(
+      { error: "Missing accountId from OAuth state" },
+      { status: 400 }
+    );
+  }
+
+  // 3. Extract code from URL
+  const code = req.nextUrl.searchParams.get("code");
+  const error = req.nextUrl.searchParams.get("error");
+
+  if (error || !code) {
+    const response = NextResponse.redirect(
       new URL(
-        "/pages/appPages/1/profileAnalyzer?error=auth_denied",
-        request.url,
-      ),
+        `/${accountId}/accountPersona?error=auth_denied`,
+        req.url
+      )
     );
-  }
-
-  if (!code) {
-    return NextResponse.json(
-      { success: false, error: "No authorization code received" },
-      { status: 400 },
-    );
-  }
-
-  // Decode state
-  let state: { platform: string; profileUrl: string } = {
-    platform: "facebook",
-    profileUrl: "",
-  };
-  if (stateParam) {
-    try {
-      state = JSON.parse(Buffer.from(stateParam, "base64").toString());
-    } catch (e) {
-      console.error("Failed to decode state:", e);
-    }
-  }
-
-  const appId = process.env.META_APP_ID;
-  const appSecret = process.env.META_APP_SECRET;
-  const redirectUri = process.env.META_REDIRECT_URI;
-
-  if (!appId || !appSecret || !redirectUri) {
-    return NextResponse.json(
-      { success: false, error: "Meta API credentials not configured" },
-      { status: 503 },
-    );
+    response.cookies.delete("rp_oauth_account");
+    return response;
   }
 
   try {
-    // Exchange code for access token
-    const tokenUrl = new URL(META_TOKEN_URL);
-    tokenUrl.searchParams.set("client_id", appId);
-    tokenUrl.searchParams.set("client_secret", appSecret);
-    tokenUrl.searchParams.set("redirect_uri", redirectUri);
+    // 4. Exchange code for access token
+    const tokenUrl = new URL("https://graph.facebook.com/v19.0/oauth/access_token");
+    tokenUrl.searchParams.set("client_id", process.env.META_APP_ID!);
+    tokenUrl.searchParams.set("client_secret", process.env.META_APP_SECRET!);
+    tokenUrl.searchParams.set("redirect_uri", process.env.META_REDIRECT_URI!);
     tokenUrl.searchParams.set("code", code);
 
     const tokenResponse = await fetch(tokenUrl.toString());
@@ -69,13 +52,11 @@ export async function GET(request: NextRequest) {
 
     const accessToken = tokenData.access_token;
 
-    // Get long-lived token (60 days instead of short-term)
-    const longLivedUrl = new URL(
-      "https://graph.facebook.com/v18.0/oauth/access_token",
-    );
+    // Get long-lived token
+    const longLivedUrl = new URL("https://graph.facebook.com/v19.0/oauth/access_token");
     longLivedUrl.searchParams.set("grant_type", "fb_exchange_token");
-    longLivedUrl.searchParams.set("client_id", appId);
-    longLivedUrl.searchParams.set("client_secret", appSecret);
+    longLivedUrl.searchParams.set("client_id", process.env.META_APP_ID!);
+    longLivedUrl.searchParams.set("client_secret", process.env.META_APP_SECRET!);
     longLivedUrl.searchParams.set("fb_exchange_token", accessToken);
 
     const longLivedResponse = await fetch(longLivedUrl.toString());
@@ -83,33 +64,40 @@ export async function GET(request: NextRequest) {
 
     const finalToken = longLivedData.access_token || accessToken;
 
-    // Store token in cookie (in production, use secure session storage)
+    // 5. Fetch platform user profile
+    const userResponse = await fetch(
+      `https://graph.facebook.com/me?fields=id,name&access_token=${finalToken}`
+    );
+    const userData = await userResponse.json();
+
+    // 6. Upsert connection
+    await upsertConnection(auth.userId, accountId, "meta", {
+      accessToken: finalToken,
+      platformUserId: userData.id,
+      platformUsername: userData.name,
+      scope:
+        "pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish,email,public_profile",
+    });
+
+    // 7. Clear OAuth cookie
     const response = NextResponse.redirect(
       new URL(
-        `/pages/appPages/1/profileAnalyzer?platform=${state.platform}&auth=success`,
-        request.url,
-      ),
+        `/${accountId}/accountPersona?connected=meta`,
+        req.url
+      )
     );
-
-    // Set HTTP-only cookie with token
-    response.cookies.set("meta_token", finalToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 60, // 60 days
-      path: "/",
-    });
+    response.cookies.delete("rp_oauth_account");
 
     return response;
   } catch (error) {
     console.error("Meta OAuth error:", error);
-    return NextResponse.redirect(
+    const response = NextResponse.redirect(
       new URL(
-        `/pages/appPages/1/profileAnalyzer?error=auth_failed&message=${encodeURIComponent(
-          error instanceof Error ? error.message : "Unknown error",
-        )}`,
-        request.url,
-      ),
+        `/${accountId}/accountPersona?error=auth_failed`,
+        req.url
+      )
     );
+    response.cookies.delete("rp_oauth_account");
+    return response;
   }
 }

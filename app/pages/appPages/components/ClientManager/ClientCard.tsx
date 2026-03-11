@@ -36,7 +36,7 @@ export default function ClientCard({ client }: ClientCardProps) {
             </p>
           </div>
         </div>
-        <button className="text-gray-400 hover:text-gray-600 p-1.5 hover:bg-gray-50 rounded-full transition-colors">
+        <button className="p-1.5 rounded-full transition-colors bg-[#000100] hover:bg-black text-white">
           <MoreHorizontal size={18} />
         </button>
       </div>
@@ -80,13 +80,13 @@ export default function ClientCard({ client }: ClientCardProps) {
 
       {/* 4. Action Buttons */}
       <div className="grid grid-cols-2 gap-2">
-        <button className="col-span-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 rounded-lg transition-colors">
+        <button className="col-span-2 font-medium py-2 rounded-lg transition-colors bg-[#000100] hover:bg-black text-white">
           View Client Workspace
         </button>
-        <button className="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium py-2 rounded-lg transition-colors border border-gray-200">
+        <button className="font-medium py-2 rounded-lg transition-colors bg-[#000100] hover:bg-black text-white">
           Message
         </button>
-        <button className="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium py-2 rounded-lg transition-colors border border-gray-200">
+        <button className="font-medium py-2 rounded-lg transition-colors bg-[#000100] hover:bg-black text-white">
           Book Meeting
         </button>
       </div>

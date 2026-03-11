@@ -133,7 +133,7 @@ export default function IdeaGrid({ isGenerating, onIdeaClick }: IdeaGridProps) {
 
       {/* End of Results Signal */}
       <div className="break-inside-avoid py-8 text-center">
-        <button className="text-xs font-bold text-gray-400 hover:text-yellow-600 transition-colors uppercase tracking-widest">
+        <button className="font-bold transition-colors uppercase tracking-widest bg-[#000100] hover:bg-black text-white">
           + Generate More Variations
         </button>
       </div>

@@ -51,7 +51,7 @@ export default function AddClientModal({
           <h3 className="font-bold text-lg text-gray-900">Add New Client</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="bg-[#000100] hover:bg-black text-white"
           >
             <X size={20} />
           </button>
@@ -142,7 +142,7 @@ export default function AddClientModal({
 
           <button
             type="submit"
-            className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all mt-4"
+            className="w-full py-3 rounded-xl font-bold transition-all mt-4 bg-[#000100] hover:bg-black text-white"
           >
             Create Client
           </button>

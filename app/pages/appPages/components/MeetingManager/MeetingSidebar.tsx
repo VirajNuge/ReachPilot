@@ -94,7 +94,7 @@ export default function MeetingSidebar({ upcoming }: SidebarProps) {
               >
                 <Video size={12} /> Join {meeting.platform}
               </button>
-              <button className="px-2 bg-white border border-gray-200 text-gray-400 rounded-lg hover:bg-gray-50">
+              <button className="px-2 rounded-lg bg-[#000100] hover:bg-black text-white">
                 <MoreHorizontal size={14} />
               </button>
             </div>

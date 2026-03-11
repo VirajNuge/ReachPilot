@@ -103,7 +103,7 @@ export default function FunnelOptimizer({
                     <div className="text-xs font-bold text-[#caee55] bg-[#caee55]/20 px-2 py-1 rounded-lg border border-[#caee55]/30">
                       Exp. Impact: {tactic.impact}
                     </div>
-                    <button className="px-3 py-1.5 bg-[#000100] hover:bg-black text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-colors shadow-sm">
+                    <button className="px-3 py-1.5 font-bold rounded-xl flex items-center gap-2 transition-colors bg-[#000100] hover:bg-black text-white">
                       <FaMagic className="text-[#caee55]" /> Generate Assets
                     </button>
                   </div>

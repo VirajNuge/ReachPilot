@@ -6,20 +6,26 @@ import {
   clearHistory,
   AnalysisSession,
 } from "../../../../lib/storage";
+import { useAuth } from "../../../contexts/AuthContext";
 import { FaHistory, FaTrash, FaArrowRight, FaChartLine } from "react-icons/fa";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function HistoryPage() {
+  const { user } = useAuth();
   const [history, setHistory] = useState<AnalysisSession[]>([]);
 
   useEffect(() => {
-    setHistory(getHistory());
-  }, []);
+    const loadHistory = async () => {
+      const h = await getHistory(user?.id);
+      setHistory(h);
+    };
+    loadHistory();
+  }, [user]);
 
   const handleClear = () => {
     if (confirm("Are you sure you want to clear all history?")) {
-      clearHistory();
+      clearHistory(user?.id);
       setHistory([]);
     }
   };

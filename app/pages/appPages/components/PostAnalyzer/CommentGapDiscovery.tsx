@@ -131,7 +131,7 @@ export default function CommentGapDiscovery({
 
         {/* ── Action Button ── */}
         <div className="pt-2">
-          <button className="w-full py-3 bg-[#0052FF] hover:bg-[#003DD4] text-white rounded-xl text-[13px] font-bold transition-all shadow-md shadow-blue-500/20 active:scale-[0.98]">
+          <button className="w-full py-3 rounded-xl font-bold transition-all bg-[#000100] hover:bg-black text-white">
             Generate &ldquo;Reply Post&rdquo; Content
           </button>
         </div>

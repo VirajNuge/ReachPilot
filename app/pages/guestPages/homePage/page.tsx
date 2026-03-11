@@ -214,8 +214,8 @@ const homePage = () => {
                 transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
                 className={style.heroSectionContainerContentSubTitle}
               >
-                From profile optimization to post generation, manage your entire
-                online
+                From profile optimization to content strategy, manage your
+                entire online
                 <br />
                 presence in one platform.
               </motion.p>
@@ -282,19 +282,6 @@ const homePage = () => {
                 </div>
               </div>
               <br />
-              <div className={style.featureFour}>
-                <div className={style.featureOneNumTitle}>
-                  <p>4</p>
-                  <h6>SEE MORE →</h6>
-                </div>
-                <h4>Social Media Post Generator</h4>
-                <h5>
-                  Track your growth, post performance,
-                  <br />
-                  and content reach in real time.
-                </h5>
-                <img src="images/homepage/feature4.png" />
-              </div>
               <div className={style.featuresdown}>
                 <div className={style.featureOnee}>
                   <div className={style.featureOneNumTitle}>
@@ -365,7 +352,7 @@ const homePage = () => {
                         <p>📊 Profile Health Overview</p>
                       </div>
                       <div className={style.featureBubbleSpace}>
-                        <p>✍️ Post Scheduler & Creator</p>
+                        <p>✍️ Content Strategy Hub</p>
                       </div>
                     </div>
                     <div className={style.featureBubbleContainer}>
@@ -534,7 +521,7 @@ const homePage = () => {
 
               <div className={style.pricingInclusions}>
                 <BsCheckCircleFill color="#9E4DFF" size={16} />
-                <p>5 AI Post Generations</p>
+                <p>AI Concept Proposals</p>
               </div>
 
               <div className={style.pricingInclusions}>
@@ -595,7 +582,7 @@ const homePage = () => {
 
               <div className={style.pricingInclusions}>
                 <BsCheckCircleFill color="#9E4DFF" size={16} />
-                <p>Unlimited AI Post Generations</p>
+                <p>Advanced Content Analysis</p>
               </div>
 
               <div className={style.pricingInclusions}>

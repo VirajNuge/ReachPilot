@@ -39,7 +39,7 @@ export default function BlueprintModal({
             `But data shows that 4 hours of deep work beats 12 hours of distracted busy work.\n\n` +
             `Your "Grindset" isn't impressive. It's inefficient.\n\n` +
             `Stop trading time. Start building systems. ⚙️\n\n` +
-            `#Productivity #DeepWork #AntiHustle #SystemsThinking`
+            `#Productivity #DeepWork #AntiHustle #SystemsThinking`,
         );
         setLoading(false);
       }, 1500);
@@ -139,7 +139,7 @@ export default function BlueprintModal({
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"
+              className="p-2 rounded-full transition-colors bg-[#000100] hover:bg-black text-white"
             >
               <X size={20} />
             </button>
@@ -174,11 +174,8 @@ export default function BlueprintModal({
 
           {/* Footer Actions */}
           <div className="p-6 border-t border-gray-100 bg-white flex justify-end gap-3 z-20">
-            <button className="px-5 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
+            <button className="px-5 py-3 rounded-xl font-bold hover: transition-all flex items-center gap-2 bg-[#000100] hover:bg-black text-white">
               <Copy size={16} /> Copy Text
-            </button>
-            <button className="px-6 py-3 rounded-xl bg-yellow-500 text-white font-bold text-sm hover:bg-yellow-600 shadow-lg shadow-yellow-200 transition-all flex items-center gap-2">
-              <Share2 size={16} /> Generate Post
             </button>
           </div>
         </div>

@@ -87,7 +87,7 @@ export default function CopyCatEngine() {
               </div>
 
               {/* ⭐ CLONE BUTTON (Clean Style) */}
-              <button className="w-full py-3 bg-white border border-gray-200 text-gray-700 rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all shadow-sm">
+              <button className="w-full py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover: transition-all bg-[#000100] hover:bg-black text-white">
                 <Sparkles size={14} />
                 Generate 5 Variations
               </button>

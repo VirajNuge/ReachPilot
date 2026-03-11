@@ -108,7 +108,7 @@ export default function RemixModal({
 
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+              className="p-2 rounded-full transition-colors bg-[#000100] hover:bg-black text-white"
             >
               <X size={20} />
             </button>
@@ -117,7 +117,7 @@ export default function RemixModal({
           {/* Controls Bar */}
           <div className="px-6 py-3 border-b border-gray-100 flex items-center gap-3 bg-gray-50/30">
             <span className="text-xs font-bold text-gray-500">Angle:</span>
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:border-indigo-300">
+            <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg font-semibold hover: bg-[#000100] hover:bg-black text-white">
               {angle} <ChevronDown size={12} />
             </button>
             <div className="h-4 w-px bg-gray-300 mx-2"></div>
@@ -156,10 +156,10 @@ export default function RemixModal({
 
           {/* Footer Actions */}
           <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
-            <button className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-white hover:border-gray-300 transition-all flex items-center gap-2">
+            <button className="px-4 py-2.5 rounded-xl font-bold hover: transition-all flex items-center gap-2 bg-[#000100] hover:bg-black text-white">
               <Copy size={16} /> Copy Text
             </button>
-            <button className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all flex items-center gap-2">
+            <button className="px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 bg-[#000100] hover:bg-black text-white">
               <Send size={16} /> Schedule Post
             </button>
           </div>

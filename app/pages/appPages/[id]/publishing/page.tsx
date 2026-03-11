@@ -98,8 +98,6 @@ export default function PublishingPage() {
       <div className="flex-shrink-0">
         <TopMenu
           pageName="Scheduling & Publishing"
-          userName="Robert Downey Jr."
-          userTier="Pro"
           tokens={2000}
         />
       </div>

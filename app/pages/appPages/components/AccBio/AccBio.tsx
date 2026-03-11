@@ -196,7 +196,7 @@ const AccBio: React.FC<AccBioProps> = ({
             </div>
 
             <motion.button
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 py-3 text-sm font-bold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3 font-bold transition-all bg-[#000100] hover:bg-black text-white"
               onClick={handleRewriteWithAI}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

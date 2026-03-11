@@ -51,8 +51,6 @@ export default function QuestionMinePage() {
       <div className="flex-shrink-0">
         <TopMenu
           pageName="The Question Mine"
-          userName="Robert Downey Jr."
-          userTier="Pro"
           tokens={2000}
         />
       </div>

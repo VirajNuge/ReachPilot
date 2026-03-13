@@ -3,20 +3,13 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getAuthFromCookies } from "@/lib/auth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
+import { parseAIJson } from "@/lib/parseAIJson";
 import { buildHookGeneratorPrompt } from "@/lib/postGenerationPrompts";
 import type {
   ContentStrategyOutput,
   HookOption,
   PostGenerationInput,
 } from "@/lib/types/postGeneration";
-
-function parseAIJson(text: string): unknown {
-  const cleaned = text
-    .replace(/```json\n?/g, "")
-    .replace(/```\n?/g, "")
-    .trim();
-  return JSON.parse(cleaned);
-}
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

@@ -17,19 +17,19 @@ interface WizardContainerProps {
 
 const DEFAULT_INPUT: PostGenerationInput = {
   objective: "educational",
-  targetAudience: "general_audience",
+  targetAudiences: ["general_audience"],
   coreMessage: "",
   platforms: ["linkedin"],
   generationFocus: "balanced",
   brandType: "personal_brand",
-  visualStyle: "minimal",
+  visualStyles: ["minimal"],
   imageGenType: "ai_background",
   brandAssets: {
     colorPalette: ["#0052FF", "#1A1D23"],
     watermark: false,
   },
-  tone: "professional",
-  cta: "none",
+  tones: ["professional"],
+  ctas: ["none"],
   emojiLevel: "medium",
   hashtagIntensity: "medium",
 };

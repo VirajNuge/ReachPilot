@@ -161,18 +161,18 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
       // Step 1 fields
       updates.objective = deriveObjective(p.primaryObjective);
       const audience = deriveTargetAudience(p.audienceRole, p.audienceSegments);
-      updates.targetAudience = audience;
+      updates.targetAudiences = [audience];
       if (audience === "custom") {
         updates.customAudience = [p.audienceRole, ...(p.audienceSegments ?? [])]
           .filter(Boolean)
           .join(", ");
       }
       const angle = deriveContentAngle(p.contentMix);
-      if (angle) updates.contentAngle = angle;
+      if (angle) updates.contentAngles = [angle];
 
       // Step 2 fields
       updates.brandType = deriveBrandType(p.userRole ?? "", p.industry ?? "");
-      updates.visualStyle = deriveVisualStyle(p.brandArchetype, p.toneSliders);
+      updates.visualStyles = [deriveVisualStyle(p.brandArchetype, p.toneSliders)];
       const personaColors =
         p.colorPalette?.length ? p.colorPalette : p.brandColorHex ? [p.brandColorHex] : [];
       updates.brandAssets = {
@@ -183,8 +183,8 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
       };
 
       // Step 3 fields
-      updates.tone = deriveTone(p.toneSliders);
-      updates.cta = deriveCTA(p.conversionGoal);
+      updates.tones = [deriveTone(p.toneSliders)];
+      updates.ctas = [deriveCTA(p.conversionGoal)];
       updates.emojiLevel = deriveEmojiLevel(p.emojiUsage);
 
       onChange(updates);
@@ -196,7 +196,21 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
     }
   };
 
-  const postText = input.postText ?? {};
+  const getTextBlock = (label: string) =>
+    (input.textBlocks ?? []).find((b) => b.label === label)?.text ?? "";
+  const setTextBlock = (label: string, text: string) => {
+    const blocks = input.textBlocks ?? [];
+    const existing = blocks.find((b) => b.label === label);
+    if (text) {
+      if (existing) {
+        onChange({ textBlocks: blocks.map((b) => b.label === label ? { ...b, text } : b) });
+      } else {
+        onChange({ textBlocks: [...blocks, { id: label.toLowerCase(), label, text }] });
+      }
+    } else {
+      onChange({ textBlocks: blocks.filter((b) => b.label !== label) });
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -309,11 +323,11 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
         <h3 className="text-sm font-bold text-gray-800 mb-3">Who are you talking to?</h3>
         <div className="flex flex-wrap gap-2">
           {(Object.entries(TARGET_AUDIENCE_LABELS) as [TargetAudience, string][]).map(([key, label]) => {
-            const isSelected = input.targetAudience === key;
+            const isSelected = input.targetAudiences?.[0] === key;
             return (
               <button
                 key={key}
-                onClick={() => onChange({ targetAudience: key })}
+                onClick={() => onChange({ targetAudiences: [key] })}
                 className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 border ${
                   isSelected
                     ? "bg-gray-800 text-white border-gray-800 shadow-md transform scale-105"
@@ -326,7 +340,7 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
           })}
         </div>
         
-        {input.targetAudience === "custom" && (
+        {input.targetAudiences?.[0] === "custom" && (
           <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
             <input
               type="text"
@@ -370,8 +384,8 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
             <input
               type="text"
               placeholder="Main headline..."
-              value={postText.title ?? ""}
-              onChange={(e) => onChange({ postText: { ...postText, title: e.target.value || undefined } })}
+              value={getTextBlock("Title")}
+              onChange={(e) => setTextBlock("Title", e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all bg-white text-sm"
             />
           </div>
@@ -380,8 +394,8 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
             <input
               type="text"
               placeholder="Supporting line..."
-              value={postText.subtitle ?? ""}
-              onChange={(e) => onChange({ postText: { ...postText, subtitle: e.target.value || undefined } })}
+              value={getTextBlock("Subtitle")}
+              onChange={(e) => setTextBlock("Subtitle", e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all bg-white text-sm"
             />
           </div>
@@ -389,8 +403,8 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
             <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Caption</label>
             <textarea
               placeholder="The social caption to use or base on..."
-              value={postText.caption ?? ""}
-              onChange={(e) => onChange({ postText: { ...postText, caption: e.target.value || undefined } })}
+              value={getTextBlock("Caption")}
+              onChange={(e) => setTextBlock("Caption", e.target.value)}
               className="w-full h-20 px-4 py-3 rounded-xl border border-gray-200 focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all bg-white text-sm resize-none"
             />
           </div>
@@ -398,8 +412,8 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
             <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Body Text</label>
             <textarea
               placeholder="Longer body copy, key points, or paragraphs to include..."
-              value={postText.bodyText ?? ""}
-              onChange={(e) => onChange({ postText: { ...postText, bodyText: e.target.value || undefined } })}
+              value={getTextBlock("Body Text")}
+              onChange={(e) => setTextBlock("Body Text", e.target.value)}
               className="w-full h-24 px-4 py-3 rounded-xl border border-gray-200 focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all bg-white text-sm resize-none"
             />
           </div>
@@ -484,11 +498,11 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
         <h3 className="text-sm font-bold text-gray-800 mb-3">Content Angle <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
         <div className="flex overflow-x-auto pb-4 -mx-2 px-2 hide-scrollbar gap-2">
           {(Object.entries(CONTENT_ANGLE_LABELS) as [ContentAngle, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
-            const isSelected = input.contentAngle === key;
+            const isSelected = input.contentAngles?.[0] === key;
             return (
               <button
                 key={key}
-                onClick={() => onChange({ contentAngle: isSelected ? undefined : key })}
+                onClick={() => onChange({ contentAngles: isSelected ? undefined : [key] })}
                 title={desc}
                 className={`flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-200 border ${
                   isSelected

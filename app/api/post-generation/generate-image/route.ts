@@ -7,6 +7,7 @@ import type {
   PostGenerationInput,
   PosterPromptOutput,
   ImageVariation,
+  ReferenceImage,
 } from "@/lib/types/postGeneration";
 import { POST_IMAGE_SIZES } from "@/lib/types/postGeneration";
 import { buildPosterPrompt } from "@/lib/postGeneration/posterPromptBuilder";
@@ -47,11 +48,28 @@ async function callGeminiGenerateContent(
   modelId: string,
   prompt: string,
   logoBase64?: string,
-  logoMimeType?: string
+  logoMimeType?: string,
+  referenceImages?: ReferenceImage[]
 ): Promise<{ data: string; mimeType: string } | null> {
   const contentParts: object[] = [];
 
-  // If logo provided, inject as first part (reference image)
+  // Inject reference images first (subject/style references)
+  if (referenceImages && referenceImages.length > 0) {
+    for (const ref of referenceImages) {
+      const mimeMatch = ref.dataUrl.match(/^data:([^;]+);base64,/);
+      const mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
+      const base64 = stripDataUrlPrefix(ref.dataUrl);
+      contentParts.push({
+        inlineData: { mimeType: mime, data: base64 },
+      });
+      // Add a label so the model understands what this reference is
+      if (ref.label) {
+        contentParts.push({ text: `[Reference: ${ref.label}]` });
+      }
+    }
+  }
+
+  // If logo provided, inject as a reference image
   if (logoBase64) {
     contentParts.push({
       inlineData: {
@@ -59,6 +77,7 @@ async function callGeminiGenerateContent(
         data: logoBase64,
       },
     });
+    contentParts.push({ text: "[Logo — include in image]" });
   }
 
   // Text prompt
@@ -67,9 +86,6 @@ async function callGeminiGenerateContent(
   const config: Record<string, unknown> = {
     responseModalities: [Modality.IMAGE, Modality.TEXT],
   };
-
-  // Only gemini-3-pro-image-preview supports imageConfig
-  // (flash models ignore it — don't pass to avoid errors)
 
   const response = await ai.models.generateContent({
     model: modelId,
@@ -181,6 +197,16 @@ export async function POST(req: NextRequest) {
     // Build the complete poster prompt
     const posterPrompt = buildPosterPrompt(body.input, body.posterOutput, aspectRatio);
 
+    // Append reference image labels to the prompt text for Imagen (which can't take inline images)
+    const referenceImages = body.input.referenceImages ?? [];
+    let promptWithRefs = posterPrompt;
+    if (referenceImages.length > 0) {
+      const refDescriptions = referenceImages
+        .map((r) => r.label || "reference subject")
+        .join(", ");
+      promptWithRefs = `${posterPrompt}\n\nIncorporate the following subjects/elements in the image: ${refDescriptions}.`;
+    }
+
     // Extract logo base64 if provided
     let logoBase64: string | undefined;
     let logoMimeType: string | undefined;
@@ -198,7 +224,8 @@ export async function POST(req: NextRequest) {
     try {
       if (IMAGEN_MODELS.has(modelId)) {
         // Imagen: single call with numberOfImages: 3
-        const results = await callImagenGenerateImages(ai, modelId, posterPrompt, aspectRatio, 3);
+        // Imagen doesn't support inline reference images — labels are injected into the prompt text
+        const results = await callImagenGenerateImages(ai, modelId, promptWithRefs, aspectRatio, 3);
         results.forEach((result, index) => {
           imageVariations.push({
             id: index + 1,
@@ -208,11 +235,11 @@ export async function POST(req: NextRequest) {
           });
         });
       } else {
-        // Gemini: 3 parallel generateContent() calls
+        // Gemini: 3 parallel generateContent() calls, with reference images injected as inline parts
         const calls = await Promise.allSettled([
-          callGeminiGenerateContent(ai, modelId, posterPrompt, logoBase64, logoMimeType),
-          callGeminiGenerateContent(ai, modelId, posterPrompt, logoBase64, logoMimeType),
-          callGeminiGenerateContent(ai, modelId, posterPrompt, logoBase64, logoMimeType),
+          callGeminiGenerateContent(ai, modelId, posterPrompt, logoBase64, logoMimeType, referenceImages),
+          callGeminiGenerateContent(ai, modelId, posterPrompt, logoBase64, logoMimeType, referenceImages),
+          callGeminiGenerateContent(ai, modelId, posterPrompt, logoBase64, logoMimeType, referenceImages),
         ]);
 
         calls.forEach((result, index) => {

@@ -3,19 +3,12 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getAuthFromCookies } from "@/lib/auth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
+import { parseAIJson } from "@/lib/parseAIJson";
 import { buildContentStrategistPrompt } from "@/lib/postGenerationPrompts";
 import type {
   ContentStrategyOutput,
   PostGenerationInput,
 } from "@/lib/types/postGeneration";
-
-function parseAIJson(text: string): unknown {
-  const cleaned = text
-    .replace(/```json\n?/g, "")
-    .replace(/```\n?/g, "")
-    .trim();
-  return JSON.parse(cleaned);
-}
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -61,13 +54,14 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as {
       input?: PostGenerationInput;
       accountId?: string;
+      includePersona?: boolean;
     };
 
     if (!body.input) {
       return NextResponse.json({ error: "input is required" }, { status: 400 });
     }
 
-    const personaContext = await loadPersonaContext(body.accountId);
+    const personaContext = body.includePersona ? await loadPersonaContext(body.accountId) : "";
     const prompt = buildContentStrategistPrompt(body.input, personaContext);
 
     const genAI = new GoogleGenerativeAI(apiKey);

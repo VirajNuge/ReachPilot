@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { buildContentScorePrompt } from "@/lib/postGenerationPrompts";
+import { parseAIJson } from "@/lib/parseAIJson";
 import type { ContentScore } from "@/lib/types/postGeneration";
-
-function parseAIJson(text: string): unknown {
-  const cleaned = text
-    .replace(/```json\n?/g, "")
-    .replace(/```\n?/g, "")
-    .trim();
-  return JSON.parse(cleaned);
-}
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

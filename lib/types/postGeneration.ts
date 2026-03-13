@@ -300,6 +300,7 @@ export interface PostGenerationInput {
 
   // Step 1 — Image Brief
   imageConcept?: string;
+  imageReferences?: string; // names, objects, people to include in the image
 
   // Step 1 — Generation Focus
   generationFocus?: "caption" | "balanced" | "image";
@@ -322,6 +323,12 @@ export interface PostGenerationInput {
   ctas: CTAType[];
   emojiLevel: IntensityLevel;
   hashtagIntensity: IntensityLevel;
+
+  // LinkedIn Optimization (optional — only when LinkedIn is selected)
+  linkedInPostType?: LinkedInPostType;
+  linkedInStyleProfile?: LinkedInStyleProfile;
+  linkedInPersonalAngle?: string;
+  linkedInKeyPoints?: string[];
 }
 
 // --- AI Pipeline Output Types ---
@@ -413,7 +420,65 @@ export interface PostPackage {
   hooks?: HookOption[];
   cta?: string;
   imageVariations?: ImageVariation[];
+  linkedInRefined?: {
+    viralityScore: number;       // 1-10
+    qualityFlags: string[];      // e.g. ["Hook could be stronger", "Remove buzzwords"]
+    styleProfile?: LinkedInStyleProfile;
+    postType?: LinkedInPostType;
+  };
+  xRefined?: {
+    engagementScore: number;     // 1-10
+    qualityFlags: string[];      // e.g. ["Hook too generic", "Over 280 chars"]
+  };
+  instagramRefined?: {
+    engagementScore: number;     // 1-10
+    qualityFlags: string[];      // e.g. ["Hook too generic", "Missing engagement question"]
+    postType?: InstagramPostType;
+  };
+  facebookRefined?: {
+    engagementScore: number;     // 1-10
+    qualityFlags: string[];      // e.g. ["Discussion question missing", "Too formal for Facebook"]
+  };
 }
+
+// --- LinkedIn-Specific Types ---
+
+export type LinkedInStyleProfile =
+  | "hormozi"
+  | "justin_welsh"
+  | "naval"
+  | "corporate"
+  | "startup_founder";
+
+export type LinkedInPostType =
+  | "insight"
+  | "story"
+  | "lesson"
+  | "framework"
+  | "list";
+
+export type InstagramPostType =
+  | "carousel_tips"
+  | "mini_story"
+  | "myth_vs_fact"
+  | "step_by_step_guide"
+  | "mistake_list";
+
+export const LINKEDIN_STYLE_PROFILE_LABELS: Record<LinkedInStyleProfile, { label: string; desc: string }> = {
+  hormozi:         { label: "Alex Hormozi",      desc: "Bold, direct, value-dense. Short punchy lines. No fluff." },
+  justin_welsh:    { label: "Justin Welsh",       desc: "Personal story-first. Relatable and humble. Lessons from real experience." },
+  naval:           { label: "Naval",              desc: "Deep insight, philosophical. Concise wisdom. One idea per post." },
+  corporate:       { label: "Corporate",          desc: "Professional, structured, data-backed. Credible tone." },
+  startup_founder: { label: "Startup Founder",   desc: "Authentic, raw, behind-the-scenes. Show the journey, not just the win." },
+};
+
+export const LINKEDIN_POST_TYPE_LABELS: Record<LinkedInPostType, { label: string; desc: string; emoji: string }> = {
+  insight:   { label: "Insight",    desc: "Share a sharp observation or key takeaway",   emoji: "💡" },
+  story:     { label: "Story",      desc: "Situation → Struggle → Realization → Lesson", emoji: "📖" },
+  lesson:    { label: "Lesson",     desc: "Something you learned the hard way",           emoji: "🎓" },
+  framework: { label: "Framework",  desc: "A system or mental model you follow",          emoji: "🔧" },
+  list:      { label: "List",       desc: "Numbered or bulleted high-value list",         emoji: "📋" },
+};
 
 // --- Remix Types ---
 

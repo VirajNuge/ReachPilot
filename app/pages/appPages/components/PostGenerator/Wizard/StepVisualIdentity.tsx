@@ -119,11 +119,11 @@ export function StepVisualIdentity({ input, onChange }: StepVisualIdentityProps)
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {(Object.entries(VISUAL_STYLE_LABELS) as [VisualStyle, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
-            const isSelected = input.visualStyle === key;
+            const isSelected = input.visualStyles?.[0] === key;
             return (
               <button
                 key={key}
-                onClick={() => onChange({ visualStyle: key })}
+                onClick={() => onChange({ visualStyles: [key] })}
                 className={`flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 text-left ${
                   isSelected
                     ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"

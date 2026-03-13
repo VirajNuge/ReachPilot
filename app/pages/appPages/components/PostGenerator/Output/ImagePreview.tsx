@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Download, Image as ImageIcon, CheckCircle2, Sparkles } from "lucide-react";
+import { Download, Image as ImageIcon, CheckCircle2 } from "lucide-react";
 import type { ImageVariation } from "@/lib/types/postGeneration";
 
 interface ImagePreviewProps {
@@ -107,10 +107,6 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
               alt={`Generated poster - ${headline}`}
               className="w-full h-auto object-contain"
             />
-            <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-1.5">
-              <Sparkles className="w-3 h-3" />
-              AI Generated
-            </div>
           </>
         ) : (
           <div className="aspect-square flex flex-col items-center justify-center animate-pulse">

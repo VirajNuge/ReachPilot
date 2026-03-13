@@ -4,20 +4,13 @@ import { getAuthFromCookies } from "@/lib/auth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
 import { buildCaptionGeneratorPrompt } from "@/lib/postGenerationPrompts";
+import { parseAIJson } from "@/lib/parseAIJson";
 import type {
   CaptionGeneratorOutput,
   ContentStrategyOutput,
   PostGenerationInput,
   PostPlatform,
 } from "@/lib/types/postGeneration";
-
-function parseAIJson(text: string): unknown {
-  const cleaned = text
-    .replace(/```json\n?/g, "")
-    .replace(/```\n?/g, "")
-    .trim();
-  return JSON.parse(cleaned);
-}
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -113,6 +106,7 @@ export async function POST(req: NextRequest) {
       input?: PostGenerationInput;
       strategy?: ContentStrategyOutput;
       accountId?: string;
+      includePersona?: boolean;
     };
 
     if (!body.input || !body.strategy) {
@@ -122,7 +116,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const personaContext = await loadPersonaContext(body.accountId);
+    const personaContext = body.includePersona ? await loadPersonaContext(body.accountId) : "";
     const prompt = buildCaptionGeneratorPrompt(
       body.input,
       body.strategy,

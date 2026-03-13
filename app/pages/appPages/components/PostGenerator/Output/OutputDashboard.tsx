@@ -1,144 +1,205 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { PostPackage, RemixStyle, HookOption } from "@/lib/types/postGeneration";
-import { CaptionCard } from "./CaptionCard";
-import { ContentScoreCard } from "./ContentScoreCard";
-import { HookSelector } from "./HookSelector";
-import { HashtagPanel } from "./HashtagPanel";
+import type {
+  PostPackage,
+  RemixStyle,
+  HookOption,
+  PostPlatform,
+  PostGenerationInput,
+  ContentStrategyOutput,
+  InstagramPostType,
+} from "@/lib/types/postGeneration";
+import { PLATFORM_DISPLAY } from "@/lib/types/postGeneration";
 import { ImagePreview } from "./ImagePreview";
-import { Sparkles, BarChart3 } from "lucide-react";
+import { PlatformTab } from "./PlatformTab";
 
 interface OutputDashboardProps {
   postPackage: PostPackage;
+  input?: PostGenerationInput;
+  strategy?: ContentStrategyOutput;
+  accountId?: string;
   onRemix: (caption: string, platform: string, style: RemixStyle) => void;
   onSelectHook: (hook: HookOption) => void;
   onScoreRequest: (platform: string) => void;
+  onRefinedCaption?: (platform: string, newCaption: string, newScore: number, newFlags: string[]) => void;
   isRemixing?: boolean;
   isScoring?: boolean;
 }
 
 export const OutputDashboard: React.FC<OutputDashboardProps> = ({
   postPackage,
+  input,
+  strategy,
+  accountId,
   onRemix,
   onSelectHook,
   onScoreRequest,
+  onRefinedCaption,
   isRemixing = false,
   isScoring = false,
 }) => {
-  const platforms = Object.keys(postPackage.captions);
+  const platforms = Object.keys(postPackage.captions) as PostPlatform[];
+  const [activeTab, setActiveTab] = useState<string>(platforms[0] ?? "linkedin");
+
+  // Local state for captions + linkedInRefined + xRefined + instagramRefined so re-refine updates reflect immediately
+  const [localCaptions, setLocalCaptions] = useState<Record<string, string>>(postPackage.captions);
+  const [localLinkedInRefined, setLocalLinkedInRefined] = useState(postPackage.linkedInRefined);
+  const [localXRefined, setLocalXRefined] = useState(postPackage.xRefined);
+  const [localInstagramRefined, setLocalInstagramRefined] = useState(postPackage.instagramRefined);
+  const [localFacebookRefined, setLocalFacebookRefined] = useState(postPackage.facebookRefined);
+
+  // Sync if postPackage changes (e.g. remix updates)
+  React.useEffect(() => {
+    setLocalCaptions(postPackage.captions);
+  }, [postPackage.captions]);
+
+  React.useEffect(() => {
+    setLocalLinkedInRefined(postPackage.linkedInRefined);
+  }, [postPackage.linkedInRefined]);
+
+  React.useEffect(() => {
+    setLocalXRefined(postPackage.xRefined);
+  }, [postPackage.xRefined]);
+
+  React.useEffect(() => {
+    setLocalInstagramRefined(postPackage.instagramRefined);
+  }, [postPackage.instagramRefined]);
+
+  React.useEffect(() => {
+    setLocalFacebookRefined(postPackage.facebookRefined);
+  }, [postPackage.facebookRefined]);
+
+  const activeCaption = localCaptions[activeTab] ?? "";
+
+  const handleRefinedCaption = (newCaption: string, newScore: number, newFlags: string[]) => {
+    setLocalCaptions((prev) => ({ ...prev, [activeTab]: newCaption }));
+    setLocalLinkedInRefined((prev) => ({
+      viralityScore: newScore,
+      qualityFlags: newFlags,
+      styleProfile: prev?.styleProfile,
+      postType: prev?.postType,
+    }));
+    onRefinedCaption?.(activeTab, newCaption, newScore, newFlags);
+  };
+
+  const handleXRefined = (newCaption: string, newScore: number, newFlags: string[]) => {
+    setLocalCaptions((prev) => ({ ...prev, [activeTab]: newCaption }));
+    setLocalXRefined({ engagementScore: newScore, qualityFlags: newFlags });
+    onRefinedCaption?.(activeTab, newCaption, newScore, newFlags);
+  };
+
+  const handleInstagramRefined = (
+    newCaption: string,
+    newScore: number,
+    newFlags: string[],
+    newPostType?: InstagramPostType
+  ) => {
+    setLocalCaptions((prev) => ({ ...prev, [activeTab]: newCaption }));
+    setLocalInstagramRefined((prev) => ({
+      engagementScore: newScore,
+      qualityFlags: newFlags,
+      postType: newPostType ?? prev?.postType,
+    }));
+    onRefinedCaption?.(activeTab, newCaption, newScore, newFlags);
+  };
+
+  const handleFacebookRefined = (newCaption: string, newScore: number, newFlags: string[]) => {
+    setLocalCaptions((prev) => ({ ...prev, [activeTab]: newCaption }));
+    setLocalFacebookRefined({ engagementScore: newScore, qualityFlags: newFlags });
+    onRefinedCaption?.(activeTab, newCaption, newScore, newFlags);
+  };
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Sparkles className="w-8 h-8 text-[#0052FF]" />
-            Generated Content
-          </h1>
-          <p className="text-sm font-bold text-slate-500 mt-2 uppercase tracking-widest">
-            Review, remix, and export your posts
-          </p>
-        </div>
-      </div>
+    <div className="w-full max-w-4xl mx-auto flex flex-col gap-5">
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-        {/* Left Column: Captions */}
-        <div className="xl:col-span-5 flex flex-col gap-6">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
-              Platform Variations
-            </h2>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-white px-3 py-1 rounded-full shadow-sm">
-              {platforms.length} Platforms
-            </span>
-          </div>
-          
-          <div className="flex flex-col gap-6">
-            {platforms.map((platform, index) => (
+      {/* Image Preview — full width at top */}
+      <ImagePreview
+        imagePrompt={postPackage.imagePrompt}
+        headline={postPackage.headline}
+        subtext={postPackage.subtext}
+        cta={postPackage.cta}
+        imageUrl={postPackage.imageUrl}
+        imageVariations={postPackage.imageVariations}
+      />
+
+      {/* Platform Tab Bar */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="flex gap-0 border-b border-gray-100">
+          {platforms.map((platform) => {
+            const { label, color } = PLATFORM_DISPLAY[platform] ?? { label: platform, color: "#0052FF", shortLabel: platform };
+            const isActive = activeTab === platform;
+            return (
+              <button
+                key={platform}
+                onClick={() => setActiveTab(platform)}
+                className={`flex items-center gap-2 px-5 py-3.5 text-[12px] font-bold transition-all duration-200 relative ${
+                  isActive
+                    ? "text-gray-900 bg-white"
+                    : "text-gray-400 hover:text-gray-700 hover:bg-gray-50/60"
+                }`}
+              >
+                <div
+                  className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-all duration-200"
+                  style={{
+                    backgroundColor: isActive ? color : "#CBD5E1",
+                  }}
+                />
+                {label}
+                {/* Active underline */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTabUnderline"
+                    className="absolute bottom-0 left-0 right-0 h-0.5"
+                    style={{ backgroundColor: color }}
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-5">
+          {platforms.map((platform) =>
+            platform === activeTab ? (
               <motion.div
                 key={platform}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.18 }}
               >
-                <CaptionCard
+                <PlatformTab
                   platform={platform}
-                  caption={postPackage.captions[platform]}
-                  onCopy={() => navigator.clipboard.writeText(postPackage.captions[platform])}
-                  onRemix={(style) => onRemix(postPackage.captions[platform], platform, style)}
+                  caption={activeCaption}
+                  hashtags={postPackage.hashtags}
+                  contentScore={postPackage.contentScore}
+                  hooks={postPackage.hooks}
+                  linkedInRefined={platform === "linkedin" ? localLinkedInRefined : undefined}
+                  xRefined={platform === "x" ? localXRefined : undefined}
+                  input={input ?? ({} as PostGenerationInput)}
+                  strategy={strategy}
+                  accountId={accountId}
+                  onRemix={(style) => onRemix(activeCaption, platform, style)}
+                  onScoreRequest={() => onScoreRequest(platform)}
+                  onSelectHook={onSelectHook}
+                   onRefinedCaption={handleRefinedCaption}
+                  onXRefined={handleXRefined}
+                  instagramRefined={platform === "instagram_post" ? localInstagramRefined : undefined}
+                  onInstagramRefined={handleInstagramRefined}
+                  facebookRefined={platform === "facebook" ? localFacebookRefined : undefined}
+                  onFacebookRefined={handleFacebookRefined}
+                  onCaptionChange={(newCaption) =>
+                    setLocalCaptions((prev) => ({ ...prev, [platform]: newCaption }))
+                  }
                   isRemixing={isRemixing}
+                  isScoring={isScoring}
                 />
               </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Column: Dashboard Stats & Assets */}
-        <div className="xl:col-span-7 flex flex-col gap-6">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
-              Content Intelligence
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6">
-            {postPackage.contentScore ? (
-              <ContentScoreCard score={postPackage.contentScore} />
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <BarChart3 className="w-5 h-5 text-[#0052FF]" />
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900">Content Score</h3>
-                    <p className="text-xs text-slate-400">Analyze your content quality with AI</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => platforms[0] && onScoreRequest(platforms[0])}
-                  disabled={isScoring}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-[#0052FF] text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isScoring ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Scoring...
-                    </>
-                  ) : (
-                    <>
-                      <BarChart3 className="w-4 h-4" />
-                      Score Content
-                    </>
-                  )}
-                </button>
-              </motion.div>
-            )}
-
-            {postPackage.hooks && postPackage.hooks.length > 0 && (
-              <HookSelector
-                hooks={postPackage.hooks}
-                onSelect={onSelectHook}
-              />
-            )}
-
-            {postPackage.hashtags && (
-              <HashtagPanel hashtags={postPackage.hashtags} />
-            )}
-
-            <ImagePreview
-              imagePrompt={postPackage.imagePrompt}
-              headline={postPackage.headline}
-              subtext={postPackage.subtext}
-              cta={postPackage.cta}
-              imageUrl={postPackage.imageUrl}
-              imageVariations={postPackage.imageVariations}
-            />
-          </div>
+            ) : null
+          )}
         </div>
       </div>
     </div>

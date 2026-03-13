@@ -35,11 +35,11 @@ export function StepToneMessaging({ input, onChange }: StepToneMessagingProps) {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {(Object.entries(TONE_LABELS) as [ToneType, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
-            const isSelected = input.tone === key;
+            const isSelected = input.tones?.[0] === key;
             return (
               <button
                 key={key}
-                onClick={() => onChange({ tone: key })}
+                onClick={() => onChange({ tones: [key] })}
                 className={`flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 text-left ${
                   isSelected
                     ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
@@ -66,11 +66,11 @@ export function StepToneMessaging({ input, onChange }: StepToneMessagingProps) {
         </div>
         <div className="flex flex-wrap gap-2">
           {(Object.entries(CTA_LABELS) as [CTAType, string][]).map(([key, label]) => {
-            const isSelected = input.cta === key;
+            const isSelected = input.ctas?.[0] === key;
             return (
               <button
                 key={key}
-                onClick={() => onChange({ cta: key })}
+                onClick={() => onChange({ ctas: [key] })}
                 className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 border ${
                   isSelected
                     ? "bg-gray-800 text-white border-gray-800 shadow-md transform scale-105"

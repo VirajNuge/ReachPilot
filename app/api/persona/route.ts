@@ -23,16 +23,34 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ persona: null }, { status: 200 });
     }
 
-    // Return brand-relevant fields needed by the wizard and post generation
+    // Return all fields needed by the wizard and post generation
     return NextResponse.json({
       persona: {
+        // Identity (Step 1)
         personaName: persona.personaName,
+        userRole: persona.userRole,
         industry: persona.industry,
         tagline: persona.tagline,
-        brandColorHex: persona.brandColorHex,
+        websiteUrl: persona.websiteUrl,
+        // Audience (Step 2)
+        audienceRole: persona.audienceRole ?? [],
+        audienceSegments: persona.audienceSegments ?? [],
+        painPoints: persona.painPoints,
+        audienceGoals: persona.audienceGoals ?? [],
+        audienceDesiredOutcome: persona.audienceDesiredOutcome,
+        // Objectives (Step 3)
+        primaryObjective: persona.primaryObjective ?? [],
+        contentMix: persona.contentMix ?? [],
+        conversionGoal: persona.conversionGoal,
+        // Tone & Voice (Step 4)
+        toneSliders: persona.toneSliders,
+        writingStyle: persona.writingStyle,
+        emojiUsage: persona.emojiUsage,
+        influencerStyle: persona.influencerStyle,
+        // Brand identity
         brandArchetype: persona.brandArchetype,
         coreValues: persona.coreValues,
-        websiteUrl: persona.websiteUrl,
+        brandColorHex: persona.brandColorHex,
         // Brand style fields (Step 6)
         logoUrl: persona.logoUrl ?? "",
         colorPalette: persona.colorPalette?.length

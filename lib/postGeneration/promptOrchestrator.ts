@@ -28,7 +28,7 @@ import {
 const PLATFORM_ASPECT_RATIO: Record<string, string> = {
   instagram_post: "1:1",
   instagram_story: "9:16",
-  linkedin: "4:3",
+  linkedin: "16:9",  // 1200×627 landscape — thought leadership format
   x: "16:9",
   facebook: "16:9",
   tiktok: "9:16",
@@ -268,7 +268,7 @@ function buildGeneratorPrompt(
 - Mood & Atmosphere: ${stylePreset.mood}
 - Brand Colors: ${brandColors} — apply with ${stylePreset.colorDirection ?? "balanced prominence"}
 - Typography: ${fontFamily}
-- Platform: ${primaryPlatform} (${aspectRatio} aspect ratio)`);
+- Platform: ${primaryPlatform} (${aspectRatio} aspect ratio)${primaryPlatform === "linkedin" ? "\n- LinkedIn Image Style: Thought leadership aesthetic. Clean, professional, minimal. No generic stock photo clichés. Prefer subtle gradients, abstract data visualization, or professional scene with clear typography space." : ""}`);
 
   // ── COMPOSITION DIRECTIVE ──
   sections.push(`## COMPOSITION DIRECTIVE
@@ -553,8 +553,9 @@ export function buildFinalImagePrompt(
 
   return `Create a high-quality, professional social media poster. This is a COMPLETE FINISHED POSTER — all text must be clearly readable and embedded in the image.
 
-OUTPUT FORMAT:
-${sizeDescription} social media graphic.
+OUTPUT FORMAT — CRITICAL SIZE REQUIREMENT:
+Generate this image at EXACTLY ${sizeDescription}.
+Aspect ratio MUST be ${aspectRatio} — do not crop, pad, letterbox, or alter this ratio under any circumstances.
 ${imageConceptSection}
 DESIGN STYLE:
 ${stylePreset.base}
@@ -620,6 +621,7 @@ COMPOSITION RULES:
 - High production value — ready to post immediately
 
 CRITICAL REQUIREMENTS:
+- IMAGE DIMENSIONS: Output MUST be ${sizeDescription}. Aspect ratio MUST be ${aspectRatio}. This is non-negotiable.
 - ALL text must be spelled correctly and exactly as written above
 - Headline must be the largest text element with dominant visual weight
 - Strong contrast between text color and background (minimum WCAG AA)

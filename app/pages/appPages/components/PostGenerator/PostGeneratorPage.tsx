@@ -99,6 +99,28 @@ const INITIAL_STAGES: PipelineStage[] = [
   },
 ];
 
+function buildPipelineStages(platforms: PostPlatform[]): PipelineStage[] {
+  const stages: PipelineStage[] = [
+    { name: "Content Strategist", description: "Analyzing your brief and creating a content strategy", status: "pending" },
+    { name: "Caption Generator", description: "Writing platform-optimized captions", status: "pending" },
+  ];
+  if (platforms.includes("linkedin")) {
+    stages.push({ name: "LinkedIn Optimizer", description: "Refining your LinkedIn post for maximum virality", status: "pending" });
+  }
+  if (platforms.includes("x")) {
+    stages.push({ name: "X Optimizer", description: "Refining your X post for maximum engagement", status: "pending" });
+  }
+  if (platforms.includes("instagram_post")) {
+    stages.push({ name: "Instagram Optimizer", description: "Refining your Instagram post for maximum engagement", status: "pending" });
+  }
+  if (platforms.includes("facebook")) {
+    stages.push({ name: "Facebook Optimizer", description: "Refining your Facebook post for maximum discussion and reach", status: "pending" });
+  }
+  stages.push({ name: "Image Prompt Generator", description: "Designing visual concepts for your post", status: "pending" });
+  stages.push({ name: "Image Render", description: "Generating your social media image with AI", status: "pending" });
+  return stages;
+}
+
 const DEFAULT_INPUT: PostGenerationInput = {
   objective: "educational",
   targetAudiences: ["general_audience"],
@@ -129,15 +151,16 @@ function deriveBrandType(userRole: string, industry: string): BrandType {
 }
 
 function deriveTargetAudience(
-  audienceRole: string | undefined,
+  audienceRole: string | string[] | undefined,
   audienceSegments: string[] | undefined
 ): TargetAudience {
-  const combined = ((audienceRole ?? "") + " " + (audienceSegments ?? []).join(" ")).toLowerCase();
+  const roleStr = Array.isArray(audienceRole) ? audienceRole.join(" ") : (audienceRole ?? "");
+  const combined = (roleStr + " " + (audienceSegments ?? []).join(" ")).toLowerCase();
   if (combined.includes("founder") || combined.includes("startup")) return "startup_founders";
   if (combined.includes("developer") || combined.includes("engineer")) return "developers";
   if (combined.includes("marketing") || combined.includes("agency")) return "marketing_agencies";
   if (combined.includes("real estate")) return "real_estate_buyers";
-  if (audienceRole || (audienceSegments && audienceSegments.length > 0)) return "custom";
+  if (roleStr || (audienceSegments && audienceSegments.length > 0)) return "custom";
   return "general_audience";
 }
 
@@ -153,10 +176,10 @@ function deriveTone(
 }
 
 function deriveVisualStyle(
-  brandArchetype: string | undefined,
+  brandArchetype: string | string[] | undefined,
   toneSliders: { formalCasual: number } | undefined
 ): VisualStyle {
-  const a = (brandArchetype ?? "").toLowerCase();
+  const a = (Array.isArray(brandArchetype) ? brandArchetype.join(" ") : (brandArchetype ?? "")).toLowerCase();
   if (a.includes("luxury") || a.includes("sage")) return "luxury";
   if (a.includes("rebel") || a.includes("outlaw")) return "bold";
   if (a.includes("tech") || a.includes("magician")) return "tech";
@@ -173,13 +196,14 @@ function deriveEmojiLevel(emojiUsage: string | undefined): IntensityLevel {
   return "medium";
 }
 
-function deriveCTA(conversionGoal: string | undefined): CTAType {
-  if (!conversionGoal) return "none";
-  if (conversionGoal.includes("call")) return "visit_link";
-  if (conversionGoal.includes("newsletter") || conversionGoal.includes("lead magnet")) return "sign_up";
-  if (conversionGoal.includes("Buy") || conversionGoal.includes("product")) return "visit_link";
-  if (conversionGoal.includes("Follow")) return "follow_for_more";
-  if (conversionGoal.includes("community") || conversionGoal.includes("Join")) return "comment_cta";
+function deriveCTA(conversionGoal: string | string[] | undefined): CTAType {
+  if (!conversionGoal || (Array.isArray(conversionGoal) && conversionGoal.length === 0)) return "none";
+  const goal = Array.isArray(conversionGoal) ? conversionGoal.join(" ") : conversionGoal;
+  if (goal.includes("call")) return "visit_link";
+  if (goal.includes("newsletter") || goal.includes("lead magnet")) return "sign_up";
+  if (goal.includes("Buy") || goal.includes("product")) return "visit_link";
+  if (goal.includes("Follow")) return "follow_for_more";
+  if (goal.includes("community") || goal.includes("Join")) return "comment_cta";
   return "none";
 }
 
@@ -455,58 +479,208 @@ export function PostGeneratorPage() {
     setLastInput(wizardInput);
     setView("generating");
     setError(null);
-    setPipelineStages([
-      { ...INITIAL_STAGES[0], status: "active" },
-      INITIAL_STAGES[1],
-      INITIAL_STAGES[2],
-      INITIAL_STAGES[3],
-    ]);
+
+    const hasLinkedIn = wizardInput.platforms.includes("linkedin");
+    const hasX = wizardInput.platforms.includes("x");
+    const hasInstagram = wizardInput.platforms.includes("instagram_post");
+    const hasFacebook = wizardInput.platforms.includes("facebook");
+    const dynamicStages = buildPipelineStages(wizardInput.platforms);
+    setPipelineStages(dynamicStages.map((s, i) => i === 0 ? { ...s, status: "active" } : s));
+
+    // Dynamic stage indices
+    let offset = 2; // after strategist + captions
+    const stageIdx = {
+      strategist: 0,
+      captions: 1,
+      linkedInOptimizer: hasLinkedIn ? offset++ : -1,
+      xOptimizer: hasX ? offset++ : -1,
+      instagramOptimizer: hasInstagram ? offset++ : -1,
+      facebookOptimizer: hasFacebook ? offset++ : -1,
+      imagePrompt: offset++,
+      imageRender: offset,
+    };
 
     try {
       // Stage 1: Strategist
       const strategyRes = await fetch("/api/post-generation/strategist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: wizardInput, accountId }),
+        body: JSON.stringify({ input: wizardInput, accountId, includePersona: usePersonaImport }),
       });
 
-      if (!strategyRes.ok) throw new Error("Failed to generate strategy");
+      if (!strategyRes.ok) {
+        const errBody = await strategyRes.json().catch(() => ({}));
+        throw new Error((errBody as { error?: string }).error || `Strategy failed (${strategyRes.status})`);
+      }
       const strategyJson = await strategyRes.json();
       const strategyData: ContentStrategyOutput = strategyJson.strategy;
       setStrategy(strategyData);
 
-      updateStageStatus(0, "completed");
-      updateStageStatus(1, "active");
+      updateStageStatus(stageIdx.strategist, "completed");
+      updateStageStatus(stageIdx.captions, "active");
 
       // Stage 2: Captions
       const captionsRes = await fetch("/api/post-generation/captions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId }),
+        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId, includePersona: usePersonaImport }),
       });
 
-      if (!captionsRes.ok) throw new Error("Failed to generate captions");
+      if (!captionsRes.ok) {
+        const errBody = await captionsRes.json().catch(() => ({}));
+        throw new Error((errBody as { error?: string }).error || `Captions failed (${captionsRes.status})`);
+      }
       const captionsJson = await captionsRes.json();
       const captionsData: CaptionGeneratorOutput = captionsJson.captions;
       setCaptionOutput(captionsData);
 
-      updateStageStatus(1, "completed");
-      updateStageStatus(2, "active");
+      // Build captions record early so we can refine LinkedIn before image prompt
+      const captionsRecord: Record<string, string> = Object.fromEntries(
+        captionsData.captions.map((c) => [c.platform, c.caption])
+      );
+
+      updateStageStatus(stageIdx.captions, "completed");
+
+      // Stage 2.5: LinkedIn Optimizer (conditional)
+      let linkedInRefinedData: PostPackage["linkedInRefined"] | undefined = undefined;
+      if (hasLinkedIn && captionsRecord["linkedin"]) {
+        updateStageStatus(stageIdx.linkedInOptimizer, "active");
+        try {
+          const linkedInRefineRes = await fetch("/api/post-generation/linkedin-refine", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              caption: captionsRecord["linkedin"],
+              input: wizardInput,
+              strategy: strategyData,
+              accountId,
+              includePersona: usePersonaImport,
+            }),
+          });
+          if (linkedInRefineRes.ok) {
+            const refineJson = await linkedInRefineRes.json();
+            captionsRecord["linkedin"] = refineJson.refinedCaption;
+            linkedInRefinedData = {
+               viralityScore: refineJson.viralityScore,
+               qualityFlags: refineJson.qualityFlags,
+             };
+          }
+        } catch (err) {
+          console.warn("LinkedIn refine failed (non-fatal):", err);
+        }
+        updateStageStatus(stageIdx.linkedInOptimizer, "completed");
+      }
+
+      // Stage 2.6: X Optimizer (conditional)
+      let xRefinedData: PostPackage["xRefined"] | undefined = undefined;
+      if (hasX && captionsRecord["x"]) {
+        updateStageStatus(stageIdx.xOptimizer, "active");
+        try {
+          const xRefineRes = await fetch("/api/post-generation/x-refine", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              caption: captionsRecord["x"],
+              input: wizardInput,
+              strategy: strategyData,
+              accountId,
+              includePersona: usePersonaImport,
+            }),
+          });
+          if (xRefineRes.ok) {
+            const refineJson = await xRefineRes.json();
+            captionsRecord["x"] = refineJson.refinedPost;
+            xRefinedData = {
+              engagementScore: refineJson.engagementScore,
+              qualityFlags: refineJson.qualityFlags,
+            };
+          }
+        } catch (err) {
+          console.warn("X refine failed (non-fatal):", err);
+        }
+        updateStageStatus(stageIdx.xOptimizer, "completed");
+      }
+
+      // Stage 2.7: Instagram Optimizer (conditional)
+      let instagramRefinedData: PostPackage["instagramRefined"] | undefined = undefined;
+      if (hasInstagram && captionsRecord["instagram_post"]) {
+        updateStageStatus(stageIdx.instagramOptimizer, "active");
+        try {
+          const igRefineRes = await fetch("/api/post-generation/instagram-refine", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              caption: captionsRecord["instagram_post"],
+              input: wizardInput,
+              strategy: strategyData,
+              accountId,
+              includePersona: usePersonaImport,
+            }),
+          });
+          if (igRefineRes.ok) {
+            const refineJson = await igRefineRes.json();
+            captionsRecord["instagram_post"] = refineJson.refinedCaption;
+            instagramRefinedData = {
+              engagementScore: refineJson.engagementScore,
+              qualityFlags: refineJson.qualityFlags,
+              postType: refineJson.postType,
+            };
+          }
+        } catch (err) {
+          console.warn("Instagram refine failed (non-fatal):", err);
+        }
+        updateStageStatus(stageIdx.instagramOptimizer, "completed");
+      }
+
+      // Stage 2.8: Facebook Optimizer (conditional)
+      let facebookRefinedData: PostPackage["facebookRefined"] | undefined = undefined;
+      if (hasFacebook && captionsRecord["facebook"]) {
+        updateStageStatus(stageIdx.facebookOptimizer, "active");
+        try {
+          const fbRefineRes = await fetch("/api/post-generation/facebook-refine", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              caption: captionsRecord["facebook"],
+              input: wizardInput,
+              strategy: strategyData,
+              accountId,
+              includePersona: usePersonaImport,
+            }),
+          });
+          if (fbRefineRes.ok) {
+            const refineJson = await fbRefineRes.json();
+            captionsRecord["facebook"] = refineJson.refinedPost;
+            facebookRefinedData = {
+              engagementScore: refineJson.engagementScore,
+              qualityFlags: refineJson.qualityFlags,
+            };
+          }
+        } catch (err) {
+          console.warn("Facebook refine failed (non-fatal):", err);
+        }
+        updateStageStatus(stageIdx.facebookOptimizer, "completed");
+      }
+
+      updateStageStatus(stageIdx.imagePrompt, "active");
 
       // Stage 3: Image Prompt
       const imagePromptRes = await fetch("/api/post-generation/image-prompt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId }),
+        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId, includePersona: usePersonaImport }),
       });
 
-      if (!imagePromptRes.ok) throw new Error("Failed to generate image prompt");
+      if (!imagePromptRes.ok) {
+        const errBody = await imagePromptRes.json().catch(() => ({}));
+        throw new Error((errBody as { error?: string }).error || `Image prompt failed (${imagePromptRes.status})`);
+      }
       const imagePromptJson = await imagePromptRes.json();
       const imagePromptData: PosterPromptOutput = imagePromptJson.imagePrompt;
       setImagePrompt(imagePromptData);
 
-      updateStageStatus(2, "completed");
-      updateStageStatus(3, "active");
+      updateStageStatus(stageIdx.imagePrompt, "completed");
+      updateStageStatus(stageIdx.imageRender, "active");
 
       // Stage 4: Generate poster variations
       let generatedVariations: ImageVariation[] = [];
@@ -532,11 +706,7 @@ export function PostGeneratorPage() {
         console.warn("Image generation error (non-fatal):", imageGenError);
       }
 
-      updateStageStatus(3, "completed");
-
-      const captionsRecord: Record<string, string> = Object.fromEntries(
-        captionsData.captions.map((c) => [c.platform, c.caption])
-      );
+      updateStageStatus(stageIdx.imageRender, "completed");
 
       const sizesRecord = Object.fromEntries(
         wizardInput.platforms.map((p) => [
@@ -556,6 +726,10 @@ export function PostGeneratorPage() {
         subtext: imagePromptData.subtext,
         cta: imagePromptData.cta,
         designStyle: wizardInput.visualStyles[0] ?? "minimal",
+        linkedInRefined: linkedInRefinedData,
+        xRefined: xRefinedData,
+        instagramRefined: instagramRefinedData,
+        facebookRefined: facebookRefinedData,
       };
 
       setPostPackage(newPostPackage);
@@ -565,7 +739,7 @@ export function PostGeneratorPage() {
       fetch("/api/post-generation/hooks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId }),
+        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId, includePersona: usePersonaImport }),
       })
         .then((res) => res.json())
         .then((data) => setHooks(data.hooks))
@@ -1373,6 +1547,9 @@ export function PostGeneratorPage() {
                 hooks: hooks || undefined,
                 contentScore: contentScore || undefined,
               }}
+              input={lastInput ?? formInput}
+              strategy={strategy ?? undefined}
+              accountId={accountId}
               onRemix={handleRemix}
               onSelectHook={(hook) => {
                 console.log("Selected hook:", hook);

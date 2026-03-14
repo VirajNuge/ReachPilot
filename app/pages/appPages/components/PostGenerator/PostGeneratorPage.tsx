@@ -42,6 +42,15 @@ import type {
   RemixStyle,
   PostTextBlock,
   ReferenceImage,
+  NicheCategory,
+  PostIntent,
+  LightingDirection,
+  ShadingStyle,
+  ImageStyle,
+  CompositionPreference,
+  TextStylePreference,
+  ColorThemePreset,
+  CaptionStylePreference,
 } from "@/lib/types/postGeneration";
 import {
   POST_OBJECTIVE_LABELS,
@@ -56,10 +65,20 @@ import {
   PLATFORM_DISPLAY,
   PLATFORM_INTELLIGENCE,
   POST_IMAGE_SIZES,
+  NICHE_CATEGORY_LABELS,
+  POST_INTENT_LABELS,
+  LIGHTING_DIRECTION_LABELS,
+  SHADING_STYLE_LABELS,
+  IMAGE_STYLE_LABELS,
+  COMPOSITION_PREFERENCE_LABELS,
+  TEXT_STYLE_PREFERENCE_LABELS,
+  COLOR_THEME_PRESET_LABELS,
+  CAPTION_STYLE_LABELS,
 } from "@/lib/types/postGeneration";
 
 import { GenerationPipeline, PipelineStage } from "./Pipeline/GenerationPipeline";
 import { OutputDashboard } from "./Output/OutputDashboard";
+import { CAPTION_TEMPLATES } from "@/lib/postGeneration/captionTemplates";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -303,6 +322,345 @@ function MultiSelectPills({ label, options, selected, onChange }: MultiSelectPil
   );
 }
 
+// ── StylePickerModal ──────────────────────────────────────────────────────────
+
+type StyleTab = "imageStyle" | "lighting" | "shading" | "composition" | "textStyle" | "colorTheme";
+
+interface StylePickerModalProps {
+  open: boolean;
+  onClose: () => void;
+  formInput: PostGenerationInput;
+  updateInput: (updates: Partial<PostGenerationInput>) => void;
+}
+
+function StylePickerModal({ open, onClose, formInput, updateInput }: StylePickerModalProps) {
+  const [activeTab, setActiveTab] = useState<StyleTab>("imageStyle");
+
+  if (!open) return null;
+
+  const tabs: { key: StyleTab; label: string; emoji: string }[] = [
+    { key: "imageStyle", label: "Image Style", emoji: "🖼️" },
+    { key: "lighting", label: "Lighting", emoji: "💡" },
+    { key: "shading", label: "Shading", emoji: "🌑" },
+    { key: "composition", label: "Composition", emoji: "⚖️" },
+    { key: "textStyle", label: "Text Style", emoji: "✍️" },
+    { key: "colorTheme", label: "Color Theme", emoji: "🎨" },
+  ];
+
+  const tabContent: Record<StyleTab, { entries: [string, { label: string; desc: string }][]; field: keyof PostGenerationInput; current: string | undefined }> = {
+    imageStyle: {
+      entries: Object.entries(IMAGE_STYLE_LABELS) as [ImageStyle, { label: string; desc: string }][],
+      field: "imageStyle",
+      current: formInput.imageStyle,
+    },
+    lighting: {
+      entries: Object.entries(LIGHTING_DIRECTION_LABELS) as [LightingDirection, { label: string; desc: string }][],
+      field: "lightingDirection",
+      current: formInput.lightingDirection,
+    },
+    shading: {
+      entries: Object.entries(SHADING_STYLE_LABELS) as [ShadingStyle, { label: string; desc: string }][],
+      field: "shadingStyle",
+      current: formInput.shadingStyle,
+    },
+    composition: {
+      entries: Object.entries(COMPOSITION_PREFERENCE_LABELS) as [CompositionPreference, { label: string; desc: string }][],
+      field: "compositionPreference",
+      current: formInput.compositionPreference,
+    },
+    textStyle: {
+      entries: Object.entries(TEXT_STYLE_PREFERENCE_LABELS) as [TextStylePreference, { label: string; desc: string }][],
+      field: "textStylePreference",
+      current: formInput.textStylePreference,
+    },
+    colorTheme: {
+      entries: Object.entries(COLOR_THEME_PRESET_LABELS) as [ColorThemePreset, { label: string; desc: string }][],
+      field: "colorThemePreset",
+      current: formInput.colorThemePreset,
+    },
+  };
+
+  const { entries, field, current } = tabContent[activeTab];
+
+  // Count how many style fields are set
+  const activeCount = [
+    formInput.imageStyle,
+    formInput.lightingDirection,
+    formInput.shadingStyle,
+    formInput.compositionPreference,
+    formInput.textStylePreference,
+    formInput.colorThemePreset,
+  ].filter(Boolean).length;
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h2 className="text-[15px] font-bold text-gray-900">Choose Visual Style</h2>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              {activeCount > 0 ? `${activeCount} style${activeCount > 1 ? "s" : ""} selected` : "Select styles to guide image generation"}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-1 px-4 pt-3 border-b border-gray-100 overflow-x-auto pb-0 flex-shrink-0">
+          {tabs.map((tab) => {
+            const tabField = tabContent[tab.key];
+            const isSet = Boolean(tabField.current);
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-t-xl text-[12px] font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
+                  activeTab === tab.key
+                    ? "border-[#0052FF] text-[#0052FF] bg-blue-50/40"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <span>{tab.emoji}</span>
+                <span>{tab.label}</span>
+                {isSet && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0052FF] flex-shrink-0" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Content */}
+        <div className="flex-1 overflow-y-auto p-5">
+          <div className="grid grid-cols-2 gap-2.5">
+            {entries.map(([value, { label, desc }]) => {
+              const isSelected = current === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => {
+                    if (isSelected) {
+                      updateInput({ [field]: undefined });
+                    } else {
+                      updateInput({ [field]: value });
+                    }
+                  }}
+                  className={`text-left p-3 rounded-xl border transition-all ${
+                    isSelected
+                      ? "border-[#0052FF] bg-blue-50/40 shadow-[0_0_0_1px_#0052FF]"
+                      : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                  }`}
+                >
+                  <p className={`text-[12px] font-bold ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>{label}</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">{desc}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-between">
+          <button
+            onClick={() => {
+              updateInput({
+                imageStyle: undefined,
+                lightingDirection: undefined,
+                shadingStyle: undefined,
+                compositionPreference: undefined,
+                textStylePreference: undefined,
+                colorThemePreset: undefined,
+              });
+            }}
+            className="text-[12px] text-gray-400 hover:text-red-500 transition-colors"
+          >
+            Clear all
+          </button>
+          <button
+            onClick={onClose}
+            className="px-5 py-2 bg-[#0052FF] text-white rounded-xl text-[12px] font-bold hover:bg-[#0041CC] transition-colors"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── WritingStyleModal ─────────────────────────────────────────────────────────
+
+type WritingPlatform = "linkedin" | "x" | "instagram_post" | "facebook";
+
+interface WritingStyleModalProps {
+  open: boolean;
+  onClose: () => void;
+  formInput: PostGenerationInput;
+  updateInput: (updates: Partial<PostGenerationInput>) => void;
+}
+
+// Map caption template id → CaptionStylePreference
+const TEMPLATE_TO_CAPTION_STYLE: Record<string, CaptionStylePreference> = {
+  problem_solution: "promotional",
+  hook_value_cta: "educational",
+  story_format: "storytelling",
+  authority_format: "authority",
+  listicle_format: "educational",
+  engagement_question: "conversational",
+};
+
+function WritingStyleModal({ open, onClose, formInput, updateInput }: WritingStyleModalProps) {
+  const [activePlatform, setActivePlatform] = useState<WritingPlatform>("linkedin");
+
+  if (!open) return null;
+
+  const platformTabs: { key: WritingPlatform; label: string; color: string }[] = [
+    { key: "linkedin", label: "LinkedIn", color: "#0A66C2" },
+    { key: "x", label: "X (Twitter)", color: "#000000" },
+    { key: "instagram_post", label: "Instagram", color: "#E1306C" },
+    { key: "facebook", label: "Facebook", color: "#1877F2" },
+  ];
+
+  const templates = Object.values(CAPTION_TEMPLATES);
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h2 className="text-[15px] font-bold text-gray-900">Choose Writing Style</h2>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              {formInput.captionStyle && formInput.captionStyle !== "auto"
+                ? `Active: ${CAPTION_STYLE_LABELS[formInput.captionStyle]?.label ?? formInput.captionStyle}`
+                : "Select a caption framework to guide your post structure"}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
+        </div>
+
+        {/* Platform Tabs */}
+        <div className="flex gap-1 px-4 pt-3 border-b border-gray-100 overflow-x-auto pb-0 flex-shrink-0">
+          {platformTabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActivePlatform(tab.key)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-t-xl text-[12px] font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
+                activePlatform === tab.key
+                  ? "border-[#0052FF] text-[#0052FF] bg-blue-50/40"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Template Cards */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-3">
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Caption Frameworks</p>
+          {templates.map((template) => {
+            const variation = template.platformVariations[activePlatform];
+            const mappedStyle = TEMPLATE_TO_CAPTION_STYLE[template.id];
+            const isSelected = formInput.captionStyle === mappedStyle;
+
+            return (
+              <button
+                key={template.id}
+                type="button"
+                onClick={() => {
+                  if (isSelected) {
+                    updateInput({ captionStyle: "auto" });
+                  } else {
+                    updateInput({ captionStyle: mappedStyle });
+                  }
+                }}
+                className={`w-full text-left p-4 rounded-xl border transition-all ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/40 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-[13px] font-bold ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>
+                      {template.name}
+                    </p>
+                    <p className="text-[11px] text-gray-500 mt-0.5">{template.description}</p>
+                  </div>
+                  {isSelected && (
+                    <span className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full bg-[#0052FF] flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                  )}
+                </div>
+
+                {/* Platform-specific variation */}
+                {variation && (
+                  <div className="mt-2.5 p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">
+                      {platformTabs.find(p => p.key === activePlatform)?.label} variation
+                    </p>
+                    <p className="text-[11px] text-gray-600 leading-relaxed">{variation}</p>
+                  </div>
+                )}
+
+                {/* Best for tags */}
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {template.bestFor.map((style) => (
+                    <span
+                      key={style}
+                      className="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-medium text-gray-500"
+                    >
+                      {CAPTION_STYLE_LABELS[style]?.label ?? style}
+                    </span>
+                  ))}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-between">
+          <button
+            onClick={() => updateInput({ captionStyle: "auto" })}
+            className="text-[12px] text-gray-400 hover:text-red-500 transition-colors"
+          >
+            Reset to Auto
+          </button>
+          <button
+            onClick={onClose}
+            className="px-5 py-2 bg-[#0052FF] text-white rounded-xl text-[12px] font-bold hover:bg-[#0041CC] transition-colors"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function PostGeneratorPage() {
@@ -314,6 +672,10 @@ export function PostGeneratorPage() {
   // Form state
   const [formInput, setFormInput] = useState<PostGenerationInput>(DEFAULT_INPUT);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+
+  // Modal state
+  const [styleModalOpen, setStyleModalOpen] = useState(false);
+  const [writingStyleModalOpen, setWritingStyleModalOpen] = useState(false);
 
   // Persona import state
   const [usePersonaImport, setUsePersonaImport] = useState(false);
@@ -914,6 +1276,70 @@ export function PostGeneratorPage() {
 
   const fontOptions = FONTS.map((f) => ({ value: f, label: f }));
 
+  // Creative Engine option arrays
+  const nicheOptions = [
+    { value: "", label: "— Auto —" },
+    ...(Object.entries(NICHE_CATEGORY_LABELS) as [NicheCategory, { label: string; emoji: string }][]).map(
+      ([key, { label, emoji }]) => ({ value: key, label: `${emoji} ${label}` })
+    ),
+  ];
+
+  const postIntentOptions = [
+    { value: "", label: "— Auto —" },
+    ...(Object.entries(POST_INTENT_LABELS) as [PostIntent, { label: string; desc: string; emoji: string }][]).map(
+      ([key, { label, emoji }]) => ({ value: key, label: `${emoji} ${label}` })
+    ),
+  ];
+
+  const lightingOptions = [
+    { value: "", label: "— Auto —" },
+    ...(Object.entries(LIGHTING_DIRECTION_LABELS) as [LightingDirection, { label: string; desc: string }][]).map(
+      ([key, { label }]) => ({ value: key, label })
+    ),
+  ];
+
+  const shadingOptions = [
+    { value: "", label: "— Auto —" },
+    ...(Object.entries(SHADING_STYLE_LABELS) as [ShadingStyle, { label: string; desc: string }][]).map(
+      ([key, { label }]) => ({ value: key, label })
+    ),
+  ];
+
+  const imageStyleOptions = [
+    { value: "", label: "— Auto —" },
+    ...(Object.entries(IMAGE_STYLE_LABELS) as [ImageStyle, { label: string; desc: string }][]).map(
+      ([key, { label }]) => ({ value: key, label })
+    ),
+  ];
+
+  const compositionOptions = [
+    { value: "", label: "— Auto —" },
+    ...(Object.entries(COMPOSITION_PREFERENCE_LABELS) as [CompositionPreference, { label: string; desc: string }][]).map(
+      ([key, { label }]) => ({ value: key, label })
+    ),
+  ];
+
+  const textStyleOptions = [
+    { value: "", label: "— Auto —" },
+    ...(Object.entries(TEXT_STYLE_PREFERENCE_LABELS) as [TextStylePreference, { label: string; desc: string }][]).map(
+      ([key, { label }]) => ({ value: key, label })
+    ),
+  ];
+
+  const colorThemeOptions = [
+    { value: "", label: "— Auto —" },
+    ...(Object.entries(COLOR_THEME_PRESET_LABELS) as [ColorThemePreset, { label: string; desc: string }][]).map(
+      ([key, { label }]) => ({ value: key, label })
+    ),
+  ];
+
+  const captionStyleOptions = [
+    { value: "", label: "— Auto —" },
+    ...(Object.entries(CAPTION_STYLE_LABELS) as [CaptionStylePreference, { label: string; desc: string }][]).map(
+      ([key, { label }]) => ({ value: key, label })
+    ),
+  ];
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
@@ -992,6 +1418,55 @@ export function PostGeneratorPage() {
               </div>
             )}
           </div>
+
+          {/* Creative Style Buttons */}
+          {(() => {
+            const styleCount = [
+              formInput.imageStyle,
+              formInput.lightingDirection,
+              formInput.shadingStyle,
+              formInput.compositionPreference,
+              formInput.textStylePreference,
+              formInput.colorThemePreset,
+            ].filter(Boolean).length;
+            const hasWritingStyle = formInput.captionStyle && formInput.captionStyle !== "auto";
+            return (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setStyleModalOpen(true)}
+                  className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border transition-all text-[12px] font-bold ${
+                    styleCount > 0
+                      ? "border-[#0052FF] bg-blue-50/40 text-[#0052FF] shadow-[0_0_0_1px_#0052FF]"
+                      : "border-gray-200 bg-white text-gray-600 hover:border-[#0052FF]/40 hover:text-[#0052FF] hover:bg-blue-50/20 shadow-sm"
+                  }`}
+                >
+                  <span className="text-base leading-none">🎨</span>
+                  <span>Choose Style</span>
+                  {styleCount > 0 && (
+                    <span className="ml-auto bg-[#0052FF] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0">
+                      {styleCount}
+                    </span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWritingStyleModalOpen(true)}
+                  className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border transition-all text-[12px] font-bold ${
+                    hasWritingStyle
+                      ? "border-[#0052FF] bg-blue-50/40 text-[#0052FF] shadow-[0_0_0_1px_#0052FF]"
+                      : "border-gray-200 bg-white text-gray-600 hover:border-[#0052FF]/40 hover:text-[#0052FF] hover:bg-blue-50/20 shadow-sm"
+                  }`}
+                >
+                  <span className="text-base leading-none">✍️</span>
+                  <span>Writing Style</span>
+                  {hasWritingStyle && (
+                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#0052FF] flex-shrink-0" />
+                  )}
+                </button>
+              </div>
+            );
+          })()}
 
           {/* Core Message */}
           <div>
@@ -1472,6 +1947,94 @@ export function PostGeneratorPage() {
                   options={imageGenTypeOptions}
                 />
 
+                {/* ── Creative Engine Fields ── */}
+
+                {/* Niche */}
+                <SelectField
+                  label="Industry Niche"
+                  value={formInput.niche || ""}
+                  onChange={(v) => updateInput({ niche: (v || undefined) as NicheCategory | undefined })}
+                  options={nicheOptions}
+                />
+
+                {/* Post Intent */}
+                <SelectField
+                  label="Post Intent"
+                  value={formInput.postIntent || ""}
+                  onChange={(v) => updateInput({ postIntent: (v || undefined) as PostIntent | undefined })}
+                  options={postIntentOptions}
+                />
+
+                {/* Location */}
+                <div className="mb-4">
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., San Francisco, CA"
+                    value={formInput.location || ""}
+                    onChange={(e) => updateInput({ location: e.target.value || undefined })}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all text-sm font-medium text-gray-800"
+                  />
+                </div>
+
+                {/* Caption Style */}
+                <SelectField
+                  label="Caption Style"
+                  value={formInput.captionStyle || ""}
+                  onChange={(v) => updateInput({ captionStyle: (v || undefined) as CaptionStylePreference | undefined })}
+                  options={captionStyleOptions}
+                />
+
+                {/* Lighting Direction */}
+                <SelectField
+                  label="Lighting Direction"
+                  value={formInput.lightingDirection || ""}
+                  onChange={(v) => updateInput({ lightingDirection: (v || undefined) as LightingDirection | undefined })}
+                  options={lightingOptions}
+                />
+
+                {/* Shading Style */}
+                <SelectField
+                  label="Shading Style"
+                  value={formInput.shadingStyle || ""}
+                  onChange={(v) => updateInput({ shadingStyle: (v || undefined) as ShadingStyle | undefined })}
+                  options={shadingOptions}
+                />
+
+                {/* Image Style */}
+                <SelectField
+                  label="Image Style"
+                  value={formInput.imageStyle || ""}
+                  onChange={(v) => updateInput({ imageStyle: (v || undefined) as ImageStyle | undefined })}
+                  options={imageStyleOptions}
+                />
+
+                {/* Composition */}
+                <SelectField
+                  label="Composition"
+                  value={formInput.compositionPreference || ""}
+                  onChange={(v) => updateInput({ compositionPreference: (v || undefined) as CompositionPreference | undefined })}
+                  options={compositionOptions}
+                />
+
+                {/* Text Style */}
+                <SelectField
+                  label="Text Style"
+                  value={formInput.textStylePreference || ""}
+                  onChange={(v) => updateInput({ textStylePreference: (v || undefined) as TextStylePreference | undefined })}
+                  options={textStyleOptions}
+                />
+
+                {/* Color Theme */}
+                <SelectField
+                  label="Color Theme"
+                  value={formInput.colorThemePreset || ""}
+                  onChange={(v) => updateInput({ colorThemePreset: (v || undefined) as ColorThemePreset | undefined })}
+                  options={colorThemeOptions}
+                />
+
               </div>
             )}
           </div>
@@ -1561,6 +2124,20 @@ export function PostGeneratorPage() {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      <StylePickerModal
+        open={styleModalOpen}
+        onClose={() => setStyleModalOpen(false)}
+        formInput={formInput}
+        updateInput={updateInput}
+      />
+      <WritingStyleModal
+        open={writingStyleModalOpen}
+        onClose={() => setWritingStyleModalOpen(false)}
+        formInput={formInput}
+        updateInput={updateInput}
+      />
     </div>
   );
 }

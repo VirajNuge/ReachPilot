@@ -1,16 +1,18 @@
 "use client";
 
 import React from "react";
-import { MessageCircle, Link, Smile, Hash } from "lucide-react";
+import { MessageCircle, Link, Smile, Hash, BookOpen } from "lucide-react";
 import type { 
   PostGenerationInput, 
   ToneType, 
   CTAType, 
-  IntensityLevel 
+  IntensityLevel,
+  CaptionStylePreference,
 } from "@/lib/types/postGeneration";
 import { 
   TONE_LABELS, 
-  CTA_LABELS 
+  CTA_LABELS,
+  CAPTION_STYLE_LABELS,
 } from "@/lib/types/postGeneration";
 
 interface StepToneMessagingProps {
@@ -78,6 +80,37 @@ export function StepToneMessaging({ input, onChange }: StepToneMessagingProps) {
                 }`}
               >
                 {label}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Caption Style */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <BookOpen className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Caption Style <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {(Object.entries(CAPTION_STYLE_LABELS) as [CaptionStylePreference, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
+            const isSelected = input.captionStyle === key;
+            return (
+              <button
+                key={key}
+                onClick={() => onChange({ captionStyle: isSelected ? undefined : key })}
+                className={`flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 text-left ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <span className={`text-sm font-bold mb-1 ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>
+                  {label}
+                </span>
+                <span className={`text-xs font-medium ${isSelected ? "text-blue-600/70" : "text-gray-400"}`}>
+                  {desc}
+                </span>
               </button>
             );
           })}

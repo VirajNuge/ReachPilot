@@ -1,19 +1,31 @@
 "use client";
 
 import React, { useRef } from "react";
-import { Palette, Layers, Image as ImageIcon, Plus, X, Cpu, Upload } from "lucide-react";
+import { Palette, Layers, Image as ImageIcon, Plus, X, Cpu, Upload, Sun, Droplets, Sparkles, Grid3X3, Type } from "lucide-react";
 import type { 
   PostGenerationInput, 
   BrandType, 
   VisualStyle, 
   ImageGenType,
-  GeminiImageModel
+  GeminiImageModel,
+  LightingDirection,
+  ShadingStyle,
+  ImageStyle,
+  CompositionPreference,
+  TextStylePreference,
+  ColorThemePreset,
 } from "@/lib/types/postGeneration";
 import { 
   BRAND_TYPE_LABELS, 
   VISUAL_STYLE_LABELS, 
   IMAGE_GEN_TYPE_LABELS,
-  IMAGE_MODEL_LABELS
+  IMAGE_MODEL_LABELS,
+  LIGHTING_DIRECTION_LABELS,
+  SHADING_STYLE_LABELS,
+  IMAGE_STYLE_LABELS,
+  COMPOSITION_PREFERENCE_LABELS,
+  TEXT_STYLE_PREFERENCE_LABELS,
+  COLOR_THEME_PRESET_LABELS,
 } from "@/lib/types/postGeneration";
 
 interface StepVisualIdentityProps {
@@ -215,6 +227,192 @@ export function StepVisualIdentity({ input, onChange }: StepVisualIdentityProps)
           </div>
         </section>
       )}
+
+      {/* Lighting Direction */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <Sun className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Lighting Direction <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {(Object.entries(LIGHTING_DIRECTION_LABELS) as [LightingDirection, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
+            const isSelected = input.lightingDirection === key;
+            return (
+              <button
+                key={key}
+                onClick={() => onChange({ lightingDirection: isSelected ? undefined : key })}
+                className={`flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 text-left ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <span className={`text-sm font-bold mb-1 ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>
+                  {label}
+                </span>
+                <span className={`text-xs font-medium ${isSelected ? "text-blue-600/70" : "text-gray-400"}`}>
+                  {desc}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Shading Style */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <Droplets className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Shading Style <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {(Object.entries(SHADING_STYLE_LABELS) as [ShadingStyle, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
+            const isSelected = input.shadingStyle === key;
+            return (
+              <button
+                key={key}
+                onClick={() => onChange({ shadingStyle: isSelected ? undefined : key })}
+                className={`flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 text-left ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <span className={`text-sm font-bold mb-1 ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>
+                  {label}
+                </span>
+                <span className={`text-xs font-medium ${isSelected ? "text-blue-600/70" : "text-gray-400"}`}>
+                  {desc}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Image Style */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Image Style <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {(Object.entries(IMAGE_STYLE_LABELS) as [ImageStyle, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
+            const isSelected = input.imageStyle === key;
+            return (
+              <button
+                key={key}
+                onClick={() => onChange({ imageStyle: isSelected ? undefined : key })}
+                className={`flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 text-left ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <span className={`text-sm font-bold mb-1 ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>
+                  {label}
+                </span>
+                <span className={`text-xs font-medium ${isSelected ? "text-blue-600/70" : "text-gray-400"}`}>
+                  {desc}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Composition Preference */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <Grid3X3 className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Composition <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {(Object.entries(COMPOSITION_PREFERENCE_LABELS) as [CompositionPreference, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
+            const isSelected = input.compositionPreference === key;
+            return (
+              <button
+                key={key}
+                onClick={() => onChange({ compositionPreference: isSelected ? undefined : key })}
+                className={`flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 text-left ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <span className={`text-sm font-bold mb-1 ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>
+                  {label}
+                </span>
+                <span className={`text-xs font-medium ${isSelected ? "text-blue-600/70" : "text-gray-400"}`}>
+                  {desc}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Text Style Preference */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <Type className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Text Style <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {(Object.entries(TEXT_STYLE_PREFERENCE_LABELS) as [TextStylePreference, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
+            const isSelected = input.textStylePreference === key;
+            return (
+              <button
+                key={key}
+                onClick={() => onChange({ textStylePreference: isSelected ? undefined : key })}
+                className={`flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 text-left ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <span className={`text-sm font-bold mb-1 ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>
+                  {label}
+                </span>
+                <span className={`text-xs font-medium ${isSelected ? "text-blue-600/70" : "text-gray-400"}`}>
+                  {desc}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Color Theme Preset */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <Palette className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Color Theme <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {(Object.entries(COLOR_THEME_PRESET_LABELS) as [ColorThemePreset, { label: string; desc: string }][]).map(([key, { label, desc }]) => {
+            const isSelected = input.colorThemePreset === key;
+            return (
+              <button
+                key={key}
+                onClick={() => onChange({ colorThemePreset: isSelected ? undefined : key })}
+                className={`flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 text-left ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <span className={`text-sm font-bold mb-1 ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>
+                  {label}
+                </span>
+                <span className={`text-xs font-medium ${isSelected ? "text-blue-600/70" : "text-gray-400"}`}>
+                  {desc}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Brand Assets */}
       <section className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">

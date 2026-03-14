@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Target, MessageSquare, LayoutGrid, User, FileText, Image, SlidersHorizontal, Type } from "lucide-react";
+import { Target, MessageSquare, LayoutGrid, User, FileText, Image, SlidersHorizontal, Type, MapPin, Compass, Crosshair } from "lucide-react";
 import type { 
   PostGenerationInput, 
   PostObjective, 
@@ -13,12 +13,16 @@ import type {
   ToneType,
   CTAType,
   IntensityLevel,
+  NicheCategory,
+  PostIntent,
 } from "@/lib/types/postGeneration";
 import { 
   POST_OBJECTIVE_LABELS, 
   TARGET_AUDIENCE_LABELS, 
   CONTENT_ANGLE_LABELS, 
-  PLATFORM_DISPLAY 
+  PLATFORM_DISPLAY,
+  NICHE_CATEGORY_LABELS,
+  POST_INTENT_LABELS,
 } from "@/lib/types/postGeneration";
 
 interface StepStrategyProps {
@@ -287,6 +291,82 @@ export function StepStrategy({ input, onChange, accountId }: StepStrategyProps) 
             )}
           </div>
         )}
+      </section>
+
+      {/* Niche Category */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <Compass className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Industry Niche <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {(Object.entries(NICHE_CATEGORY_LABELS) as [NicheCategory, { label: string; emoji: string }][]).map(([key, { label, emoji }]) => {
+            const isSelected = input.niche === key;
+            return (
+              <button
+                key={key}
+                onClick={() => onChange({ niche: isSelected ? undefined : key })}
+                className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-200 ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <span className="text-2xl mb-2">{emoji}</span>
+                <span className={`text-xs font-bold text-center ${isSelected ? "text-[#0052FF]" : "text-gray-700"}`}>
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Post Intent */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <Crosshair className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Post Intent <span className="text-xs font-normal text-gray-400 ml-1">— Optional</span></h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {(Object.entries(POST_INTENT_LABELS) as [PostIntent, { label: string; desc: string; emoji: string }][]).map(([key, { label, desc, emoji }]) => {
+            const isSelected = input.postIntent === key;
+            return (
+              <button
+                key={key}
+                onClick={() => onChange({ postIntent: isSelected ? undefined : key })}
+                className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-200 ${
+                  isSelected
+                    ? "border-[#0052FF] bg-blue-50/30 shadow-[0_0_0_1px_#0052FF]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
+                }`}
+              >
+                <span className="text-2xl mb-2">{emoji}</span>
+                <span className={`text-xs font-bold text-center mb-1 ${isSelected ? "text-[#0052FF]" : "text-gray-700"}`}>
+                  {label}
+                </span>
+                <span className={`text-[10px] text-center ${isSelected ? "text-blue-600/70" : "text-gray-400"}`}>
+                  {desc}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Location */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <MapPin className="w-5 h-5 text-[#0052FF]" />
+          <h3 className="text-sm font-bold text-gray-800">Location <span className="text-xs font-normal text-gray-400 ml-1">— Optional, for local hashtags</span></h3>
+        </div>
+        <input
+          type="text"
+          placeholder="e.g., San Francisco, CA or London, UK"
+          value={input.location || ""}
+          onChange={(e) => onChange({ location: e.target.value || undefined })}
+          className="w-full p-4 rounded-2xl border border-gray-200 focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all bg-white shadow-sm text-sm"
+        />
       </section>
 
       {/* Post Objective */}

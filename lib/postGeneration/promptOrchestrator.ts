@@ -11,6 +11,7 @@ import type {
   LayoutStyle,
   PostPlatform,
   PosterPromptOutput,
+  CompositionPreference,
 } from "@/lib/types/postGeneration";
 
 import { POST_IMAGE_SIZES } from "@/lib/types/postGeneration";
@@ -21,7 +22,19 @@ import {
   VISUAL_METAPHOR_TEMPLATES,
   CAMERA_PRESETS,
   IMAGE_SYSTEM_PROMPT,
+  LIGHTING_PRESETS,
+  SHADING_PRESETS,
+  IMAGE_STYLE_PRESETS,
+  TEXT_STYLE_PRESETS,
+  COMPOSITION_PREFERENCE_TO_RULE,
+  COLOR_THEME_DESCRIPTIONS,
 } from "./designTokens";
+
+import {
+  resolveCreativeProfile,
+  COLOR_THEME_PALETTES,
+} from "./creativeDirector";
+import type { CreativeProfile } from "./creativeDirector";
 
 // ── Platform Aspect Ratios (local until consolidated) ────────
 
@@ -151,6 +164,7 @@ export interface OrchestratedPrompt {
     camera: string;
     metaphor?: string;
     aspectRatio: string;
+    creativeProfile: CreativeProfile;
   };
 }
 
@@ -159,11 +173,18 @@ export interface OrchestratedPrompt {
 /**
  * Maps a visual style + optional layout to the best composition rule key.
  * Layout preference overrides the default style mapping when applicable.
+ * If a Creative Director compositionPreference is provided, it takes priority over style mapping.
  */
 export function resolveComposition(
   style: VisualStyle,
-  layout?: LayoutStyle
+  layout?: LayoutStyle,
+  compositionPreference?: CompositionPreference
 ): string {
+  // Creative Director preference takes priority over style-based mapping
+  if (compositionPreference) {
+    const mapped = COMPOSITION_PREFERENCE_TO_RULE[compositionPreference];
+    if (mapped && COMPOSITION_RULES[mapped]) return mapped;
+  }
   if (layout && LAYOUT_TO_COMPOSITION[layout]) {
     return LAYOUT_TO_COMPOSITION[layout] as string;
   }
@@ -236,8 +257,9 @@ function buildGeneratorPrompt(
   resolvedTokens: OrchestratedPrompt["resolvedTokens"]
 ): string {
   const { input, strategy, personaContext } = config;
+  const profile = resolvedTokens.creativeProfile;
 
-  const styleKey = (input.visualStyles?.[0] ?? "minimal") as VisualStyle;
+  const styleKey = (resolvedTokens.style ?? "minimal") as VisualStyle;
   const stylePreset = STYLE_PRESETS[styleKey] ?? STYLE_PRESETS["minimal"];
   const compositionKey = resolvedTokens.composition;
   const compositionRule =
@@ -246,11 +268,27 @@ function buildGeneratorPrompt(
   const cameraPreset = CAMERA_PRESETS[cameraKey] ?? CAMERA_PRESETS["editorial"];
   const metaphorKey = resolvedTokens.metaphor;
 
+  // Resolve Creative Director design tokens
+  const lightingPreset = LIGHTING_PRESETS[profile.lightingDirection];
+  const shadingPreset = SHADING_PRESETS[profile.shadingStyle];
+  const imageStylePreset = IMAGE_STYLE_PRESETS[profile.imageStyle];
+  const textStyleToken = TEXT_STYLE_PRESETS[profile.textStylePreference];
+  const colorThemeDesc = COLOR_THEME_DESCRIPTIONS[profile.colorThemePreset];
+
   const primaryPlatform = input.platforms?.[0] ?? "instagram_post";
   const aspectRatio = resolvedTokens.aspectRatio;
   const ctaLabel = (input.ctas?.[0] ?? "none").replace(/_/g, " ");
   const toneLabel = (input.tones?.[0] ?? "professional").replace(/_/g, " ");
-  const brandColors = formatBrandColors(input.brandAssets.colorPalette);
+
+  // Resolve brand colors: user's palette > color theme palette > auto
+  const userColors = input.brandAssets.colorPalette ?? [];
+  const effectiveColors =
+    userColors.length > 0
+      ? userColors
+      : profile.colorThemePreset !== "brand_colors"
+        ? COLOR_THEME_PALETTES[profile.colorThemePreset] ?? []
+        : [];
+  const brandColors = formatBrandColors(effectiveColors);
   const fontFamily = input.brandAssets.fontFamily ?? "Montserrat";
 
   const sections: string[] = [];
@@ -263,11 +301,17 @@ function buildGeneratorPrompt(
   // ── VISUAL IDENTITY ──
   sections.push(`## VISUAL IDENTITY
 - Design System: ${stylePreset.base}
-- Lighting Direction: ${stylePreset.lighting}
+- Image Rendering Style: ${imageStylePreset.description}
+- Lighting Direction: ${lightingPreset.description}
+- Lighting Rig: ${lightingPreset.rig}
+- Lighting Mood: ${lightingPreset.mood}
+- Shading Style: ${shadingPreset.description}${shadingPreset.materialQuality ? `\n- Material Quality: ${shadingPreset.materialQuality}` : ""}
 - Camera Treatment: ${stylePreset.camera}
 - Mood & Atmosphere: ${stylePreset.mood}
+- Color Theme: ${colorThemeDesc}
 - Brand Colors: ${brandColors} — apply with ${stylePreset.colorDirection ?? "balanced prominence"}
-- Typography: ${fontFamily}
+- Typography: ${textStyleToken.description}
+- Font Guidance: ${textStyleToken.fontGuidance}
 - Platform: ${primaryPlatform} (${aspectRatio} aspect ratio)${primaryPlatform === "linkedin" ? "\n- LinkedIn Image Style: Thought leadership aesthetic. Clean, professional, minimal. No generic stock photo clichés. Prefer subtle gradients, abstract data visualization, or professional scene with clear typography space." : ""}`);
 
   // ── COMPOSITION DIRECTIVE ──
@@ -336,7 +380,10 @@ Camera & Technical:
 - Lighting Rig: ${cameraPreset.lightingRig}
 - Angle: ${cameraPreset.angle}
 
-Quality Direction:
+Image Style Quality:
+${imageStylePreset.qualityModifiers.map((q: string) => `- ${q}`).join("\n")}
+
+Design System Quality:
 ${(stylePreset.qualityModifiers ?? []).map((q: string) => `- ${q}`).join("\n")}
 
 Texture Direction:
@@ -381,8 +428,12 @@ Typography style options:
 
 Design Rules:
 - Match the resolved style: ${stylePreset.base}
+- Render in ${imageStylePreset.description} style
+- Use ${lightingPreset.description} lighting
+- Apply ${shadingPreset.description} shading
+- Follow ${textStyleToken.fontGuidance} typography
 - If a User's Visual Brief is provided, build the compositionNotes around it — treat it as the primary visual direction
-- Reference camera and lighting terms from the visual inspiration in your compositionNotes (e.g., "${cameraPreset.focalLength} perspective", "${cameraPreset.lightingRig}")
+- Reference camera and lighting terms from the visual inspiration in your compositionNotes (e.g., "${cameraPreset.focalLength} perspective", "${lightingPreset.rig}")
 - Maintain negative space: ${stylePreset.negativeSpace ?? "generous breathing room"}
 - compositionNotes must describe colors, mood, imagery style, and spatial arrangement concretely
 - Match the tone: ${toneLabel}
@@ -396,20 +447,35 @@ function buildImageModelPromptTemplate(
   resolvedTokens: OrchestratedPrompt["resolvedTokens"]
 ): string {
   const { input } = config;
+  const profile = resolvedTokens.creativeProfile;
 
-  const styleKey = (input.visualStyles?.[0] ?? "minimal") as VisualStyle;
+  const styleKey = (resolvedTokens.style ?? "minimal") as VisualStyle;
   const stylePreset = STYLE_PRESETS[styleKey] ?? STYLE_PRESETS["minimal"];
   const cameraKey = resolvedTokens.camera;
   const cameraPreset = CAMERA_PRESETS[cameraKey] ?? CAMERA_PRESETS["editorial"];
   const compositionKey = resolvedTokens.composition;
   const compositionRule =
     COMPOSITION_RULES[compositionKey] ?? COMPOSITION_RULES["rule_of_thirds"];
-  const brandColors = formatBrandColors(input.brandAssets.colorPalette);
+
+  const userColors = input.brandAssets.colorPalette ?? [];
+  const effectiveColors =
+    userColors.length > 0
+      ? userColors
+      : profile.colorThemePreset !== "brand_colors"
+        ? COLOR_THEME_PALETTES[profile.colorThemePreset] ?? []
+        : [];
+  const brandColors = formatBrandColors(effectiveColors);
   const fontInstruction = input.brandAssets.fontFamily
     ? `Use ${input.brandAssets.fontFamily} as the primary typeface.`
     : "Use a modern clean sans-serif typeface.";
   const aspectRatio = resolvedTokens.aspectRatio;
   const metaphorKey = resolvedTokens.metaphor;
+
+  const lightingPreset = LIGHTING_PRESETS[profile.lightingDirection];
+  const shadingPreset = SHADING_PRESETS[profile.shadingStyle];
+  const imageStylePreset = IMAGE_STYLE_PRESETS[profile.imageStyle];
+  const textStyleToken = TEXT_STYLE_PRESETS[profile.textStylePreference];
+  const colorThemeDesc = COLOR_THEME_DESCRIPTIONS[profile.colorThemePreset];
 
   // This is a template — the real image prompt is built by buildFinalImagePrompt
   // which has the posterOutput available. Return a structural preview for debugging.
@@ -417,14 +483,18 @@ function buildImageModelPromptTemplate(
 
 OUTPUT FORMAT: ${aspectRatio} aspect ratio social media graphic.
 DESIGN STYLE: ${stylePreset.base}
-LIGHTING: ${stylePreset.lighting}
+IMAGE STYLE: ${imageStylePreset.description}
+LIGHTING: ${lightingPreset.description}
+LIGHTING RIG: ${lightingPreset.rig}
+SHADING: ${shadingPreset.description}
 CAMERA: ${cameraPreset.focalLength}, ${cameraPreset.aperture}, ${cameraPreset.lightingRig}
+COLOR THEME: ${colorThemeDesc}
 BRAND COLORS: ${brandColors} — ${stylePreset.colorDirection ?? "balanced"}
-TYPOGRAPHY: ${fontInstruction}
+TYPOGRAPHY: ${textStyleToken.fontGuidance}
 COMPOSITION: ${compositionRule.description}
 NEGATIVE SPACE: ${stylePreset.negativeSpace ?? "generous"}
 ${metaphorKey ? `VISUAL METAPHOR: ${VISUAL_METAPHOR_TEMPLATES[metaphorKey]?.description ?? ""}` : ""}
-QUALITY: ${(stylePreset.qualityModifiers ?? []).join(", ")}
+QUALITY: ${imageStylePreset.qualityModifiers.join(", ")}
 TEXTURE: ${stylePreset.texture ?? "clean professional"}`;
 }
 
@@ -441,15 +511,23 @@ export function orchestrateImagePrompt(
 ): OrchestratedPrompt {
   const { input } = config;
 
+  // ── Step 0: Resolve Creative Profile ──
+  const creativeProfile = resolveCreativeProfile(input);
+
   // ── Step 1: Resolve Design Tokens ──
-  const styleKey = (input.visualStyles?.[0] ?? "minimal") as VisualStyle;
+  // Use creative profile's visualStyle (which already respects priority layers)
+  const styleKey = creativeProfile.visualStyle;
 
   // Ensure the style key exists in presets, fall back to "minimal"
   const resolvedStyle = STYLE_PRESETS[styleKey]
     ? styleKey
     : "minimal";
 
-  const compositionKey = resolveComposition(resolvedStyle as VisualStyle);
+  const compositionKey = resolveComposition(
+    resolvedStyle as VisualStyle,
+    undefined,
+    creativeProfile.compositionPreference
+  );
   const cameraKey = resolveCameraPreset(resolvedStyle as VisualStyle);
   const metaphorKey = resolveVisualMetaphor(input.imageConcept);
   const { aspectRatio } = resolveAspectRatio(input);
@@ -460,6 +538,7 @@ export function orchestrateImagePrompt(
     camera: cameraKey,
     metaphor: metaphorKey,
     aspectRatio,
+    creativeProfile,
   };
 
   // ── Step 2: Build System Prompt ──
@@ -497,15 +576,19 @@ export function buildFinalImagePrompt(
 ): string {
   const { input } = config;
 
-  // Resolve tokens inline (same logic as orchestrateImagePrompt)
-  const styleKey = (input.visualStyles?.[0] ?? "minimal") as VisualStyle;
+  // Resolve creative profile for the final prompt (same as orchestrateImagePrompt)
+  const creativeProfile = resolveCreativeProfile(input);
+
+  // Resolve tokens inline
+  const styleKey = creativeProfile.visualStyle;
   const resolvedStyle = STYLE_PRESETS[styleKey] ? styleKey : "minimal";
   const stylePreset =
     STYLE_PRESETS[resolvedStyle as VisualStyle] ?? STYLE_PRESETS["minimal"];
 
   const compositionKey = resolveComposition(
     resolvedStyle as VisualStyle,
-    posterOutput.layout
+    posterOutput.layout,
+    creativeProfile.compositionPreference
   );
   const compositionRule =
     COMPOSITION_RULES[compositionKey] ?? COMPOSITION_RULES["rule_of_thirds"];
@@ -517,10 +600,25 @@ export function buildFinalImagePrompt(
 
   const { aspectRatio, sizeDescription } = resolveAspectRatio(input);
 
-  const brandColors = formatBrandColors(input.brandAssets.colorPalette);
+  // Resolve Creative Director design tokens
+  const lightingPreset = LIGHTING_PRESETS[creativeProfile.lightingDirection];
+  const shadingPreset = SHADING_PRESETS[creativeProfile.shadingStyle];
+  const imageStylePreset = IMAGE_STYLE_PRESETS[creativeProfile.imageStyle];
+  const textStyleToken = TEXT_STYLE_PRESETS[creativeProfile.textStylePreference];
+  const colorThemeDesc = COLOR_THEME_DESCRIPTIONS[creativeProfile.colorThemePreset];
+
+  // Resolve brand colors: user's palette > color theme palette > auto
+  const userColors = input.brandAssets.colorPalette ?? [];
+  const effectiveColors =
+    userColors.length > 0
+      ? userColors
+      : creativeProfile.colorThemePreset !== "brand_colors"
+        ? COLOR_THEME_PALETTES[creativeProfile.colorThemePreset] ?? []
+        : [];
+  const brandColors = formatBrandColors(effectiveColors);
   const fontInstruction = input.brandAssets.fontFamily
     ? `Use ${input.brandAssets.fontFamily} as the primary typeface.`
-    : "Use Montserrat as the primary typeface.";
+    : textStyleToken.fontGuidance;
 
   // ── Resolve exact text from user's text blocks (if provided) ──
   const textBlocks = input.textBlocks ?? [];
@@ -539,7 +637,14 @@ export function buildFinalImagePrompt(
     ? `LOGO:\nPlace the provided brand logo in a clean professional position (bottom-right corner preferred).\nDo not distort or alter the logo. Incorporate it naturally into the poster design.`
     : `LOGO AREA:\nReserve the bottom-right corner for a brand logo placeholder.`;
 
-  const qualityModifiers = (stylePreset.qualityModifiers ?? [])
+  // Merge quality modifiers from both style preset and image style preset
+  const allQualityModifiers = [
+    ...new Set([
+      ...(imageStylePreset.qualityModifiers ?? []),
+      ...(stylePreset.qualityModifiers ?? []),
+    ]),
+  ];
+  const qualityModifiers = allQualityModifiers
     .map((q: string) => `- ${q}`)
     .join("\n");
 
@@ -551,23 +656,38 @@ export function buildFinalImagePrompt(
     ? `\nUSER'S VISUAL BRIEF (PRIMARY DIRECTION — follow this closely):\n"${input.imageConcept}"\n`
     : "";
 
+  // Build shading section (skip if "none")
+  const shadingSection = creativeProfile.shadingStyle !== "none"
+    ? `\nSHADING & MATERIAL:\n${shadingPreset.description}\nMaterial Quality: ${shadingPreset.materialQuality}`
+    : "";
+
   return `Create a high-quality, professional social media poster. This is a COMPLETE FINISHED POSTER — all text must be clearly readable and embedded in the image.
 
 OUTPUT FORMAT — CRITICAL SIZE REQUIREMENT:
 Generate this image at EXACTLY ${sizeDescription}.
 Aspect ratio MUST be ${aspectRatio} — do not crop, pad, letterbox, or alter this ratio under any circumstances.
 ${imageConceptSection}
+IMAGE RENDERING STYLE:
+${imageStylePreset.description}
+
 DESIGN STYLE:
 ${stylePreset.base}
-Lighting: ${stylePreset.lighting}
-Camera feel: ${stylePreset.camera}
-Mood: ${stylePreset.mood}
+
+LIGHTING:
+${lightingPreset.description}
+Lighting Rig: ${lightingPreset.rig}
+Lighting Mood: ${lightingPreset.mood}
+${shadingSection}
+
+COLOR THEME:
+${colorThemeDesc}
 
 BRAND COLORS:
 Use these brand colors prominently: ${brandColors}
 Color application: ${stylePreset.colorDirection ?? "balanced prominence across the design"}
 
 TYPOGRAPHY:
+${textStyleToken.description}
 ${fontInstruction}
 Strong contrast between text and background.
 Large, readable headline. All text must be crisp and legible.
@@ -600,7 +720,7 @@ ${posterOutput.typographyStyle === "bold_serif" ? "Bold serif headline with edit
 TECHNICAL SPECS:
 - Focal length feel: ${cameraPreset.focalLength}
 - Depth of field: ${cameraPreset.aperture}
-- Lighting setup: ${cameraPreset.lightingRig}
+- Lighting setup: ${lightingPreset.rig}
 - Viewing angle: ${cameraPreset.angle}
 ${metaphorSection}
 

@@ -21,7 +21,12 @@ import {
   BRAND_TYPE_LABELS,
   LINKEDIN_STYLE_PROFILE_LABELS,
   LINKEDIN_POST_TYPE_LABELS,
+  NICHE_CATEGORY_LABELS,
+  POST_INTENT_LABELS,
 } from "../types/postGeneration";
+
+import { resolveCreativeProfile, NICHE_KEYWORDS } from "./postGeneration/creativeDirector";
+import { buildCaptionTemplateInstructions } from "./postGeneration/captionTemplates";
 
 // ── LinkedIn Style Profile Personas ──────────────────────────────────────────
 
@@ -100,7 +105,21 @@ export function buildContentStrategistPrompt(
 - Core Message: ${input.coreMessage}
 - Content Angle: ${angleLabel}
 - Tone: ${toneLabel}
-- Platforms: ${platformNames}`);
+- Platforms: ${platformNames}${input.niche ? `\n- Industry/Niche: ${NICHE_CATEGORY_LABELS[input.niche]?.label ?? input.niche}` : ""}${input.postIntent ? `\n- Post Intent: ${POST_INTENT_LABELS[input.postIntent]?.label ?? input.postIntent}` : ""}${input.location ? `\n- Location Context: ${input.location}` : ""}`);
+
+  // Add niche context if available
+  if (input.niche && input.niche !== "other") {
+    const nicheKw = NICHE_KEYWORDS[input.niche];
+    if (nicheKw) {
+      sections.push(`## NICHE INTELLIGENCE
+- Industry: ${NICHE_CATEGORY_LABELS[input.niche]?.label ?? input.niche}
+- Core Industry Terms: ${nicheKw.primary.join(", ")}
+- Trending Topics: ${nicheKw.trending.join(", ")}
+- High-Engagement Words: ${nicheKw.engagement.join(", ")}
+
+Use these niche-specific terms and topics to make the content strategy deeply relevant to the industry. Reference trending topics when applicable. Incorporate high-engagement trigger words naturally.`);
+    }
+  }
 
   sections.push(`## YOUR TASK
 You are a Content Strategist AI. Analyze the brief above and produce a strategic content plan.
@@ -156,6 +175,19 @@ ${strategy.talkingPoints.map((p) => `  • ${p}`).join("\n")}`);
 - Emoji Level: ${input.emojiLevel}
 - Hashtag Intensity: ${input.hashtagIntensity}`);
 
+  // Inject caption template framework from Creative Director
+  const creativeProfile = resolveCreativeProfile(input);
+  const primaryPlatform = input.platforms[0] ?? "instagram_post";
+  const captionTemplateBlock = buildCaptionTemplateInstructions(
+    creativeProfile.captionStyle,
+    primaryPlatform,
+    input.objective,
+    input.niche,
+  );
+  if (captionTemplateBlock) {
+    sections.push(captionTemplateBlock);
+  }
+
   // Build platform-specific instructions
   const platformInstructions = input.platforms.map((p) => {
     const intel = PLATFORMS[p];
@@ -186,6 +218,43 @@ ${strategy.talkingPoints.map((p) => `  • ${p}`).join("\n")}`);
 
   sections.push(`## PLATFORM RULES\n${platformInstructions.join("\n\n")}`);
 
+  // Inject niche-based hashtag intelligence
+  if (input.niche && input.niche !== "other") {
+    const nicheKw = NICHE_KEYWORDS[input.niche];
+    if (nicheKw) {
+      const nicheLabel = NICHE_CATEGORY_LABELS[input.niche] || input.niche;
+      const hashtagIntelLines: string[] = [
+        `## HASHTAG INTELLIGENCE`,
+        `Niche: ${nicheLabel}`,
+        ``,
+        `Use these niche-specific seed keywords to generate highly relevant hashtags:`,
+        `- Primary industry terms: ${nicheKw.primary.join(", ")}`,
+        `- Trending in this niche: ${nicheKw.trending.join(", ")}`,
+        `- High-engagement words: ${nicheKw.engagement.join(", ")}`,
+        ``,
+        `Build hashtags BY COMBINING these seed keywords with the specific topic of this post.`,
+        `Do NOT just hashtag the seed words directly — derive relevant, specific hashtags from them.`,
+      ];
+
+      if (input.location) {
+        hashtagIntelLines.push(
+          ``,
+          `Location: ${input.location}`,
+          `Include 1-2 location-specific hashtags (e.g., #${input.location.replace(/[^a-zA-Z0-9]/g, "")}RealEstate, #${input.location.replace(/[^a-zA-Z0-9]/g, "")}Eats).`,
+          `Blend location into niche hashtags where natural.`,
+        );
+      }
+
+      sections.push(hashtagIntelLines.join("\n"));
+    }
+  } else if (input.location) {
+    // No niche but location provided — still inject location hashtag guidance
+    sections.push(`## HASHTAG INTELLIGENCE
+Location: ${input.location}
+Include 1-2 location-specific hashtags derived from this location.
+Blend location into topic-relevant hashtags where natural.`);
+  }
+
   // Build expected JSON shape dynamically
   const captionFields = input.platforms
     .map((p) => `    "${p}": "Full caption for ${PLATFORMS[p]?.name || p}"`)
@@ -208,10 +277,11 @@ ${captionFields}
 
 Rules:
 - Each caption MUST follow its platform's specific rules (length, tone, structure)
-- Hashtags should be relevant, not generic
-- High reach hashtags = broad audience (100K+ posts)
-- Niche hashtags = targeted community (10K-100K posts)
-- Branded hashtags = unique to the brand
+- Hashtags MUST be relevant to the post topic, niche, and audience — never generic
+- High reach hashtags = broad audience appeal (100K+ posts), derived from primary niche terms
+- Niche hashtags = targeted community (10K-100K posts), derived from trending & engagement seed keywords
+- Branded hashtags = unique to the brand identity
+- If HASHTAG INTELLIGENCE section is provided above, USE the seed keywords as the basis for hashtag generation
 - For LinkedIn: hashtags go AT THE END separated by a blank line (3-5 max)
 - ONLY return valid JSON, no markdown or extra text`);
 

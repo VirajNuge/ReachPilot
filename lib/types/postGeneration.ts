@@ -203,6 +203,103 @@ export type CTAType =
 
 export type IntensityLevel = "low" | "medium" | "high";
 
+// --- Creative Engine: Image Generation Style Controls ---
+
+export type LightingDirection =
+  | "natural"
+  | "studio"
+  | "dramatic"
+  | "golden_hour"
+  | "neon_glow"
+  | "backlit"
+  | "soft_diffused"
+  | "rim_light"
+  | "low_key";
+
+export type ShadingStyle =
+  | "flat"
+  | "soft_gradient"
+  | "hard_shadow"
+  | "ambient_occlusion"
+  | "cel_shaded"
+  | "volumetric"
+  | "none";
+
+export type ImageStyle =
+  | "photorealistic"
+  | "minimalist"
+  | "3d_render"
+  | "flat_illustration"
+  | "watercolor"
+  | "cyberpunk"
+  | "retro_vintage"
+  | "pop_art"
+  | "abstract"
+  | "line_art"
+  | "collage";
+
+export type CompositionPreference =
+  | "rule_of_thirds"
+  | "centered"
+  | "asymmetric"
+  | "diagonal"
+  | "frame_within_frame"
+  | "leading_lines"
+  | "golden_ratio"
+  | "negative_space";
+
+export type TextStylePreference =
+  | "bold_modern"
+  | "elegant_serif"
+  | "handwritten"
+  | "tech_mono"
+  | "playful_rounded"
+  | "minimalist_sans"
+  | "retro_display";
+
+export type ColorThemePreset =
+  | "vibrant"
+  | "pastel"
+  | "monochrome"
+  | "earth_tones"
+  | "neon"
+  | "dark_luxury"
+  | "brand_colors";
+
+export type CaptionStylePreference =
+  | "educational"
+  | "storytelling"
+  | "motivational"
+  | "promotional"
+  | "authority"
+  | "conversational"
+  | "auto";
+
+export type PostIntent =
+  | "brand_awareness"
+  | "lead_generation"
+  | "engagement"
+  | "promotion"
+  | "education";
+
+export type NicheCategory =
+  | "real_estate"
+  | "fitness"
+  | "tech_saas"
+  | "food_restaurant"
+  | "fashion"
+  | "finance"
+  | "healthcare"
+  | "education"
+  | "travel"
+  | "beauty"
+  | "automotive"
+  | "legal"
+  | "ecommerce"
+  | "agency_marketing"
+  | "personal_brand"
+  | "other";
+
 // ── Image Size Presets ────────────────────────────────────────
 
 export interface ImageSizePreset {
@@ -318,11 +415,25 @@ export interface PostGenerationInput {
     watermark: boolean;
   };
 
+  // Step 2 — Creative Engine: Image Style Controls (all optional — AI auto-selects if empty)
+  lightingDirection?: LightingDirection;
+  shadingStyle?: ShadingStyle;
+  imageStyle?: ImageStyle;
+  compositionPreference?: CompositionPreference;
+  textStylePreference?: TextStylePreference;
+  colorThemePreset?: ColorThemePreset;
+
+  // Step 1 — Niche & Intent
+  niche?: NicheCategory;
+  postIntent?: PostIntent;
+  location?: string; // e.g. "New York, NY" — for hashtag intelligence
+
   // Step 3 — Tone & Messaging
   tones: ToneType[];
   ctas: CTAType[];
   emojiLevel: IntensityLevel;
   hashtagIntensity: IntensityLevel;
+  captionStyle?: CaptionStylePreference;
 
   // LinkedIn Optimization (optional — only when LinkedIn is selected)
   linkedInPostType?: LinkedInPostType;
@@ -622,6 +733,112 @@ export const REMIX_STYLE_LABELS: Record<RemixStyle, { label: string; emoji: stri
   shorter: { label: "Make it shorter", emoji: "✂️" },
   more_viral: { label: "Make it more viral", emoji: "🔥" },
   more_controversial: { label: "Make it controversial", emoji: "⚡" },
+};
+
+// --- Creative Engine: Display Labels ---
+
+export const LIGHTING_DIRECTION_LABELS: Record<LightingDirection, { label: string; desc: string }> = {
+  natural: { label: "Natural", desc: "Daylight, soft and even" },
+  studio: { label: "Studio", desc: "Three-point professional setup" },
+  dramatic: { label: "Dramatic", desc: "High contrast, chiaroscuro" },
+  golden_hour: { label: "Golden Hour", desc: "Warm sunset tones" },
+  neon_glow: { label: "Neon Glow", desc: "Vibrant colored light sources" },
+  backlit: { label: "Backlit", desc: "Silhouette and halo effects" },
+  soft_diffused: { label: "Soft Diffused", desc: "Cloud-cover, gentle illumination" },
+  rim_light: { label: "Rim Light", desc: "Edge-lit subject separation" },
+  low_key: { label: "Low Key", desc: "Mostly dark with selective highlights" },
+};
+
+export const SHADING_STYLE_LABELS: Record<ShadingStyle, { label: string; desc: string }> = {
+  flat: { label: "Flat", desc: "No depth, graphic poster look" },
+  soft_gradient: { label: "Soft Gradient", desc: "Smooth tonal transitions" },
+  hard_shadow: { label: "Hard Shadow", desc: "Crisp, defined shadows" },
+  ambient_occlusion: { label: "Ambient Occlusion", desc: "Subtle contact shadows" },
+  cel_shaded: { label: "Cel Shaded", desc: "Cartoon/anime style shading" },
+  volumetric: { label: "Volumetric", desc: "Light rays through atmosphere" },
+  none: { label: "None", desc: "AI auto-selects shading" },
+};
+
+export const IMAGE_STYLE_LABELS: Record<ImageStyle, { label: string; desc: string }> = {
+  photorealistic: { label: "Photorealistic", desc: "Camera-quality realism" },
+  minimalist: { label: "Minimalist", desc: "Clean, whitespace-heavy" },
+  "3d_render": { label: "3D Render", desc: "Dimensional, rendered objects" },
+  flat_illustration: { label: "Flat Illustration", desc: "Vector-style graphics" },
+  watercolor: { label: "Watercolor", desc: "Soft, painted aesthetic" },
+  cyberpunk: { label: "Cyberpunk", desc: "Neon, futuristic, dark" },
+  retro_vintage: { label: "Retro/Vintage", desc: "Nostalgic, film-grain" },
+  pop_art: { label: "Pop Art", desc: "Bold colors, Warhol-inspired" },
+  abstract: { label: "Abstract", desc: "Non-representational forms" },
+  line_art: { label: "Line Art", desc: "Hand-drawn outlines" },
+  collage: { label: "Collage", desc: "Mixed media composition" },
+};
+
+export const COMPOSITION_PREFERENCE_LABELS: Record<CompositionPreference, { label: string; desc: string }> = {
+  rule_of_thirds: { label: "Rule of Thirds", desc: "Classic grid-based balance" },
+  centered: { label: "Centered", desc: "Symmetrical focal point" },
+  asymmetric: { label: "Asymmetric", desc: "Deliberate visual tension" },
+  diagonal: { label: "Diagonal", desc: "Dynamic angular energy" },
+  frame_within_frame: { label: "Frame-in-Frame", desc: "Nested framing elements" },
+  leading_lines: { label: "Leading Lines", desc: "Lines guiding the eye" },
+  golden_ratio: { label: "Golden Ratio", desc: "Mathematically harmonious" },
+  negative_space: { label: "Negative Space", desc: "Emptiness as design" },
+};
+
+export const TEXT_STYLE_PREFERENCE_LABELS: Record<TextStylePreference, { label: string; desc: string }> = {
+  bold_modern: { label: "Bold Modern", desc: "Clean, heavy sans-serif" },
+  elegant_serif: { label: "Elegant Serif", desc: "Editorial, authoritative" },
+  handwritten: { label: "Handwritten", desc: "Personal, organic feel" },
+  tech_mono: { label: "Tech Mono", desc: "Developer/code aesthetic" },
+  playful_rounded: { label: "Playful Rounded", desc: "Friendly, approachable" },
+  minimalist_sans: { label: "Minimalist Sans", desc: "Ultra-clean, light weight" },
+  retro_display: { label: "Retro Display", desc: "Vintage, decorative type" },
+};
+
+export const COLOR_THEME_PRESET_LABELS: Record<ColorThemePreset, { label: string; desc: string }> = {
+  vibrant: { label: "Vibrant", desc: "Saturated, energetic colors" },
+  pastel: { label: "Pastel", desc: "Soft, muted tones" },
+  monochrome: { label: "Monochrome", desc: "Single-hue variations" },
+  earth_tones: { label: "Earth Tones", desc: "Natural, warm palette" },
+  neon: { label: "Neon", desc: "Electric, glowing accents" },
+  dark_luxury: { label: "Dark Luxury", desc: "Black and gold premium" },
+  brand_colors: { label: "Brand Colors", desc: "Use your brand palette" },
+};
+
+export const CAPTION_STYLE_LABELS: Record<CaptionStylePreference, { label: string; desc: string }> = {
+  educational: { label: "Educational", desc: "Teach and inform" },
+  storytelling: { label: "Storytelling", desc: "Narrative-driven content" },
+  motivational: { label: "Motivational", desc: "Inspire and uplift" },
+  promotional: { label: "Promotional", desc: "Sell and convert" },
+  authority: { label: "Authority", desc: "Expert positioning" },
+  conversational: { label: "Conversational", desc: "Casual and relatable" },
+  auto: { label: "Auto", desc: "AI selects best style" },
+};
+
+export const POST_INTENT_LABELS: Record<PostIntent, { label: string; desc: string; emoji: string }> = {
+  brand_awareness: { label: "Brand Awareness", desc: "Increase visibility and recognition", emoji: "👁️" },
+  lead_generation: { label: "Lead Generation", desc: "Capture leads and drive sign-ups", emoji: "🎯" },
+  engagement: { label: "Engagement", desc: "Maximize comments, shares, saves", emoji: "💬" },
+  promotion: { label: "Promotion", desc: "Promote product, service, or offer", emoji: "📣" },
+  education: { label: "Education", desc: "Teach, inform, build authority", emoji: "📚" },
+};
+
+export const NICHE_CATEGORY_LABELS: Record<NicheCategory, { label: string; emoji: string }> = {
+  real_estate: { label: "Real Estate", emoji: "🏠" },
+  fitness: { label: "Fitness & Health", emoji: "💪" },
+  tech_saas: { label: "Tech / SaaS", emoji: "💻" },
+  food_restaurant: { label: "Food & Restaurant", emoji: "🍕" },
+  fashion: { label: "Fashion", emoji: "👗" },
+  finance: { label: "Finance", emoji: "💰" },
+  healthcare: { label: "Healthcare", emoji: "🏥" },
+  education: { label: "Education", emoji: "🎓" },
+  travel: { label: "Travel", emoji: "✈️" },
+  beauty: { label: "Beauty & Skincare", emoji: "💄" },
+  automotive: { label: "Automotive", emoji: "🚗" },
+  legal: { label: "Legal", emoji: "⚖️" },
+  ecommerce: { label: "E-commerce", emoji: "🛒" },
+  agency_marketing: { label: "Agency / Marketing", emoji: "📈" },
+  personal_brand: { label: "Personal Brand", emoji: "🌟" },
+  other: { label: "Other", emoji: "📌" },
 };
 
 // --- Platform Display Helpers ---

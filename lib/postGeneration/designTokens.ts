@@ -4,7 +4,15 @@
 // Maps style labels → rich photography/design instructions.
 // ============================================================
 
-import type { VisualStyle } from "@/lib/types/postGeneration";
+import type {
+  VisualStyle,
+  LightingDirection,
+  ShadingStyle,
+  ImageStyle,
+  TextStylePreference,
+  CompositionPreference,
+  ColorThemePreset,
+} from "@/lib/types/postGeneration";
 
 // ── Type Definitions ─────────────────────────────────────────
 
@@ -367,3 +375,223 @@ WHAT YOU NEVER DO:
 - No flat, lifeless compositions lacking depth or dimension
 - No text that fights with the background for attention
 - No generic "professional" that could belong to any brand`;
+
+// ── Lighting Direction Presets ────────────────────────────────
+
+export interface LightingPreset {
+  /** Full lighting setup description for image prompt injection */
+  description: string;
+  /** Mood impact */
+  mood: string;
+  /** Technical camera lighting rig */
+  rig: string;
+}
+
+export const LIGHTING_PRESETS: Record<LightingDirection, LightingPreset> = {
+  natural: {
+    description: "Soft, even daylight illumination. Natural cloud-diffused sunlight from slightly above, creating gentle shadows with soft edges. No artificial light sources visible.",
+    mood: "authentic, trustworthy, approachable",
+    rig: "Single natural daylight source from upper-left, subtle ambient fill from environment, no hard shadows",
+  },
+  studio: {
+    description: "Professional three-point lighting setup. Clean, controlled illumination with precise shadow management. Key light at 45°, fill light opposite, rim/hair light for subject separation.",
+    mood: "polished, professional, controlled",
+    rig: "Three-point studio setup: softbox key at 45° right, fill reflector at 30° left, rim light behind at 135°",
+  },
+  dramatic: {
+    description: "High-contrast chiaroscuro lighting. Deep shadows dominate with selective bright highlights on key elements. Inspired by Caravaggio — light emerges from darkness to guide the eye.",
+    mood: "intense, powerful, cinematic",
+    rig: "Single hard key light from side at 90°, no fill (1:8 ratio), creating deep dramatic shadows and strong highlights",
+  },
+  golden_hour: {
+    description: "Warm, amber-toned light from low angle. Long soft shadows. Everything bathed in golden warmth with a slight lens flare. The magic hour — 15 minutes before sunset aesthetic.",
+    mood: "warm, nostalgic, aspirational",
+    rig: "Low-angle warm key light (3200K), amber gel, long shadows, soft warm fill from reflected ground surfaces",
+  },
+  neon_glow: {
+    description: "Vibrant colored neon light sources casting colored shadows and reflections. Multiple colored light sources creating dynamic interplay. Cyberpunk-inspired mixed-color illumination.",
+    mood: "futuristic, energetic, electric",
+    rig: "Multiple colored LED panels: primary neon blue from left, secondary magenta from right, green accent from below. No white light.",
+  },
+  backlit: {
+    description: "Strong light source directly behind the subject creating silhouette effects and luminous edge halos. The subject is a dark shape against a bright, glowing background. Ethereal rim lighting.",
+    mood: "mysterious, ethereal, dramatic",
+    rig: "Strong backlight directly behind subject, no front fill (intentional silhouette), glowing rim/edge light on subject outline",
+  },
+  soft_diffused: {
+    description: "Ultra-soft, shadowless illumination. Cloud-cover quality — light comes from everywhere equally. No directional shadows. Gentle, even, flattering. Like being inside a softbox.",
+    mood: "calm, gentle, safe",
+    rig: "Overhead silk diffusion panel, wrap-around bounce cards, virtually shadowless 1:1 lighting ratio",
+  },
+  rim_light: {
+    description: "Edge lighting that outlines the subject with a thin bright contour. Subject separated from background by a glowing edge. Interior of subject remains in relative shadow.",
+    mood: "sleek, defined, separated",
+    rig: "Two strip softboxes at 135° angles behind subject, creating bright edge outline. Minimal front fill at 1:4 ratio.",
+  },
+  low_key: {
+    description: "Predominantly dark with small pockets of selective illumination. Most of the image is in shadow. Light used surgically to reveal only what matters. Noir aesthetic.",
+    mood: "moody, focused, intense",
+    rig: "Small, focused spotlight or snoot on key element only. No fill. Background falls to near-black. High contrast, 1:16 ratio.",
+  },
+};
+
+// ── Shading Style Presets ────────────────────────────────────
+
+export interface ShadingPreset {
+  /** Description for prompt injection */
+  description: string;
+  /** How surfaces and materials render */
+  materialQuality: string;
+}
+
+export const SHADING_PRESETS: Record<ShadingStyle, ShadingPreset> = {
+  flat: {
+    description: "No gradients, no depth shading. Solid color fills with clean edges. Graphic poster aesthetic — think vintage travel posters or modern flat illustration.",
+    materialQuality: "Solid matte fills, no surface variation, clean vector-like edges, no reflection or specularity",
+  },
+  soft_gradient: {
+    description: "Smooth, subtle tonal transitions across surfaces. Gentle light-to-shadow gradients that create depth without harsh contrast. Professional, polished feel.",
+    materialQuality: "Smooth matte-to-satin surfaces, subtle depth through tonal shifts, no hard shadow lines",
+  },
+  hard_shadow: {
+    description: "Crisp, well-defined shadow edges with clear light-dark boundaries. Strong directional light creating geometric shadow patterns. Bold and graphic.",
+    materialQuality: "Sharp shadow cutoffs, defined light/dark zones, minimal penumbra, high contrast surfaces",
+  },
+  ambient_occlusion: {
+    description: "Subtle darkening in crevices, corners, and contact points between objects. Creates realistic grounding and dimensional depth through contact shadows alone.",
+    materialQuality: "Soft contact shadows at object bases, subtle corner darkening, realistic surface interaction shadows",
+  },
+  cel_shaded: {
+    description: "Cartoon/anime-style shading with defined shadow steps (2-3 tonal bands). No smooth gradients — shading steps are clearly visible. Illustration aesthetic.",
+    materialQuality: "2-3 distinct tonal bands per surface, clean step transitions, no smooth gradients, anime-inspired rendering",
+  },
+  volumetric: {
+    description: "Light rays visible through atmospheric haze, fog, or dust particles. God rays and volumetric scattering. Cinematic depth through atmospheric perspective.",
+    materialQuality: "Visible light shafts, atmospheric haze, depth fog, particles catching light, cinematic atmosphere",
+  },
+  none: {
+    description: "",
+    materialQuality: "",
+  },
+};
+
+// ── Image Style Presets ──────────────────────────────────────
+
+export interface ImageStylePreset {
+  /** Core visual rendering description */
+  description: string;
+  /** Quality/rendering modifiers */
+  qualityModifiers: string[];
+}
+
+export const IMAGE_STYLE_PRESETS: Record<ImageStyle, ImageStylePreset> = {
+  photorealistic: {
+    description: "Camera-quality photorealistic rendering. Indistinguishable from professional photography. Real materials, real physics, real light behavior.",
+    qualityModifiers: ["8K resolution", "photorealistic rendering", "professional DSLR quality", "accurate light physics", "real material textures"],
+  },
+  minimalist: {
+    description: "Stripped-down visual composition. Maximum whitespace, minimum elements. Every shape earns its place. Clean geometric forms, limited color palette.",
+    qualityModifiers: ["clean vector edges", "precise geometric forms", "ample whitespace", "limited 2-3 color palette", "no decorative noise"],
+  },
+  "3d_render": {
+    description: "Polished 3D rendered objects and scenes. Smooth materials, studio lighting on 3D objects, isometric or perspective views. Blender/Cinema 4D aesthetic.",
+    qualityModifiers: ["smooth 3D rendering", "studio-lit objects", "subtle reflections and refractions", "clean material shaders", "professional 3D modeling quality"],
+  },
+  flat_illustration: {
+    description: "Vector-style flat illustration. Clean shapes, solid colors, no gradients or 3D depth. Modern illustration style used in tech and editorial.",
+    qualityModifiers: ["clean vector shapes", "solid color fills", "consistent line weight", "no depth or shadows", "modern editorial illustration style"],
+  },
+  watercolor: {
+    description: "Soft watercolor painting aesthetic. Bleeding edges, transparent color washes, visible paper texture. Organic and hand-crafted feel.",
+    qualityModifiers: ["watercolor bleeding edges", "transparent color layers", "visible paper texture", "organic brush strokes", "hand-painted quality"],
+  },
+  cyberpunk: {
+    description: "Neon-lit futuristic cityscape aesthetic. Dark backgrounds with electric neon accents. Holographic UI elements, rain-slicked surfaces, dystopian tech.",
+    qualityModifiers: ["neon color palette", "dark atmospheric base", "holographic elements", "rain and reflections", "futuristic tech details"],
+  },
+  retro_vintage: {
+    description: "Nostalgic retro aesthetic. Film grain, muted color palette, vintage typography. 70s-80s design revival with modern sensibility.",
+    qualityModifiers: ["film grain overlay", "muted desaturated colors", "vintage color grading", "retro typography", "aged paper or film texture"],
+  },
+  pop_art: {
+    description: "Bold, high-saturation pop art style. Ben-Day dots, bold outlines, primary colors. Warhol/Lichtenstein inspired with modern twist.",
+    qualityModifiers: ["bold outlines", "high saturation primary colors", "halftone dot patterns", "comic book aesthetic", "maximum visual impact"],
+  },
+  abstract: {
+    description: "Non-representational abstract composition. Color fields, geometric or organic shapes, emotional color theory. Art gallery quality.",
+    qualityModifiers: ["non-representational forms", "bold color fields", "geometric and organic shapes", "emotional color relationships", "gallery-quality composition"],
+  },
+  line_art: {
+    description: "Hand-drawn line illustration style. Clean or sketchy line work depending on context. Minimal or no color fill — the line is the art.",
+    qualityModifiers: ["consistent line quality", "hand-drawn aesthetic", "minimal color fill", "precise or organic line character", "illustration portfolio quality"],
+  },
+  collage: {
+    description: "Mixed-media collage composition. Cut-out elements, varied textures, overlapping layers. Editorial magazine collage with modern design sensibility.",
+    qualityModifiers: ["cut-out edge effects", "mixed texture layers", "overlapping composition", "varied material sources", "editorial collage quality"],
+  },
+};
+
+// ── Text Style Presets ───────────────────────────────────────
+
+export interface TextStyleToken {
+  /** Typography description for prompt injection */
+  description: string;
+  /** Font style guidance */
+  fontGuidance: string;
+}
+
+export const TEXT_STYLE_PRESETS: Record<TextStylePreference, TextStyleToken> = {
+  bold_modern: {
+    description: "Clean, heavy-weight sans-serif typography. Strong visual weight. Contemporary tech-startup aesthetic.",
+    fontGuidance: "Use a bold modern sans-serif like Montserrat Bold, Inter Bold, or SF Pro Display Bold. Heavy weight, clean geometry.",
+  },
+  elegant_serif: {
+    description: "Refined serif typography with editorial authority. Think luxury magazine or premium brand. Timeless and sophisticated.",
+    fontGuidance: "Use an elegant serif like Playfair Display, Cormorant Garamond, or Georgia. Mix serif headline with sans-serif body.",
+  },
+  handwritten: {
+    description: "Personal, organic handwriting or brush script style. Adds warmth and human touch. Not overly decorative.",
+    fontGuidance: "Use a natural handwriting or brush script font. Irregular baseline, organic letter forms. Readable at small sizes.",
+  },
+  tech_mono: {
+    description: "Monospaced technical typography. Code editor or terminal aesthetic. Clean, precise, developer-focused.",
+    fontGuidance: "Use a monospaced font like JetBrains Mono, Fira Code, or IBM Plex Mono. Clean, technical, precise character.",
+  },
+  playful_rounded: {
+    description: "Friendly, rounded typography with soft corners. Approachable and consumer-friendly. Perfect for lifestyle brands.",
+    fontGuidance: "Use a rounded sans-serif like Nunito, Quicksand, or Comfortaa. Soft geometry, friendly character.",
+  },
+  minimalist_sans: {
+    description: "Ultra-clean, light-weight sans-serif. Maximum readability, minimum visual noise. Swiss design influenced.",
+    fontGuidance: "Use a clean light/regular weight sans-serif like Helvetica Neue Light, Inter Regular, or DM Sans. Generous letter-spacing.",
+  },
+  retro_display: {
+    description: "Vintage decorative display typography. Retro flair with modern usage. Statement headings, not for body text.",
+    fontGuidance: "Use a retro display font with character. Art deco, vintage signage, or 70s style. Bold headline use only.",
+  },
+};
+
+// ── Composition Preference → Composition Rule Mapping ────────
+
+export const COMPOSITION_PREFERENCE_TO_RULE: Record<CompositionPreference, string> = {
+  rule_of_thirds: "rule_of_thirds",
+  centered: "center_dominant",
+  asymmetric: "dynamic_diagonal",
+  diagonal: "dynamic_diagonal",
+  frame_within_frame: "golden_ratio",
+  leading_lines: "rule_of_thirds",
+  golden_ratio: "golden_ratio",
+  negative_space: "negative_space_hero",
+};
+
+// ── Color Theme → Prompt Description ─────────────────────────
+
+export const COLOR_THEME_DESCRIPTIONS: Record<ColorThemePreset, string> = {
+  vibrant: "Fully saturated, energetic color palette. Bright, bold hues that pop off the screen. Maximum color impact.",
+  pastel: "Soft, muted, desaturated tones. Gentle color palette that feels calm and sophisticated. Reduced saturation by 30-40%.",
+  monochrome: "Single-hue color scheme with variations in lightness and saturation. Elegant restraint in color usage.",
+  earth_tones: "Natural, warm palette inspired by earth: terracotta, olive, sand, coffee, cream. Organic and grounded.",
+  neon: "Electric, glowing neon colors against dark backgrounds. Vibrant accent colors that feel luminous and energetic.",
+  dark_luxury: "Deep blacks and dark grays as base with gold, champagne, or ivory accents. Premium, exclusive feel.",
+  brand_colors: "Primary palette derived from the user's brand color selections. Colors applied structurally, not as accents.",
+};

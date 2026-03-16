@@ -38,6 +38,7 @@ interface PlatformTabProps {
   onRemix: (style: RemixStyle) => void;
   onScoreRequest: () => void;
   onSelectHook: (hook: HookOption) => void;
+  selectedHookId?: string;
   onRefinedCaption?: (newCaption: string, newScore: number, newFlags: string[]) => void;
   onXRefined?: (newCaption: string, newScore: number, newFlags: string[]) => void;
   onInstagramRefined?: (newCaption: string, newScore: number, newFlags: string[], newPostType?: InstagramPostType) => void;
@@ -63,6 +64,7 @@ export const PlatformTab: React.FC<PlatformTabProps> = ({
   onRemix,
   onScoreRequest,
   onSelectHook,
+  selectedHookId,
   onRefinedCaption,
   onXRefined,
   onInstagramRefined,
@@ -123,7 +125,7 @@ export const PlatformTab: React.FC<PlatformTabProps> = ({
 
       {/* Hook Selector */}
       {hooks && hooks.length > 0 && (
-        <HookSelector hooks={hooks} onSelect={onSelectHook} />
+        <HookSelector hooks={hooks} onSelect={onSelectHook} selectedHookId={selectedHookId} />
       )}
 
       {/* LinkedIn Performance (LinkedIn tab only) */}

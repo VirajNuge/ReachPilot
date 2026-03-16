@@ -25,7 +25,7 @@ import type { OrchestratorConfig } from "./promptOrchestrator";
 export const PLATFORM_ASPECT_RATIO: Record<string, string> = {
   instagram_post: "1:1",
   instagram_story: "9:16",
-  linkedin: "4:3",
+  linkedin: "16:9",
   x: "16:9",
   facebook: "16:9",
   tiktok: "9:16",

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import React, { useState, useRef, useEffect } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   RefreshCw,
@@ -17,6 +17,14 @@ import {
   X,
   Upload,
   Wand2,
+  Palette,
+  Layers,
+  Sun,
+  Droplets,
+  Grid3X3,
+  Type,
+  PenLine,
+  Search,
 } from "lucide-react";
 
 import type {
@@ -78,7 +86,6 @@ import {
 
 import { GenerationPipeline, PipelineStage } from "./Pipeline/GenerationPipeline";
 import { OutputDashboard } from "./Output/OutputDashboard";
-import { CAPTION_TEMPLATES } from "@/lib/postGeneration/captionTemplates";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -251,19 +258,20 @@ interface SelectFieldProps {
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string }[];
+  className?: string;
 }
 
-function SelectField({ label, value, onChange, options }: SelectFieldProps) {
+function SelectField({ label, value, onChange, options, className }: SelectFieldProps) {
   return (
-    <div className="mb-4">
-      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+    <div className={`mb-4 ${className ?? ""}`}>
+      <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-widest mb-1.5">
         {label}
       </label>
-      <div className="relative">
+      <div className="relative group">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all text-sm font-medium text-gray-800 appearance-none cursor-pointer pr-9"
+          className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-white focus:border-[#0052FF] focus:ring-2 focus:ring-[#0052FF]/20 shadow-sm outline-none transition-all text-[13px] font-semibold text-[#1A1D23] appearance-none cursor-pointer pr-10 hover:border-gray-300"
         >
           {options.map((o) => (
             <option key={o.value} value={o.value}>
@@ -271,7 +279,7 @@ function SelectField({ label, value, onChange, options }: SelectFieldProps) {
             </option>
           ))}
         </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none group-focus-within:text-[#0052FF] transition-colors" />
       </div>
     </div>
   );
@@ -296,10 +304,17 @@ function MultiSelectPills({ label, options, selected, onChange }: MultiSelectPil
   };
   return (
     <div className="mb-4">
-      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">
-        {label}
-      </label>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex items-center justify-between mb-2">
+        <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-widest">
+          {label}
+        </label>
+        {selected.length > 0 && (
+          <span className="text-[10px] font-bold text-[#0052FF] bg-[#EEF3FF] px-2 py-0.5 rounded-full">
+            {selected.length} selected
+          </span>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-2">
         {options.map((opt) => {
           const isSelected = selected.includes(opt.value);
           return (
@@ -307,13 +322,16 @@ function MultiSelectPills({ label, options, selected, onChange }: MultiSelectPil
               key={opt.value}
               type="button"
               onClick={() => toggle(opt.value)}
-              className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
+              className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all border shadow-sm ${
                 isSelected
-                  ? "bg-[#0052FF] text-white border-[#0052FF] shadow-sm"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-[#0052FF]/40 hover:text-[#0052FF]"
+                  ? "bg-[#0052FF] text-white border-[#0052FF] shadow-blue-100"
+                  : "bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#0052FF]/40 hover:text-[#0052FF] hover:bg-[#EEF3FF]"
               }`}
             >
               {opt.label}
+              {isSelected && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#AAFF50] flex-shrink-0" />
+              )}
             </button>
           );
         })}
@@ -322,9 +340,9 @@ function MultiSelectPills({ label, options, selected, onChange }: MultiSelectPil
   );
 }
 
-// ── StylePickerModal ──────────────────────────────────────────────────────────
+// ── StylePickerModal (DB-driven with Templates tab) ──────────────────────────
 
-type StyleTab = "imageStyle" | "lighting" | "shading" | "composition" | "textStyle" | "colorTheme";
+type StyleTab = "templates" | "imageStyle" | "lighting" | "shading" | "composition" | "textStyle" | "colorTheme";
 
 interface StylePickerModalProps {
   open: boolean;
@@ -333,54 +351,87 @@ interface StylePickerModalProps {
   updateInput: (updates: Partial<PostGenerationInput>) => void;
 }
 
+interface DbVisualStylePreset {
+  _id: string;
+  name: string;
+  description: string;
+  colorPalette: string[];
+  primaryColor: string;
+  imageStyle: string;
+  lightingDirection: string;
+  shadingStyle: string;
+  compositionPreference: string;
+  textStylePreference: string;
+  colorThemePreset: string;
+  mood: string;
+  tags: string[];
+  thumbnailBg: string;
+}
+
+interface DbStyleOption {
+  _id: string;
+  tab: "imageStyle" | "lighting" | "shading" | "composition" | "textStyle" | "colorTheme";
+  value: string;
+  label: string;
+  description: string;
+  referenceImageUrl: string;
+  sortOrder: number;
+}
+
+const STYLE_TAB_TO_FIELD: Record<Exclude<StyleTab, "templates">, keyof PostGenerationInput> = {
+  imageStyle: "imageStyle",
+  lighting: "lightingDirection",
+  shading: "shadingStyle",
+  composition: "compositionPreference",
+  textStyle: "textStylePreference",
+  colorTheme: "colorThemePreset",
+};
+
+const STYLE_TAB_FALLBACK_LABELS: Record<Exclude<StyleTab, "templates">, Record<string, { label: string; desc: string }>> = {
+  imageStyle: IMAGE_STYLE_LABELS,
+  lighting: LIGHTING_DIRECTION_LABELS,
+  shading: SHADING_STYLE_LABELS,
+  composition: COMPOSITION_PREFERENCE_LABELS,
+  textStyle: TEXT_STYLE_PREFERENCE_LABELS,
+  colorTheme: COLOR_THEME_PRESET_LABELS,
+};
+
 function StylePickerModal({ open, onClose, formInput, updateInput }: StylePickerModalProps) {
-  const [activeTab, setActiveTab] = useState<StyleTab>("imageStyle");
+  const [activeTab, setActiveTab] = useState<StyleTab>("templates");
+  const [presets, setPresets] = useState<DbVisualStylePreset[]>([]);
+  const [dbOptions, setDbOptions] = useState<DbStyleOption[]>([]);
+  const [loadingData, setLoadingData] = useState(false);
+  const [activePresetId, setActivePresetId] = useState<string | null>(formInput.visualStylePresetId ?? null);
+
+  useEffect(() => {
+    if (!open) return;
+    setLoadingData(true);
+    Promise.all([
+      fetch("/api/visual-styles").then(r => r.ok ? r.json() : { styles: [] }),
+      fetch("/api/visual-styles/options").then(r => r.ok ? r.json() : { options: [] }),
+    ])
+      .then(([presetsData, optionsData]) => {
+        setPresets(presetsData.styles ?? []);
+        setDbOptions(optionsData.options ?? []);
+      })
+      .catch(() => {
+        setPresets([]);
+        setDbOptions([]);
+      })
+      .finally(() => setLoadingData(false));
+  }, [open]);
 
   if (!open) return null;
 
-  const tabs: { key: StyleTab; label: string; emoji: string }[] = [
-    { key: "imageStyle", label: "Image Style", emoji: "🖼️" },
-    { key: "lighting", label: "Lighting", emoji: "💡" },
-    { key: "shading", label: "Shading", emoji: "🌑" },
-    { key: "composition", label: "Composition", emoji: "⚖️" },
-    { key: "textStyle", label: "Text Style", emoji: "✍️" },
-    { key: "colorTheme", label: "Color Theme", emoji: "🎨" },
+  const tabs: { key: StyleTab; label: string; icon: React.ReactNode }[] = [
+    { key: "templates", label: "Templates", icon: <Sparkles className="w-3.5 h-3.5" /> },
+    { key: "imageStyle", label: "Image Style", icon: <Layers className="w-3.5 h-3.5" /> },
+    { key: "lighting", label: "Lighting", icon: <Sun className="w-3.5 h-3.5" /> },
+    { key: "shading", label: "Shading", icon: <Droplets className="w-3.5 h-3.5" /> },
+    { key: "composition", label: "Composition", icon: <Grid3X3 className="w-3.5 h-3.5" /> },
+    { key: "textStyle", label: "Text Style", icon: <Type className="w-3.5 h-3.5" /> },
+    { key: "colorTheme", label: "Color Theme", icon: <Palette className="w-3.5 h-3.5" /> },
   ];
-
-  const tabContent: Record<StyleTab, { entries: [string, { label: string; desc: string }][]; field: keyof PostGenerationInput; current: string | undefined }> = {
-    imageStyle: {
-      entries: Object.entries(IMAGE_STYLE_LABELS) as [ImageStyle, { label: string; desc: string }][],
-      field: "imageStyle",
-      current: formInput.imageStyle,
-    },
-    lighting: {
-      entries: Object.entries(LIGHTING_DIRECTION_LABELS) as [LightingDirection, { label: string; desc: string }][],
-      field: "lightingDirection",
-      current: formInput.lightingDirection,
-    },
-    shading: {
-      entries: Object.entries(SHADING_STYLE_LABELS) as [ShadingStyle, { label: string; desc: string }][],
-      field: "shadingStyle",
-      current: formInput.shadingStyle,
-    },
-    composition: {
-      entries: Object.entries(COMPOSITION_PREFERENCE_LABELS) as [CompositionPreference, { label: string; desc: string }][],
-      field: "compositionPreference",
-      current: formInput.compositionPreference,
-    },
-    textStyle: {
-      entries: Object.entries(TEXT_STYLE_PREFERENCE_LABELS) as [TextStylePreference, { label: string; desc: string }][],
-      field: "textStylePreference",
-      current: formInput.textStylePreference,
-    },
-    colorTheme: {
-      entries: Object.entries(COLOR_THEME_PRESET_LABELS) as [ColorThemePreset, { label: string; desc: string }][],
-      field: "colorThemePreset",
-      current: formInput.colorThemePreset,
-    },
-  };
-
-  const { entries, field, current } = tabContent[activeTab];
 
   // Count how many style fields are set
   const activeCount = [
@@ -392,47 +443,82 @@ function StylePickerModal({ open, onClose, formInput, updateInput }: StylePicker
     formInput.colorThemePreset,
   ].filter(Boolean).length;
 
+  // Build option entries for individual tabs: use DB if available, fallback to hardcoded
+  const getOptionEntries = (tabKey: Exclude<StyleTab, "templates">): { value: string; label: string; desc: string; imageUrl?: string }[] => {
+    const tabOptions = dbOptions.filter(o => o.tab === tabKey);
+    if (tabOptions.length > 0) {
+      return tabOptions.map(o => ({ value: o.value, label: o.label, desc: o.description, imageUrl: o.referenceImageUrl || undefined }));
+    }
+    // Fallback to hardcoded constants
+    const fallback = STYLE_TAB_FALLBACK_LABELS[tabKey];
+    return Object.entries(fallback).map(([value, info]) => ({ value, label: info.label, desc: info.desc }));
+  };
+
+  const handlePresetClick = (preset: DbVisualStylePreset) => {
+    setActivePresetId(preset._id);
+    updateInput({
+      imageStyle: preset.imageStyle as ImageStyle,
+      lightingDirection: preset.lightingDirection as LightingDirection,
+      shadingStyle: preset.shadingStyle as ShadingStyle,
+      compositionPreference: preset.compositionPreference as CompositionPreference,
+      textStylePreference: preset.textStylePreference as TextStylePreference,
+      colorThemePreset: preset.colorThemePreset as ColorThemePreset,
+      visualStylePresetId: preset._id,
+    });
+  };
+
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-[0_24px_60px_rgba(0,0,0,0.18)] w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden border border-[#E2E8F0]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div>
-            <h2 className="text-[15px] font-bold text-gray-900">Choose Visual Style</h2>
-            <p className="text-[11px] text-gray-400 mt-0.5">
-              {activeCount > 0 ? `${activeCount} style${activeCount > 1 ? "s" : ""} selected` : "Select styles to guide image generation"}
-            </p>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#E2E8F0]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#AAFF50]/20 flex items-center justify-center flex-shrink-0">
+              <Palette className="w-4 h-4 text-[#0052FF]" />
+            </div>
+            <div>
+              <h2 className="text-[15px] font-bold text-[#1A1D23]">Choose Visual Style</h2>
+              <p className="text-[11px] text-[#64748B] mt-0.5">
+                {activePresetId
+                  ? `Template applied • ${activeCount} style${activeCount > 1 ? "s" : ""} set`
+                  : activeCount > 0
+                  ? `${activeCount} style${activeCount > 1 ? "s" : ""} selected`
+                  : "Select styles to guide image generation"}
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F4F6FA] hover:bg-[#EEF3FF] hover:text-[#0052FF] text-[#64748B] transition-colors"
           >
-            <X className="w-4 h-4 text-gray-500" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 px-4 pt-3 border-b border-gray-100 overflow-x-auto pb-0 flex-shrink-0">
+        <div className="flex gap-1 px-4 pt-3 border-b border-[#E2E8F0] overflow-x-auto pb-0 flex-shrink-0 bg-[#F4F6FA]">
           {tabs.map((tab) => {
-            const tabField = tabContent[tab.key];
-            const isSet = Boolean(tabField.current);
+            const isTemplatesTab = tab.key === "templates";
+            const isSet = isTemplatesTab
+              ? Boolean(activePresetId)
+              : Boolean(formInput[STYLE_TAB_TO_FIELD[tab.key as Exclude<StyleTab, "templates">]] as string | undefined);
             return (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-t-xl text-[12px] font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
+                className={`flex items-center gap-1.5 px-3 py-2.5 rounded-t-xl text-[12px] font-bold whitespace-nowrap transition-all border-b-2 -mb-px ${
                   activeTab === tab.key
-                    ? "border-[#0052FF] text-[#0052FF] bg-blue-50/40"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    ? "border-[#0052FF] text-[#0052FF] bg-white"
+                    : "border-transparent text-[#64748B] hover:text-[#1A1D23] hover:bg-white/60"
                 }`}
               >
-                <span>{tab.emoji}</span>
+                <span className="flex items-center">{tab.icon}</span>
                 <span>{tab.label}</span>
                 {isSet && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0052FF] flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#AAFF50] flex-shrink-0" />
                 )}
               </button>
             );
@@ -440,37 +526,121 @@ function StylePickerModal({ open, onClose, formInput, updateInput }: StylePicker
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto p-5">
-          <div className="grid grid-cols-2 gap-2.5">
-            {entries.map(([value, { label, desc }]) => {
-              const isSelected = current === value;
+        <div className="flex-1 overflow-y-auto p-5 bg-[#F4F6FA]">
+          {loadingData ? (
+            <div className="grid grid-cols-2 gap-3">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="h-24 bg-white border border-[#E2E8F0] rounded-2xl animate-pulse" />
+              ))}
+            </div>
+          ) : activeTab === "templates" ? (
+            /* ── Templates Tab ── */
+            presets.length === 0 ? (
+              <div className="py-12 text-center">
+                <Sparkles className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-[13px] font-semibold text-gray-400">No style templates available yet</p>
+                <p className="text-[11px] text-gray-400 mt-1">Templates can be created from the admin panel</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {presets.map((preset) => {
+                  const isSelected = activePresetId === preset._id;
+                  return (
+                    <button
+                      key={preset._id}
+                      type="button"
+                      onClick={() => handlePresetClick(preset)}
+                      className={`relative text-left rounded-2xl border transition-all overflow-hidden ${
+                        isSelected
+                          ? "border-[#0052FF] bg-white shadow-sm"
+                          : "bg-white border-[#E2E8F0] hover:border-gray-300 hover:shadow-md shadow-sm"
+                      }`}
+                    >
+                      {/* Color strip */}
+                      <div className="h-8 flex" style={{ backgroundColor: preset.thumbnailBg }}>
+                        {preset.colorPalette.slice(0, 6).map((c, i) => (
+                          <div key={i} className="flex-1 h-full" style={{ backgroundColor: c }} />
+                        ))}
+                      </div>
+                      <div className="p-3.5">
+                        {isSelected && (
+                          <div className="absolute top-10 right-3 w-5 h-5 rounded-full bg-[#0052FF] flex items-center justify-center shadow-sm shadow-blue-200">
+                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        )}
+                        <p className={`text-[13px] font-bold ${isSelected ? "text-[#0052FF]" : "text-[#1A1D23]"}`}>{preset.name}</p>
+                        <p className="text-[11px] text-[#64748B] mt-0.5 line-clamp-2">{preset.description}</p>
+                        {(preset.mood || preset.tags.length > 0) && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {preset.mood && (
+                              <span className="px-2 py-0.5 bg-[#0052FF]/10 text-[#0052FF] rounded-full text-[10px] font-bold capitalize">{preset.mood}</span>
+                            )}
+                            {preset.tags.slice(0, 2).map(tag => (
+                              <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full text-[10px] font-bold">{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )
+          ) : (
+            /* ── Individual option tabs ── */
+            (() => {
+              const field = STYLE_TAB_TO_FIELD[activeTab as Exclude<StyleTab, "templates">];
+              const current = formInput[field] as string | undefined;
+              const entries = getOptionEntries(activeTab as Exclude<StyleTab, "templates">);
               return (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => {
-                    if (isSelected) {
-                      updateInput({ [field]: undefined });
-                    } else {
-                      updateInput({ [field]: value });
-                    }
-                  }}
-                  className={`text-left p-3 rounded-xl border transition-all ${
-                    isSelected
-                      ? "border-[#0052FF] bg-blue-50/40 shadow-[0_0_0_1px_#0052FF]"
-                      : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
-                  }`}
-                >
-                  <p className={`text-[12px] font-bold ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>{label}</p>
-                  <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">{desc}</p>
-                </button>
+                <div className="grid grid-cols-2 gap-3">
+                  {entries.map(({ value, label, desc, imageUrl }) => {
+                    const isSelected = current === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => {
+                          if (isSelected) {
+                            updateInput({ [field]: undefined });
+                          } else {
+                            updateInput({ [field]: value });
+                            setActivePresetId(null);
+                          }
+                        }}
+                        className={`relative text-left rounded-2xl border transition-all overflow-hidden ${
+                          isSelected
+                            ? "border-[#0052FF] bg-white shadow-sm"
+                            : "bg-white border-[#E2E8F0] hover:border-gray-300 hover:shadow-md shadow-sm"
+                        }`}
+                      >
+                        {imageUrl && (
+                          <div className="h-20 bg-gray-100 overflow-hidden">
+                            <img src={imageUrl} alt={label} className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        <div className={imageUrl ? "p-3" : "p-4"}>
+                          {isSelected && (
+                            <div className={`absolute ${imageUrl ? "top-[5.5rem]" : "top-3"} right-3 w-4 h-4 rounded-full bg-[#0052FF] flex items-center justify-center`}>
+                              <div className="w-1.5 h-1.5 rounded-full bg-[#AAFF50]" />
+                            </div>
+                          )}
+                          <p className={`text-[13px] font-bold ${isSelected ? "text-[#0052FF]" : "text-[#1A1D23]"}`}>{label}</p>
+                          <p className="text-[11px] text-[#64748B] mt-1 leading-relaxed">{desc}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               );
-            })}
-          </div>
+            })()
+          )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-[#E2E8F0] flex items-center justify-between bg-white">
           <button
             onClick={() => {
               updateInput({
@@ -480,15 +650,17 @@ function StylePickerModal({ open, onClose, formInput, updateInput }: StylePicker
                 compositionPreference: undefined,
                 textStylePreference: undefined,
                 colorThemePreset: undefined,
+                visualStylePresetId: undefined,
               });
+              setActivePresetId(null);
             }}
-            className="text-[12px] text-gray-400 hover:text-red-500 transition-colors"
+            className="text-[12px] font-semibold text-[#64748B] hover:text-red-500 transition-colors"
           >
             Clear all
           </button>
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-[#0052FF] text-white rounded-xl text-[12px] font-bold hover:bg-[#0041CC] transition-colors"
+            className="px-6 py-2.5 bg-[#0052FF] text-white rounded-xl text-[13px] font-extrabold hover:bg-[#003ECC] shadow-md shadow-blue-200 transition-all"
           >
             Done
           </button>
@@ -509,149 +681,325 @@ interface WritingStyleModalProps {
   updateInput: (updates: Partial<PostGenerationInput>) => void;
 }
 
-// Map caption template id → CaptionStylePreference
-const TEMPLATE_TO_CAPTION_STYLE: Record<string, CaptionStylePreference> = {
-  problem_solution: "promotional",
-  hook_value_cta: "educational",
-  story_format: "storytelling",
-  authority_format: "authority",
-  listicle_format: "educational",
-  engagement_question: "conversational",
+interface DbCaptionTemplate {
+  _id: string;
+  name: string;
+  description: string;
+  category: string;
+  platforms: string[];
+  platformVariants: { platform: string; structure: string; examplePost?: string }[];
+  isBundle: boolean;
+  matchKeywords: string[];
+  bestForObjectives: string[];
+}
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  how_to: "📖",
+  listicle: "📋",
+  thought_leadership: "💡",
+  product_launch: "🚀",
+  behind_the_scenes: "🎬",
+  testimonial: "⭐",
+  engagement_question: "💬",
+  personal_story: "📝",
+  announcement: "📢",
+  myth_busting: "⚡",
+  motivational: "🔥",
+  promotional: "📣",
+};
+
+const PLATFORM_SHORT: Record<string, string> = {
+  linkedin: "LinkedIn",
+  x: "X",
+  instagram_post: "Instagram",
+  facebook: "Facebook",
 };
 
 function WritingStyleModal({ open, onClose, formInput, updateInput }: WritingStyleModalProps) {
   const [activePlatform, setActivePlatform] = useState<WritingPlatform>("linkedin");
+  const [templateTab, setTemplateTab] = useState<"all" | "bundles" | "singles">("all");
+  const [search, setSearch] = useState("");
+  const [dbTemplates, setDbTemplates] = useState<DbCaptionTemplate[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setLoadingTemplates(true);
+    fetch("/api/caption-templates", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : { templates: [] }))
+      .then((data) => setDbTemplates(data.templates ?? []))
+      .catch(() => setDbTemplates([]))
+      .finally(() => setLoadingTemplates(false));
+  }, [open]);
 
   if (!open) return null;
 
-  const platformTabs: { key: WritingPlatform; label: string; color: string }[] = [
-    { key: "linkedin", label: "LinkedIn", color: "#0A66C2" },
-    { key: "x", label: "X (Twitter)", color: "#000000" },
-    { key: "instagram_post", label: "Instagram", color: "#E1306C" },
-    { key: "facebook", label: "Facebook", color: "#1877F2" },
+  const platformTabs: { key: WritingPlatform; label: string }[] = [
+    { key: "linkedin", label: "LinkedIn" },
+    { key: "x", label: "X (Twitter)" },
+    { key: "instagram_post", label: "Instagram" },
+    { key: "facebook", label: "Facebook" },
   ];
 
-  const templates = Object.values(CAPTION_TEMPLATES);
+  const searchLower = search.toLowerCase();
+
+  // Main filtering logic
+  const visibleTemplates = dbTemplates.filter((t) => {
+    // Search filter
+    const matchesSearch =
+      !search ||
+      t.name.toLowerCase().includes(searchLower) ||
+      t.description.toLowerCase().includes(searchLower);
+
+    // Tab filter
+    const matchesTab =
+      templateTab === "all" ||
+      (templateTab === "bundles" && t.isBundle) ||
+      (templateTab === "singles" && !t.isBundle);
+
+    // Platform filter — only applied for "all" and "singles" tabs (bundles are cross-platform)
+    const matchesPlatform =
+      templateTab === "bundles" ||
+      (t.isBundle && templateTab === "all") ||
+      t.platforms.length === 0 ||
+      t.platforms.includes(activePlatform);
+
+    return matchesSearch && matchesTab && matchesPlatform;
+  });
+
+  const templateTabCounts = {
+    all: dbTemplates.length,
+    bundles: dbTemplates.filter((t) => t.isBundle).length,
+    singles: dbTemplates.filter((t) => !t.isBundle).length,
+  };
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-[0_24px_60px_rgba(0,0,0,0.18)] w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-[#E2E8F0]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div>
-            <h2 className="text-[15px] font-bold text-gray-900">Choose Writing Style</h2>
-            <p className="text-[11px] text-gray-400 mt-0.5">
-              {formInput.captionStyle && formInput.captionStyle !== "auto"
-                ? `Active: ${CAPTION_STYLE_LABELS[formInput.captionStyle]?.label ?? formInput.captionStyle}`
-                : "Select a caption framework to guide your post structure"}
-            </p>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#E2E8F0]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#EEF3FF] flex items-center justify-center flex-shrink-0">
+              <PenLine className="w-4 h-4 text-[#0052FF]" />
+            </div>
+            <div>
+              <h2 className="text-[15px] font-bold text-[#1A1D23]">Choose Caption Template</h2>
+              <p className="text-[11px] text-[#64748B] mt-0.5">
+                {formInput.selectedTemplateId
+                  ? `Active: ${dbTemplates.find((t) => t._id === formInput.selectedTemplateId)?.name ?? "Template selected"}`
+                  : "Select a template to guide your post structure — or let AI choose"}
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-[#F4F6FA] hover:bg-[#EEF3FF] hover:text-[#0052FF] text-[#64748B] transition-colors"
           >
-            <X className="w-4 h-4 text-gray-500" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Platform Tabs */}
-        <div className="flex gap-1 px-4 pt-3 border-b border-gray-100 overflow-x-auto pb-0 flex-shrink-0">
-          {platformTabs.map((tab) => (
+        {/* Search bar */}
+        <div className="px-5 pt-4 pb-3 border-b border-[#E2E8F0] bg-white flex-shrink-0">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search templates…"
+              className="w-full pl-8 pr-8 py-2 text-[13px] bg-[#F8F9FC] border border-[#E2E8F0] rounded-xl outline-none focus:border-[#0052FF] focus:ring-2 focus:ring-[#0052FF]/10 text-[#1A1D23] placeholder:text-[#94A3B8] transition-all"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#94A3B8] flex items-center justify-center hover:bg-[#64748B] transition-colors"
+              >
+                <X className="w-2.5 h-2.5 text-white" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* All | Bundles | Singles tabs */}
+        <div className="flex gap-1 px-4 pt-3 pb-0 border-b border-[#E2E8F0] overflow-x-auto flex-shrink-0 bg-[#F4F6FA]">
+          {(["all", "bundles", "singles"] as const).map((tab) => (
             <button
-              key={tab.key}
-              onClick={() => setActivePlatform(tab.key)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-t-xl text-[12px] font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
-                activePlatform === tab.key
-                  ? "border-[#0052FF] text-[#0052FF] bg-blue-50/40"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+              key={tab}
+              onClick={() => setTemplateTab(tab)}
+              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-t-xl text-[12px] font-bold whitespace-nowrap transition-all border-b-2 -mb-px capitalize ${
+                templateTab === tab
+                  ? "border-[#0052FF] text-[#0052FF] bg-white"
+                  : "border-transparent text-[#64748B] hover:text-[#1A1D23] hover:bg-white/60"
               }`}
             >
-              {tab.label}
+              {tab === "all" ? "All" : tab === "bundles" ? "Bundles" : "Singles"}
+              <span
+                className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full ${
+                  templateTab === tab ? "bg-[#0052FF]/10 text-[#0052FF]" : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {templateTabCounts[tab]}
+              </span>
             </button>
           ))}
+
+          {/* Platform sub-tabs — only shown for "all" and "singles" */}
+          {templateTab !== "bundles" && (
+            <>
+              <div className="w-px bg-[#E2E8F0] mx-1 my-1.5 self-stretch" />
+              {platformTabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActivePlatform(tab.key)}
+                  className={`flex items-center gap-1.5 px-3 py-2.5 rounded-t-xl text-[12px] font-bold whitespace-nowrap transition-all border-b-2 -mb-px ${
+                    activePlatform === tab.key
+                      ? "border-[#0052FF] text-[#0052FF] bg-white"
+                      : "border-transparent text-[#64748B] hover:text-[#1A1D23] hover:bg-white/60"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </>
+          )}
         </div>
 
         {/* Template Cards */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-3">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Caption Frameworks</p>
-          {templates.map((template) => {
-            const variation = template.platformVariations[activePlatform];
-            const mappedStyle = TEMPLATE_TO_CAPTION_STYLE[template.id];
-            const isSelected = formInput.captionStyle === mappedStyle;
+        <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-[#F4F6FA]">
+          {loadingTemplates ? (
+            <div className="space-y-3">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-20 bg-white border border-[#E2E8F0] rounded-2xl animate-pulse" />
+              ))}
+            </div>
+          ) : visibleTemplates.length === 0 ? (
+            <div className="py-12 text-center">
+              <Layers className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+              <p className="text-[13px] font-semibold text-gray-400">
+                {search ? "No templates match your search" : "No templates available"}
+              </p>
+              <p className="text-[11px] text-gray-400 mt-1">
+                {search ? "Try a different keyword." : "Add templates in the admin panel to see them here."}
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-widest mb-2">
+                {visibleTemplates.length} template{visibleTemplates.length !== 1 ? "s" : ""}
+                {templateTab !== "bundles" && !search && ` for ${PLATFORM_SHORT[activePlatform]}`}
+              </p>
 
-            return (
-              <button
-                key={template.id}
-                type="button"
-                onClick={() => {
-                  if (isSelected) {
-                    updateInput({ captionStyle: "auto" });
-                  } else {
-                    updateInput({ captionStyle: mappedStyle });
-                  }
-                }}
-                className={`w-full text-left p-4 rounded-xl border transition-all ${
-                  isSelected
-                    ? "border-[#0052FF] bg-blue-50/40 shadow-[0_0_0_1px_#0052FF]"
-                    : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-[13px] font-bold ${isSelected ? "text-[#0052FF]" : "text-gray-800"}`}>
-                      {template.name}
-                    </p>
-                    <p className="text-[11px] text-gray-500 mt-0.5">{template.description}</p>
-                  </div>
-                  {isSelected && (
-                    <span className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full bg-[#0052FF] flex items-center justify-center">
-                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </span>
-                  )}
-                </div>
+              {visibleTemplates.map((template) => {
+                const isSelected = formInput.selectedTemplateId === template._id;
+                const emoji = CATEGORY_EMOJI[template.category] ?? "📄";
+                // For singles or "all" non-bundle view: show the active platform variant
+                const variant =
+                  !template.isBundle
+                    ? template.platformVariants.find((v) => v.platform === activePlatform)
+                    : undefined;
 
-                {/* Platform-specific variation */}
-                {variation && (
-                  <div className="mt-2.5 p-2.5 bg-gray-50 rounded-lg border border-gray-100">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">
-                      {platformTabs.find(p => p.key === activePlatform)?.label} variation
-                    </p>
-                    <p className="text-[11px] text-gray-600 leading-relaxed">{variation}</p>
-                  </div>
-                )}
+                return (
+                  <button
+                    key={template._id}
+                    type="button"
+                    onClick={() => {
+                      updateInput({ selectedTemplateId: isSelected ? undefined : template._id });
+                    }}
+                    className={`relative w-full text-left p-4 rounded-2xl border transition-all ${
+                      isSelected
+                        ? "border-[#0052FF] bg-white shadow-sm"
+                        : "bg-white border-[#E2E8F0] hover:border-gray-300 hover:shadow-md shadow-sm"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <span className="text-xl leading-none mt-0.5 flex-shrink-0">{emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className={`text-[13px] font-bold ${isSelected ? "text-[#0052FF]" : "text-[#1A1D23]"}`}>
+                              {template.name}
+                            </p>
+                            {template.isBundle && (
+                              <span className="px-2 py-0.5 bg-[#0052FF]/10 text-[#0052FF] text-[10px] font-bold rounded-full">
+                                Bundle
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-[#64748B] mt-0.5 line-clamp-2">{template.description}</p>
 
-                {/* Best for tags */}
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {template.bestFor.map((style) => (
-                    <span
-                      key={style}
-                      className="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-medium text-gray-500"
-                    >
-                      {CAPTION_STYLE_LABELS[style]?.label ?? style}
-                    </span>
-                  ))}
-                </div>
-              </button>
-            );
-          })}
+                          {/* Platform coverage pills */}
+                          <div className="flex gap-1 mt-2 flex-wrap">
+                            {template.platforms.map((p) => (
+                              <span
+                                key={p}
+                                className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${
+                                  p === activePlatform && !template.isBundle
+                                    ? "bg-[#0052FF]/10 text-[#0052FF]"
+                                    : template.isBundle
+                                    ? "bg-[#0052FF]/10 text-[#0052FF]"
+                                    : "bg-gray-100 text-gray-500"
+                                }`}
+                              >
+                                {PLATFORM_SHORT[p] ?? p}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      {isSelected && (
+                        <span className="flex-shrink-0 mt-0.5 w-6 h-6 rounded-full bg-[#0052FF] flex items-center justify-center shadow-sm shadow-blue-200">
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Single template: show platform-specific structure preview */}
+                    {!template.isBundle && variant?.structure && (
+                      <div className="mt-3 p-3 bg-[#F4F6FA] rounded-xl border border-[#E2E8F0]">
+                        <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wide mb-1">
+                          {PLATFORM_SHORT[activePlatform]} structure
+                        </p>
+                        <p className="text-[11px] text-[#1A1D23] leading-relaxed line-clamp-4">{variant.structure}</p>
+                      </div>
+                    )}
+
+                    {/* Bundle template: show all platform variants as a package */}
+                    {template.isBundle && template.platformVariants.length > 0 && (
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        {template.platformVariants.map((v) => (
+                          <div key={v.platform} className="p-2.5 bg-[#F4F6FA] rounded-xl border border-[#E2E8F0]">
+                            <p className="text-[10px] font-bold text-[#0052FF] mb-1">
+                              {PLATFORM_SHORT[v.platform] ?? v.platform}
+                            </p>
+                            <p className="text-[10px] text-[#1A1D23] leading-relaxed line-clamp-3">{v.structure}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </>
+          )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-[#E2E8F0] flex items-center justify-between bg-white">
           <button
-            onClick={() => updateInput({ captionStyle: "auto" })}
-            className="text-[12px] text-gray-400 hover:text-red-500 transition-colors"
+            onClick={() => updateInput({ selectedTemplateId: undefined })}
+            className="text-[12px] font-semibold text-[#64748B] hover:text-red-500 transition-colors"
           >
-            Reset to Auto
+            Let AI choose
           </button>
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-[#0052FF] text-white rounded-xl text-[12px] font-bold hover:bg-[#0041CC] transition-colors"
+            className="px-6 py-2.5 bg-[#0052FF] text-white rounded-xl text-[13px] font-extrabold hover:bg-[#003ECC] shadow-md shadow-blue-200 transition-all"
           >
             Done
           </button>
@@ -666,11 +1014,20 @@ function WritingStyleModal({ open, onClose, formInput, updateInput }: WritingSty
 export function PostGeneratorPage() {
   const params = useParams();
   const accountId = params?.id as string;
+  const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const refImgInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
   const [formInput, setFormInput] = useState<PostGenerationInput>(DEFAULT_INPUT);
+
+  // Pre-populate selectedTemplateId from URL ?templateId= query param
+  useEffect(() => {
+    const templateIdFromUrl = searchParams.get("templateId");
+    if (templateIdFromUrl) {
+      setFormInput((prev) => ({ ...prev, selectedTemplateId: templateIdFromUrl }));
+    }
+  }, [searchParams]);
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
   // Modal state
@@ -687,6 +1044,8 @@ export function PostGeneratorPage() {
   const [lastInput, setLastInput] = useState<PostGenerationInput | null>(null);
   const [strategy, setStrategy] = useState<ContentStrategyOutput | null>(null);
   const [captionOutput, setCaptionOutput] = useState<CaptionGeneratorOutput | null>(null);
+  const [usedTemplateName, setUsedTemplateName] = useState<string | undefined>(undefined);
+  const [templateAICurated, setTemplateAICurated] = useState(false);
   const [imagePrompt, setImagePrompt] = useState<PosterPromptOutput | null>(null);
   const [postPackage, setPostPackage] = useState<PostPackage | null>(null);
   const [contentScore, setContentScore] = useState<ContentScore | null>(null);
@@ -841,6 +1200,8 @@ export function PostGeneratorPage() {
     setLastInput(wizardInput);
     setView("generating");
     setError(null);
+    setUsedTemplateName(undefined);
+    setTemplateAICurated(false);
 
     const hasLinkedIn = wizardInput.platforms.includes("linkedin");
     const hasX = wizardInput.platforms.includes("x");
@@ -895,6 +1256,8 @@ export function PostGeneratorPage() {
       const captionsJson = await captionsRes.json();
       const captionsData: CaptionGeneratorOutput = captionsJson.captions;
       setCaptionOutput(captionsData);
+      if (captionsJson.usedTemplateName) setUsedTemplateName(captionsJson.usedTemplateName as string);
+      setTemplateAICurated(captionsJson.templateAICurated === true);
 
       // Build captions record early so we can refine LinkedIn before image prompt
       const captionsRecord: Record<string, string> = Object.fromEntries(
@@ -1109,6 +1472,7 @@ export function PostGeneratorPage() {
     } catch (err: unknown) {
       console.error("Generation error:", err);
       setError(err instanceof Error ? err.message : "An unexpected error occurred during generation.");
+      setView("idle");
       setPipelineStages((prev) =>
         prev.map((stage) => (stage.status === "active" ? { ...stage, status: "error" } : stage))
       );
@@ -1168,6 +1532,22 @@ export function PostGeneratorPage() {
     } else {
       setView("idle");
     }
+  };
+
+  const handleNewPost = () => {
+    setView("idle");
+    setPostPackage(null);
+    setHooks(null);
+    setContentScore(null);
+    setError(null);
+    setStrategy(null);
+    setCaptionOutput(null);
+    setImagePrompt(null);
+    setLastInput(null);
+    setUsedTemplateName(undefined);
+    setTemplateAICurated(false);
+    setPipelineStages(INITIAL_STAGES);
+    setFormInput(DEFAULT_INPUT);
   };
 
   const canGenerate = formInput.coreMessage.trim().length > 0 && formInput.platforms.length > 0;
@@ -1345,15 +1725,35 @@ export function PostGeneratorPage() {
   return (
     <div className="flex h-screen overflow-hidden bg-[#E8ECF2]">
       {/* ── Left Panel: Input Form ── */}
-      <div className="w-[420px] flex-shrink-0 flex flex-col bg-white border-r border-gray-200 overflow-hidden">
+      <div className="w-[420px] flex-shrink-0 flex flex-col bg-[#F4F6FA] border-r border-[#E2E8F0] overflow-hidden shadow-[1px_0_10px_rgba(0,0,0,0.02)] z-10">
+        
+        {/* New Post banner — shown when output is visible */}
+        {view === "output" && (
+          <div className="flex items-center justify-between px-5 py-3 bg-white border-b border-[#E2E8F0] flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[#AAFF50]" />
+              <span className="text-[12px] font-bold text-[#1A1D23]">Content generated</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleNewPost}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F4F6FA] hover:bg-[#EEF3FF] border border-[#E2E8F0] hover:border-[#0052FF]/30 text-[#1A1D23] hover:text-[#0052FF] text-[12px] font-bold transition-all"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              New Post
+            </button>
+          </div>
+        )}
+
         {/* Scrollable form */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
+        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
 
           {/* Persona Import */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-[#0052FF]/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[#0052FF]/10 flex items-center justify-center flex-shrink-0">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden border-l-4 border-l-[#0052FF]">
+            <div className="p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#EEF3FF] flex items-center justify-center flex-shrink-0">
                   <User className="w-4 h-4 text-[#0052FF]" />
                 </div>
                 <div>
@@ -1376,13 +1776,13 @@ export function PostGeneratorPage() {
               </button>
             </div>
             {isImporting && (
-              <p className="text-[11px] text-gray-500 mt-3 flex items-center gap-1.5">
+                <p className="text-[12px] font-semibold text-gray-500 mt-3 flex items-center gap-1.5">
                 <span className="inline-block w-3 h-3 border-2 border-[#0052FF] border-t-transparent rounded-full animate-spin" />
                 Importing from persona...
               </p>
             )}
             {importStatus && !isImporting && (
-              <p className={`text-[11px] mt-3 font-medium ${
+                <p className={`text-[12px] mt-3 font-semibold ${
                 importStatus.startsWith("Imported") ? "text-green-600" :
                 importStatus.includes("found") || importStatus.includes("first") ? "text-amber-600" :
                 "text-red-500"
@@ -1391,7 +1791,7 @@ export function PostGeneratorPage() {
               </p>
             )}
             {usePersonaImport && !isImporting && importStatus?.startsWith("Imported") && (
-              <div className="mt-3 flex items-center gap-2 p-2.5 bg-white/60 rounded-xl flex-wrap">
+                <div className="mt-3 flex items-center gap-2 p-2.5 bg-white/60 rounded-xl flex-wrap border border-white">
                 {formInput.brandAssets.logoUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -1417,6 +1817,7 @@ export function PostGeneratorPage() {
                 )}
               </div>
             )}
+            </div>
           </div>
 
           {/* Creative Style Buttons */}
@@ -1429,57 +1830,83 @@ export function PostGeneratorPage() {
               formInput.textStylePreference,
               formInput.colorThemePreset,
             ].filter(Boolean).length;
-            const hasWritingStyle = formInput.captionStyle && formInput.captionStyle !== "auto";
+            const hasWritingStyle = (formInput.captionStyle && formInput.captionStyle !== "auto") || !!formInput.selectedTemplateId;
             return (
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setStyleModalOpen(true)}
-                  className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border transition-all text-[12px] font-bold ${
-                    styleCount > 0
-                      ? "border-[#0052FF] bg-blue-50/40 text-[#0052FF] shadow-[0_0_0_1px_#0052FF]"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-[#0052FF]/40 hover:text-[#0052FF] hover:bg-blue-50/20 shadow-sm"
-                  }`}
-                >
-                  <span className="text-base leading-none">🎨</span>
-                  <span>Choose Style</span>
-                  {styleCount > 0 && (
-                    <span className="ml-auto bg-[#0052FF] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0">
-                      {styleCount}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                  Enhance with AI Styles
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStyleModalOpen(true)}
+                    className={`relative flex flex-col items-start gap-2 bg-white rounded-2xl border shadow-sm hover:shadow-md p-4 transition-all ${
+                      styleCount > 0
+                        ? "border-[#0052FF] bg-[#EEF3FF]"
+                        : "border-[#E2E8F0] hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-[#AAFF50]/20 flex items-center justify-center mb-1">
+                      <Palette className="w-4 h-4 text-[#0052FF]" />
+                    </div>
+                    <span className={`text-[13px] font-bold ${styleCount > 0 ? "text-[#0052FF]" : "text-[#1A1D23]"}`}>
+                      Visual Style
                     </span>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setWritingStyleModalOpen(true)}
-                  className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border transition-all text-[12px] font-bold ${
-                    hasWritingStyle
-                      ? "border-[#0052FF] bg-blue-50/40 text-[#0052FF] shadow-[0_0_0_1px_#0052FF]"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-[#0052FF]/40 hover:text-[#0052FF] hover:bg-blue-50/20 shadow-sm"
-                  }`}
-                >
-                  <span className="text-base leading-none">✍️</span>
-                  <span>Writing Style</span>
-                  {hasWritingStyle && (
-                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#0052FF] flex-shrink-0" />
-                  )}
-                </button>
+                    {styleCount > 0 && (
+                      <>
+                        <span className="absolute top-4 right-4 bg-[#0052FF] text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 shadow-sm">
+                          {styleCount}
+                        </span>
+                        <div className="absolute bottom-4 left-4 w-1.5 h-1.5 rounded-full bg-[#AAFF50]" />
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setWritingStyleModalOpen(true)}
+                    className={`relative flex flex-col items-start gap-2 bg-white rounded-2xl border shadow-sm hover:shadow-md p-4 transition-all ${
+                      hasWritingStyle
+                        ? "border-[#0052FF] bg-[#EEF3FF]"
+                        : "border-[#E2E8F0] hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-[#EEF3FF] flex items-center justify-center mb-1">
+                      <PenLine className="w-4 h-4 text-[#0052FF]" />
+                    </div>
+                    <span className={`text-[13px] font-bold ${hasWritingStyle ? "text-[#0052FF]" : "text-[#1A1D23]"}`}>
+                      Writing Style
+                    </span>
+                    {hasWritingStyle && (
+                      <>
+                        <span className="absolute top-4 right-4 bg-[#0052FF] flex items-center justify-center w-5 h-5 rounded-full shadow-sm">
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                        </span>
+                        <div className="absolute bottom-4 left-4 w-1.5 h-1.5 rounded-full bg-[#AAFF50]" />
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             );
           })()}
 
           {/* Core Message */}
-          <div>
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
-              Core Message <span className="text-red-500 normal-case">*</span>
-            </label>
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4 focus-within:ring-2 focus-within:ring-[#0052FF]/20 focus-within:border-[#0052FF] transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                Core Message <span className="text-red-500 normal-case">*</span>
+              </label>
+              <div className="bg-[#F4F6FA] rounded-full px-2 py-0.5 text-[10px] font-bold text-[#64748B]">
+                {formInput.coreMessage.length} chars
+              </div>
+            </div>
             <textarea
               value={formInput.coreMessage}
               onChange={(e) => updateInput({ coreMessage: e.target.value })}
               placeholder="Describe your post idea... e.g., Launching our AI scheduler that helps agencies manage content faster"
-              className="w-full h-28 px-4 py-3 rounded-xl border border-gray-200 focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all bg-white resize-none text-sm text-gray-800"
+              className="w-full h-28 border-0 outline-none bg-transparent resize-none text-sm text-[#1A1D23] placeholder-gray-400 p-0"
             />
-            <div className="text-right text-[10px] text-gray-400 mt-1">{formInput.coreMessage.length} chars</div>
           </div>
 
           {/* Platforms */}
@@ -1496,14 +1923,17 @@ export function PostGeneratorPage() {
                     key={platform}
                     type="button"
                     onClick={() => handlePlatformToggle(platform)}
-                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border transition-all duration-200 ${
+                    className={`relative flex items-center gap-2.5 px-4 py-3 rounded-2xl border transition-all duration-200 overflow-hidden ${
                       isSelected
-                        ? "border-[#0052FF] bg-blue-50/40 shadow-[0_0_0_1px_#0052FF]"
-                        : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        ? "border-[#0052FF] bg-[#EEF3FF] shadow-sm"
+                        : "bg-white border-[#E2E8F0] shadow-sm hover:shadow-md hover:border-gray-300"
                     }`}
                   >
-                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                    <span className={`text-[12px] font-bold ${isSelected ? "text-[#0052FF]" : "text-gray-700"}`}>
+                    {isSelected && (
+                      <div className="absolute left-0 inset-y-2 w-[3px] bg-[#AAFF50] rounded-r-xl" />
+                    )}
+                    <div className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm" style={{ backgroundColor: color }} />
+                    <span className={`text-[13px] font-bold ${isSelected ? "text-[#0052FF]" : "text-[#1A1D23]"}`}>
                       {label}
                     </span>
                   </button>
@@ -1513,19 +1943,22 @@ export function PostGeneratorPage() {
           </div>
 
           {/* Objective */}
-          <SelectField
-            label="Objective"
-            value={formInput.objective}
-            onChange={(v) => updateInput({ objective: v as PostObjective })}
-            options={objectiveOptions}
-          />
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4">
+            <SelectField
+              label="Objective"
+              value={formInput.objective}
+              onChange={(v) => updateInput({ objective: v as PostObjective })}
+              options={objectiveOptions}
+              className="!mb-0"
+            />
+          </div>
 
           {/* Generation Focus */}
-          <div>
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4">
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">
               Generation Focus
             </label>
-            <div className="bg-gray-100 p-1 rounded-xl flex items-center gap-1">
+            <div className="bg-[#F4F6FA] p-1.5 rounded-xl flex items-center gap-1">
               {(["caption", "balanced", "image"] as const).map((focus) => {
                 const isActive = (formInput.generationFocus ?? "balanced") === focus;
                 const icons = {
@@ -1543,14 +1976,17 @@ export function PostGeneratorPage() {
                     key={focus}
                     type="button"
                     onClick={() => updateInput({ generationFocus: focus })}
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-[12px] font-bold transition-all ${
+                    className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-[13px] font-bold transition-all ${
                       isActive
                         ? "bg-white text-[#0052FF] shadow-sm"
-                        : "text-gray-500 hover:text-gray-700"
+                        : "text-[#64748B] hover:text-[#1A1D23]"
                     }`}
                   >
-                    <span className={isActive ? "text-[#0052FF]" : "text-gray-400"}>{icons[focus]}</span>
+                    <span className={isActive ? "text-[#0052FF]" : "text-[#64748B]"}>{icons[focus]}</span>
                     {labels[focus]}
+                    {isActive && (
+                      <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-[#AAFF50]" />
+                    )}
                   </button>
                 );
               })}
@@ -1558,29 +1994,39 @@ export function PostGeneratorPage() {
           </div>
 
           {/* Post Text Blocks */}
-          <div>
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4">
+            <label className="block text-[11px] font-bold text-[#1A1D23] uppercase tracking-widest mb-1">
               Post Text
             </label>
-            <p className="text-[11px] text-gray-400 mb-3">Add text blocks for your image. Each block can be labeled.</p>
-            <div className="space-y-2">
+            <p className="text-[11px] text-[#64748B] mb-4">Add text blocks for your image. Each block can be labeled.</p>
+            
+            <div className="space-y-3">
               {(formInput.textBlocks ?? []).map((block) => (
-                <div key={block.id} className="flex items-start gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                  <select
-                    value={block.label}
-                    onChange={(e) => updateTextBlock(block.id, { label: e.target.value })}
-                    className="px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-[11px] font-bold text-gray-700 focus:border-[#0052FF] outline-none w-24 flex-shrink-0 appearance-none"
-                  >
-                    {["Title", "Subtitle", "Caption", "Body", "Tagline", "CTA Text"].map((lbl) => (
-                      <option key={lbl} value={lbl}>{lbl}</option>
-                    ))}
-                  </select>
+                <div key={block.id} className="flex flex-col gap-2 p-3.5 bg-[#F4F6FA] rounded-xl border border-[#E2E8F0] relative group">
+                  <div className="flex items-center justify-between">
+                    <select
+                      value={block.label}
+                      onChange={(e) => updateTextBlock(block.id, { label: e.target.value })}
+                      className="px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-[11px] font-bold text-[#1A1D23] shadow-sm focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF]/20 outline-none w-32 appearance-none"
+                    >
+                      {["Title", "Subtitle", "Caption", "Body", "Tagline", "CTA Text"].map((lbl) => (
+                        <option key={lbl} value={lbl}>{lbl}</option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => removeTextBlock(block.id)}
+                      className="w-6 h-6 flex items-center justify-center text-[#64748B] hover:bg-red-50 hover:text-red-500 rounded-md transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                   {block.label === "Caption" || block.label === "Body" ? (
                     <textarea
                       value={block.text}
                       onChange={(e) => updateTextBlock(block.id, { text: e.target.value })}
                       placeholder={`Enter ${block.label.toLowerCase()}...`}
-                      className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-[13px] text-gray-800 focus:border-[#0052FF] outline-none resize-none h-16"
+                      className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#1A1D23] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF]/20 outline-none resize-none h-20 placeholder-gray-400"
                     />
                   ) : (
                     <input
@@ -1588,47 +2034,41 @@ export function PostGeneratorPage() {
                       value={block.text}
                       onChange={(e) => updateTextBlock(block.id, { text: e.target.value })}
                       placeholder={`Enter ${block.label.toLowerCase()}...`}
-                      className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-[13px] text-gray-800 focus:border-[#0052FF] outline-none"
+                      className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#1A1D23] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF]/20 outline-none placeholder-gray-400"
                     />
                   )}
-                  <button
-                    type="button"
-                    onClick={() => removeTextBlock(block.id)}
-                    className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors mt-0.5"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
                 </div>
               ))}
             </div>
+            
             <button
               type="button"
               onClick={addTextBlock}
-              className="mt-2 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border-2 border-dashed border-gray-200 hover:border-[#0052FF] hover:bg-blue-50/30 text-[12px] font-bold text-gray-400 hover:text-[#0052FF] transition-all"
+              className="mt-3 w-full flex items-center justify-center gap-1.5 py-3 rounded-xl border border-dashed border-[#0052FF]/30 bg-[#EEF3FF]/50 text-[12px] font-bold text-[#0052FF] hover:border-[#AAFF50] hover:bg-[#AAFF50]/10 hover:text-[#1A1D23] transition-all"
             >
               <Plus className="w-3.5 h-3.5" /> Add Text Block
             </button>
           </div>
 
           {/* Image Concept */}
-          <div>
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4 focus-within:ring-2 focus-within:ring-[#0052FF]/20 focus-within:border-[#0052FF] transition-all">
+            <label className="block text-[11px] font-bold text-[#1A1D23] uppercase tracking-widest mb-2">
               Image Concept
             </label>
             <textarea
               value={formInput.imageConcept ?? ""}
               onChange={(e) => updateInput({ imageConcept: e.target.value || undefined })}
               placeholder="Describe the visual you have in mind..."
-              className="w-full h-20 px-4 py-3 rounded-xl border border-gray-200 focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all bg-white resize-none text-sm text-gray-800"
+              className="w-full h-[72px] border-0 outline-none bg-transparent resize-none text-sm text-[#1A1D23] placeholder-gray-400 p-0"
             />
           </div>
 
           {/* Reference Images */}
-          <div>
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4">
+            <label className="block text-[11px] font-bold text-[#1A1D23] uppercase tracking-widest mb-1">
               Reference Images
             </label>
-            <p className="text-[11px] text-gray-400 mb-3">Add people, products, or objects to include in the image.</p>
+            <p className="text-[11px] text-[#64748B] mb-4">Add people, products, or objects to include in the image.</p>
             <input
               ref={refImgInputRef}
               type="file"
@@ -1637,54 +2077,62 @@ export function PostGeneratorPage() {
               className="hidden"
               onChange={handleReferenceImageUpload}
             />
+            
             {(formInput.referenceImages ?? []).length > 0 && (
-              <div className="space-y-2 mb-2">
+              <div className="space-y-3 mb-3">
                 {(formInput.referenceImages ?? []).map((img) => (
-                  <div key={img.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-200">
+                  <div key={img.id} className="flex items-center gap-3 p-2 bg-[#F4F6FA] rounded-xl border border-[#E2E8F0]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={img.dataUrl}
                       alt={img.label}
-                      className="w-10 h-10 rounded-lg object-cover border border-gray-200 flex-shrink-0"
+                      className="w-12 h-12 rounded-lg object-cover border border-[#E2E8F0] shadow-sm flex-shrink-0"
                     />
                     <input
                       type="text"
                       value={img.label}
                       onChange={(e) => updateReferenceImageLabel(img.id, e.target.value)}
-                      placeholder="Label this image..."
-                      className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-[12px] text-gray-800 focus:border-[#0052FF] outline-none"
+                      placeholder="Label this image... (e.g. 'CEO')"
+                      className="flex-1 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#1A1D23] focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF]/20 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] outline-none placeholder-gray-400"
                     />
                     <button
                       type="button"
                       onClick={() => removeReferenceImage(img.id)}
-                      className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
+                      className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-[#64748B] hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors mr-1"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                 ))}
               </div>
             )}
+            
             <button
               type="button"
               onClick={() => refImgInputRef.current?.click()}
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-gray-200 hover:border-[#0052FF] hover:bg-blue-50/30 text-[12px] font-bold text-gray-400 hover:text-[#0052FF] transition-all"
+              className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl border border-dashed border-[#E2E8F0] bg-white text-[12px] font-bold text-[#64748B] hover:border-[#AAFF50] hover:bg-[#AAFF50]/10 hover:text-[#1A1D23] transition-all shadow-sm"
             >
               <Plus className="w-3.5 h-3.5" /> Add Reference Image
             </button>
           </div>
 
-          {/* Brand Assets */}
-          <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Brand Assets</p>
-            <div className="space-y-4">
+          {/* Brand Identity */}
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-4">
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[#E2E8F0] border-dashed">
+              <div className="w-6 h-6 rounded-lg bg-[#AAFF50]/20 flex items-center justify-center">
+                <Palette className="w-3.5 h-3.5 text-[#0052FF]" />
+              </div>
+              <h3 className="text-[13px] font-bold text-[#1A1D23]">Brand Identity</h3>
+            </div>
+            
+            <div className="space-y-5">
               {/* Logo */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Brand Logo</label>
+                <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-widest mb-2">Brand Logo</label>
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
                 {formInput.brandAssets.logoUrl ? (
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
+                    <div className="w-16 h-16 rounded-xl border border-[#E2E8F0] bg-[#F4F6FA] flex items-center justify-center overflow-hidden shadow-sm">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={formInput.brandAssets.logoUrl} alt="Brand logo" className="max-w-full max-h-full object-contain p-1.5" />
                     </div>
@@ -1692,14 +2140,14 @@ export function PostGeneratorPage() {
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold text-[#0052FF] bg-blue-50 hover:bg-blue-100 transition-all"
+                        className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-[#0052FF] bg-[#EEF3FF] hover:bg-[#E0E7FF] transition-all w-24"
                       >
                         <Upload className="w-3 h-3" /> Replace
                       </button>
                       <button
                         type="button"
                         onClick={() => updateInput({ brandAssets: { ...formInput.brandAssets, logoUrl: undefined } })}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold text-gray-500 bg-gray-100 hover:bg-red-50 hover:text-red-500 transition-all"
+                        className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-[#64748B] hover:bg-red-50 hover:text-red-500 transition-all w-24 border border-[#E2E8F0]"
                       >
                         <X className="w-3 h-3" /> Remove
                       </button>
@@ -1709,22 +2157,25 @@ export function PostGeneratorPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex flex-col items-center justify-center w-full h-20 rounded-xl border-2 border-dashed border-gray-200 hover:border-[#0052FF] hover:bg-blue-50/30 transition-all text-gray-400 hover:text-[#0052FF] gap-1.5"
+                    className="flex flex-col items-center justify-center w-full h-20 rounded-xl border border-dashed border-[#E2E8F0] bg-white hover:border-[#0052FF] hover:bg-[#EEF3FF] transition-all text-[#64748B] hover:text-[#0052FF] gap-1.5 shadow-sm"
                   >
                     <Upload className="w-4 h-4" />
-                    <span className="text-[11px] font-bold">Upload Brand Logo</span>
+                    <span className="text-[12px] font-bold">Upload Brand Logo</span>
                   </button>
                 )}
               </div>
 
               {/* Color Palette */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Color Palette (Max 5)</label>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-[11px] font-bold text-[#64748B] uppercase tracking-widest">Color Palette</label>
+                  <span className="text-[10px] font-bold text-[#64748B] bg-[#F4F6FA] px-1.5 py-0.5 rounded-md">Max 5</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 p-3 bg-[#F4F6FA] rounded-xl border border-[#E2E8F0] inset-shadow-sm">
                   {formInput.brandAssets.colorPalette.map((color, index) => (
                     <div key={index} className="relative group">
                       <div
-                        className="w-10 h-10 rounded-full border-2 border-gray-200 shadow-sm overflow-hidden relative cursor-pointer hover:scale-105 transition-transform"
+                        className="w-10 h-10 rounded-full border border-white shadow-sm overflow-hidden relative cursor-pointer hover:scale-105 transition-transform"
                         style={{ backgroundColor: color }}
                       >
                         <input
@@ -1737,7 +2188,7 @@ export function PostGeneratorPage() {
                       {formInput.brandAssets.colorPalette.length > 1 && (
                         <button
                           onClick={() => handleRemoveColor(index)}
-                          className="absolute -top-1 -right-1 w-4 h-4 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute -top-1 -right-1 w-4 h-4 bg-white border border-[#E2E8F0] rounded-full flex items-center justify-center text-[#64748B] hover:text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="w-2.5 h-2.5" />
                         </button>
@@ -1747,7 +2198,7 @@ export function PostGeneratorPage() {
                   {formInput.brandAssets.colorPalette.length < 5 && (
                     <button
                       onClick={handleAddColor}
-                      className="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:text-[#0052FF] hover:border-[#0052FF] hover:bg-blue-50 transition-all"
+                      className="w-10 h-10 rounded-full border border-dashed border-[#A0AABF] bg-white flex items-center justify-center text-[#64748B] hover:text-[#0052FF] hover:border-[#0052FF] hover:bg-[#EEF3FF] shadow-sm transition-all"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -1756,12 +2207,15 @@ export function PostGeneratorPage() {
               </div>
 
               {/* Font Family */}
-              <SelectField
-                label="Primary Font"
-                value={formInput.brandAssets.fontFamily ?? "Montserrat"}
-                onChange={(v) => updateInput({ brandAssets: { ...formInput.brandAssets, fontFamily: v } })}
-                options={fontOptions}
-              />
+              <div>
+                <SelectField
+                  label="Primary Font"
+                  value={formInput.brandAssets.fontFamily ?? "Montserrat"}
+                  onChange={(v) => updateInput({ brandAssets: { ...formInput.brandAssets, fontFamily: v } })}
+                  options={fontOptions}
+                  className="!mb-0"
+                />
+              </div>
 
               {/* Watermark */}
               <div className="flex items-center justify-between">
@@ -1844,25 +2298,34 @@ export function PostGeneratorPage() {
           )}
 
           {/* Advanced Settings Accordion */}
-          <div className="border border-gray-200 rounded-2xl overflow-hidden">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
             <button
               type="button"
               onClick={() => setAdvancedOpen((o) => !o)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3.5 bg-[#F4F6FA] hover:bg-[#EEF3FF] transition-colors"
             >
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-gray-500" />
-                <span className="text-[12px] font-bold text-gray-700">Advanced Settings</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-md bg-[#1A1D23] flex items-center justify-center flex-shrink-0">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-white" />
+                </div>
+                <span className="text-[13px] font-bold text-[#1A1D23]">Advanced Settings</span>
               </div>
-              {advancedOpen ? (
-                <ChevronUp className="w-4 h-4 text-gray-400" />
-              ) : (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              )}
+              <div className="flex items-center gap-2">
+                {advancedOpen && (
+                  <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider bg-white px-2 py-0.5 rounded-md border border-[#E2E8F0]">
+                    Open
+                  </span>
+                )}
+                {advancedOpen ? (
+                  <ChevronUp className="w-4 h-4 text-[#64748B]" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-[#64748B]" />
+                )}
+              </div>
             </button>
 
             {advancedOpen && (
-              <div className="px-4 py-5 space-y-0 border-t border-gray-100">
+              <div className="px-4 py-5 space-y-0 border-t border-[#E2E8F0]">
 
                 {/* Target Audience — multi-select pills */}
                 <MultiSelectPills
@@ -1878,7 +2341,7 @@ export function PostGeneratorPage() {
                       placeholder="Describe your specific audience..."
                       value={formInput.customAudience || ""}
                       onChange={(e) => updateInput({ customAudience: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all bg-white text-sm text-gray-800"
+                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] focus:border-[#0052FF] focus:ring-2 focus:ring-[#0052FF]/20 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] outline-none transition-all bg-[#F4F6FA] text-sm font-medium text-[#1A1D23] placeholder-gray-400"
                     />
                   </div>
                 )}
@@ -1947,118 +2410,43 @@ export function PostGeneratorPage() {
                   options={imageGenTypeOptions}
                 />
 
-                {/* ── Creative Engine Fields ── */}
-
-                {/* Niche */}
-                <SelectField
-                  label="Industry Niche"
-                  value={formInput.niche || ""}
-                  onChange={(v) => updateInput({ niche: (v || undefined) as NicheCategory | undefined })}
-                  options={nicheOptions}
-                />
-
-                {/* Post Intent */}
-                <SelectField
-                  label="Post Intent"
-                  value={formInput.postIntent || ""}
-                  onChange={(v) => updateInput({ postIntent: (v || undefined) as PostIntent | undefined })}
-                  options={postIntentOptions}
-                />
-
-                {/* Location */}
-                <div className="mb-4">
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g., San Francisco, CA"
-                    value={formInput.location || ""}
-                    onChange={(e) => updateInput({ location: e.target.value || undefined })}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] outline-none transition-all text-sm font-medium text-gray-800"
-                  />
-                </div>
-
-                {/* Caption Style */}
-                <SelectField
-                  label="Caption Style"
-                  value={formInput.captionStyle || ""}
-                  onChange={(v) => updateInput({ captionStyle: (v || undefined) as CaptionStylePreference | undefined })}
-                  options={captionStyleOptions}
-                />
-
-                {/* Lighting Direction */}
-                <SelectField
-                  label="Lighting Direction"
-                  value={formInput.lightingDirection || ""}
-                  onChange={(v) => updateInput({ lightingDirection: (v || undefined) as LightingDirection | undefined })}
-                  options={lightingOptions}
-                />
-
-                {/* Shading Style */}
-                <SelectField
-                  label="Shading Style"
-                  value={formInput.shadingStyle || ""}
-                  onChange={(v) => updateInput({ shadingStyle: (v || undefined) as ShadingStyle | undefined })}
-                  options={shadingOptions}
-                />
-
-                {/* Image Style */}
-                <SelectField
-                  label="Image Style"
-                  value={formInput.imageStyle || ""}
-                  onChange={(v) => updateInput({ imageStyle: (v || undefined) as ImageStyle | undefined })}
-                  options={imageStyleOptions}
-                />
-
-                {/* Composition */}
-                <SelectField
-                  label="Composition"
-                  value={formInput.compositionPreference || ""}
-                  onChange={(v) => updateInput({ compositionPreference: (v || undefined) as CompositionPreference | undefined })}
-                  options={compositionOptions}
-                />
-
-                {/* Text Style */}
-                <SelectField
-                  label="Text Style"
-                  value={formInput.textStylePreference || ""}
-                  onChange={(v) => updateInput({ textStylePreference: (v || undefined) as TextStylePreference | undefined })}
-                  options={textStyleOptions}
-                />
-
-                {/* Color Theme */}
-                <SelectField
-                  label="Color Theme"
-                  value={formInput.colorThemePreset || ""}
-                  onChange={(v) => updateInput({ colorThemePreset: (v || undefined) as ColorThemePreset | undefined })}
-                  options={colorThemeOptions}
-                />
-
               </div>
             )}
           </div>
         </div>
 
         {/* Generate Button — sticky at bottom */}
-        <div className="px-5 py-4 border-t border-gray-100 bg-white">
+        <div className="px-5 py-5 border-t border-[#E2E8F0] bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.02)] z-20">
           <button
             type="button"
             disabled={!canGenerate || view === "generating"}
             onClick={() => handleGenerate(formInput)}
-            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all ${
+            className={`relative overflow-hidden w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-[14px] transition-all duration-300 ${
               canGenerate && view !== "generating"
-                ? "bg-[#0052FF] text-white hover:bg-blue-700 shadow-md shadow-blue-200"
-                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                ? "bg-[#0052FF] text-white hover:bg-blue-700 shadow-[0_8px_20px_rgba(0,82,255,0.24)] hover:shadow-[0_12px_24px_rgba(0,82,255,0.32)] hover:-translate-y-0.5 group"
+                : "bg-[#F4F6FA] text-[#A0AABF] cursor-not-allowed border border-[#E2E8F0]"
             }`}
           >
-            <Sparkles className="w-4 h-4" />
-            {view === "generating" ? "Generating..." : "Generate Post"}
+            {canGenerate && view !== "generating" && (
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+            )}
+            <Sparkles className={`w-4 h-4 ${canGenerate && view !== "generating" ? "text-[#AAFF50]" : ""}`} />
+            <span>{view === "generating" ? "Generating Magic..." : "Generate Content"}</span>
+            {canGenerate && view !== "generating" && (
+              <div className="ml-1 w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">
+                <span className="translate-x-[0.5px]">→</span>
+              </div>
+            )}
           </button>
           {!canGenerate && (
-            <p className="text-[10px] text-gray-400 text-center mt-2">
-              {formInput.coreMessage.trim().length === 0 ? "Add a core message to continue" : "Select at least one platform"}
-            </p>
+            <div className="flex items-center justify-center gap-1.5 mt-3 text-[11px] font-semibold text-[#64748B]">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#A0AABF]" />
+              <p>
+                {formInput.coreMessage.trim().length === 0 
+                  ? "Add a core message to enable generation" 
+                  : "Select at least one platform"}
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -2067,24 +2455,8 @@ export function PostGeneratorPage() {
       <div className="flex-1 overflow-y-auto bg-[#E8ECF2]">
         {view === "idle" && (
           <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center px-8">
-            <div className="w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center mb-5 shadow-sm">
-              <Wand2 className="w-8 h-8 text-[#0052FF]/40" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Ready when you are</h2>
-            <p className="text-sm text-gray-400 max-w-xs leading-relaxed">
-              Configure your post brief on the left and hit Generate to create platform-optimized content.
-            </p>
-          </div>
-        )}
-
-        {view === "generating" && (
-          <div className="flex flex-col items-center justify-center min-h-full py-12 px-8">
-            <GenerationPipeline
-              currentStage={getCurrentStageIndex()}
-              stages={pipelineStages}
-            />
-            {error && (
-              <div className="mt-8 bg-white p-6 rounded-2xl shadow-sm border border-red-100 max-w-md w-full text-center">
+            {error ? (
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 max-w-md w-full text-center">
                 <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <AlertCircle className="w-6 h-6 text-red-500" />
                 </div>
@@ -2098,12 +2470,42 @@ export function PostGeneratorPage() {
                   Retry Generation
                 </button>
               </div>
+            ) : (
+              <>
+                <div className="w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center mb-5 shadow-sm">
+                  <Wand2 className="w-8 h-8 text-[#0052FF]/40" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800 mb-2">Ready when you are</h2>
+                <p className="text-sm text-gray-400 max-w-xs leading-relaxed">
+                  Configure your post brief on the left and hit Generate to create platform-optimized content.
+                </p>
+              </>
             )}
+          </div>
+        )}
+
+        {view === "generating" && (
+          <div className="flex flex-col items-center justify-center min-h-full py-12 px-8">
+            <GenerationPipeline
+              currentStage={getCurrentStageIndex()}
+              stages={pipelineStages}
+            />
           </div>
         )}
 
         {view === "output" && postPackage && (
           <div className="p-6">
+            {(usedTemplateName || templateAICurated) && (
+              <div className="mb-4 flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-2xl shadow-sm w-fit">
+                <span className="text-base">📋</span>
+                {usedTemplateName && (
+                  <span className="text-sm font-bold text-[#1A1D23]">Used: {usedTemplateName}</span>
+                )}
+                {templateAICurated && (
+                  <span className="px-2 py-0.5 bg-[#0052FF]/10 text-[#0052FF] text-[11px] font-bold rounded-full">✨ AI curated</span>
+                )}
+              </div>
+            )}
             <OutputDashboard
               postPackage={{
                 ...postPackage,
@@ -2114,9 +2516,6 @@ export function PostGeneratorPage() {
               strategy={strategy ?? undefined}
               accountId={accountId}
               onRemix={handleRemix}
-              onSelectHook={(hook) => {
-                console.log("Selected hook:", hook);
-              }}
               onScoreRequest={handleScoreRequest}
               isRemixing={isRemixing}
               isScoring={isScoring}

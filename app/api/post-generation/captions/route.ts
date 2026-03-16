@@ -5,6 +5,10 @@ import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
 import { buildCaptionGeneratorPrompt } from "@/lib/postGenerationPrompts";
 import { parseAIJson } from "@/lib/parseAIJson";
+import { getWritingStyleById } from "@/lib/models/adminStyles";
+import { getCaptionTemplateById } from "@/lib/models/captionTemplates";
+import type { WritingStyleDocument } from "@/lib/models/adminStyles";
+import type { CaptionTemplateDocument } from "@/lib/models/captionTemplates";
 import type {
   CaptionGeneratorOutput,
   ContentStrategyOutput,
@@ -117,10 +121,35 @@ export async function POST(req: NextRequest) {
     }
 
     const personaContext = body.includePersona ? await loadPersonaContext(body.accountId) : "";
+
+    // Fetch writing style if provided
+    let writingStyle: WritingStyleDocument | undefined;
+    if (body.input.writingStyleId) {
+      try {
+        const fetched = await getWritingStyleById(body.input.writingStyleId);
+        if (fetched) writingStyle = fetched;
+      } catch {
+        // Non-fatal — proceed without writing style
+      }
+    }
+
+    // Fetch DB caption template if provided
+    let dbTemplate: CaptionTemplateDocument | undefined;
+    if (body.input.selectedTemplateId) {
+      try {
+        const fetched = await getCaptionTemplateById(body.input.selectedTemplateId);
+        if (fetched) dbTemplate = fetched;
+      } catch {
+        // Non-fatal — proceed without DB template
+      }
+    }
+
     const prompt = buildCaptionGeneratorPrompt(
       body.input,
       body.strategy,
       personaContext,
+      writingStyle,
+      dbTemplate,
     );
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -157,7 +186,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ captions: normalized });
+    return NextResponse.json({
+      captions: normalized,
+      usedTemplateId: dbTemplate?._id?.toString(),
+      usedTemplateName: dbTemplate?.name,
+      templateAutoSelected: false,
+      templateAICurated: false,
+    });
   } catch (error) {
     console.error("Captions route error:", error);
     return NextResponse.json({ error: "Request failed" }, { status: 500 });

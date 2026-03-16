@@ -21,7 +21,7 @@ interface OutputDashboardProps {
   strategy?: ContentStrategyOutput;
   accountId?: string;
   onRemix: (caption: string, platform: string, style: RemixStyle) => void;
-  onSelectHook: (hook: HookOption) => void;
+  onSelectHook?: (hook: HookOption) => void;
   onScoreRequest: (platform: string) => void;
   onRefinedCaption?: (platform: string, newCaption: string, newScore: number, newFlags: string[]) => void;
   isRemixing?: boolean;
@@ -42,6 +42,7 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
 }) => {
   const platforms = Object.keys(postPackage.captions) as PostPlatform[];
   const [activeTab, setActiveTab] = useState<string>(platforms[0] ?? "linkedin");
+  const [selectedHookId, setSelectedHookId] = useState<string | undefined>(undefined);
 
   // Local state for captions + linkedInRefined + xRefined + instagramRefined so re-refine updates reflect immediately
   const [localCaptions, setLocalCaptions] = useState<Record<string, string>>(postPackage.captions);
@@ -130,7 +131,13 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
           {platforms.map((platform) => {
             const { label, color } = PLATFORM_DISPLAY[platform] ?? { label: platform, color: "#0052FF", shortLabel: platform };
             const isActive = activeTab === platform;
-            return (
+  const handleSelectHook = (hook: HookOption) => {
+    setSelectedHookId(hook.id);
+    setLocalCaptions((prev) => ({ ...prev, [activeTab]: hook.text }));
+    onSelectHook?.(hook);
+  };
+
+  return (
               <button
                 key={platform}
                 onClick={() => setActiveTab(platform)}
@@ -184,7 +191,8 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
                   accountId={accountId}
                   onRemix={(style) => onRemix(activeCaption, platform, style)}
                   onScoreRequest={() => onScoreRequest(platform)}
-                  onSelectHook={onSelectHook}
+                  onSelectHook={handleSelectHook}
+                  selectedHookId={selectedHookId}
                    onRefinedCaption={handleRefinedCaption}
                   onXRefined={handleXRefined}
                   instagramRefined={platform === "instagram_post" ? localInstagramRefined : undefined}

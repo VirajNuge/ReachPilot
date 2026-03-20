@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import {
   BarChart,
   Bar,
@@ -11,7 +12,13 @@ import {
   Cell,
 } from "recharts";
 import { BsSpeedometer } from "react-icons/bs";
-import { FaFire, FaBolt, FaHeartbeat } from "react-icons/fa";
+import {
+  FaFire,
+  FaRocket,
+  FaMagic,
+  FaCheck,
+  FaTimes,
+} from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
 // --- Types ---
@@ -28,6 +35,14 @@ export interface VelocityData {
   insight: string;
 }
 
+interface HookAlternative {
+  trigger: "Curiosity" | "FOMO" | "High-Value Promise";
+  text: string;
+  why: string;
+}
+
+type ModalState = "closed" | "input" | "loading" | "results";
+
 interface VelocityMeterProps {
   data?: VelocityData;
   onMatchVelocity?: () => void;
@@ -38,7 +53,11 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
   data,
   onMatchVelocity,
 }) => {
-  const [showMatchModal, setShowMatchModal] = useState(false);
+  const [modalState, setModalState] = useState<ModalState>("closed");
+  const [hookInput, setHookInput] = useState("");
+  const [hookResults, setHookResults] = useState<HookAlternative[]>([]);
+  const [hookError, setHookError] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   // Default Mock Data if none provided
   const safeData: VelocityData = data || {
@@ -53,6 +72,44 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
     ],
     insight:
       "This competitor has a high Hook-Rate. They rely on controversial openings.",
+  };
+
+  const handleGenerateHooks = async () => {
+    if (!hookInput.trim()) return;
+    setModalState("loading");
+    setHookError(false);
+    try {
+      const res = await fetch("/api/analyze-extension/boost-hook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentHook: hookInput,
+          velocityCategory: safeData.category,
+          hookRate: safeData.hookRate,
+          insight: safeData.insight,
+          platform: "X (Twitter)",
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.hooks) throw new Error("bad response");
+      setHookResults(json.hooks as HookAlternative[]);
+      setModalState("results");
+    } catch {
+      setHookError(true);
+      setModalState("input");
+    }
+  };
+
+  const handleCopy = (text: string, idx: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(idx);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const triggerColors: Record<string, string> = {
+    Curiosity: "bg-purple-100 text-purple-700",
+    FOMO: "bg-red-100 text-red-600",
+    "High-Value Promise": "bg-blue-100 text-blue-700",
   };
 
   return (
@@ -71,7 +128,7 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
           </p>
         </div>
 
-        {/* Top Right Icon Badge matching reference */}
+        {/* Top Right Icon Badge */}
         <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0">
           <BsSpeedometer size={18} />
         </div>
@@ -112,7 +169,7 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
                 {safeData.velocityGraph.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={index < 2 ? "#caee55" : "#074ed5"}
+                    fill={index < 2 ? "#caee55" : "#0052FF"}
                   />
                 ))}
               </Bar>
@@ -146,52 +203,161 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
         {/* Action Button */}
         <button
           onClick={() => {
-            setShowMatchModal(true);
+            setModalState("input");
+            setHookInput("");
+            setHookError(false);
+            setHookResults([]);
             onMatchVelocity?.();
           }}
           className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)] active:scale-[0.98]"
         >
-          <FaBolt />
-          Match this Velocity
+          <FaRocket />
+          Boost Hook Rate
         </button>
       </div>
 
-      {/* --- Match Velocity Modal (Simulation) --- */}
-      <AnimatePresence>
-        {showMatchModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col p-6 rounded-3xl"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-[#000100] flex items-center gap-2">
-                <FaBolt className="text-[#074ed5]" /> Velocity Matcher
-              </h3>
-              <button
-                onClick={() => setShowMatchModal(false)}
-                className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-[#000100] transition-colors"
+      {/* --- Boost Hook Modal via Portal --- */}
+      {modalState !== "closed" &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            <motion.div
+              key="boost-hook-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) setModalState("closed");
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.18 }}
+                className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 flex flex-col gap-5 relative"
               >
-                Close
-              </button>
-            </div>
+                {/* Close button */}
+                <button
+                  onClick={() => setModalState("closed")}
+                  className="absolute top-4 right-4 text-slate-400 hover:text-[#1A1D23] transition-colors"
+                >
+                  <FaTimes />
+                </button>
 
-            <div className="flex-1 flex flex-col justify-center items-center text-center gap-4">
-              <div className="p-3 bg-[#074ed5]/10 text-[#074ed5] rounded-2xl mb-2 animate-bounce">
-                <FaFire size={24} />
-              </div>
-              <h4 className="text-xl font-black text-[#000100]">
-                Generating 3 Hooks...
-              </h4>
-              <p className="text-sm text-slate-500 font-medium max-w-[250px]">
-                Analyzing {safeData.category} patterns to give your next post
-                immediate traction.
-              </p>
-            </div>
-          </motion.div>
+                {/* INPUT state */}
+                {modalState === "input" && (
+                  <>
+                    <div>
+                      <h3 className="text-lg font-black text-[#1A1D23] flex items-center gap-2">
+                        <FaRocket className="text-[#0052FF]" /> Boost Hook Rate
+                      </h3>
+                      <p className="text-xs text-slate-400 font-medium mt-1">
+                        Paste your current hook or first line
+                      </p>
+                    </div>
+                    <textarea
+                      value={hookInput}
+                      onChange={(e) => setHookInput(e.target.value)}
+                      placeholder="Your post's first line or video hook..."
+                      rows={3}
+                      className="w-full border border-slate-200 rounded-2xl p-3 text-sm text-[#1A1D23] resize-none focus:outline-none focus:border-[#0052FF] transition-colors"
+                    />
+                    <p className="text-[11px] text-slate-400 -mt-2">
+                      Generating with:{" "}
+                      <span className="font-bold text-[#074ed5]">
+                        {safeData.category}
+                      </span>{" "}
+                      velocity patterns
+                    </p>
+                    {hookError && (
+                      <p className="text-xs text-red-500 font-medium">
+                        Failed to generate hooks. Try again.
+                      </p>
+                    )}
+                    <button
+                      onClick={handleGenerateHooks}
+                      disabled={!hookInput.trim()}
+                      className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] disabled:opacity-40 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
+                    >
+                      <FaMagic /> Generate Alternatives
+                    </button>
+                  </>
+                )}
+
+                {/* LOADING state */}
+                {modalState === "loading" && (
+                  <div className="flex flex-col items-center justify-center py-10 gap-4">
+                    <div className="p-3 bg-[#074ed5]/10 text-[#074ed5] rounded-2xl animate-bounce">
+                      <FaFire size={24} />
+                    </div>
+                    <h4 className="text-base font-black text-[#1A1D23]">
+                      Analyzing {safeData.category} patterns...
+                    </h4>
+                    <p className="text-xs text-slate-400 font-medium">
+                      Injecting proven emotional triggers
+                    </p>
+                  </div>
+                )}
+
+                {/* RESULTS state */}
+                {modalState === "results" && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-black text-[#1A1D23] flex items-center gap-2">
+                        <FaRocket className="text-[#0052FF]" /> 3 Hook
+                        Alternatives
+                      </h3>
+                      <button
+                        onClick={() => setModalState("input")}
+                        className="text-xs font-bold text-[#074ed5] hover:underline"
+                      >
+                        ← Back
+                      </button>
+                    </div>
+                    <div className="flex flex-col gap-3 overflow-y-auto max-h-[60vh] pr-1">
+                      {hookResults.map((hook, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-[#F5F6FA] rounded-2xl border border-slate-100 p-4 flex flex-col gap-2"
+                        >
+                          <span
+                            className={`self-start text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wide ${triggerColors[hook.trigger] ?? "bg-slate-100 text-slate-600"}`}
+                          >
+                            {hook.trigger}
+                          </span>
+                          <p className="text-sm font-black text-[#1A1D23] leading-snug">
+                            {hook.text}
+                          </p>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            <span className="font-semibold text-slate-500">
+                              Why it works:
+                            </span>{" "}
+                            {hook.why}
+                          </p>
+                          <button
+                            onClick={() => handleCopy(hook.text, idx)}
+                            className="self-end flex items-center gap-1.5 text-[11px] font-bold border border-slate-200 rounded-xl px-3 py-1.5 hover:border-[#0052FF] hover:text-[#0052FF] transition-colors"
+                          >
+                            {copiedIndex === idx ? (
+                              <>
+                                <FaCheck size={10} /> Copied
+                              </>
+                            ) : (
+                              "Copy"
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </div>
   );
 };

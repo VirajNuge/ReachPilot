@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PieChart,
@@ -10,7 +11,7 @@ import {
   Tooltip as RechartsTooltip,
 } from "recharts";
 import { BsCollectionFill, BsLightningChargeFill } from "react-icons/bs";
-import { FaMagic, FaArrowRight } from "react-icons/fa";
+import { FaMagic, FaArrowRight, FaChartLine } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 
 // --- Types ---
@@ -36,13 +37,68 @@ interface ContentPillarsProps {
   pillars?: PillarData[];
   aiSummary?: string;
   onGenerateFormula?: () => void;
-  strategyFormula?: string; // New: Detailed formula text
+  strategyFormula?: string;
+}
+
+interface OptimalPillar {
+  name: string;
+  color: string;
+  currentPct: number;
+  idealPct: number;
+  delta: number;
+  engagementScore: number;
 }
 
 // --- Colors & Config ---
-// Strict approved palette
-const COLORS = ["#074ed5", "#caee55", "#000100"];
+const COLORS = ["#0052FF", "#caee55", "#000100"];
 const RADIAN = Math.PI / 180;
+
+// --- Helpers ---
+function parseEngagement(avg: string): number {
+  const lower = avg.toLowerCase();
+  if (lower === "high") return 8;
+  if (lower === "medium") return 5;
+  if (lower === "low") return 2;
+  const num = parseFloat(avg.replace("%", ""));
+  return isNaN(num) ? 3 : num;
+}
+
+function computeOptimalMix(pillars: PillarData[]): OptimalPillar[] {
+  if (!pillars.length) return [];
+  const engScores = pillars.map((p) => parseEngagement(p.avgEngagement));
+  const totalEng = engScores.reduce((a, b) => a + b, 0) || 1;
+  const rawIdeals = engScores.map((s) => (s / totalEng) * 100);
+  // Round to nearest 5
+  let rounded = rawIdeals.map((v) => Math.round(v / 5) * 5);
+  // Normalize to sum = 100
+  const diff = 100 - rounded.reduce((a, b) => a + b, 0);
+  const maxIdx = engScores.indexOf(Math.max(...engScores));
+  rounded[maxIdx] += diff;
+  return pillars.map((p, i) => {
+    const currentPct =
+      p.percentage > 1 ? p.percentage : Math.round(p.percentage * 100);
+    return {
+      name: p.name,
+      color: p.color,
+      currentPct,
+      idealPct: rounded[i],
+      delta: rounded[i] - currentPct,
+      engagementScore: engScores[i],
+    };
+  });
+}
+
+function buildWhyItWorks(optimal: OptimalPillar[]): string {
+  if (!optimal.length) return "";
+  const sorted = [...optimal].sort(
+    (a, b) => b.engagementScore - a.engagementScore
+  );
+  const top = sorted[0];
+  const bottom = sorted[sorted.length - 1];
+  if (top.engagementScore === 0 || bottom.engagementScore === 0) return "";
+  const ratio = (top.engagementScore / bottom.engagementScore).toFixed(1);
+  return `${top.name} drives ${ratio}× more engagement per post than ${bottom.name} — reallocating volume here maximises your ROI without creating more content.`;
+}
 
 const renderCustomizedLabel = ({
   cx,
@@ -51,12 +107,19 @@ const renderCustomizedLabel = ({
   innerRadius,
   outerRadius,
   percent,
-}: any) => {
+}: {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+}) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-  if (percent < 0.05) return null; // Hide if too small
+  if (percent < 0.05) return null;
 
   return (
     <text
@@ -72,16 +135,156 @@ const renderCustomizedLabel = ({
   );
 };
 
+// --- Formula Portal Modal ---
+interface FormulaModalProps {
+  pillars: PillarData[];
+  onClose: () => void;
+}
+
+const FormulaModal: React.FC<FormulaModalProps> = ({ pillars, onClose }) => {
+  const optimal = computeOptimalMix(pillars);
+  const whyItWorks = buildWhyItWorks(optimal);
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{ type: "spring", damping: 28, stiffness: 260 }}
+        className="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden"
+      >
+        {/* Modal Header */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-[#074ed5]/10 text-[#074ed5] rounded-2xl">
+              <FaMagic size={18} />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-[#000100] leading-tight">
+                Your Optimal Content Mix
+              </h3>
+              <p className="text-xs text-slate-500 font-medium">
+                Based on your engagement data — flip your strategy
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors shrink-0"
+          >
+            <IoMdClose size={20} className="text-slate-400" />
+          </button>
+        </div>
+
+        {/* Column Headers */}
+        <div className="px-6 pt-4 pb-2 grid grid-cols-[1fr_80px_80px_72px] gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          <span>Pillar</span>
+          <span className="text-center">Current</span>
+          <span className="text-center">Ideal</span>
+          <span className="text-center">Change</span>
+        </div>
+
+        {/* Pillar Rows */}
+        <div className="px-6 pb-4 flex flex-col gap-2">
+          {optimal.map((item) => (
+            <div
+              key={item.name}
+              className="grid grid-cols-[1fr_80px_80px_72px] gap-2 items-center bg-[#f4f8fb] rounded-2xl px-4 py-3 border border-slate-100"
+            >
+              {/* Name + dot */}
+              <div className="flex items-center gap-2 min-w-0">
+                <div
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="text-sm font-bold text-[#000100] truncate">
+                  {item.name}
+                </span>
+              </div>
+
+              {/* Current % */}
+              <span className="text-sm font-black text-slate-500 text-center">
+                {item.currentPct}%
+              </span>
+
+              {/* Ideal % */}
+              <span className="text-sm font-black text-[#074ed5] text-center">
+                {item.idealPct}%
+              </span>
+
+              {/* Delta badge */}
+              <div className="flex justify-center">
+                <span
+                  className={`text-xs font-black px-2 py-0.5 rounded-xl ${
+                    item.delta > 0
+                      ? "bg-green-100 text-green-700"
+                      : item.delta < 0
+                      ? "bg-red-100 text-red-600"
+                      : "bg-slate-200 text-slate-500"
+                  }`}
+                >
+                  {item.delta > 0 ? `+${item.delta}%` : `${item.delta}%`}
+                </span>
+              </div>
+            </div>
+          ))}
+
+          {optimal.length === 0 && (
+            <p className="text-slate-400 text-sm text-center py-6">
+              Not enough pillar data to compute formula.
+            </p>
+          )}
+        </div>
+
+        {/* Why It Works */}
+        {whyItWorks && (
+          <div className="mx-6 mb-4 bg-[#074ed5]/5 border border-[#074ed5]/15 rounded-2xl p-4 flex items-start gap-3">
+            <FaChartLine
+              className="text-[#074ed5] shrink-0 mt-0.5"
+              size={14}
+            />
+            <div>
+              <p className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest mb-1">
+                Why it works
+              </p>
+              <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                {whyItWorks}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* CTA */}
+        <div className="px-6 pb-6">
+          <button
+            onClick={onClose}
+            className="w-full py-3 bg-[#000100] hover:bg-black text-white rounded-2xl font-black text-sm transition-all active:scale-[0.98]"
+          >
+            Got it!
+          </button>
+        </div>
+      </motion.div>
+    </div>,
+    document.body
+  );
+};
+
+// --- Main Component ---
 const ContentPillars: React.FC<ContentPillarsProps> = ({
   pillars = [],
   aiSummary = "Analyzing strategy...",
   onGenerateFormula,
-  strategyFormula,
 }) => {
   const [activePillar, setActivePillar] = useState<PillarData | null>(null);
   const [showFormulaModal, setShowFormulaModal] = useState(false);
 
-  // Normalize data for chart if not provided
   const chartData = pillars.map((p, i) => ({
     ...p,
     color: p.color || COLORS[i % COLORS.length],
@@ -106,7 +309,6 @@ const ContentPillars: React.FC<ContentPillarsProps> = ({
           </div>
         </div>
 
-        {/* Top Right Icon Badge */}
         <div className="p-2.5 bg-[#074ed5]/10 text-[#074ed5] rounded-2xl shadow-sm shrink-0">
           <BsCollectionFill size={18} />
         </div>
@@ -247,45 +449,17 @@ const ContentPillars: React.FC<ContentPillarsProps> = ({
         </div>
       </div>
 
-      {/* --- Formula Modal --- */}
+      {/* --- Formula Portal Modal --- */}
       <AnimatePresence>
         {showFormulaModal && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute inset-0 z-20 bg-[#000100]/95 backdrop-blur-xl p-8 flex flex-col justify-center items-center text-center rounded-3xl"
-          >
-            <div className="bg-[#074ed5] p-4 rounded-3xl mb-6 shadow-2xl shadow-[#074ed5]/20">
-              <FaMagic size={32} className="text-white" />
-            </div>
-            <h3 className="text-2xl font-black text-white mb-2 tracking-tight">
-              Your "DNA" Formula
-            </h3>
-            <p className="text-slate-200 font-medium text-sm mb-8 max-w-sm">
-              We've analyzed your top performing Content Pillars to create your
-              optimal growth strategy.
-            </p>
-
-            <div className="bg-white/10 border border-white/10 rounded-2xl p-6 mb-8 w-full max-w-md">
-              <p className="text-white text-lg font-medium leading-relaxed">
-                {strategyFormula ||
-                  aiSummary ||
-                  "Focus on Educational content to build authority, mixed with 20% Personal stories."}
-              </p>
-            </div>
-
-            <button
-              onClick={() => setShowFormulaModal(false)}
-              className="px-8 py-3 bg-[#074ed5] text-white rounded-2xl font-black transition-colors hover:bg-opacity-90 active:scale-[0.98]"
-            >
-              Got it!
-            </button>
-          </motion.div>
+          <FormulaModal
+            pillars={chartData}
+            onClose={() => setShowFormulaModal(false)}
+          />
         )}
       </AnimatePresence>
 
-      {/* --- Deep Dive Overlay (Modal) --- */}
+      {/* --- Deep Dive Overlay (stays inside card — slide-up sheet) --- */}
       <AnimatePresence>
         {activePillar && (
           <motion.div
@@ -321,42 +495,52 @@ const ContentPillars: React.FC<ContentPillarsProps> = ({
 
             {/* Posts Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-y-auto pb-4 custom-scroll">
-              {activePillar.topPosts?.map((post) => (
-                <div
-                  key={post.id}
-                  className="group relative aspect-[4/5] bg-[#f4f8fb] rounded-2xl overflow-hidden border border-slate-100 cursor-pointer hover:shadow-md transition-all"
-                >
-                  {/* Thumbnail Placeholder */}
-                  <div className="absolute inset-0 bg-slate-200 flex items-center justify-center text-slate-400">
-                    {post.thumbnail ? (
-                      <img
-                        src={post.thumbnail}
-                        alt="Post"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                        No Image
-                      </span>
-                    )}
+              {activePillar.topPosts?.map((post) =>
+                post.thumbnail ? (
+                  // Image card — full aspect-ratio design
+                  <div
+                    key={post.id}
+                    className="group relative aspect-[4/5] bg-[#f4f8fb] rounded-2xl overflow-hidden border border-slate-100 cursor-pointer hover:shadow-md transition-all"
+                  >
+                    <img
+                      src={post.thumbnail}
+                      alt="Post"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#000100]/90 via-[#000100]/40 to-transparent flex flex-col justify-end p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold bg-white/20 backdrop-blur-md text-white px-2 py-0.5 rounded-xl border border-white/10">
+                          {post.type}
+                        </span>
+                        <span className="text-xs font-black text-[#caee55] flex items-center gap-1">
+                          <BsLightningChargeFill /> {post.engagementRate}
+                        </span>
+                      </div>
+                      <p className="text-xs text-white/90 line-clamp-2 font-medium leading-relaxed">
+                        {post.captionSnippet}
+                      </p>
+                    </div>
                   </div>
-
-                  {/* Overlay Info */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#000100]/90 via-[#000100]/40 to-transparent opacity-100 flex flex-col justify-end p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold bg-white/20 backdrop-blur-md text-white px-2 py-0.5 rounded-xl border border-white/10">
+                ) : (
+                  // Text-only card — no image container
+                  <div
+                    key={post.id}
+                    className="bg-[#f4f8fb] rounded-2xl border border-slate-100 p-4 flex flex-col gap-3 cursor-pointer hover:shadow-md transition-all hover:border-slate-200"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-xl">
                         {post.type}
                       </span>
-                      <span className="text-xs font-black text-[#caee55] flex items-center gap-1">
+                      <span className="text-xs font-black text-[#074ed5] flex items-center gap-1">
                         <BsLightningChargeFill /> {post.engagementRate}
                       </span>
                     </div>
-                    <p className="text-xs text-white/90 line-clamp-2 font-medium leading-relaxed">
+                    <p className="text-sm text-[#1A1D23] font-medium leading-relaxed">
                       {post.captionSnippet}
                     </p>
                   </div>
-                </div>
-              ))}
+                )
+              )}
               {(!activePillar.topPosts ||
                 activePillar.topPosts.length === 0) && (
                 <div className="col-span-3 text-center py-10 text-slate-400 font-medium">

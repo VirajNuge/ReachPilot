@@ -86,8 +86,7 @@ REQUIREMENTS:
 
 3. **profile.followers**: Use the REAL follower count from the scraped profile info: ${profile.followers || "Unknown"}. If unknown, estimate from engagement.
 
-4. **quickFixes**: Generate 6-8 ${platformName}-specific fixes. IMPORTANT: Sort by impact — HIGH IMPACT fixes MUST come first.
-   The first 3 items will be displayed in the "Triage Station" on the Pulse Overview.
+4. **quickFixes**: Generate exactly 10 ${platformName}-specific fixes. IMPORTANT: Sort by impact — HIGH IMPACT fixes MUST come first.
     - headline: Short punchy title (max 5 words).
     - description: One sentence calculation of impact (e.g. "Fixing this could add 200 followers/mo").
     - tag: "HIGH IMPACT", "MEDIUM IMPACT", or "LOW IMPACT".
@@ -436,13 +435,14 @@ REQUIREMENTS:
     - peakHour: The hour with most engagement on that day (e.g. "9 AM")
     - trend: "Rising" (engagement up vs prev week), "Flat", or "Dropping"
 
-36. **engagementVitals**: Medical-style engagement vitals for the Pulse Overview.
-    - engagementRate: Actual average engagement rate % from the scraped data.
-    - benchmarkRate: Platform average engagement rate % (use PLATFORM_BENCHMARKS).
-    - reachEfficiency: 0-100 score (how well posts reach beyond followers).
-    - interactionRatio: Avg likes ÷ avg comments (e.g. 15.3).
-    - status: "Healthy" if engagementRate > benchmarkRate, "Warning" if within 50%, "Critical" if below 50%.
-    - insight: One sentence explaining the most important engagement finding.
+36. **engagementVitals**: Medical-style engagement vitals for the Pulse Overview. Use the formulas below — these are algorithmic signals, not simple averages.
+    - engagementRate: Actual average engagement rate % from scraped data. Formula: (totalLikes + totalReplies + totalRetweets) / totalViews * 100. Round to 2 decimal places.
+    - benchmarkRate: Platform average engagement rate % (use PLATFORM_BENCHMARKS for the relevant platform).
+    - reachEfficiency: "Discovery Ratio" — how well content breaks out of the follower bubble. Formula: use (totalViews / followers) * 100 as a proxy, clamped 0–100. A score of 100 means every follower saw the content; above 100 means non-followers are discovering it (cap at 100). Thresholds: Healthy >70, Warning 40–70, Critical <40.
+    - conversationDensity: Quality-of-engagement metric. Formula: (totalComments / totalEngagements) * 100, where totalEngagements = totalLikes + totalReplies + totalRetweets. Round to 1 decimal place. Thresholds: Healthy >10 (high-intent audience), Warning 2–10 (standard), Critical <2 (surface-level / bot-like likes).
+    - amplificationPower: Virality signal. Formula: (totalRetweets / totalViews) * 100 (use retweets as shares proxy for Twitter/X; for other platforms use shares + saves if available). Round to 2 decimal places. Thresholds: Healthy >2 (strong amplification), Warning 0.5–2 (moderate), Critical <0.5 (low virality).
+    - status: Overall status for the Engagement Rate vital specifically. "Healthy" if engagementRate >= benchmarkRate, "Warning" if engagementRate is 50–99% of benchmarkRate, "Critical" if engagementRate < 50% of benchmarkRate.
+    - insight: One sentence explaining the single most actionable engagement finding based on all four vitals combined.
 
 37. **audienceTemperature**: Audience heat level for the Pulse Overview.
     - tempScore: 0-100. Formula: (fanboyPercent * 1.0) + (seekerPercent * 0.5) - (criticPercent * 1.5). Clamp 0-100.

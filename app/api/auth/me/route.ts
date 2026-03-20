@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { getAuthFromCookies } from "../../../../lib/auth";
-import { getUserById } from "../../../../lib/models/user";
 
 export async function GET() {
   try {
@@ -9,12 +8,19 @@ export async function GET() {
       return NextResponse.json({ user: null }, { status: 401 });
     }
 
-    const user = await getUserById(auth.userId);
-    if (!user) {
-      return NextResponse.json({ user: null }, { status: 401 });
-    }
-
-    return NextResponse.json({ user }, { status: 200 });
+    // All user fields are embedded in the JWT — no DB lookup needed.
+    return NextResponse.json(
+      {
+        user: {
+          id: auth.userId,
+          username: auth.username,
+          email: auth.email,
+          firstName: auth.firstName,
+          lastName: auth.lastName,
+        },
+      },
+      { status: 200 }
+    );
   } catch {
     return NextResponse.json({ user: null }, { status: 401 });
   }

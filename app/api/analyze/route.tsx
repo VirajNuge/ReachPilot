@@ -142,8 +142,35 @@ export async function POST(req: Request) {
       Strictly follow the JSON schema.
     `;
 
-    const result = await model.generateContent(prompt);
-    return NextResponse.json(JSON.parse(result.response.text()));
+    // Stream the response so the client gets data as it arrives instead of
+    // waiting for the full generation to complete.
+    const streamResult = await model.generateContentStream(prompt);
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        try {
+          for await (const chunk of streamResult.stream) {
+            const text = chunk.text();
+            if (text) {
+              controller.enqueue(encoder.encode(text));
+            }
+          }
+        } catch (err) {
+          controller.error(err);
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json(

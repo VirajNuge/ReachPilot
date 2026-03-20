@@ -115,7 +115,8 @@ export async function POST(req: Request) {
 
     console.log(`[analyze-extension] Sending 3 parallel requests to Gemini...`);
 
-    // 6. Execute Parallel Requests
+    // 6. Execute Parallel Requests — collect full text then merge
+    // (streaming the merge of 3 JSON blobs requires the full text anyway)
     const [coreResult, audienceResult, strategyResult] = await Promise.all([
       coreModel.generateContent(prompt),
       audienceModel.generateContent(prompt),
@@ -159,16 +160,30 @@ export async function POST(req: Request) {
       timestamp: Date.now(),
     };
 
-    // Write to file for persistence
-    await fs.writeFile(CACHE_FILE_PATH, JSON.stringify(cacheData, null, 2));
-
-    return NextResponse.json(
-      {
-        success: true,
-        ...cacheData,
-      },
-      { headers: corsHeaders },
+    // Write to file for persistence (non-blocking — don't await)
+    fs.writeFile(CACHE_FILE_PATH, JSON.stringify(cacheData, null, 2)).catch(
+      (err) => console.error("[analyze-extension] Cache write failed:", err),
     );
+
+    // Stream the final merged JSON so the browser starts receiving data
+    // immediately rather than waiting for the cache write.
+    const encoder = new TextEncoder();
+    const responseBody = JSON.stringify({ success: true, ...cacheData });
+
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(responseBody));
+        controller.close();
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "Transfer-Encoding": "chunked",
+      },
+    });
   } catch (error: any) {
     console.error("[analyze-extension] Error:", error);
 

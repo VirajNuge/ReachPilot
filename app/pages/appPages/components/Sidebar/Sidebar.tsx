@@ -256,13 +256,13 @@ const Sidebar = () => {
             <div className="ml-5 mt-1 border-l-2 border-slate-200/50 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
               {/* Keep a few links for brevity */}
               <Link
-                href="/crm-pipeline"
+                href={`/${accountId}/crm-pipeline`}
                 className={`${subLinkBase} ${isActive("crm-pipeline") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
                 CRM Pipeline
               </Link>
               <Link
-                href="/client-workspace"
+                href={`/${accountId}/client-workspace`}
                 className={`${subLinkBase} ${isActive("client-workspace") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
               >
                 Client Workspace

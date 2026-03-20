@@ -193,12 +193,12 @@ export default function GrowthCommand({
                       >
                         <stop
                           offset="5%"
-                          stopColor="#074ed5"
+                          stopColor="#0052FF"
                           stopOpacity={0.25}
                         />
                         <stop
                           offset="95%"
-                          stopColor="#074ed5"
+                          stopColor="#0052FF"
                           stopOpacity={0}
                         />
                       </linearGradient>
@@ -224,7 +224,7 @@ export default function GrowthCommand({
                     <Area
                       type="monotone"
                       dataKey="value"
-                      stroke="#074ed5"
+                      stroke="#0052FF"
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorValue)"
@@ -238,7 +238,7 @@ export default function GrowthCommand({
       </div>
 
       {/* Middle Row: Content Disruptor (Weekly Plan) */}
-      <div className="col-span-12 h-full">
+      <div className="w-full h-full">
         <ContentDisruptor disruptor={disruptor!} />
       </div>
 

@@ -118,9 +118,9 @@ export default function CTACommand({ data: apiData }: CTACommandProps) {
               <Radar
                 name="CTA Mix"
                 dataKey="score"
-                stroke="#074ed5"
+                stroke="#0052FF"
                 strokeWidth={2}
-                fill="#074ed5"
+                fill="#0052FF"
                 fillOpacity={0.15}
               />
             </RadarChart>

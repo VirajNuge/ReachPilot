@@ -62,10 +62,6 @@ export async function createUser(data: {
 
   const result = await col.insertOne(doc);
 
-  // Ensure indexes
-  await col.createIndex({ username: 1 }, { unique: true });
-  await col.createIndex({ email: 1 }, { unique: true });
-
   return {
     id: result.insertedId.toString(),
     username: doc.username,

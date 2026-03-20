@@ -29,12 +29,7 @@ function getRandomColor(): string {
 
 async function getCollection() {
   const { db } = await connectToDatabase();
-  const collection = db.collection<AccountDocument>('accounts');
-  
-  // Ensure index on userId
-  await collection.createIndex({ userId: 1 });
-  
-  return collection;
+  return db.collection<AccountDocument>('accounts');
 }
 
 export async function createAccount(userId: string, name: string): Promise<AccountDocument> {

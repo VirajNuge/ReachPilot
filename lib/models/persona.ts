@@ -122,8 +122,6 @@ export async function upsertPersona(
   };
 
   const result = await col.insertOne(doc);
-  // Ensure indexes
-  await col.createIndex({ userId: 1, accountId: 1 });
   return { id: result.insertedId.toString(), updated: false };
 }
 

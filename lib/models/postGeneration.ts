@@ -33,7 +33,6 @@ export async function createPostGeneration(
   };
 
   const result = await col.insertOne(doc);
-  await col.createIndex({ userId: 1, createdAt: -1 });
   return result.insertedId.toString();
 }
 
@@ -126,7 +125,6 @@ export async function saveBrandStyle(
     createdAt: new Date(),
   };
   const result = await col.insertOne(doc);
-  await col.createIndex({ userId: 1 });
   return result.insertedId.toString();
 }
 

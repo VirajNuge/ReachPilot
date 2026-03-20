@@ -17,14 +17,24 @@ export function useAnalysisData(initialData?: any): UseAnalysisResult {
     setLoading(true);
     setError(null);
     try {
-      // In a real scenario, we might pass an ID or rely on session/cookies
-      // For the analyzer extension flow, we might need to poll or fetch the latest
+      // The GET endpoint returns the cached analysis written by the extension.
+      // It always responds with a complete JSON body (not a stream), so we use
+      // response.json() here. The POST /api/analyze endpoint uses streaming but
+      // is not called from this hook.
       const response = await fetch("/api/analyze-extension");
+
       interface ApiResponse {
         success: boolean;
         analysis: RawAnalysisData;
         error?: string;
       }
+
+      if (!response.ok) {
+        const result: ApiResponse = await response.json();
+        setError(result.error || "Failed to fetch analysis data");
+        return;
+      }
+
       const result: ApiResponse = await response.json();
 
       if (result.success && result.analysis) {

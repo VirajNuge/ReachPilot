@@ -8,14 +8,17 @@ interface TriageStationProps {
   fixes: RawAnalysisData["quickFixes"];
 }
 
-export default function TriageStation({ fixes }: TriageStationProps) {
-  // Only show top 3 HIGH IMPACT fixes
-  const highImpactFixes =
-    fixes?.filter((f: any) => f.tag === "HIGH IMPACT").slice(0, 3) || [];
+const TAG_ORDER: Record<string, number> = {
+  "HIGH IMPACT": 0,
+  "MEDIUM IMPACT": 1,
+  "LOW IMPACT": 2,
+};
 
-  // Fallback if no high impact fixes
-  const displayFixes =
-    highImpactFixes.length > 0 ? highImpactFixes : fixes?.slice(0, 3) || [];
+export default function TriageStation({ fixes }: TriageStationProps) {
+  // Show all fixes, sorted: HIGH IMPACT → MEDIUM IMPACT → LOW IMPACT
+  const displayFixes = [...(fixes || [])].sort(
+    (a, b) => (TAG_ORDER[a.tag] ?? 3) - (TAG_ORDER[b.tag] ?? 3),
+  );
 
   const [completed, setCompleted] = useState<number[]>([]);
 
@@ -28,9 +31,9 @@ export default function TriageStation({ fixes }: TriageStationProps) {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col">
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-5 h-full flex flex-col min-h-0">
       {/* Header */}
-      <div className="mb-5">
+      <div className="mb-3 shrink-0">
         <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
           Optimization
         </h3>
@@ -44,46 +47,46 @@ export default function TriageStation({ fixes }: TriageStationProps) {
         </div>
       </div>
 
-      {/* Fix Items List */}
-      <div className="space-y-3 mt-5 flex-1">
+      {/* Scrollable Fix Items List */}
+      <div className="space-y-2.5 overflow-y-auto flex-1 min-h-0 pr-1">
         {displayFixes.map((fix: any, i: number) => {
           const isDone = completed.includes(i);
           return (
             <div
               key={i}
               onClick={() => toggleComplete(i)}
-              className={`group bg-[#F5F6FA] rounded-2xl border p-4 transition-all duration-200 cursor-pointer ${
+              className={`group bg-[#F5F6FA] rounded-2xl border p-3 transition-all duration-200 cursor-pointer ${
                 isDone
                   ? "border-slate-100 opacity-50"
                   : "border-slate-100 hover:border-[#0052FF]/30 hover:shadow-[0_2px_12px_rgba(0,82,255,0.07)]"
               }`}
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-2.5">
                 {/* Item Number Circle */}
                 <div
-                  className={`w-7 h-7 rounded-full text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+                  className={`w-6 h-6 rounded-full text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
                     isDone
                       ? "bg-emerald-500 text-white"
                       : "bg-[#0052FF] text-white"
                   }`}
                 >
-                  {isDone ? <FaCheck size={10} /> : i + 1}
+                  {isDone ? <FaCheck size={9} /> : i + 1}
                 </div>
 
                 {/* Content column */}
                 <div className="flex-1 min-w-0">
                   {/* Tags row */}
-                  <div className="flex flex-wrap gap-1.5 mb-1.5">
+                  <div className="flex flex-wrap gap-1 mb-1">
                     {fix.tag === "HIGH IMPACT" ? (
-                      <span className="bg-[#0052FF] text-white font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                      <span className="bg-[#0052FF] text-white font-bold text-[10px] px-2 py-0.5 rounded-full">
                         HIGH IMPACT
                       </span>
                     ) : fix.tag === "MEDIUM IMPACT" ? (
-                      <span className="bg-[#F0FFF4] text-[#22C55E] font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                      <span className="bg-[#F0FFF4] text-[#22C55E] font-bold text-[10px] px-2 py-0.5 rounded-full">
                         QUICK WIN
                       </span>
                     ) : (
-                      <span className="bg-slate-200 text-slate-600 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                      <span className="bg-slate-200 text-slate-600 font-bold text-[10px] px-2 py-0.5 rounded-full">
                         {fix.tag}
                       </span>
                     )}
@@ -91,11 +94,11 @@ export default function TriageStation({ fixes }: TriageStationProps) {
 
                   {/* Title & Description */}
                   <h4
-                    className={`text-sm font-black leading-snug ${isDone ? "text-slate-500 line-through" : "text-[#1A1D23]"}`}
+                    className={`text-xs font-black leading-snug ${isDone ? "text-slate-500 line-through" : "text-[#1A1D23]"}`}
                   >
                     {fix.headline}
                   </h4>
-                  <p className="text-xs text-slate-500 font-medium leading-relaxed mt-0.5">
+                  <p className="text-[11px] text-slate-500 font-medium leading-relaxed mt-0.5">
                     {fix.description}
                   </p>
                 </div>

@@ -2,19 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { RawAnalysisData } from "../../../../../lib/types/analysis";
+import { computePulseScore } from "../../../../../lib/pulseScore";
 
 interface PulseScoreProps {
   data: RawAnalysisData;
 }
 
 export default function PulseScore({ data }: PulseScoreProps) {
-  const profileHealth = data.profile?.profileScore ?? 58;
-  const contentFitness = data.csiScore ?? 65;
-  const engagementPower = data.contentMetrics?.engagementScore ?? 35;
-
-  const totalScore = Math.round(
-    profileHealth * 0.2 + contentFitness * 0.4 + engagementPower * 0.4,
-  );
+  const { totalScore, breakdown, grade } = computePulseScore(data);
+  const { profileHealth, contentFitness, engagementPower, audienceWarmth, growthMomentum } = breakdown;
+  const { label: gradeLabel, color: gradeColor } = grade;
 
   const [animated, setAnimated] = useState(false);
 
@@ -22,17 +19,6 @@ export default function PulseScore({ data }: PulseScoreProps) {
     const timer = setTimeout(() => setAnimated(true), 400);
     return () => clearTimeout(timer);
   }, []);
-
-  const getGrade = (s: number) => {
-    if (s >= 90) return { label: "S", color: "#B6FF33" }; // lime — top tier
-    if (s >= 80) return { label: "A", color: "#0052FF" }; // blue — strong
-    if (s >= 65) return { label: "B", color: "#0052FF" }; // blue — good
-    if (s >= 50) return { label: "C", color: "#1A1D23" }; // dark — average
-    if (s >= 35) return { label: "D", color: "#EF4444" }; // red — weak
-    return { label: "F", color: "#EF4444" }; // red — fail
-  };
-
-  const { label: gradeLabel, color: gradeColor } = getGrade(totalScore);
 
   const segments = [
     {
@@ -56,9 +42,23 @@ export default function PulseScore({ data }: PulseScoreProps) {
       color: "#1A1D23",
       bg: "bg-[#1A1D23]",
     },
+    {
+      label: "Audience",
+      short: "Audience",
+      value: audienceWarmth,
+      color: "#6366F1",
+      bg: "bg-[#6366F1]",
+    },
+    {
+      label: "Growth",
+      short: "Growth",
+      value: growthMomentum,
+      color: "#22C55E",
+      bg: "bg-[#22C55E]",
+    },
   ];
 
-  const totalBarWeight = profileHealth + contentFitness + engagementPower || 1;
+  const totalBarWeight = segments.reduce((sum, s) => sum + s.value, 0) || 1;
 
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 flex flex-col">
@@ -71,7 +71,7 @@ export default function PulseScore({ data }: PulseScoreProps) {
           <h3 className="text-xl font-black text-[#1A1D23]">Overall Grade</h3>
         </div>
 
-        {/* Grade Badge — matches blue icon badge in reference */}
+        {/* Grade Badge */}
         <div
           className="flex flex-col items-center justify-center w-12 h-12 rounded-2xl shrink-0"
           style={{
@@ -99,11 +99,11 @@ export default function PulseScore({ data }: PulseScoreProps) {
         <span className="text-lg text-slate-400 font-medium">/100</span>
       </div>
 
-      {/* Segment percentages above bar — like HR reference */}
-      <div className="flex items-end justify-between mb-1.5 px-0.5">
+      {/* Segment percentages above bar */}
+      <div className="flex items-end justify-between mb-1.5 px-0.5 flex-wrap gap-y-1">
         {segments.map((seg, i) => (
           <span key={i} className="text-xs font-black text-[#1A1D23]">
-            {Math.round((seg.value / totalBarWeight) * 100)}%
+            {seg.value}/100
           </span>
         ))}
       </div>
@@ -115,7 +115,9 @@ export default function PulseScore({ data }: PulseScoreProps) {
             key={i}
             className="h-full rounded-full transition-all duration-1000 ease-out"
             style={{
-              width: animated ? `${(seg.value / totalBarWeight) * 100}%` : "0%",
+              width: animated
+                ? `${(seg.value / totalBarWeight) * 100}%`
+                : "0%",
               backgroundColor: seg.color,
               transitionDelay: `${i * 200}ms`,
             }}

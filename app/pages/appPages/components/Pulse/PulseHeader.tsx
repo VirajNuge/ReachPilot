@@ -40,8 +40,10 @@ export default function PulseHeader({
                 </div>
               )}
             </div>
-            {/* Online dot */}
-            <div className="absolute bottom-1 right-1 w-4 h-4 bg-[#0052FF] border-2 border-white rounded-full" />
+            {/* Online dot — only shown when profile has a pfp (i.e., a real scraped profile) */}
+            {profile.pfp && (
+              <div className="absolute bottom-1 right-1 w-4 h-4 bg-[#22C55E] border-2 border-white rounded-full" />
+            )}
           </div>
 
           <div className="flex-1 pb-1">

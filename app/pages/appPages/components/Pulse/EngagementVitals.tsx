@@ -1,15 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  EngagementVitals,
-  RawAnalysisData,
-} from "../../../../../lib/types/analysis";
-import { FaHeartbeat, FaChartLine, FaExchangeAlt } from "react-icons/fa";
+import { EngagementVitals } from "../../../../../lib/types/analysis";
+import { FaHeartbeat, FaChartLine, FaComments, FaBolt } from "react-icons/fa";
 
 interface EngagementVitalsProps {
   data: EngagementVitals;
-  contentMetrics: RawAnalysisData["contentMetrics"];
 }
 
 interface VitalCardProps {
@@ -19,6 +15,8 @@ interface VitalCardProps {
   status: "Healthy" | "Warning" | "Critical";
   icon: React.ReactNode;
   delay: number;
+  /** Progress bar fill 0–100 */
+  progress: number;
 }
 
 const VitalCard = ({
@@ -28,6 +26,7 @@ const VitalCard = ({
   status,
   icon,
   delay,
+  progress,
 }: VitalCardProps) => {
   const [show, setShow] = useState(false);
 
@@ -99,19 +98,34 @@ const VitalCard = ({
         <div
           className={`h-full rounded-full ${barFillColors[status]} transition-all duration-1000 ease-out`}
           style={{
-            width: show
-              ? status === "Healthy"
-                ? "80%"
-                : status === "Warning"
-                  ? "50%"
-                  : "25%"
-              : "0%",
+            width: show ? `${Math.min(100, Math.max(0, progress))}%` : "0%",
           }}
         />
       </div>
     </div>
   );
 };
+
+/** Reach Efficiency (Discovery Ratio) status: >70 Healthy, 40–70 Warning, <40 Critical */
+function reachEfficiencyStatus(score: number): "Healthy" | "Warning" | "Critical" {
+  if (score > 70) return "Healthy";
+  if (score >= 40) return "Warning";
+  return "Critical";
+}
+
+/** Conversation Density status: >10% Healthy, 2–10% Warning, <2% Critical */
+function conversationDensityStatus(pct: number): "Healthy" | "Warning" | "Critical" {
+  if (pct > 10) return "Healthy";
+  if (pct >= 2) return "Warning";
+  return "Critical";
+}
+
+/** Amplification Power status: >2% Healthy, 0.5–2% Warning, <0.5% Critical */
+function amplificationPowerStatus(pct: number): "Healthy" | "Warning" | "Critical" {
+  if (pct > 2) return "Healthy";
+  if (pct >= 0.5) return "Warning";
+  return "Critical";
+}
 
 export default function EngagementVitalsPanel({ data }: EngagementVitalsProps) {
   if (!data) return null;
@@ -127,40 +141,52 @@ export default function EngagementVitalsPanel({ data }: EngagementVitalsProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 1. Engagement Rate — vs platform benchmark */}
         <VitalCard
           title="Engagement Rate"
-          value={`${data.engagementRate}%`}
-          subValue={`vs ${data.benchmarkRate}% avg`}
-          status={data.status}
+          value={`${data.engagementRate ?? 0}%`}
+          subValue={`vs ${data.benchmarkRate ?? 0}% avg`}
+          status={data.status ?? "Warning"}
           icon={<FaHeartbeat className="text-sm" />}
           delay={0}
+          // Progress: scale relative to 2× the benchmark so healthy ER fills the bar nicely
+          progress={Math.min(100, ((data.engagementRate ?? 0) / Math.max((data.benchmarkRate ?? 1) * 2, 0.01)) * 100)}
         />
+
+        {/* 2. Reach Efficiency — Discovery Ratio 0–100 */}
         <VitalCard
           title="Reach Efficiency"
-          value={data.reachEfficiency.toString()}
+          value={`${data.reachEfficiency ?? 0}`}
           subValue="/ 100"
-          status={
-            data.reachEfficiency > 75
-              ? "Healthy"
-              : data.reachEfficiency > 50
-                ? "Warning"
-                : "Critical"
-          }
+          status={reachEfficiencyStatus(data.reachEfficiency ?? 0)}
           icon={<FaChartLine className="text-sm" />}
           delay={150}
+          progress={data.reachEfficiency ?? 0}
         />
+
+        {/* 3. Conversation Density — comments / total engagements % */}
         <VitalCard
-          title="Interaction Ratio"
-          value={data.interactionRatio.toFixed(1)}
-          subValue="Likes per Comment"
-          status={
-            data.interactionRatio < 20 && data.interactionRatio > 5
-              ? "Healthy"
-              : "Warning"
-          }
-          icon={<FaExchangeAlt className="text-sm" />}
+          title="Conversation Density"
+          value={`${(data.conversationDensity ?? 0).toFixed(1)}%`}
+          subValue="of engagements"
+          status={conversationDensityStatus(data.conversationDensity ?? 0)}
+          icon={<FaComments className="text-sm" />}
           delay={300}
+          // Progress: 20% density = full bar (>10% is already Healthy, so 20 gives headroom)
+          progress={Math.min(100, ((data.conversationDensity ?? 0) / 20) * 100)}
+        />
+
+        {/* 4. Amplification Power — shares+saves / reach % */}
+        <VitalCard
+          title="Amplification Power"
+          value={`${(data.amplificationPower ?? 0).toFixed(2)}%`}
+          subValue="of reach shared"
+          status={amplificationPowerStatus(data.amplificationPower ?? 0)}
+          icon={<FaBolt className="text-sm" />}
+          delay={450}
+          // Progress: 5% amplification = full bar (>2% is Healthy)
+          progress={Math.min(100, ((data.amplificationPower ?? 0) / 5) * 100)}
         />
       </div>
     </div>

@@ -1,14 +1,28 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { HeartbeatDay } from "../../../../../lib/types/analysis";
 
 interface HeartbeatChartProps {
   data: HeartbeatDay[];
 }
 
+interface TooltipState {
+  visible: boolean;
+  x: number;
+  y: number;
+  label: string;
+}
+
 export default function HeartbeatChart({ data }: HeartbeatChartProps) {
   const [mounted, setMounted] = useState(false);
+  const [tooltip, setTooltip] = useState<TooltipState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    label: "",
+  });
+  const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -47,8 +61,57 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
         ? "#EF4444"
         : "#1A1D23";
 
+  const handlePointMouseEnter = (
+    e: React.MouseEvent<SVGCircleElement>,
+    d: HeartbeatDay,
+    svgX: number,
+    svgY: number,
+  ) => {
+    const svgEl = svgRef.current;
+    if (!svgEl) return;
+    const rect = svgEl.getBoundingClientRect();
+    // Convert SVG coordinate to % of SVG dimensions for positioning
+    const pctX = svgX / width;
+    const pctY = svgY / height;
+    const pixX = rect.left + pctX * rect.width;
+    const pixY = rect.top + pctY * rect.height;
+    setTooltip({
+      visible: true,
+      x: pixX,
+      y: pixY,
+      label: `${d.day}: ${d.postsCount} post${d.postsCount !== 1 ? "s" : ""}`,
+    });
+  };
+
+  const handlePointMouseLeave = () => {
+    setTooltip((prev) => ({ ...prev, visible: false }));
+  };
+
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 relative overflow-hidden">
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 relative overflow-visible">
+      {/* React-portal-style tooltip — rendered in DOM above SVG */}
+      {tooltip.visible && (
+        <div
+          className="fixed z-50 bg-[#1A1D23] text-white text-xs px-2.5 py-1.5 rounded-xl shadow-xl pointer-events-none whitespace-nowrap"
+          style={{
+            left: tooltip.x,
+            top: tooltip.y - 44,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {tooltip.label}
+          {/* Arrow */}
+          <div
+            className="absolute left-1/2 -bottom-1.5 -translate-x-1/2 w-0 h-0"
+            style={{
+              borderLeft: "5px solid transparent",
+              borderRight: "5px solid transparent",
+              borderTop: "6px solid #1A1D23",
+            }}
+          />
+        </div>
+      )}
+
       <div className="flex justify-between items-start mb-6">
         <div>
           <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
@@ -77,6 +140,7 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
       {/* Chart Container */}
       <div className="relative h-[120px] w-full">
         <svg
+          ref={svgRef}
           viewBox={`0 0 ${width} ${height}`}
           className="w-full h-full overflow-visible"
           preserveAspectRatio="none"
@@ -103,7 +167,6 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={mounted ? "animate-draw" : ""}
             style={{
               strokeDasharray: 3000,
               strokeDashoffset: mounted ? 0 : 3000,
@@ -111,7 +174,7 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
             }}
           />
 
-          {/* Points */}
+          {/* Points with React-driven tooltips */}
           {data.map((d, i) => {
             const x = (i / (data.length - 1)) * (width - padding * 2) + padding;
             const y =
@@ -119,29 +182,18 @@ export default function HeartbeatChart({ data }: HeartbeatChartProps) {
               (d.activityScore / maxScore) * (height - padding * 2) -
               padding;
             return (
-              <g key={i} className="group">
-                <circle
-                  cx={x}
-                  cy={y}
-                  r="6"
-                  fill="white"
-                  stroke={trendColor}
-                  strokeWidth="3"
-                  className="transition-all duration-300 group-hover:r-8"
-                />
-                {/* Tooltip */}
-                <foreignObject
-                  x={x - 40}
-                  y={y - 50}
-                  width="80"
-                  height="40"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-                >
-                  <div className="bg-[#1A1D23] text-white text-xs px-2.5 py-1.5 rounded-xl text-center shadow-xl w-max mx-auto">
-                    {d.day}: {d.postsCount} posts
-                  </div>
-                </foreignObject>
-              </g>
+              <circle
+                key={i}
+                cx={x}
+                cy={y}
+                r="8"
+                fill="white"
+                stroke={trendColor}
+                strokeWidth="3"
+                className="cursor-pointer transition-all duration-200 hover:r-10"
+                onMouseEnter={(e) => handlePointMouseEnter(e, d, x, y)}
+                onMouseLeave={handlePointMouseLeave}
+              />
             );
           })}
         </svg>

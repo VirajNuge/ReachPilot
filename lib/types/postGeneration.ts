@@ -440,6 +440,13 @@ export interface PostGenerationInput {
   linkedInStyleProfile?: LinkedInStyleProfile;
   linkedInPersonalAngle?: string;
   linkedInKeyPoints?: string[];
+
+  // Writing Style & Template Selection
+  writingStyleId?: string;
+  selectedTemplateId?: string;
+
+  // Visual Style Preset Selection
+  visualStylePresetId?: string;
 }
 
 // --- AI Pipeline Output Types ---
@@ -465,6 +472,14 @@ export interface CaptionGeneratorOutput {
     niche: string[];
     branded: string[];
   };
+}
+
+export interface CaptionGeneratorResponse {
+  captions: CaptionGeneratorOutput;
+  usedTemplateId?: string;
+  usedTemplateName?: string;
+  templateAutoSelected?: boolean;
+  templateAICurated?: boolean;
 }
 
 export interface ImagePromptOutput {

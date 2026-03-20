@@ -10,6 +10,8 @@ import type {
   RemixStyle,
   InstagramPostType,
 } from "../types/postGeneration";
+import type { WritingStyleDocument } from "./models/adminStyles";
+import type { CaptionTemplateDocument } from "./models/captionTemplates";
 import {
   PLATFORM_INTELLIGENCE as PLATFORMS,
   POST_OBJECTIVE_LABELS,
@@ -151,7 +153,9 @@ Rules:
 export function buildCaptionGeneratorPrompt(
   input: PostGenerationInput,
   strategy: ContentStrategyOutput,
-  personaContext?: string
+  personaContext?: string,
+  writingStyle?: WritingStyleDocument,
+  dbTemplate?: CaptionTemplateDocument,
 ): string {
   const sections: string[] = [];
 
@@ -175,17 +179,61 @@ ${strategy.talkingPoints.map((p) => `  • ${p}`).join("\n")}`);
 - Emoji Level: ${input.emojiLevel}
 - Hashtag Intensity: ${input.hashtagIntensity}`);
 
-  // Inject caption template framework from Creative Director
-  const creativeProfile = resolveCreativeProfile(input);
-  const primaryPlatform = input.platforms[0] ?? "instagram_post";
-  const captionTemplateBlock = buildCaptionTemplateInstructions(
-    creativeProfile.captionStyle,
-    primaryPlatform,
-    input.objective,
-    input.niche,
-  );
-  if (captionTemplateBlock) {
-    sections.push(captionTemplateBlock);
+  // Inject writing style from DB if provided
+  if (writingStyle) {
+    const tp = writingStyle.toneProfile;
+    const toneParts: string[] = [];
+    if (tp.formalCasual > 60) toneParts.push("casual and conversational");
+    else if (tp.formalCasual < 40) toneParts.push("formal and professional");
+    else toneParts.push("balanced register");
+    if (tp.seriousPlayful > 60) toneParts.push("playful and fun");
+    else if (tp.seriousPlayful < 40) toneParts.push("serious and focused");
+    if (tp.inspiringInformative > 60) toneParts.push("informative and data-driven");
+    else if (tp.inspiringInformative < 40) toneParts.push("inspiring and emotional");
+    if (tp.dataDriven > 60) toneParts.push("data-driven with stats and proof");
+    const toneDesc = toneParts.filter(Boolean).join(", ");
+
+    const styleLines: string[] = [
+      `## WRITING STYLE: ${writingStyle.name.toUpperCase()}`,
+      writingStyle.description,
+      ``,
+      `Tone Profile: ${toneDesc || "balanced"}`,
+      `Sentence Length: ${writingStyle.sentenceLength.join(", ")} sentences`,
+      `Emoji Usage: ${writingStyle.emojiUsage}`,
+      `Hashtag Intensity: ${writingStyle.hashtagIntensity}`,
+    ];
+    if (writingStyle.ctas?.length) {
+      styleLines.push(`Preferred CTAs: ${writingStyle.ctas.join(", ")}`);
+    }
+    if (writingStyle.examplePost) {
+      styleLines.push(``, `Example post in this style:`, `"""`, writingStyle.examplePost, `"""`);
+    }
+    styleLines.push(``, `IMPORTANT: Apply this writing style to ALL platform captions. Override generic tone guidance with the style above.`);
+    sections.push(styleLines.join("\n"));
+  }
+
+  // Inject caption template — DB template takes priority over in-code templates
+  if (dbTemplate) {
+    const primaryPlatform = input.platforms[0] ?? "instagram_post";
+    const variant =
+      dbTemplate.platformVariants.find((v) => v.platform === primaryPlatform) ??
+      dbTemplate.platformVariants[0];
+    if (variant) {
+      sections.push(`## CAPTION TEMPLATE: ${dbTemplate.name.toUpperCase()}\n\n${variant.structure}`);
+    }
+  } else {
+    // Fall back to in-code templates
+    const creativeProfile = resolveCreativeProfile(input);
+    const primaryPlatform = input.platforms[0] ?? "instagram_post";
+    const captionTemplateBlock = buildCaptionTemplateInstructions(
+      creativeProfile.captionStyle,
+      primaryPlatform,
+      input.objective,
+      input.niche,
+    );
+    if (captionTemplateBlock) {
+      sections.push(captionTemplateBlock);
+    }
   }
 
   // Build platform-specific instructions

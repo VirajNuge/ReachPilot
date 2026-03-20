@@ -90,7 +90,8 @@ body {
 
 .QkFixContainer {
   background-color: transparent;
-  width: 478px;
+  max-width: 478px;
+  width: 100%;
   border-radius: 16px;
   overflow: visible;
 }

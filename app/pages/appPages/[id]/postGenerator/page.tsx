@@ -1,8 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { PostGeneratorPage } from "../../components/PostGenerator/PostGeneratorPage";
 
 export default function PostGeneratorRoute() {
-  return <PostGeneratorPage />;
+  return (
+    <Suspense fallback={null}>
+      <PostGeneratorPage />
+    </Suspense>
+  );
 }

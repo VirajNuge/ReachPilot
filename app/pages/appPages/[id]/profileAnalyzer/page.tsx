@@ -18,7 +18,7 @@ export default function UnifiedAnalyzerPage() {
     <div className="relative min-h-screen bg-[#f4f8fb] font-sans text-[#000100] overflow-x-hidden">
       <MotionBackground />
 
-      <div className="relative z-10 pl-4 max-w-7xl mx-auto pb-24">
+      <div className="relative z-10 px-6 max-w-7xl mx-auto pb-24">
         {/* Header Section */}
 
         {!hasAnalysis ? (
@@ -41,11 +41,11 @@ export default function UnifiedAnalyzerPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-[1.02] bg-[#000100] hover:bg-black text-white">
+                <button className="px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-[1.02] bg-[#0052FF] hover:bg-[#0044dd] text-white shadow-[0_4px_16px_rgba(0,82,255,0.3)]">
                   <FaChrome size={20} />
                   Download Extension
                 </button>
-                <button className="px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-[#000100] hover:bg-black text-white">
+                <button className="px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-white hover:bg-slate-50 text-[#000100] border border-slate-200 hover:border-slate-300">
                   Watch Demo <FaArrowRight size={12} />
                 </button>
               </div>

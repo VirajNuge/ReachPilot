@@ -10,40 +10,132 @@ import {
   FaMap,
   FaRocket,
 } from "react-icons/fa";
-// Component imports
+import dynamic from "next/dynamic";
 
-import VelocityMeter from "../../../components/VelocityMeter/VelocityMeter";
-import PsychTriggers from "../../../components/PsychTriggers/PsychTriggers";
-import PostFatigue from "../../../components/PostFatigue/PostFatigue";
-import CompetitorGap from "../../../components/CompetitorGap/CompetitorGap";
-import ViralRecipe from "../../../components/ViralRecipe/ViralRecipe";
-import VoiceSpectrum from "../../../components/VoiceSpectrum/VoiceSpectrum";
-import SentimentMap from "../../../components/SentimentMap/SentimentMap";
-import ActiveHours from "../../../components/ActiveHours/ActiveHours";
-import CrowdPersonas from "../../../components/CrowdPersonas/CrowdPersonas";
-import QuestionCloud from "../../../components/QuestionCloud/QuestionCloud"; 
-import EthicalBribe from "../../../components/EthicalBribe/EthicalBribe";
-import CTACommand from "../../../components/CTACommand/CTACommand";
-import StackFingerprint from "../../../components/StackFingerprint/StackFingerprint";
-import ValueLadder from "../../../components/ValueLadder/ValueLadder";
-import GrowthCommand from "../../../components/GrowthCommand/GrowthCommand";
+// Always-needed (tiny, above the fold)
 import LoadingScreen from "../../../components/LoadingScreen/LoadingScreen";
 import { ErrorState } from "../../../components/ErrorState/ErrorState";
 import { AnalyzerTabs } from "../../../components/Shared/AnalyzerTabs";
 
-import PulseHeader from "../../../components/Pulse/PulseHeader";
-import PulseScore from "../../../components/Pulse/PulseScore";
-import HeartbeatChart from "../../../components/Pulse/HeartbeatChart";
-import EngagementVitalsPanel from "../../../components/Pulse/EngagementVitals";
-import AudienceTemp from "../../../components/Pulse/AudienceTemp";
-import GrowthTrend from "../../../components/Pulse/GrowthTrend";
-import TriageStation from "../../../components/Pulse/TriageStation";
+// Type-only import for ContentPillars named export (dynamic() only carries default export)
+import type { PillarData as UI_PillarData } from "../../../components/ContentPillars/ContentPillars";
 
-import OnboardingTour from "../../../components/OnboardingTour/OnboardingTour";
+// Inline skeleton for deferred components
+const TabSkeleton = () => (
+  <div className="w-full h-48 bg-white rounded-3xl border border-slate-100 animate-pulse" />
+);
+
+// --- Pulse tab components ---
+const PulseHeader = dynamic(
+  () => import("../../../components/Pulse/PulseHeader"),
+  { ssr: false }
+);
+const PulseScore = dynamic(
+  () => import("../../../components/Pulse/PulseScore"),
+  { ssr: false }
+);
+const HeartbeatChart = dynamic(
+  () => import("../../../components/Pulse/HeartbeatChart"),
+  { ssr: false }
+);
+const EngagementVitalsPanel = dynamic(
+  () => import("../../../components/Pulse/EngagementVitals"),
+  { ssr: false }
+);
+const AudienceTemp = dynamic(
+  () => import("../../../components/Pulse/AudienceTemp"),
+  { ssr: false }
+);
+const GrowthTrend = dynamic(
+  () => import("../../../components/Pulse/GrowthTrend"),
+  { ssr: false }
+);
+const TriageStation = dynamic(
+  () => import("../../../components/Pulse/TriageStation"),
+  { ssr: false }
+);
+
+// --- Lab tab components ---
+const VelocityMeter = dynamic(
+  () => import("../../../components/VelocityMeter/VelocityMeter"),
+  { ssr: false, loading: () => <TabSkeleton /> }
+);
+const PsychTriggers = dynamic(
+  () => import("../../../components/PsychTriggers/PsychTriggers"),
+  { ssr: false }
+);
+const PostFatigue = dynamic(
+  () => import("../../../components/PostFatigue/PostFatigue"),
+  { ssr: false }
+);
+const CompetitorGap = dynamic(
+  () => import("../../../components/CompetitorGap/CompetitorGap"),
+  { ssr: false }
+);
+const ViralRecipe = dynamic(
+  () => import("../../../components/ViralRecipe/ViralRecipe"),
+  { ssr: false }
+);
+const VoiceSpectrum = dynamic(
+  () => import("../../../components/VoiceSpectrum/VoiceSpectrum"),
+  { ssr: false }
+);
+const ContentPillars = dynamic(
+  () => import("../../../components/ContentPillars/ContentPillars"),
+  { ssr: false }
+);
+
+// --- Crowd tab components ---
+const SentimentMap = dynamic(
+  () => import("../../../components/SentimentMap/SentimentMap"),
+  { ssr: false, loading: () => <TabSkeleton /> }
+);
+const ActiveHours = dynamic(
+  () => import("../../../components/ActiveHours/ActiveHours"),
+  { ssr: false }
+);
+const CrowdPersonas = dynamic(
+  () => import("../../../components/CrowdPersonas/CrowdPersonas"),
+  { ssr: false }
+);
+const QuestionCloud = dynamic(
+  () => import("../../../components/QuestionCloud/QuestionCloud"),
+  { ssr: false }
+);
+
+// --- Blueprint tab components ---
+const EthicalBribe = dynamic(
+  () => import("../../../components/EthicalBribe/EthicalBribe"),
+  { ssr: false, loading: () => <TabSkeleton /> }
+);
+const CTACommand = dynamic(
+  () => import("../../../components/CTACommand/CTACommand"),
+  { ssr: false }
+);
+const StackFingerprint = dynamic(
+  () => import("../../../components/StackFingerprint/StackFingerprint"),
+  { ssr: false }
+);
+const ValueLadder = dynamic(
+  () => import("../../../components/ValueLadder/ValueLadder"),
+  { ssr: false }
+);
+
+// --- Growth / misc ---
+const GrowthCommand = dynamic(
+  () => import("../../../components/GrowthCommand/GrowthCommand"),
+  { ssr: false }
+);
+const OnboardingTour = dynamic(
+  () => import("../../../components/OnboardingTour/OnboardingTour"),
+  { ssr: false }
+);
+
 import "./analyzedAccount.css";
 
 import { useAnalysisData } from "../../../../../../hooks/useAnalysisData";
 import { saveAnalysis, getAnalysisById } from "../../../../../../lib/storage";
+import { computePulseScore } from "../../../../../../lib/pulseScore";
 import { useAuth } from "../../../../../contexts/AuthContext";
 import {
   RawAnalysisData,
@@ -62,11 +154,6 @@ import {
   CTAData,
   TechStackData,
 } from "../../../../../../lib/types/analysis";
-
-// ... existing component imports ...
-import ContentPillars, {
-  PillarData as UI_PillarData,
-} from "../../../components/ContentPillars/ContentPillars";
 
 const MOCK_PILLARS: UI_PillarData[] = [
   {
@@ -373,9 +460,10 @@ function AnalysisContent() {
               engagementRate: 2.5,
               benchmarkRate: 2.0,
               reachEfficiency: 80,
-              interactionRatio: 15.5,
+              conversationDensity: 12.5,
+              amplificationPower: 3.2,
               status: "Healthy",
-              insight: "Engagement is 25% above average.",
+              insight: "Engagement is 25% above average with strong conversation density.",
             },
             audienceTemperature: {
               tempScore: 75,
@@ -498,13 +586,13 @@ function AnalysisContent() {
   return (
     <>
       <OnboardingTour />
-      <div className="analyzeAccContainer font-sans pb-20 pt-0">
+      <div className="analyzeAccContainer font-sans pb-20 pt-4">
         <Suspense fallback={<LoadingScreen link={link || ""} />}>
           <div className="flex flex-col gap-6">
             {/* Tabs */}
-            <div className="flex justify-start mb-6 sticky top-0 z-20 bg-[#F9F9FB]/95 backdrop-blur-sm py-2">
+            <div className="flex justify-start mb-2 sticky top-0 z-20 bg-[#f4f8fb]/95 backdrop-blur-sm py-2">
               <AnalyzerTabs
-                className="bg-white border-gray-200/60 shadow-sm w-fit mb-[-30px]"
+                className="bg-white border-gray-200/60 shadow-sm w-fit"
                 tabs={[
                   {
                     id: "Pulse",
@@ -537,7 +625,7 @@ function AnalysisContent() {
               />
             </div>
 
-            <div className="min-h-[1000px] overflow-x-hidden">
+            <div className="min-h-screen overflow-x-hidden">
               <AnimatePresence mode="wait">
                 {/* --- Zone 1: The Pulse (Overview) --- */}
                 {activeTab === "Pulse" && (
@@ -549,7 +637,10 @@ function AnalysisContent() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                   >
                     {/* Header Summary */}
-                    <PulseHeader profile={data.profile} />
+                    <PulseHeader
+                      profile={data.profile}
+                      profileScore={computePulseScore(data).totalScore}
+                    />
 
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                       {/* Left Column (Wide) - 2/3 width */}
@@ -568,7 +659,7 @@ function AnalysisContent() {
 
                         {/* Growth Trend - Bottom chart */}
                         <div className="min-h-[200px]">
-                          <GrowthTrend data={data.growthTrajectory} />
+                          <GrowthTrend data={data.growthTrajectory} followers={data.profile.followers} />
                         </div>
                       </div>
 
@@ -634,7 +725,10 @@ function AnalysisContent() {
                       {/* Row 2: Post Fatigue, Content Gap */}
                       <div className="xl:col-span-4 flex flex-col">
                         {data.postFatigue ? (
-                          <PostFatigue data={data.postFatigue as any} />
+                          <PostFatigue
+                            data={data.postFatigue as any}
+                            pulseHeartbeat={data.pulseHeartbeat}
+                          />
                         ) : (
                           <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
                             No Fatigue Data
@@ -654,7 +748,7 @@ function AnalysisContent() {
                       {/* Row 3: Viral Recipe, Brand Voice */}
                       <div className="xl:col-span-6 flex flex-col">
                         {data.viralRecipe && data.viralRecipe.length > 0 ? (
-                          <ViralRecipe data={data.viralRecipe[0]} />
+                          <ViralRecipe recipes={data.viralRecipe} />
                         ) : (
                           <div className="p-4 text-center text-gray-400 bg-white rounded-3xl border border-slate-100 flex-1 flex items-center justify-center">
                             No Viral Recipe

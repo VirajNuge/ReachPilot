@@ -1,567 +1,643 @@
 {
   "analysis": {
     "profile": {
-      "name": "Mahesh Chulet",
-      "headline": "SaaS & Digital Marketing Insights",
-      "followers": 944,
-      "projects": "http://logitia.com",
-      "profileScore": 45,
-      "bio": "scaling software services business of \nhttp://\nlogitia.com,  deeply into building SaaS & digital marketing",
-      "pfp": "https://pbs.twimg.com/profile_images/2016089274761048064/U2uZ0b7t_bigger.jpg",
-      "banner": "https://pbs.twimg.com/profile_banners/18550300/1664652853/1080x360",
-      "followingCount": 498
+      "name": "Jakub T. Jankiewicz ",
+      "headline": "JavaScript, Open Source, Wikipedia Expert",
+      "followers": 3678,
+      "projects": "JavaScript expert, Open Source developer, and Wikipedia editor",
+      "profileScore": 52,
+      "bio": "JavaScript expert, Open Source developer, and Wikipedia editor\n\nInspired by early MIT hackers; GNU/Linux and GNU Emacs 4 life \n\nDM  \nhttps://\njcu.bi/dm",
+      "pfp": "https://pbs.twimg.com/profile_images/1690455863369048065/Z2euDpXc_200x200.jpg",
+      "banner": "https://pbs.twimg.com/profile_banners/148001227/1729797417/600x200",
+      "followingCount": 427
     },
     "quickFixes": [
       {
-        "headline": "Optimize Posting Times",
-        "description": "Posting during peak hours (9 AM, 12 PM, 3 PM, 6 PM) could boost engagement significantly.",
+        "headline": "Optimize Profile Bio Keywords",
+        "description": "Adding keywords like 'web development' or 'coding tutorials' to the bio can improve search visibility and attract targeted followers; this could increase follower growth by 10%.",
+        "tag": "HIGH IMPACT"
+      },
+      {
+        "headline": "Engage More Actively in Comments",
+        "description": "Responding to comments, even with simple acknowledgements, can boost engagement rates and foster a sense of community, potentially increasing interaction rates by 15%.",
         "tag": "HIGH IMPACT"
       },
       {
         "headline": "Incorporate Visual Content",
-        "description": "Adding images or videos could increase engagement by 2-3x.",
+        "description": "Adding relevant images or short videos to tweets can significantly increase visibility and engagement, potentially doubling like and retweet rates.",
         "tag": "HIGH IMPACT"
       },
       {
-        "headline": "Engage in Conversations",
-        "description": "Actively participate in relevant conversations to build community.",
-        "tag": "HIGH IMPACT"
-      },
-      {
-        "headline": "Refine Profile Bio",
-        "description": "A clearer bio can attract more relevant followers.",
+        "headline": "Run Polls for Audience Insights",
+        "description": "Conducting polls on relevant topics not only increases engagement but also provides valuable audience insights for future content creation; this could improve content relevance by 20%.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Add Relevant Keywords",
-        "description": "Using industry-specific keywords can improve searchability.",
+        "headline": "Schedule Tweets During Peak Hours",
+        "description": "Consistently posting during peak engagement hours (9 AM, 12 PM, 3 PM, 6 PM) can maximize visibility and interaction, potentially increasing tweet reach by 25%.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Experiment with Polls",
-        "description": "Polls can be a great way to increase audience interaction.",
+        "headline": "Create Concise Threads",
+        "description": "Breaking down complex topics into digestible Twitter threads can boost engagement and encourage followers to stay informed; this could increase content consumption by 30%.",
+        "tag": "MEDIUM IMPACT"
+      },
+      {
+        "headline": "Ask Engaging Questions",
+        "description": "Posing open-ended questions in tweets can stimulate conversations and encourage audience participation, potentially increasing reply rates by 10%.",
+        "tag": "MEDIUM IMPACT"
+      },
+      {
+        "headline": "Share Relevant Industry News",
+        "description": "Curating and sharing timely industry news can position the profile as a valuable resource and attract new followers; this could improve credibility by 15%.",
         "tag": "LOW IMPACT"
       },
       {
-        "headline": "Share User Success Stories",
-        "description": "Highlighting user achievements can build trust and credibility.",
+        "headline": "Use Relevant Hashtags",
+        "description": "Including popular and relevant hashtags in tweets can increase their visibility and reach a wider audience, potentially boosting impressions by 10%.",
+        "tag": "LOW IMPACT"
+      },
+      {
+        "headline": "Promote Free Content",
+        "description": "Sharing links to free articles or resources can drive traffic and establish the profile as a provider of valuable content, potentially increasing click-through rates by 5%.",
         "tag": "LOW IMPACT"
       }
     ],
     "bioAnalysis": {
-      "clarityScore": 6,
-      "keywordScore": 7,
-      "tone": "Informative and question-oriented",
+      "clarityScore": 7,
+      "keywordScore": 6,
+      "tone": "Informative, slightly opinionated",
       "strengths": [
-        "Focus on SaaS and digital marketing",
-        "Asks engaging questions to prompt discussion",
-        "Shares advice for founders"
+        "Expertise in JavaScript and Open Source development is clear.",
+        "Connection to Wikipedia editing adds credibility.",
+        "Bio includes a direct method for contact (DM link)."
       ],
       "weaknesses": [
-        "Profile bio could be more specific",
-        "Lacks visual content",
-        "Engagement is inconsistent"
+        "Bio could benefit from more specific keywords related to web development or coding.",
+        "Inspiration by MIT hackers may not resonate with a broad audience.",
+        "Bio lacks a clear call to action or value proposition."
       ],
       "suggestions": [
-        "Clearly define target audience in bio",
-        "Incorporate relevant hashtags in posts",
-        "Use images/videos to enhance content"
+        "Incorporate keywords like 'web development', 'coding tutorials', or 'open source contributions'.",
+        "Highlight a specific achievement or contribution in the field.",
+        "Add a call to action, such as 'Follow for JavaScript tips' or 'Learn about open source development'."
       ]
     },
     "keywords": {
       "current": [
-        "founder",
-        "SaaS",
-        "digital marketing",
-        "build in public",
-        "advice",
-        "paying user",
-        "solo founder",
-        "consistent"
+        "JavaScript",
+        "Open Source",
+        "Wikipedia",
+        "CodeMirror",
+        "eleven_ty",
+        "Pi Day",
+        "social media",
+        "blog"
       ],
       "missing": [
-        "growth hacking",
-        "marketing automation",
-        "lead generation",
-        "customer acquisition",
-        "SEO",
-        "content marketing",
-        "social media marketing",
-        "startup"
+        "web development",
+        "coding tutorials",
+        "frontend development",
+        "software engineering",
+        "programming",
+        "GitHub"
       ]
     },
     "textAnalysis": {
-      "frequency": "3.3 posts/day, which is within the optimal range.",
-      "contentMix": "100% text-based content. Lacks variety.",
-      "engagement": "Engagement is inconsistent with spikes in Post 3, but generally low."
+      "frequency": "1.9 posts/day, leaning towards blog promotion and commentary on tech topics.",
+      "contentMix": "Exclusively text-based, lacking visual elements or interactive content.",
+      "engagement": "Low engagement rate, indicating a need for more engaging content types or topics."
     },
     "contentMetrics": {
-      "frequencyScore": 85,
-      "contentMixScore": 20,
-      "engagementScore": 30
+      "frequencyScore": 63,
+      "contentMixScore": 10,
+      "engagementScore": 15
     },
     "pulseHeartbeat": [
       {
         "day": "Mon",
-        "activityScore": 10,
-        "postsCount": 0,
-        "peakHour": "N/A",
+        "activityScore": 42,
+        "postsCount": 2,
+        "peakHour": "1 AM",
         "trend": "Flat"
       },
       {
         "day": "Tue",
-        "activityScore": 10,
-        "postsCount": 0,
-        "peakHour": "N/A",
+        "activityScore": 36,
+        "postsCount": 1,
+        "peakHour": "2 AM",
         "trend": "Flat"
       },
       {
         "day": "Wed",
-        "activityScore": 10,
-        "postsCount": 0,
-        "peakHour": "N/A",
+        "activityScore": 28,
+        "postsCount": 1,
+        "peakHour": "4 PM",
         "trend": "Flat"
       },
       {
         "day": "Thu",
-        "activityScore": 50,
+        "activityScore": 75,
         "postsCount": 3,
-        "peakHour": "6 PM",
-        "trend": "Flat"
+        "peakHour": "1 AM",
+        "trend": "Rising"
       },
       {
         "day": "Fri",
-        "activityScore": 60,
-        "postsCount": 3,
-        "peakHour": "6 PM",
-        "trend": "Flat"
+        "activityScore": 30,
+        "postsCount": 1,
+        "peakHour": "7 PM",
+        "trend": "Dropping"
       },
       {
         "day": "Sat",
-        "activityScore": 70,
-        "postsCount": 3,
-        "peakHour": "2 PM",
+        "activityScore": 55,
+        "postsCount": 2,
+        "peakHour": "5 AM",
         "trend": "Flat"
       },
       {
         "day": "Sun",
-        "activityScore": 10,
-        "postsCount": 0,
-        "peakHour": "N/A",
+        "activityScore": 68,
+        "postsCount": 3,
+        "peakHour": "3 AM",
         "trend": "Flat"
       }
     ],
     "schedule": [
       {
-        "day": "MONDAY",
+        "day": "Monday",
         "slots": [
           {
-            "id": "09:00",
-            "label": "9 AM",
-            "value": 20,
+            "id": "mon_00",
+            "label": "00:00-06:00",
+            "value": 75,
+            "engagement": "High"
+          },
+          {
+            "id": "mon_06",
+            "label": "06:00-12:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "12:00",
-            "label": "12 PM",
-            "value": 25,
+            "id": "mon_12",
+            "label": "12:00-18:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "15:00",
-            "label": "3 PM",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "18:00",
-            "label": "6 PM",
-            "value": 20,
+            "id": "mon_18",
+            "label": "18:00-00:00",
+            "value": 10,
             "engagement": "Low"
           }
         ]
       },
       {
-        "day": "TUESDAY",
+        "day": "Tuesday",
         "slots": [
           {
-            "id": "09:00",
-            "label": "9 AM",
-            "value": 20,
+            "id": "tue_00",
+            "label": "00:00-06:00",
+            "value": 70,
+            "engagement": "High"
+          },
+          {
+            "id": "tue_06",
+            "label": "06:00-12:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "12:00",
-            "label": "12 PM",
-            "value": 25,
+            "id": "tue_12",
+            "label": "12:00-18:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "15:00",
-            "label": "3 PM",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "18:00",
-            "label": "6 PM",
-            "value": 20,
+            "id": "tue_18",
+            "label": "18:00-00:00",
+            "value": 10,
             "engagement": "Low"
           }
         ]
       },
       {
-        "day": "WEDNESDAY",
+        "day": "Wednesday",
         "slots": [
           {
-            "id": "09:00",
-            "label": "9 AM",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "12:00",
-            "label": "12 PM",
-            "value": 25,
-            "engagement": "Low"
-          },
-          {
-            "id": "15:00",
-            "label": "3 PM",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "18:00",
-            "label": "6 PM",
-            "value": 20,
-            "engagement": "Low"
-          }
-        ]
-      },
-      {
-        "day": "THURSDAY",
-        "slots": [
-          {
-            "id": "09:00",
-            "label": "9 AM",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "12:00",
-            "label": "12 PM",
-            "value": 50,
+            "id": "wed_00",
+            "label": "00:00-06:00",
+            "value": 60,
             "engagement": "Medium"
           },
           {
-            "id": "15:00",
-            "label": "3 PM",
-            "value": 20,
+            "id": "wed_06",
+            "label": "06:00-12:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "18:00",
-            "label": "6 PM",
+            "id": "wed_12",
+            "label": "12:00-18:00",
+            "value": 70,
+            "engagement": "High"
+          },
+          {
+            "id": "wed_18",
+            "label": "18:00-00:00",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "Thursday",
+        "slots": [
+          {
+            "id": "thu_00",
+            "label": "00:00-06:00",
+            "value": 80,
+            "engagement": "High"
+          },
+          {
+            "id": "thu_06",
+            "label": "06:00-12:00",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "thu_12",
+            "label": "12:00-18:00",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "thu_18",
+            "label": "18:00-00:00",
             "value": 60,
             "engagement": "Medium"
           }
         ]
       },
       {
-        "day": "FRIDAY",
+        "day": "Friday",
         "slots": [
           {
-            "id": "09:00",
-            "label": "9 AM",
-            "value": 20,
+            "id": "fri_00",
+            "label": "00:00-06:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "12:00",
-            "label": "12 PM",
-            "value": 25,
+            "id": "fri_06",
+            "label": "06:00-12:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "15:00",
-            "label": "3 PM",
-            "value": 20,
+            "id": "fri_12",
+            "label": "12:00-18:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "18:00",
-            "label": "6 PM",
-            "value": 60,
+            "id": "fri_18",
+            "label": "18:00-00:00",
+            "value": 70,
+            "engagement": "High"
+          }
+        ]
+      },
+      {
+        "day": "Saturday",
+        "slots": [
+          {
+            "id": "sat_00",
+            "label": "00:00-06:00",
+            "value": 70,
+            "engagement": "High"
+          },
+          {
+            "id": "sat_06",
+            "label": "06:00-12:00",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "sat_12",
+            "label": "12:00-18:00",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "sat_18",
+            "label": "18:00-00:00",
+            "value": 65,
             "engagement": "Medium"
           }
         ]
       },
       {
-        "day": "SATURDAY",
+        "day": "Sunday",
         "slots": [
           {
-            "id": "09:00",
-            "label": "9 AM",
-            "value": 20,
+            "id": "sun_00",
+            "label": "00:00-06:00",
+            "value": 80,
+            "engagement": "High"
+          },
+          {
+            "id": "sun_06",
+            "label": "06:00-12:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "12:00",
-            "label": "12 PM",
-            "value": 60,
-            "engagement": "Medium"
-          },
-          {
-            "id": "15:00",
-            "label": "3 PM",
-            "value": 50,
-            "engagement": "Medium"
-          },
-          {
-            "id": "18:00",
-            "label": "6 PM",
-            "value": 20,
-            "engagement": "Low"
-          }
-        ]
-      },
-      {
-        "day": "SUNDAY",
-        "slots": [
-          {
-            "id": "09:00",
-            "label": "9 AM",
-            "value": 20,
+            "id": "sun_12",
+            "label": "12:00-18:00",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "12:00",
-            "label": "12 PM",
-            "value": 25,
-            "engagement": "Low"
-          },
-          {
-            "id": "15:00",
-            "label": "3 PM",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "18:00",
-            "label": "6 PM",
-            "value": 20,
+            "id": "sun_18",
+            "label": "18:00-00:00",
+            "value": 10,
             "engagement": "Low"
           }
         ]
       }
     ],
-    "scheduleHighlight": "Post most frequently on Thursday, Friday, and Saturday. Prioritize posting at 6 PM and 12 PM for higher engagement.",
-    "csiScore": 55,
+    "scheduleHighlight": "Posting consistently between 1:00 AM and 3:00 AM seems to yield the best engagement, but try varying times for broader reach.",
+    "csiScore": 65,
     "contentPillars": [
       {
-        "name": "Founder Advice",
-        "percentage": 0.4,
-        "count": 4,
-        "avgEngagement": "Low",
-        "description": "Posts offering tips and insights for founders, often phrased as questions.",
+        "name": "Technology Commentary",
+        "percentage": 0.38,
+        "count": 5,
+        "avgEngagement": "Medium",
+        "description": "Posts offering opinions on tech-related news, spam, social media cards, and general observations.",
         "topPosts": [
+          {
+            "id": "6",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "Comments on a spammer being suspended and which rule they broke. This post got 1 reply.",
+            "thumbnail": ""
+          },
           {
             "id": "4",
             "type": "Text",
             "engagementRate": "N/A",
-            "captionSnippet": "As a solo founder, how long did you wait before you got your first paying user after launch?",
-            "thumbnail": ""
-          },
-          {
-            "id": "5",
-            "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "Biggest solo founder advantage: speed. Biggest solo founder weakness: no mirror.",
+            "captionSnippet": "Asks about social media card appearance. This post is seeking engagement and feedback.",
             "thumbnail": ""
           }
         ],
         "color": "#8b5cf6"
       },
       {
-        "name": "Product Sharing",
-        "percentage": 0.1,
-        "count": 1,
-        "avgEngagement": "High",
-        "description": "Posts specifically designed to get audience members to share their product links.",
-        "topPosts": [
-          {
-            "id": "3",
-            "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "share your Product Link.",
-            "thumbnail": ""
-          }
-        ],
-        "color": "#3b82f6"
-      },
-      {
-        "name": "General Questions",
-        "percentage": 0.3,
+        "name": "JavaScript and Coding",
+        "percentage": 0.23,
         "count": 3,
-        "avgEngagement": "Low",
-        "description": "Open-ended questions about business and engineering.",
+        "avgEngagement": "Medium",
+        "description": "Content related to JavaScript, coding tools (CodeMirror), and development techniques.",
         "topPosts": [
           {
-            "id": "2",
+            "id": "5",
             "type": "Text",
             "engagementRate": "N/A",
-            "captionSnippet": "What matters more in engineering? - Code quality - Speed of delivery - Scalability - Simplicity",
+            "captionSnippet": "Sharing news about Wikipedia Code Editor's syntax highlighting using CodeMirror 6. This post received moderate likes and retweets.",
             "thumbnail": ""
           },
           {
-            "id": "10",
+            "id": "8",
             "type": "Text",
             "engagementRate": "N/A",
-            "captionSnippet": "What do you build first? 1. MVP 2. Landing page 3. Audience 4. Waitlist",
+            "captionSnippet": "Discusses adding social cards to a blog using @eleven_ty, seeking feedback on the card's appearance. This post received a few likes and a retweet.",
             "thumbnail": ""
           }
         ],
         "color": "#10b981"
       },
       {
-        "name": "Personal Branding",
-        "percentage": 0.1,
-        "count": 1,
-        "avgEngagement": "Low",
-        "description": "Posts about building a personal brand",
+        "name": "Education and Training",
+        "percentage": 0.15,
+        "count": 2,
+        "avgEngagement": "High",
+        "description": "Posts about conducting training sessions, particularly related to Wikipedia editing.",
         "topPosts": [
           {
-            "id": "7",
+            "id": "3",
             "type": "Text",
             "engagementRate": "N/A",
-            "captionSnippet": "Build a strong personal brand: → Choose your passion → Show your expertise → Be consistent in posting → Engage genuinely → Show your face",
+            "captionSnippet": "Sharing experience of conducting a Wikipedia editing training for charity and securing a paid gig. This post received the highest likes and a retweet.",
+            "thumbnail": ""
+          },
+          {
+            "id": "11",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "Promoting an article on adding a table of contents using DevTools on @FreeCodeCamp. This post received several likes and a retweet.",
             "thumbnail": ""
           }
         ],
         "color": "#f59e0b"
       },
       {
-        "name": "Contrarian Advice",
-        "percentage": 0.1,
-        "count": 1,
+        "name": "Random Musings",
+        "percentage": 0.15,
+        "count": 2,
         "avgEngagement": "Low",
-        "description": "Advice that goes against common wisdom.",
+        "description": "Posts with general thoughts or statements, often lacking specific context or call to action.",
         "topPosts": [
           {
-            "id": "6",
+            "id": "1",
             "type": "Text",
             "engagementRate": "N/A",
-            "captionSnippet": "\"Just be consistent\" Is a bullsh*t advice. Consistency in the wrong direction can waste all the efforts and time.",
+            "captionSnippet": "Repeating 'BLOGS ARE WEBSITES. BLOG POSTS ARE ARTICLES' multiple times. This post received very little engagement.",
+            "thumbnail": ""
+          },
+          {
+            "id": "13",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "A short, somewhat assertive statement: 'You can just do shit and be good at it.' This post received minimal engagement.",
             "thumbnail": ""
           }
         ],
         "color": "#ef4444"
-      }
-    ],
-    "pillarInsight": "The 'Product Sharing' pillar drives the highest engagement. Leverage this by creating more prompts for users to share their products.",
-    "postDNA": [
-      {
-        "hookType": "Direct Question",
-        "format": "Text",
-        "topic": "Link Sharing",
-        "verdict": "Post 3 performed well due to a direct call to action to share product links, resulting in high replies."
       },
       {
-        "hookType": "Open Question",
+        "name": "Pi Day",
+        "percentage": 0.08,
+        "count": 1,
+        "avgEngagement": "Medium",
+        "description": "Posts celebrating Pi Day with ASCII-generated images and mentions of @openclipart.",
+        "topPosts": [
+          {
+            "id": "9",
+            "type": "Text",
+            "engagementRate": "N/A",
+            "captionSnippet": "Celebrating Pi Day with an ASCII-Block generated image and providing the Python code.  This post received a reply.",
+            "thumbnail": ""
+          }
+        ],
+        "color": "#3b82f6"
+      }
+    ],
+    "pillarInsight": "The 'Education and Training' pillar receives the highest engagement, suggesting a strong interest in practical knowledge and tutorials.",
+    "postDNA": [
+      {
+        "hookType": "Statement",
         "format": "Text",
-        "topic": "Engineering",
-        "verdict": "Post 2 had low engagement due to a broad topic and lack of visual appeal."
+        "topic": "Blogs are Websites",
+        "verdict": "Poor Performance: Repetitive content lacked engagement."
+      },
+      {
+        "hookType": "Question",
+        "format": "Text",
+        "topic": "Potential Problems",
+        "verdict": "Poor Performance: Vague and lacked context."
+      },
+      {
+        "hookType": "Announcement",
+        "format": "Text",
+        "topic": "Wikipedia Training",
+        "verdict": "Good Performance: Showcased expertise and a positive outcome."
+      },
+      {
+        "hookType": "Question",
+        "format": "Text",
+        "topic": "Social Media Card",
+        "verdict": "Poor Performance: Seeking feedback, but lacked visual appeal."
+      },
+      {
+        "hookType": "Announcement",
+        "format": "Text",
+        "topic": "CodeMirror Integration",
+        "verdict": "Good Performance: Shared valuable tech news."
+      },
+      {
+        "hookType": "Report",
+        "format": "Text",
+        "topic": "Spammer Suspension",
+        "verdict": "Poor Performance: Limited relatability and impact."
       },
       {
         "hookType": "Statement",
         "format": "Text",
-        "topic": "Solo Founder Advice",
-        "verdict": "Post 5 performed poorly due to the lack of a specific question or call to action."
+        "topic": "Free Things",
+        "verdict": "Poor Performance: Too generic and lacked a specific offering."
       },
       {
-        "hookType": "Contrarian",
+        "hookType": "Question",
         "format": "Text",
-        "topic": "Consistency",
-        "verdict": "Post 6 did not resonate well due to its negative and confrontational tone."
+        "topic": "11ty Blog Social Cards",
+        "verdict": "Poor Performance: Technical details without a clear visual."
       },
       {
-        "hookType": "Direct Question",
+        "hookType": "Celebration",
         "format": "Text",
-        "topic": "Product Development",
-        "verdict": "Post 10 had moderate engagement because it asked a relevant question to founders."
+        "topic": "Pi Day",
+        "verdict": "Poor Performance: Relevant for a niche audience."
+      },
+      {
+        "hookType": "Mention",
+        "format": "Text",
+        "topic": "Pi Day",
+        "verdict": "Poor Performance: Directed at a specific account."
+      },
+      {
+        "hookType": "Announcement",
+        "format": "Text",
+        "topic": "FreeCodeCamp Article",
+        "verdict": "Good Performance: Shared a valuable resource."
+      },
+      {
+        "hookType": "Statement",
+        "format": "Text",
+        "topic": "Blank Content",
+        "verdict": "Poor Performance: No content."
+      },
+      {
+        "hookType": "Statement",
+        "format": "Text",
+        "topic": "General Assertion",
+        "verdict": "Poor Performance: Lacked context or value."
       }
     ],
     "engagementVitals": {
       "engagementRate": 0,
       "benchmarkRate": 1.5,
-      "reachEfficiency": 10,
-      "interactionRatio": 6.08,
+      "reachEfficiency": 0,
+      "conversationDensity": 10.3,
+      "amplificationPower": 0,
       "status": "Critical",
-      "insight": "Engagement rates are significantly below platform benchmarks due to a lack of impressions data, indicating low visibility and reach."
+      "insight": "The engagement rate is critically low, indicating a significant need to improve content relevance and engagement tactics to meet even the average platform benchmark."
     },
     "velocity": {
-      "hookRate": 15,
+      "hookRate": 2,
       "category": "Pulse",
       "velocityGraph": [
         {
           "hour": "1h",
-          "engagement": 1
+          "engagement": 0.2
         },
         {
           "hour": "2h",
-          "engagement": 2
+          "engagement": 0.4
         },
         {
           "hour": "4h",
-          "engagement": 3
+          "engagement": 0.7
         },
         {
           "hour": "12h",
-          "engagement": 6
+          "engagement": 1.5
         },
         {
           "hour": "24h",
-          "engagement": 10
+          "engagement": 2
         }
       ],
-      "insight": "Hooks lack immediate intrigue, causing low initial interaction rates."
+      "insight": "The hooks are not very effective, leading to low initial engagement and slow growth."
     },
     "psychTriggers": {
       "radarData": [
         {
           "trigger": "Urgency",
-          "score": 5,
+          "score": 10,
           "fullMark": 100
         },
         {
           "trigger": "Curiosity",
-          "score": 65,
+          "score": 40,
           "fullMark": 100
         },
         {
           "trigger": "Social Proof",
-          "score": 10,
+          "score": 20,
           "fullMark": 100
         },
         {
           "trigger": "Authority",
-          "score": 30,
+          "score": 50,
           "fullMark": 100
         },
         {
           "trigger": "FOMO",
-          "score": 10,
+          "score": 15,
           "fullMark": 100
         },
         {
           "trigger": "Reciprocity",
-          "score": 40,
+          "score": 35,
           "fullMark": 100
         }
       ],
-      "winningTrigger": "Curiosity",
-      "insight": "Questions pique interest, leading to higher engagement compared to other triggers."
+      "winningTrigger": "Authority",
+      "insight": "Leveraging his expertise and credentials can be effective in driving engagement."
     },
     "postFatigue": {
       "status": "Warning",
@@ -571,37 +647,37 @@
       "weeklyImpact": [
         {
           "day": "Mon",
-          "posts": 0,
+          "posts": 2,
           "impactScore": 0.8
         },
         {
           "day": "Tue",
-          "posts": 0,
-          "impactScore": 0.8
+          "posts": 1,
+          "impactScore": 1.2
         },
         {
           "day": "Wed",
-          "posts": 0,
-          "impactScore": 0.8
+          "posts": 1,
+          "impactScore": 0.9
         },
         {
           "day": "Thu",
           "posts": 3,
-          "impactScore": 0.9
+          "impactScore": 0.7
         },
         {
           "day": "Fri",
-          "posts": 3,
-          "impactScore": 0.9
+          "posts": 1,
+          "impactScore": 1.1
         },
         {
           "day": "Sat",
-          "posts": 3,
-          "impactScore": 1.2
+          "posts": 2,
+          "impactScore": 0.8
         },
         {
           "day": "Sun",
-          "posts": 0,
+          "posts": 3,
           "impactScore": 0.7
         }
       ]
@@ -609,192 +685,171 @@
     "viralRecipe": [
       {
         "id": "3",
-        "engagementMultiplier": "12.6x",
-        "hookType": "Call to Action",
-        "hookText": "|￣￣￣￣￣￣￣￣￣￣￣￣￣￣|\n|     share your Product Link.        |\n|＿＿＿＿＿＿＿＿＿＿＿＿＿＿|",
+        "engagementMultiplier": "4x",
+        "hookType": "Story",
+        "hookText": "Last weekend I conducted my first complete training about Wikipedia editing that I've put on for the @fundacjawosp charity.",
         "ingredients": [
           {
-            "name": "Direct Ask",
-            "value": "Clear request for product links",
-            "score": 9
+            "name": "Personal Story",
+            "value": "Sharing a personal experience",
+            "score": 8
           },
           {
-            "name": "Visual Element",
-            "value": "Text-based graphic",
+            "name": "Charity Mention",
+            "value": "Mentioning a known charity",
             "score": 7
           },
           {
-            "name": "Simplicity",
-            "value": "Easy to understand prompt",
-            "score": 8
+            "name": "Positive Outcome",
+            "value": "Highlighting a successful result",
+            "score": 6
           }
         ],
-        "whyItWorked": "Direct ask combined with visual cue triggered a strong response.",
+        "whyItWorked": "The post resonated because it told a personal story with a positive outcome and mentioned a charitable organization, creating a sense of goodwill and interest.",
         "templateStructure": [
-          "1. Hook: [Clear call to share]",
-          "2. Graphic: [Simple visual]",
-          "3. Incentive: [Community involvement]",
-          "4. Result: [Product sharing]"
+          "1. Hook: [Share a personal experience]",
+          "2. Detail: [Elaborate on the experience]",
+          "3. Result: [Highlight a positive outcome]",
+          "4. Call to action: [Ask for engagement or feedback]"
         ]
       }
     ],
     "voiceSpectrum": {
-      "personaName": "The SaaS Guide",
+      "personaName": "The Pragmatic Coder",
       "axes": [
         {
-          "id": "formal",
+          "id": "Formal ↔ Casual",
           "leftLabel": "Formal",
           "rightLabel": "Casual",
           "score": 30
         },
         {
-          "id": "technical",
+          "id": "Technical ↔ Simple",
           "leftLabel": "Technical",
           "rightLabel": "Simple",
-          "score": 40
+          "score": -20
         },
         {
-          "id": "serious",
+          "id": "Serious ↔ Playful",
           "leftLabel": "Serious",
           "rightLabel": "Playful",
-          "score": 10
+          "score": -10
         },
         {
-          "id": "dataDriven",
+          "id": "Data-driven ↔ Story-driven",
           "leftLabel": "Data-driven",
           "rightLabel": "Story-driven",
-          "score": -20
+          "score": -5
         }
       ],
       "signatureWords": [
-        "founder",
-        "build",
-        "advantage",
-        "consistent",
-        "advice"
+        "Wikipedia",
+        "CodeMirror",
+        "Social cards",
+        "Open Source",
+        "Pi Day"
       ],
-      "insight": "A balanced voice, leaning slightly towards casual and simple, helps connect with a broader audience."
+      "insight": "The voice is technical and slightly casual, fitting for a developer sharing insights and projects."
     },
     "crowdPersonas": {
       "primaryArchetype": {
-        "id": "saas_founder",
-        "role": "The Aspiring Founder",
-        "iconName": "Rocket",
+        "id": "dev_1",
+        "role": "The Mid-Level Dev",
+        "iconName": "LaptopCode",
         "color": "#3b82f6",
-        "bio": "Early-stage entrepreneurs seeking actionable advice on building and launching SaaS products.",
+        "bio": "A developer seeking practical coding tips and tools to improve their skills and projects.",
         "percentage": 50,
         "triggers": [
-          "MVP",
-          "Launch",
-          "Paying users"
+          "JavaScript",
+          "Code Editor",
+          "Syntax Highlighting"
         ],
         "painPoints": [
-          "Acquiring first users",
-          "Validating product ideas"
+          "Finding efficient coding solutions",
+          "Keeping up with new technologies"
         ]
       },
       "secondaryArchetypes": [
         {
-          "id": "indie_hacker",
-          "role": "The Indie Hacker",
-          "iconName": "LaptopCode",
+          "id": "wiki_1",
+          "role": "The Wikipedia Editor",
+          "iconName": "UserTie",
           "color": "#8b5cf6",
-          "bio": "Independent developers focused on building and scaling side projects.",
+          "bio": "A Wikipedia enthusiast interested in contributing and learning about Wikipedia editing.",
           "percentage": 30,
           "triggers": [
-            "Build in public",
-            "Personal brand",
-            "Consistency"
+            "Wikipedia",
+            "Editing",
+            "Training"
           ],
           "painPoints": [
-            "Balancing speed and quality",
-            "Staying motivated solo"
+            "Improving Wikipedia articles",
+            "Learning new editing techniques"
           ]
         },
         {
-          "id": "experienced_founder",
-          "role": "The Seasoned Founder",
-          "iconName": "UserTie",
+          "id": "oss_1",
+          "role": "The Open Source Contributor",
+          "iconName": "Users",
           "color": "#10b981",
-          "bio": "Experienced entrepreneurs offering advice and insights based on their past ventures.",
+          "bio": "An open-source advocate looking for projects and tools to contribute to.",
           "percentage": 20,
           "triggers": [
-            "Founder advice",
-            "Engineering",
-            "Product link"
+            "Open Source",
+            "CodeMirror",
+            "eleven_ty"
           ],
           "painPoints": [
-            "Finding new opportunities",
-            "Giving back to community"
+            "Finding valuable open-source projects",
+            "Contributing effectively to projects"
           ]
         }
       ],
       "insight": {
-        "title": "Focus on Early-Stage Advice",
-        "description": "The audience is primarily aspiring founders and indie hackers seeking practical advice. Provide content that directly addresses their challenges.",
-        "actionable": "Create more content focused on MVP development, user acquisition, and validation strategies."
+        "title": "Focus on Developer Content",
+        "description": "The audience is primarily composed of developers interested in coding and open-source projects. Content should cater to their needs and interests.",
+        "actionable": "Prioritize content related to JavaScript, code editors, and practical coding tips to engage the core audience."
       }
     },
     "crowdSentiment": {
-      "totalComments": 204,
-      "vibeScore": 7,
+      "totalComments": 4,
+      "vibeScore": 6.5,
       "vibes": [
         {
           "type": "Fanboys",
-          "percentage": 10,
-          "count": 20,
+          "percentage": 25,
+          "count": 1,
           "keywords": [
-            "amazing",
-            "love this",
-            "fire",
-            "need this",
-            "obsessed",
-            "great"
+            "Happy Pi Day"
           ],
           "color": "#8b5cf6",
           "description": "Social Proof & Loyalty"
         },
         {
           "type": "Seekers",
-          "percentage": 60,
-          "count": 122,
+          "percentage": 50,
+          "count": 2,
           "keywords": [
-            "share link",
-            "product link",
-            "how long",
-            "wait before",
-            "best advice",
-            "build first"
+            "What would you do",
+            ""
           ],
           "color": "#3b82f6",
           "description": "Unmet Demand (High Intent)"
         },
         {
           "type": "Skeptics",
-          "percentage": 20,
-          "count": 41,
-          "keywords": [
-            "wrong answers",
-            "what matters more",
-            "consistent",
-            "bullshit",
-            "solo founder",
-            "biggest"
-          ],
+          "percentage": 0,
+          "count": 0,
+          "keywords": [],
           "color": "#f59e0b",
           "description": "Trust Barriers"
         },
         {
           "type": "Critics",
-          "percentage": 10,
-          "count": 21,
+          "percentage": 25,
+          "count": 1,
           "keywords": [
-            "in engineering",
-            "solo founder",
-            "what do you build",
-            "consistency in the wrong direction",
-            "share your product link",
-            "just be consistent"
+            "spam"
           ],
           "color": "#ef4444",
           "description": "Vulnerabilities"
@@ -802,94 +857,34 @@
       ],
       "sentimentTrend": [
         {
-          "post": 1,
-          "score": 6.5
+          "post": 9,
+          "score": 7
         },
         {
-          "post": 2,
-          "score": 7.2
+          "post": 10,
+          "score": 7
         },
         {
-          "post": 3,
-          "score": 8.1
+          "post": 12,
+          "score": 5
         },
         {
-          "post": 4,
-          "score": 6.8
-        },
-        {
-          "post": 5,
-          "score": 6.2
+          "post": 6,
+          "score": 7
         }
       ]
     },
     "questionCloud": [
       {
         "id": "kw_1",
-        "word": "Product Link",
-        "count": 183,
-        "engagement": 75,
+        "word": "Improve card look",
+        "count": 1,
+        "engagement": 0,
         "intent": "Educational",
         "sampleQuestions": [
           {
-            "text": "share your Product Link",
-            "likes": 69
-          }
-        ]
-      },
-      {
-        "id": "kw_2",
-        "word": "Solo Founder",
-        "count": 6,
-        "engagement": 55,
-        "intent": "Educational",
-        "sampleQuestions": [
-          {
-            "text": "As a solo founder, how long did you wait before you got your first paying user after launch?",
-            "likes": 7
-          },
-          {
-            "text": "Biggest solo founder advantage: speed.",
-            "likes": 3
-          }
-        ]
-      },
-      {
-        "id": "kw_3",
-        "word": "Engineering",
-        "count": 3,
-        "engagement": 60,
-        "intent": "Educational",
-        "sampleQuestions": [
-          {
-            "text": "What matters more in engineering?",
-            "likes": 7
-          }
-        ]
-      },
-      {
-        "id": "kw_4",
-        "word": "Founder Advice",
-        "count": 6,
-        "engagement": 50,
-        "intent": "Educational",
-        "sampleQuestions": [
-          {
-            "text": "As a founder, whats your best advice to new founders?",
-            "likes": 6
-          }
-        ]
-      },
-      {
-        "id": "kw_5",
-        "word": "MVP",
-        "count": 3,
-        "engagement": 50,
-        "intent": "Educational",
-        "sampleQuestions": [
-          {
-            "text": "What do you build first?",
-            "likes": 10
+            "text": "What would you do to improve the look of the card?",
+            "likes": 0
           }
         ]
       }
@@ -897,501 +892,495 @@
     "activeHours": [
       {
         "hour": 0,
-        "creatorPosts": 0,
-        "audienceActivity": 5
+        "creatorPosts": 1,
+        "audienceActivity": 25
       },
       {
         "hour": 1,
-        "creatorPosts": 0,
-        "audienceActivity": 5
+        "creatorPosts": 3,
+        "audienceActivity": 75
       },
       {
         "hour": 2,
-        "creatorPosts": 0,
-        "audienceActivity": 5
+        "creatorPosts": 1,
+        "audienceActivity": 25
       },
       {
         "hour": 3,
-        "creatorPosts": 0,
-        "audienceActivity": 5
+        "creatorPosts": 3,
+        "audienceActivity": 100
       },
       {
         "hour": 4,
         "creatorPosts": 0,
-        "audienceActivity": 5
+        "audienceActivity": 0
       },
       {
         "hour": 5,
-        "creatorPosts": 0,
-        "audienceActivity": 5
+        "creatorPosts": 1,
+        "audienceActivity": 25
       },
       {
         "hour": 6,
         "creatorPosts": 0,
-        "audienceActivity": 10
+        "audienceActivity": 0
       },
       {
         "hour": 7,
         "creatorPosts": 0,
-        "audienceActivity": 10
+        "audienceActivity": 0
       },
       {
         "hour": 8,
-        "creatorPosts": 0,
-        "audienceActivity": 15
+        "creatorPosts": 1,
+        "audienceActivity": 25
       },
       {
         "hour": 9,
         "creatorPosts": 0,
-        "audienceActivity": 20
+        "audienceActivity": 0
       },
       {
         "hour": 10,
         "creatorPosts": 0,
-        "audienceActivity": 25
+        "audienceActivity": 0
       },
       {
         "hour": 11,
         "creatorPosts": 0,
-        "audienceActivity": 30
+        "audienceActivity": 0
       },
       {
         "hour": 12,
         "creatorPosts": 1,
-        "audienceActivity": 50
+        "audienceActivity": 25
       },
       {
         "hour": 13,
         "creatorPosts": 0,
-        "audienceActivity": 40
+        "audienceActivity": 0
       },
       {
         "hour": 14,
-        "creatorPosts": 2,
-        "audienceActivity": 60
+        "creatorPosts": 0,
+        "audienceActivity": 0
       },
       {
         "hour": 15,
         "creatorPosts": 0,
-        "audienceActivity": 40
+        "audienceActivity": 0
       },
       {
         "hour": 16,
-        "creatorPosts": 0,
-        "audienceActivity": 30
+        "creatorPosts": 1,
+        "audienceActivity": 25
       },
       {
         "hour": 17,
         "creatorPosts": 0,
-        "audienceActivity": 40
+        "audienceActivity": 0
       },
       {
         "hour": 18,
-        "creatorPosts": 3,
-        "audienceActivity": 70
+        "creatorPosts": 0,
+        "audienceActivity": 0
       },
       {
         "hour": 19,
-        "creatorPosts": 0,
-        "audienceActivity": 60
+        "creatorPosts": 1,
+        "audienceActivity": 25
       },
       {
         "hour": 20,
-        "creatorPosts": 2,
-        "audienceActivity": 80
+        "creatorPosts": 1,
+        "audienceActivity": 25
       },
       {
         "hour": 21,
-        "creatorPosts": 0,
-        "audienceActivity": 70
+        "creatorPosts": 1,
+        "audienceActivity": 25
       },
       {
         "hour": 22,
         "creatorPosts": 0,
-        "audienceActivity": 40
+        "audienceActivity": 0
       },
       {
         "hour": 23,
-        "creatorPosts": 1,
-        "audienceActivity": 30
+        "creatorPosts": 0,
+        "audienceActivity": 0
       }
     ],
     "tribes": [
       {
-        "name": "Aspiring Founders",
-        "size": 40,
+        "name": "JavaScript Developers",
+        "size": 35,
+        "growth": "Stable",
+        "sentiment": "Neutral"
+      },
+      {
+        "name": "Wikipedia Editors",
+        "size": 30,
         "growth": "Stable",
         "sentiment": "Positive"
       },
       {
-        "name": "Indie Hackers",
-        "size": 30,
-        "growth": "Growing",
+        "name": "Open Source Contributors",
+        "size": 25,
+        "growth": "Stable",
         "sentiment": "Neutral"
       },
       {
-        "name": "Seasoned Entrepreneurs",
-        "size": 20,
+        "name": "Pi Day Enthusiasts",
+        "size": 10,
         "growth": "Declining",
         "sentiment": "Positive"
-      },
-      {
-        "name": "Engineering Professionals",
-        "size": 10,
-        "growth": "Stable",
-        "sentiment": "Neutral"
       }
     ],
     "shadowAudience": {
-      "lurkersPercent": 80,
-      "engagersPercent": 20,
-      "insight": "A small fraction of the audience actively engages; focus on drawing out silent observers."
+      "lurkersPercent": 98,
+      "engagersPercent": 2,
+      "insight": "The audience is largely composed of passive lurkers, with very few active commenters."
     },
     "audienceTemperature": {
-      "tempScore": 58,
+      "tempScore": 50,
       "label": "Warm",
-      "fanboyPercent": 10,
-      "criticPercent": 10,
-      "dominantEmotion": "Curious",
-      "recommendation": "Incorporate strong calls to action to convert curious followers into active engagers."
+      "fanboyPercent": 25,
+      "criticPercent": 25,
+      "dominantEmotion": "Neutral",
+      "recommendation": "Incorporate more engaging content formats and ask for opinions to boost audience interaction."
     },
     "hypeValueScore": {
-      "hype": 35,
-      "value": 65
+      "hype": 40,
+      "value": 60
     },
     "ideaBank": [
       {
-        "concept": "Share a detailed case study of a SaaS business you helped scale.",
-        "impact": "Showcase expertise and attract potential clients."
+        "concept": "Share a thread on lesser-known Emacs tips.",
+        "impact": "Showcase expertise and provide practical value to followers."
       },
       {
-        "concept": "Create a poll asking founders about their biggest challenges in the first year.",
-        "impact": "Increase engagement and gather valuable audience insights."
+        "concept": "Create a poll asking about preferred coding editors.",
+        "impact": "Increase engagement and gather audience insights."
       },
       {
-        "concept": "Offer a free checklist for building a strong personal brand for founders.",
-        "impact": "Generate leads and provide valuable content."
+        "concept": "Post a mini-tutorial on using DevTools for debugging.",
+        "impact": "Offer a quick, actionable solution that attracts shares."
       },
       {
-        "concept": "Run a 'wrong answers only' thread about common SaaS startup mistakes.",
-        "impact": "Boost engagement and inject humor into your content."
+        "concept": "Write a thread about the history of GNU/Linux.",
+        "impact": "Appeal to the 'hacker' ethos of your audience."
       },
       {
-        "concept": "Share a personal story about a time you failed as a founder and what you learned.",
-        "impact": "Build trust and connect with your audience on a human level."
+        "concept": "Share a 'day in the life' post as an open-source developer.",
+        "impact": "Humanize your brand and connect with followers on a personal level."
       }
     ],
     "leadMagnet": {
       "type": "Checklist",
-      "title": "SaaS Growth Checklist",
-      "hook": "Scale your SaaS business to the next level.",
+      "title": "Top 10 Emacs Customizations",
+      "hook": "Supercharge your Emacs workflow with these essential tweaks.",
       "friction": "Low",
       "temp": "Cold",
-      "suggestion": "Offer a free email course on SaaS growth.",
-      "whyItWorks": "Provides actionable steps for SaaS growth."
+      "suggestion": "Offer a 'done-for-you' Emacs configuration file for a small fee.",
+      "whyItWorks": "Emacs users are highly customizable and appreciate curated settings."
     },
     "ctaAnalysis": {
       "mix": [
         {
           "type": "Engagement",
-          "score": 60,
+          "score": 30,
           "fullMark": 100
         },
         {
           "type": "Bridge",
-          "score": 10,
+          "score": 20,
           "fullMark": 100
         },
         {
           "type": "Conversion",
-          "score": 5,
+          "score": 10,
           "fullMark": 100
         },
         {
           "type": "Conversation",
-          "score": 25,
+          "score": 40,
           "fullMark": 100
         }
       ],
       "topTrigger": {
-        "keyword": "Share",
-        "count": 2
+        "keyword": "SHARE",
+        "count": 3
       },
       "urgencyScore": 5,
-      "dominantStyle": "Reach Hunter",
+      "dominantStyle": "Community Builder",
       "placementHeatmap": [
         {
           "location": "First Line",
-          "count": 2
+          "count": 1
         },
         {
           "location": "Bottom",
-          "count": 5
+          "count": 10
         },
         {
           "location": "P.S.",
-          "count": 0
+          "count": 2
         }
       ]
     },
     "techStack": {
       "tools": [
         {
+          "category": "Development",
+          "name": "Emacs",
+          "confidence": "High"
+        },
+        {
           "category": "Hosting",
-          "name": "Unknown",
-          "confidence": "Low"
+          "name": "Eleventy",
+          "confidence": "Medium"
         },
         {
-          "category": "Marketing",
-          "name": "Unknown",
-          "confidence": "Low"
-        },
-        {
-          "category": "Payment",
-          "name": "Unknown",
+          "category": "AI",
+          "name": "Opus",
           "confidence": "Low"
         }
       ],
-      "businessClass": "Hobbyist",
-      "verdict": "Appears to be a standard marketing setup with low overhead."
+      "businessClass": "Pro Creator",
+      "verdict": "They have a developer-centric setup with a static site generator and AI-assisted content creation."
     },
     "valueLadder": {
       "products": {
         "Bait": {
-          "name": "Socialjobs.in",
+          "name": "Emacs Configuration Snippets",
           "price": "Free",
-          "type": "Job board",
-          "intensity": "Low"
-        },
-        "Tripwire": {
-          "name": "SaaS Marketing Checklist",
-          "price": "$29",
           "type": "Template",
           "intensity": "Low"
+        },
+        "Core": {
+          "name": "Advanced JavaScript Course",
+          "price": "$299",
+          "type": "Course",
+          "intensity": "Medium"
         }
       },
-      "gap": "Missing Core",
-      "insight": "Consider developing a $199 SaaS Marketing Course to bridge the gap."
+      "gap": "Missing Tripwire",
+      "insight": "They jump from free resources to a high-ticket course. Offer a lower-priced workshop or template pack."
     },
     "growthTasks": [
       {
-        "id": "task_1",
-        "title": "Create a $27 SaaS Template",
-        "category": "Quick Win",
-        "impact": 7,
-        "effort": 3,
-        "type": "Funnel",
-        "status": "To Do",
-        "reasoning": "Captures lost leads from bio.",
-        "actionType": "Content"
-      },
-      {
-        "id": "task_2",
-        "title": "Schedule Tweets for Peak Hours",
+        "id": "gt_1",
+        "title": "Create a $49 Emacs Starter Kit",
         "category": "Quick Win",
         "impact": 6,
-        "effort": 2,
-        "type": "Content",
-        "status": "To Do",
-        "reasoning": "Improves visibility.",
-        "actionType": "Strategy"
-      },
-      {
-        "id": "task_3",
-        "title": "Run a Poll Asking About Biggest Challenges",
-        "category": "Big Bet",
-        "impact": 8,
-        "effort": 5,
-        "type": "Crowd",
-        "status": "To Do",
-        "reasoning": "Generate leads.",
+        "effort": 3,
+        "type": "Funnel",
+        "status": "Pending",
+        "reasoning": "Captures leads interested in Emacs but not ready for a full course.",
         "actionType": "Content"
       },
       {
-        "id": "task_4",
-        "title": "Automate Engagement with Hypefury",
-        "category": "Big Bet",
-        "impact": 7,
-        "effort": 6,
-        "type": "Content",
-        "status": "To Do",
-        "reasoning": "Scale content.",
-        "actionType": "Tech"
+        "id": "gt_2",
+        "title": "Run a Twitter Poll on DevTools Preferences",
+        "category": "Quick Win",
+        "impact": 5,
+        "effort": 2,
+        "type": "Crowd",
+        "status": "Pending",
+        "reasoning": "Engages audience and provides insights for future content.",
+        "actionType": "Content"
       },
       {
-        "id": "task_5",
-        "title": "Rewrite Profile Bio",
+        "id": "gt_3",
+        "title": "Write a Thread on the History of GNU/Linux",
+        "category": "Big Bet",
+        "impact": 8,
+        "effort": 7,
+        "type": "Content",
+        "status": "Pending",
+        "reasoning": "Appeals to core audience and positions as a knowledgeable authority.",
+        "actionType": "Content"
+      },
+      {
+        "id": "gt_4",
+        "title": "Optimize Bio for Keyword 'JavaScript Expert'",
         "category": "Quick Win",
         "impact": 7,
         "effort": 2,
         "type": "Funnel",
-        "status": "To Do",
-        "reasoning": "Optimize for conversions.",
+        "status": "Pending",
+        "reasoning": "Improves search visibility for relevant skills.",
         "actionType": "Bio"
+      },
+      {
+        "id": "gt_5",
+        "title": "Schedule Tweets During Peak Engagement Times",
+        "category": "Quick Win",
+        "impact": 6,
+        "effort": 3,
+        "type": "Content",
+        "status": "Pending",
+        "reasoning": "Increases visibility and engagement with existing content.",
+        "actionType": "Strategy"
       }
     ],
     "disruptor": {
-      "score": 65,
-      "focus": "Data-backed Thought Leadership",
+      "score": 70,
+      "focus": "Value-Driven Engagement",
       "schedule": [
         {
           "day": "Monday",
           "time": "08:00 AM",
           "pillar": "Authority",
-          "topic": "SaaS Growth Hacks",
-          "hookStyle": "Data-backed",
-          "suggestedHook": "3 little-known SaaS growth hacks that actually work.",
-          "strategicReason": "Start the week with actionable insights."
+          "topic": "Debunking Common JavaScript Myths",
+          "hookStyle": "Controversial",
+          "suggestedHook": "Think you know JavaScript? Here are three myths that even experts get wrong.",
+          "strategicReason": "Challenges existing knowledge and drives curiosity."
         },
         {
           "day": "Tuesday",
           "time": "12:00 PM",
           "pillar": "Educational",
-          "topic": "SaaS Marketing Automation",
-          "hookStyle": "Story-driven",
-          "suggestedHook": "I spent years automating my marketing, here is what I learned.",
-          "strategicReason": "Share personal failures."
+          "topic": "Emacs Productivity Hacks",
+          "hookStyle": "Actionable",
+          "suggestedHook": "Boost your coding speed by 50% with these simple Emacs shortcuts.",
+          "strategicReason": "Provides direct value to the audience and positions as an Emacs expert."
         },
         {
           "day": "Wednesday",
-          "time": "06:00 PM",
+          "time": "03:00 PM",
           "pillar": "Community",
-          "topic": "SaaS Founder Challenges",
-          "hookStyle": "Empathetic",
-          "suggestedHook": "What is the hardest thing about running a SaaS startup?",
-          "strategicReason": "Engage users."
+          "topic": "JavaScript Community Q&A",
+          "hookStyle": "Interactive",
+          "suggestedHook": "Ask me anything about JavaScript development! I'm here to help.",
+          "strategicReason": "Fosters a sense of community and engagement."
         },
         {
           "day": "Thursday",
-          "time": "09:00 AM",
+          "time": "06:00 PM",
           "pillar": "Authority",
-          "topic": "SaaS Pricing Strategies",
-          "hookStyle": "Data-backed",
-          "suggestedHook": "What is the best SaaS Pricing Structure?",
-          "strategicReason": "Data Driven."
+          "topic": "The Future of Open Source",
+          "hookStyle": "Visionary",
+          "suggestedHook": "Open source is changing the world. Here's what I see coming next.",
+          "strategicReason": "Positions as a thought leader in the open-source space."
         },
         {
           "day": "Friday",
-          "time": "12:00 PM",
-          "pillar": "Educational",
-          "topic": "SaaS Customer Acquisition",
+          "time": "09:00 AM",
+          "pillar": "Personal",
+          "topic": "My Coding Journey",
           "hookStyle": "Story-driven",
-          "suggestedHook": "My journey of acquiring my first 100 SaaS Customers.",
-          "strategicReason": "Share lessons."
+          "suggestedHook": "From beginner to expert, here's how I learned to code and what I wish I knew then.",
+          "strategicReason": "Humanizes your brand and connects with followers on a personal level."
         },
         {
           "day": "Saturday",
-          "time": "02:00 PM",
-          "pillar": "Community",
-          "topic": "SaaS Founder Q&A",
-          "hookStyle": "Empathetic",
-          "suggestedHook": "Ask Me Anything: SaaS edition.",
-          "strategicReason": "Engage users."
+          "time": "11:00 AM",
+          "pillar": "Educational",
+          "topic": "DevTools Debugging Secrets",
+          "hookStyle": "Actionable",
+          "suggestedHook": "Stop wasting time debugging. These DevTools tricks will save you hours.",
+          "strategicReason": "Offers practical solutions to common problems."
         },
         {
           "day": "Sunday",
-          "time": "06:00 PM",
-          "pillar": "Authority",
-          "topic": "SaaS Marketing Trends",
-          "hookStyle": "Data-backed",
-          "suggestedHook": "Three SaaS trends you need to know now.",
-          "strategicReason": "Strategic Data."
+          "time": "04:00 PM",
+          "pillar": "Community",
+          "topic": "Weekend Coding Challenge",
+          "hookStyle": "Interactive",
+          "suggestedHook": "What are you coding this weekend? Share your projects and let's inspire each other!",
+          "strategicReason": "Encourages participation and builds a sense of community."
         }
       ]
     },
     "funnelTactics": [
       {
-        "title": "Dedicated Landing Page",
-        "problem": "Linktree is too generic.",
-        "solution": "Create a landing page for your lead magnet.",
-        "impact": "+20% Click-through",
-        "difficulty": "Medium",
-        "status": "Pending",
-        "id": "funnel_1"
-      },
-      {
-        "title": "Email Course for SaaS Marketing",
-        "problem": "Current checklist is not enough.",
-        "solution": "Offer an email course for deeper value.",
+        "title": "Add Tripwire Product",
+        "problem": "Missing a low-cost product to capture leads.",
+        "solution": "Create a $47 Emacs configuration template.",
         "impact": "+15% Conversion",
         "difficulty": "Medium",
-        "status": "Pending",
-        "id": "funnel_2"
+        "status": "Pending"
       },
       {
-        "title": "Personalized Follow-up",
-        "problem": "Missing personal touches.",
-        "solution": "Automated email sequence.",
-        "impact": "+10% Engagement",
+        "title": "Optimize Bio Link",
+        "problem": "Bio link leads to a generic page.",
+        "solution": "Create a dedicated landing page with a clear call to action.",
+        "impact": "+20% Click-through",
         "difficulty": "Easy",
-        "status": "Pending",
-        "id": "funnel_3"
+        "status": "Pending"
+      },
+      {
+        "title": "Offer Free Consultation",
+        "problem": "No high-touch offer to close premium clients.",
+        "solution": "Offer a free 15-minute consultation for potential clients.",
+        "impact": "+10% High-Ticket Sales",
+        "difficulty": "Medium",
+        "status": "Pending"
       }
     ],
     "crowdTactics": [
       {
         "title": "Address Skepticism",
         "audienceState": "Skeptical",
-        "action": "Case studies in comments.",
+        "action": "Reply to top 5 skeptical comments with case studies.",
         "targetParams": "Builds Trust",
-        "status": "Ready",
-        "id": "crowd_1"
+        "status": "Ready"
       },
       {
-        "title": "Vibe Matching",
-        "audienceState": "Engaged",
-        "action": "Add a giveaway in the thread.",
-        "targetParams": "Improve Community",
-        "status": "Ready",
-        "id": "crowd_2"
-      },
-      {
-        "title": "Solve Frustrations",
+        "title": "Respond to Questions",
         "audienceState": "Frustrated",
-        "action": "Provide quick tips in comments.",
-        "targetParams": "Add Value",
-        "status": "Ready",
-        "id": "crowd_3"
+        "action": "Answer top 5 questions about Emacs compatibility.",
+        "targetParams": "Demonstrates Expertise",
+        "status": "Ready"
+      },
+      {
+        "title": "Engage Fanboys",
+        "audienceState": "Engaged",
+        "action": "Retweet and reply to positive comments with additional resources.",
+        "targetParams": "Reinforces Loyalty",
+        "status": "Ready"
       }
     ],
     "competitorGap": {
       "metrics": [
         {
           "category": "Engagement Rate",
-          "profileValue": 0.0001,
-          "benchmarkValue": 0.015,
+          "profileValue": 0.07,
+          "benchmarkValue": 1.5,
           "gapType": "Opportunity"
         },
         {
           "category": "Post Frequency",
-          "profileValue": 3.3,
+          "profileValue": 1.9,
           "benchmarkValue": 4,
           "gapType": "Opportunity"
         },
         {
           "category": "Content Quality",
-          "profileValue": 50,
-          "benchmarkValue": 70,
+          "profileValue": 60,
+          "benchmarkValue": 75,
           "gapType": "Opportunity"
         },
         {
           "category": "Hook Strength",
-          "profileValue": 30,
-          "benchmarkValue": 60,
+          "profileValue": 40,
+          "benchmarkValue": 65,
           "gapType": "Opportunity"
         }
       ],
       "topOpportunity": "Engagement Rate",
-      "insight": "Low engagement rate is a critical weak point, indicating a disconnect between content and audience interests.",
+      "insight": "The biggest weakness is engagement rate, indicating content isn't resonating effectively with the audience. ",
       "recommendations": [
-        "Incorporate more visuals (images/videos) to enhance engagement.",
-        "Experiment with different hook styles to capture audience attention.",
-        "Run contests/giveaways to boost interaction and increase followers."
+        "Focus on crafting stronger hooks to capture attention.",
+        "Increase posting frequency to stay top-of-mind.",
+        "Improve content quality by providing more actionable tips and insights."
       ]
     }
   },
   "platform": "x",
-  "postCount": 10,
+  "postCount": 13,
   "source": "extension_scrape",
-  "timestamp": 1772899085480
+  "timestamp": 1773937965919
 }

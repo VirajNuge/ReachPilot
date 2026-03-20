@@ -143,10 +143,19 @@ export interface HeartbeatDay {
 }
 
 export interface EngagementVitals {
+  /** Actual average engagement rate % from scraped data */
   engagementRate: number;
+  /** Platform average engagement rate % for comparison */
   benchmarkRate: number;
+  /** Discovery Ratio: 0–100. How well posts break out of the follower bubble.
+   *  Formula: (uniqueReach / totalImpressions) * 100, or views-based proxy. */
   reachEfficiency: number;
-  interactionRatio: number;
+  /** Conversation Density: comments / totalEngagements * 100.
+   *  Measures quality of engagement — how many interactions require intent. */
+  conversationDensity: number;
+  /** Amplification Power: (shares + saves) / reach * 100.
+   *  For Twitter/X uses retweets as shares proxy. */
+  amplificationPower: number;
   status: "Healthy" | "Warning" | "Critical";
   insight: string;
 }

@@ -15,7 +15,7 @@ const MOCK_PERSONAS: CrowdPersonaData = {
     id: "1",
     role: "The Mid-Level Dev",
     iconName: "LaptopCode",
-    color: "#074ed5", // Primary blue
+    color: "#0052FF", // Primary blue
     bio: "Backend-focused, uses Next.js professionally. Wants to move from Junior to Senior.",
     percentage: 55,
     triggers: ["Architecture", "Performance", "Career Growth"],
@@ -212,9 +212,6 @@ export default function CrowdPersonas({
                   </div>
                 </div>
               </div>
-              <button className="w-full py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-[#000100] hover:bg-black text-white">
-                Target this Persona
-              </button>
             </div>
           </motion.div>
         </AnimatePresence>

@@ -206,7 +206,7 @@ export default function QuestionCloud({
       case "Urgency":
         return "#000100"; // Dark Text
       case "Buying":
-        return "#074ed5"; // Primary Blue
+        return "#0052FF"; // Primary Blue
       case "Educational":
         return "#caee55"; // Lime
       default:

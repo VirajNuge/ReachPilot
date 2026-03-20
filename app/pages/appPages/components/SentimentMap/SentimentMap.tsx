@@ -7,18 +7,16 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
-  YAxis,
 } from "recharts";
 import {
   FaFire,
   FaQuestionCircle,
   FaSearchDollar,
   FaExclamationTriangle,
-  FaRobot,
-  FaFilter,
   FaArrowRight,
 } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { TbAlertTriangle, TbBulb, TbTargetArrow, TbTrendingUp } from "react-icons/tb";
+import { motion } from "framer-motion";
 
 // --- Types ---
 
@@ -58,7 +56,7 @@ const MOCK_CROWD_DATA: CrowdAnalysisData = {
       percentage: 45,
       count: 225,
       keywords: ["amazing", "obsessed", "need this", "fire", "love"],
-      color: "#074ed5", // Primary blue
+      color: "#0052FF",
       icon: <FaFire />,
       description: "Social Proof & Loyalty",
     },
@@ -67,7 +65,7 @@ const MOCK_CROWD_DATA: CrowdAnalysisData = {
       percentage: 25,
       count: 125,
       keywords: ["price?", "shipping?", "compatible with X?", "how to"],
-      color: "#caee55", // Lime highlight
+      color: "#caee55",
       icon: <FaQuestionCircle />,
       description: "Unmet Demand (High Intent)",
     },
@@ -76,7 +74,7 @@ const MOCK_CROWD_DATA: CrowdAnalysisData = {
       percentage: 20,
       count: 100,
       keywords: ["is this real", "competitor is cheaper", "reviews?"],
-      color: "#000100", // Dark text
+      color: "#000100",
       icon: <FaSearchDollar />,
       description: "Trust Barriers",
     },
@@ -85,12 +83,40 @@ const MOCK_CROWD_DATA: CrowdAnalysisData = {
       percentage: 10,
       count: 50,
       keywords: ["broken", "slow shipping", "no response", "bad service"],
-      color: "#f4f8fb", // Inset bg (looks light gray)
+      color: "#f4f8fb",
       icon: <FaExclamationTriangle />,
       description: "Vulnerabilities",
     },
   ],
 };
+
+/** Returns a strategic implication for a Seeker keyword */
+function seekerSignal(keyword: string): string {
+  const k = keyword.toLowerCase();
+  if (k.includes("price") || k.includes("cost") || k.includes("how much"))
+    return "High purchase intent — price transparency post would convert directly.";
+  if (k.includes("ship") || k.includes("deliver"))
+    return "Logistics anxiety — a delivery FAQ reel removes a key conversion blocker.";
+  if (k.includes("compat") || k.includes("work with") || k.includes("support"))
+    return "Integration doubt — a compatibility checklist post addresses the hidden objection.";
+  if (k.includes("how") || k.includes("tutorial") || k.includes("guide"))
+    return "Learning gap — a step-by-step walkthrough would capture this segment.";
+  if (k.includes("refund") || k.includes("return") || k.includes("policy"))
+    return "Risk aversion — a trust-first post (guarantee highlight) lowers the barrier.";
+  return "Unmet information gap — a direct FAQ post for this topic would capture high-intent traffic.";
+}
+
+/** Returns a strategic implication for a Skeptic keyword */
+function skepticSignal(keyword: string): string {
+  const k = keyword.toLowerCase();
+  if (k.includes("cheaper") || k.includes("expensive") || k.includes("worth"))
+    return "Price-value objection — a value-stack comparison post directly counters this.";
+  if (k.includes("real") || k.includes("legit") || k.includes("scam"))
+    return "Trust deficit — social proof or behind-the-scenes content builds credibility.";
+  if (k.includes("review"))
+    return "Proof-seeking behaviour — a compiled testimonials post will address this cluster.";
+  return "Doubt signal — addressing this openly in content turns skeptics into advocates.";
+}
 
 // --- Component ---
 
@@ -100,26 +126,14 @@ export default function SentimentMap({
   data?: CrowdAnalysisData;
 }) {
   const [activeVibe, setActiveVibe] = useState<VibeType | null>(null);
-  const [filterMode, setFilterMode] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [contentIdeas, setContentIdeas] = useState<string[]>([]);
 
-  // Find the 'Seeker' data for the "Intent Hotspot"
   const safeVibes = data?.vibes || [];
   const seekers = safeVibes.find((v) => v.type === "Seekers");
-  const topSeekerQuestion = seekers?.keywords[0] || "Pricing?";
+  const skeptics = safeVibes.find((v) => v.type === "Skeptics");
+  const critics = safeVibes.find((v) => v.type === "Critics");
 
-  const handleGenerateContent = () => {
-    setIsGenerating(true);
-    setTimeout(() => {
-      setContentIdeas([
-        "'Yes, it works with Shopify!' (Reel)",
-        "'Price Breakdown: Why it's worth it.' (Carousel)",
-        "'Installation Guide in 30s' (Short)",
-      ]);
-      setIsGenerating(false);
-    }, 1500);
-  };
+  // Dominant signal group (highest %)
+  const topVibe = [...safeVibes].sort((a, b) => b.percentage - a.percentage)[0];
 
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col relative overflow-hidden">
@@ -133,7 +147,6 @@ export default function SentimentMap({
             <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
               Sentiment Map
             </h2>
-            {/* Tooltip */}
             <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-[#000100] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
               <div className="font-bold mb-1 text-[#caee55]">
                 Why this matters:
@@ -157,13 +170,13 @@ export default function SentimentMap({
               Vibe Score
             </div>
           </div>
-          {/* Top Right Icon Badge */}
           <div className="p-2.5 bg-[#074ed5] text-white rounded-2xl shadow-sm shrink-0 flex items-center justify-center">
             <FaFire size={18} />
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-6 flex-1 overflow-y-auto custom-scroll">
+
+      <div className="flex flex-col gap-5 flex-1 overflow-y-auto custom-scroll">
         {/* Top Section: Donut + Legend */}
         <div className="flex flex-col md:flex-row gap-6 items-center">
           {/* Donut Chart */}
@@ -202,11 +215,11 @@ export default function SentimentMap({
                 <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
-                      const data = payload[0].payload as VibeData;
+                      const d = payload[0].payload as VibeData;
                       return (
                         <div className="bg-[#000100] text-white text-xs p-2 rounded-lg shadow-xl">
-                          <span className="font-bold">{data.type}</span>:{" "}
-                          {data.percentage}%
+                          <span className="font-bold">{d.type}</span>:{" "}
+                          {d.percentage}%
                         </div>
                       );
                     }
@@ -215,7 +228,6 @@ export default function SentimentMap({
                 />
               </PieChart>
             </ResponsiveContainer>
-            {/* Center Label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-2xl font-bold text-[#000100]">
                 {data.totalComments}
@@ -235,7 +247,7 @@ export default function SentimentMap({
                   activeVibe === v.type ? "ring-2 ring-offset-1" : ""
                 }`}
                 style={{
-                  borderColor: activeVibe === v.type ? "#074ed5" : "#f1f5f9",
+                  borderColor: activeVibe === v.type ? "#0052FF" : "#f1f5f9",
                   backgroundColor:
                     activeVibe === v.type
                       ? "rgba(7, 78, 213, 0.05)"
@@ -267,136 +279,155 @@ export default function SentimentMap({
           </div>
         </div>
 
-        {/* Intent Hotspot & Sparkline */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Intent Hotspot (Seekers focus) */}
-          <div className="p-4 bg-[#f4f8fb] border border-slate-100 rounded-2xl relative overflow-hidden group flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-start mb-1">
-                <span className="text-[10px] font-bold text-[#074ed5] uppercase tracking-wider flex items-center gap-1">
-                  <FaQuestionCircle /> Intent Hotspot
-                </span>
-                <span className="text-[10px] text-[#074ed5] font-mono font-bold">
-                  {seekers?.percentage}% Vol
-                </span>
-              </div>
-              <div className="text-slate-500 font-medium text-sm leading-snug mb-3 pr-2">
-                "Most Seekers are asking about{" "}
-                <span className="font-bold text-[#000100] underline decoration-[#caee55] decoration-2">
-                  {topSeekerQuestion}
-                </span>
-                "
-              </div>
-            </div>
-
-            {contentIdeas.length > 0 && (
-              <div className="mb-3 text-xs text-[#000100] bg-white p-2 rounded-xl border border-slate-200">
-                <div className="font-bold text-[#074ed5] mb-1 text-[10px] uppercase">
-                  Generated ideas:
-                </div>
-                <ul className="list-disc pl-4 space-y-1">
-                  {contentIdeas.map((idea, idx) => (
-                    <li key={idx}>{idea}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Convert Button */}
-            <button
-              onClick={handleGenerateContent}
-              disabled={isGenerating || contentIdeas.length > 0}
-              className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(7,78,213,0.39)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-auto"
-            >
-              {isGenerating ? (
-                <>
-                  <FaRobot className="animate-spin" /> Analyzing...
-                </>
-              ) : contentIdeas.length > 0 ? (
-                <>
-                  <FaRobot /> Strategy Generated
-                </>
-              ) : (
-                <>
-                  <FaRobot /> Convert Seekers
-                </>
-              )}
-            </button>
+        {/* Vibe Trend Sparkline */}
+        <div className="p-4 bg-[#f4f8fb] border border-slate-100 rounded-2xl flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              Vibe Trend (Last 5 Posts)
+            </span>
+            <span className="text-[#000100] bg-[#caee55]/30 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-0.5">
+              <FaArrowRight className="-rotate-45" size={10} /> +12%
+            </span>
           </div>
-
-          {/* Sentiment Sparkline & Skeptic Filter */}
-          <div className="flex flex-col gap-3">
-            <div className="p-4 bg-[#f4f8fb] border border-slate-100 rounded-2xl flex flex-col justify-between flex-1">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Vibe Trend (Last 5)
-                </span>
-                {/* Mini Indicator */}
-                <span className="text-[#000100] bg-[#caee55]/30 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-0.5">
-                  <FaArrowRight className="-rotate-45" size={10} /> +12%
-                </span>
-              </div>
-              <div className="h-[50px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={data.sentimentTrend}>
-                    <Line
-                      type="monotone"
-                      dataKey="score"
-                      stroke="#074ed5"
-                      strokeWidth={2}
-                      dot={false}
-                      isAnimationActive={true}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="text-[10px] text-slate-400 text-center mt-2 font-medium">
-                Critics are shrinking. Quality content is working.
-              </div>
-            </div>
-
-            {/* Better Filter Button Design */}
-            <button
-              onClick={() => setFilterMode(!filterMode)}
-              className={`p-3 rounded-2xl text-xs font-bold transition-all border w-full flex items-center justify-center gap-2 ${
-                filterMode
-                  ? "bg-[#074ed5]/10 text-[#074ed5] border-[#074ed5]/30"
-                  : "bg-white text-slate-500 border-slate-200 hover:bg-[#f4f8fb]"
-              }`}
-            >
-              <FaFilter size={12} />
-              {filterMode ? "Disable Skeptic Filter" : "Enable Skeptic Filter"}
-            </button>
+          <div className="h-[44px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data.sentimentTrend}>
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#0052FF"
+                  strokeWidth={2}
+                  dot={false}
+                  isAnimationActive={true}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="text-[10px] text-slate-400 text-center mt-2 font-medium">
+            Critics are shrinking. Quality content is working.
           </div>
         </div>
 
-        {/* Skeptic Filter Overlay (Conditional) */}
-        <AnimatePresence>
-          {filterMode && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="bg-[#f4f8fb] rounded-2xl p-4 border border-slate-100 overflow-hidden"
-            >
-              <div className="flex items-center gap-2 mb-3 text-[#074ed5]">
-                <FaFilter size={14} />
-                <span className="text-xs font-bold uppercase tracking-wider">
-                  Skeptic Content Filter Active
+        {/* ── Intent Hotspot (expanded) ── */}
+        <div className="bg-[#f4f8fb] border border-slate-100 rounded-2xl p-4 flex flex-col gap-4">
+          <div className="flex items-center gap-1.5">
+            <TbTargetArrow className="text-[#074ed5]" size={13} />
+            <h5 className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest">
+              Intent Hotspot
+            </h5>
+          </div>
+
+          {/* Dominant crowd signal */}
+          {topVibe && (
+            <div className="bg-white border border-slate-100 rounded-xl px-3 py-2.5 flex items-start gap-2">
+              <TbTrendingUp className="text-[#074ed5] shrink-0 mt-0.5" size={13} />
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                  Dominant Signal
+                </p>
+                <p className="text-xs font-bold text-[#000100]">
+                  {topVibe.percentage}% {topVibe.type} —{" "}
+                  <span className="font-medium text-slate-500">
+                    {topVibe.description}
+                  </span>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Seekers: high-intent unmet demand */}
+          {seekers && seekers.keywords.length > 0 && (
+            <div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <FaQuestionCircle className="text-[#074ed5]" size={10} />
+                <span className="text-[10px] font-bold text-[#074ed5] uppercase tracking-wider">
+                  Seekers — {seekers.percentage}% · Unmet Demand
                 </span>
               </div>
-              <ul className="space-y-2">
-                <li className="text-sm bg-white p-3 rounded-xl border border-slate-100 text-slate-500 font-medium italic">
-                  "I saw a review saying the battery life is terrible. Is that
-                  fixed?"
-                </li>
-                <li className="text-sm bg-white p-3 rounded-xl border border-slate-100 text-slate-500 font-medium italic">
-                  "Seems expensive for just a PDF wrapper..."
-                </li>
-              </ul>
-            </motion.div>
+              <div className="flex flex-col gap-2">
+                {seekers.keywords.map((kw, i) => (
+                  <div
+                    key={i}
+                    className="bg-white border border-slate-100 rounded-xl px-3 py-2.5"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-[#000100]">
+                        &ldquo;{kw}&rdquo;
+                      </span>
+                      <span className="text-[10px] font-bold text-[#074ed5] bg-[#074ed5]/8 px-2 py-0.5 rounded-full border border-[#074ed5]/15">
+                        High Intent
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">
+                      {seekerSignal(kw)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
-        </AnimatePresence>
+
+          {/* Skeptics: trust barriers */}
+          {skeptics && skeptics.keywords.length > 0 && (
+            <div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <FaSearchDollar className="text-slate-500" size={10} />
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  Skeptics — {skeptics.percentage}% · Trust Barriers
+                </span>
+              </div>
+              <div className="flex flex-col gap-2">
+                {skeptics.keywords.map((kw, i) => (
+                  <div
+                    key={i}
+                    className="bg-white border border-slate-100 rounded-xl px-3 py-2.5"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-[#000100]">
+                        &ldquo;{kw}&rdquo;
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                        Doubt
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">
+                      {skepticSignal(kw)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Critics: vulnerabilities */}
+          {critics && critics.keywords.length > 0 && (
+            <div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <TbAlertTriangle className="text-amber-500" size={12} />
+                <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
+                  Critics — {critics.percentage}% · Vulnerabilities
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {critics.keywords.map((kw, i) => (
+                  <div
+                    key={i}
+                    className="bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 flex items-center gap-1.5"
+                  >
+                    <TbBulb className="text-amber-500 shrink-0" size={11} />
+                    <span className="text-[11px] text-amber-800 font-medium">
+                      {kw}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                These pain signals are publicly visible. Addressing them in
+                content turns brand vulnerabilities into credibility moments.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

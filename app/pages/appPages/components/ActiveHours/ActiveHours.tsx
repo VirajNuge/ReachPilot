@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaClock, FaBolt, FaSync, FaBell } from "react-icons/fa";
+import { FaClock, FaBolt } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 // --- Types ---
@@ -36,8 +36,6 @@ const MOCK_HOURS: ActiveHourData[] = Array.from({ length: 24 }, (_, i) => {
 
 export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
   const [hoveredHour, setHoveredHour] = useState<ActiveHourData | null>(null);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [isSynced, setIsSynced] = useState(false);
 
   // Identifying the "Strategic Delta"
   // Simple logic: Find max audience activity hour
@@ -50,14 +48,6 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
     const ampm = h >= 12 ? "PM" : "AM";
     const hour12 = h % 12 || 12;
     return `${hour12}${ampm}`;
-  };
-
-  const handleSync = () => {
-    setIsSyncing(true);
-    setTimeout(() => {
-      setIsSynced(true);
-      setIsSyncing(false);
-    }, 1500);
   };
 
   // --- Clock Visualization Helpers ---
@@ -227,7 +217,7 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-3 pb-2">
+          <div className="grid grid-cols-2 gap-3">
             <div className="p-3 bg-[#f4f8fb] rounded-xl border border-slate-100">
               <div className="text-[10px] text-slate-400 uppercase font-bold mb-1">
                 Response Velocity
@@ -240,38 +230,6 @@ export default function ActiveHours({ data = MOCK_HOURS }: ActiveHoursProps) {
               </div>
               <div className="text-lg font-bold text-[#000100]">~8 Hours</div>
             </div>
-          </div>
-
-          {/* Action Button */}
-          <div className="mt-auto flex flex-col gap-2">
-            <button
-              onClick={handleSync}
-              disabled={isSyncing || isSynced}
-              className="w-full py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-[#000100] hover:bg-black text-white"
-            >
-              {isSyncing ? (
-                <>
-                  <FaSync className="animate-spin" /> Syncing Queue...
-                </>
-              ) : isSynced ? (
-                <>
-                  <FaSync /> Schedule Synced ✅
-                </>
-              ) : (
-                <>
-                  <FaSync /> Sync to My Schedule
-                </>
-              )}
-            </button>
-            {isSynced && (
-              <motion.div
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center text-xs font-bold text-[#000100] bg-[#caee55]/40 py-2 rounded-xl"
-              >
-                Added slots for {formatHour(bestHour.hour)} (Golden Window)
-              </motion.div>
-            )}
           </div>
         </div>
       </div>

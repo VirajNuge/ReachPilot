@@ -14,20 +14,28 @@ import {
   Label,
 } from "recharts";
 import { Sparkles, AlertCircle } from "lucide-react";
-import { PlatformKey } from "./types";
+import type { PlatformKey } from "@/lib/analytics/platforms";
+import type { AnomalyPoint, HistoryPoint, PredictionPoint } from "@/lib/analytics/types";
 import { HISTORY_DATA, PREDICTION_DATA, ANOMALY_DATA } from "./mockData";
 
 interface GrowthChartProps {
   platform: PlatformKey;
+  history?: HistoryPoint[];
+  prediction?: PredictionPoint[];
+  anomalies?: AnomalyPoint[];
 }
 
-export default function GrowthChart({ platform }: GrowthChartProps) {
+export default function GrowthChart({ platform, history, prediction, anomalies }: GrowthChartProps) {
   const [showForecast, setShowForecast] = useState(false);
   const [showAnomalies, setShowAnomalies] = useState(true); // Default ON
 
+  const baseHistory = history ?? HISTORY_DATA;
+  const basePrediction = prediction ?? PREDICTION_DATA;
+  const baseAnomalies = anomalies ?? ANOMALY_DATA;
+
   const chartData = showForecast
-    ? [...HISTORY_DATA, ...PREDICTION_DATA.slice(1)]
-    : HISTORY_DATA;
+    ? [...baseHistory, ...basePrediction.slice(1)]
+    : baseHistory;
 
   const colors: Record<string, string> = {
     linkedin: "#0077B5",
@@ -41,13 +49,13 @@ export default function GrowthChart({ platform }: GrowthChartProps) {
   // Custom Tooltip for Anomalies
   const CustomTooltip = ({ active, payload, label }: any) => {
     // Check if this date has an anomaly
-    const anomaly = ANOMALY_DATA.find((a) => a.date === label);
+    const anomaly = baseAnomalies.find((a) => a.date === label);
 
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 rounded-xl shadow-xl border border-gray-100 max-w-[250px] z-50">
-          <p className="text-xs font-bold text-gray-400 mb-1">{label}</p>
-          <p className="text-sm font-bold text-gray-900 mb-2">
+        <div className="bg-white p-4 rounded-2xl shadow-xl border border-slate-100 max-w-[250px] z-50">
+          <p className="text-xs font-bold text-slate-400 mb-1">{label}</p>
+          <p className="text-sm font-bold text-slate-900 mb-2">
             {payload[0].value} Followers
           </p>
 
@@ -74,19 +82,19 @@ export default function GrowthChart({ platform }: GrowthChartProps) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm h-[420px] flex flex-col relative overflow-hidden group">
+    <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] h-[420px] flex flex-col relative overflow-hidden group">
       {/* Header Controls */}
       <div className="mb-6 flex justify-between items-start z-10 relative">
         <div>
-          <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-[#000100] flex items-center gap-2">
             Audience Growth
             {showAnomalies && (
-              <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] rounded-full uppercase tracking-wider">
+              <span className="px-2 py-0.5 bg-[#0052FF]/10 text-[#0052FF] text-[10px] rounded-full uppercase tracking-wider">
                 AI Active
               </span>
             )}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-slate-500">
             {platform === "all"
               ? "Cumulative growth"
               : `Net growth on ${platform}`}
@@ -97,10 +105,10 @@ export default function GrowthChart({ platform }: GrowthChartProps) {
           {/* Anomaly Toggle */}
           <button
             onClick={() => setShowAnomalies(!showAnomalies)}
-            className={`p-2 rounded-full transition-all border ${
+            className={`p-2.5 rounded-full transition-all border ${
               showAnomalies
-                ? "bg-indigo-50 text-indigo-600 border-indigo-200"
-                : "text-gray-400 border-gray-200"
+                ? "bg-[#0052FF]/10 text-[#0052FF] border-[#0052FF]/20"
+                : "text-slate-400 border-slate-200"
             }`}
             title="Toggle AI Anomaly Detection"
           >
@@ -112,8 +120,8 @@ export default function GrowthChart({ platform }: GrowthChartProps) {
             onClick={() => setShowForecast(!showForecast)}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
               showForecast
-                ? "bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-100"
-                : "bg-white text-gray-500 border-gray-200 hover:border-indigo-300"
+                ? "bg-[#0052FF] text-white border-[#0052FF] shadow-md ring-2 ring-[#0052FF]/10"
+                : "bg-white text-slate-500 border-slate-200 hover:border-[#0052FF]/30"
             }`}
           >
             <Sparkles
@@ -183,7 +191,7 @@ export default function GrowthChart({ platform }: GrowthChartProps) {
               <Area
                 type="monotone"
                 dataKey={platform}
-                stroke={colors[platform] || "#6366F1"}
+                stroke={colors[platform] || "#0052FF"}
                 fill={`url(#color-${platform})`}
                 strokeWidth={3}
               />
@@ -191,7 +199,7 @@ export default function GrowthChart({ platform }: GrowthChartProps) {
 
             {/* ⭐ RENDER ANOMALY MARKERS */}
             {showAnomalies &&
-              ANOMALY_DATA.map((anomaly, idx) => (
+              baseAnomalies.map((anomaly, idx) => (
                 <ReferenceDot
                   key={idx}
                   x={anomaly.date}

@@ -2,8 +2,11 @@ export interface HookCTAProps {
   trigger: string;
   skeleton: string;
   pivotA: string;
+  pivotAEngagement: string;
   pivotB: string;
+  pivotBEngagement: string;
   pivotC: string;
+  pivotCEngagement: string;
   ctaType: string;
   ctaTip: string;
 }
@@ -47,6 +50,7 @@ export interface CommentGapProps {
     sentiment: string;
     insight: string;
   };
+  analysisId?: string;
 }
 
 export interface VisualStrategyProps {
@@ -56,6 +60,9 @@ export interface VisualStrategyProps {
     midjourney: string;
     dalle: string;
   };
+  // Injected by parent for template saving
+  analysisId?: string;
+  images?: string[];
 }
 
 export interface ViralVelocityProps {

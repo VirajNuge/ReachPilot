@@ -37,27 +37,27 @@ export const HashtagPanel: React.FC<HashtagPanelProps> = ({ hashtags }) => {
   const renderTagGroup = (title: string, tags: string[]) => {
     if (!tags || tags.length === 0) return null;
     return (
-      <div className="flex flex-col gap-3">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+      <div className="flex flex-col gap-2">
+        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">
           {title}
         </span>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-start max-h-36 overflow-y-auto pr-1">
           {tags.map((tag, index) => {
             const isCopied = copiedTag === tag;
             return (
               <motion.button
                 key={`${tag}-${index}`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => handleCopyTag(tag)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1 ${
+                className={`relative px-2.5 py-1.5 rounded-lg text-[11px] font-semibold leading-none transition-all duration-200 flex items-center gap-1.5 hover:z-10 flex-shrink-0 ${
                   isCopied
                     ? "bg-green-100 text-green-700 border border-green-200"
                     : "bg-[#E8ECF2] text-gray-700 border border-transparent hover:bg-gray-200"
                 }`}
               >
                 {isCopied ? <Check className="w-3 h-3" /> : <Hash className="w-3 h-3" />}
-                {tag.replace(/^#/, "")}
+                <span>{tag.replace(/^#/, "")}</span>
               </motion.button>
             );
           })}
@@ -70,7 +70,7 @@ export const HashtagPanel: React.FC<HashtagPanelProps> = ({ hashtags }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-6"
+      className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-4"
     >
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
@@ -79,14 +79,14 @@ export const HashtagPanel: React.FC<HashtagPanelProps> = ({ hashtags }) => {
         </h3>
         <button
           onClick={handleCopyAll}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-bold text-xs text-gray-700 shadow-sm"
+          className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 font-semibold text-[11px] text-gray-700"
         >
           {copiedAll ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
           {copiedAll ? "Copied All" : "Copy All"}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="flex flex-col gap-5 mt-2">
         {renderTagGroup("High Reach", hashtags?.highReach || [])}
         {renderTagGroup("Niche", hashtags?.niche || [])}
         {renderTagGroup("Branded", hashtags?.branded || [])}

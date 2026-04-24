@@ -62,6 +62,8 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data, recipes }) => {
   const [showReplicateModal, setShowReplicateModal] = useState(false);
   const [generatedDraft, setGeneratedDraft] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [replicateError, setReplicateError] = useState(false);
+  const [selectedRecipeForModal, setSelectedRecipeForModal] = useState<ViralPostData | null>(null);
   const [copied, setCopied] = useState(false);
   const [showAllFormats, setShowAllFormats] = useState(false);
   const [saveStates, setSaveStates] = useState<Record<string, SaveState>>({});
@@ -92,17 +94,39 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data, recipes }) => {
 
   const safeData: ViralPostData = allRecipes[0];
 
-  const handleReplicate = () => {
+  const handleReplicate = async (recipe: ViralPostData) => {
     setIsGenerating(true);
-    setTimeout(() => {
+    setReplicateError(false);
+    setGeneratedDraft("");
+    try {
+      const res = await fetch("/api/analyze-extension/replicate-recipe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hookType: recipe.hookType,
+          hookText: recipe.hookText,
+          engagementMultiplier: recipe.engagementMultiplier,
+          ingredients: recipe.ingredients,
+          whyItWorked: recipe.whyItWorked,
+          templateStructure: recipe.templateStructure,
+        }),
+      });
+      const json: unknown = await res.json();
+      if (
+        !res.ok ||
+        typeof json !== "object" ||
+        json === null ||
+        !("draft" in json) ||
+        typeof (json as Record<string, unknown>).draft !== "string"
+      ) {
+        throw new Error("bad response");
+      }
+      setGeneratedDraft((json as { draft: string }).draft);
+    } catch {
+      setReplicateError(true);
+    } finally {
       setIsGenerating(false);
-      const template = safeData.templateStructure
-        .map((line, i) => `${i + 1}. ${line}`)
-        .join("\n\n");
-      setGeneratedDraft(
-        `Template based on Viral Logic:\n\n${template}\n\n// Fill in the brackets with your specific niche topic.`,
-      );
-    }, 1500);
+    }
   };
 
   const copyToClipboard = () => {
@@ -232,7 +256,20 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data, recipes }) => {
                             </div>
                           </div>
 
-                          {/* Save Template button */}
+                          {/* Save Template + Replicate buttons */}
+                          <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedRecipeForModal(recipe);
+                              setShowAllFormats(false);
+                              setShowReplicateModal(true);
+                              handleReplicate(recipe);
+                            }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border bg-white border-slate-200 text-slate-600 hover:border-[#074ed5] hover:text-[#074ed5]"
+                          >
+                            <FaMagic size={11} className="text-[#074ed5]" />
+                            Replicate
+                          </button>
                           <button
                             onClick={() => handleSaveTemplate(recipe)}
                             disabled={saveState === "saving" || saveState === "saved"}
@@ -268,6 +305,7 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data, recipes }) => {
                               </>
                             )}
                           </button>
+                          </div>
                         </div>
 
                         {/* Hook */}
@@ -370,9 +408,16 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data, recipes }) => {
                     <div className="p-2.5 bg-[#caee55] text-[#000100] rounded-2xl">
                       <FaMagic size={16} />
                     </div>
-                    <h3 className="text-lg font-black text-[#000100]">
-                      Template Generator
-                    </h3>
+                    <div>
+                      <h3 className="text-lg font-black text-[#000100] leading-none">
+                        Template Generator
+                      </h3>
+                      {selectedRecipeForModal && (
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                          {selectedRecipeForModal.hookType}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <button
                     onClick={() => setShowReplicateModal(false)}
@@ -390,10 +435,24 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data, recipes }) => {
                         Extracting Viral DNA…
                       </p>
                     </div>
+                  ) : replicateError ? (
+                    <div className="flex flex-col items-center justify-center gap-4 py-16">
+                      <FaExclamationTriangle className="text-red-400 text-3xl" />
+                      <p className="font-bold text-slate-500 text-sm text-center">
+                        Something went wrong generating the draft.
+                      </p>
+                      <button
+                        onClick={() => selectedRecipeForModal && handleReplicate(selectedRecipeForModal)}
+                        className="px-5 py-2.5 bg-[#074ed5] text-white rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#0041CC] transition-colors"
+                      >
+                        <FaMagic size={13} />
+                        Try Again
+                      </button>
+                    </div>
                   ) : (
                     <>
                       <p className="text-xs text-slate-500 font-medium">
-                        Here is a structure based on the outlier post. Fill in the blanks with your topic.
+                        Here is a draft based on the viral recipe. Swap in your own topic and publish.
                       </p>
                       <div className="flex-1 bg-[#f4f8fb] border border-slate-200 rounded-2xl p-5 font-mono text-sm text-[#000100] whitespace-pre-wrap overflow-y-auto custom-scroll shadow-inner">
                         {generatedDraft}
@@ -407,7 +466,7 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data, recipes }) => {
                         }`}
                       >
                         {copied ? <FaCheck /> : <FaCopy />}
-                        {copied ? "Copied to Clipboard!" : "Copy Template"}
+                        {copied ? "Copied to Clipboard!" : "Copy Draft"}
                       </button>
                     </>
                   )}
@@ -545,8 +604,9 @@ const ViralRecipe: React.FC<ViralRecipeProps> = ({ data, recipes }) => {
             <div className="mt-auto flex flex-col gap-2">
               <button
                 onClick={() => {
+                  setSelectedRecipeForModal(safeData);
                   setShowReplicateModal(true);
-                  handleReplicate();
+                  handleReplicate(safeData);
                 }}
                 className="w-full py-3 bg-[#000100] hover:bg-black text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(26,29,35,0.2)] active:scale-[0.98]"
               >

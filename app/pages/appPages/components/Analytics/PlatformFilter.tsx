@@ -10,7 +10,7 @@ import {
   FaPinterest,
   FaAt,
 } from "react-icons/fa";
-import { PlatformKey } from "./types";
+import type { PlatformKey } from "@/lib/analytics/platforms";
 
 interface PlatformFilterProps {
   selected: PlatformKey;
@@ -67,7 +67,7 @@ export default function PlatformFilter({
   ];
 
   return (
-    <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 px-3 py-2 rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       {platforms.map((p) => {
         const isActive = selected === p.id;
         return (
@@ -76,8 +76,8 @@ export default function PlatformFilter({
             onClick={() => onSelect(p.id as PlatformKey)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border whitespace-nowrap ${
               isActive
-                ? "bg-gray-900 text-white border-gray-900 shadow-md transform scale-105"
-                : "bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                ? "bg-[#000100] text-white border-[#000100] shadow-md transform scale-105"
+                : "bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
             }`}
           >
             <span className={isActive ? "text-white" : p.color}>{p.icon}</span>

@@ -1,0 +1,1273 @@
+[
+  {
+    "id": "e678718d-c1fc-4be6-b8c1-698cb0539e4c",
+    "analysis": {
+      "hookCTA": {
+        "trigger": "Curiosity Gap + Social Proof",
+        "skeleton": "I'm thinking about learning [skill/language], but I'm told [common choice] isn't the best. What should I actually learn?",
+        "pivotA": "I want to learn to code, but Python feels overdone. What's a better language to future-proof my career?",
+        "pivotAEngagement": "High Comments",
+        "pivotB": "Everyone says to invest in stocks, but is real estate a smarter move for long-term wealth?",
+        "pivotBEngagement": "High Comments",
+        "pivotC": "Considering learning a new marketing skill. Is SEO still relevant, or should I focus on AI?",
+        "pivotCEngagement": "High Comments",
+        "ctaType": "Seeking Recommendations",
+        "ctaTip": "Frame the question around a perceived problem or challenge, making people feel their advice is valuable."
+      },
+      "retention": {
+        "segments": [
+          {
+            "text": "was thinking about learning an indian language, just in case",
+            "retention": "high"
+          },
+          {
+            "text": "hindi feels obvious but i’m told it’s not the one",
+            "retention": "high"
+          },
+          {
+            "text": "what should i actually learn, just in case?",
+            "retention": "high"
+          }
+        ],
+        "seedComments": [
+          "Interesting question! What are your goals for learning the language?",
+          "There are so many factors... what's your timeframe and commitment level?",
+          "I have some experience in this area. Can you share more about what you hope to achieve?"
+        ]
+      },
+      "leadPersona": {
+        "audienceData": [
+          {
+            "label": "Linguistics Enthusiasts",
+            "value": 0.4,
+            "color": "#FF5733"
+          },
+          {
+            "label": "Indian Language Speakers",
+            "value": 0.35,
+            "color": "#36A2EB"
+          },
+          {
+            "label": "Travel/Culture Buffs",
+            "value": 0.25,
+            "color": "#FFC300"
+          }
+        ],
+        "highIntentLeads": [
+          {
+            "name": "SagasofBharat",
+            "role": "Advocate",
+            "intent": "Passionate about Hindi language and culture, defending it against perceived biases.",
+            "avatar": "https://pbs.twimg.com/profile_images/2012786179272323073/Krf7FqTm_bigger.jpg"
+          },
+          {
+            "name": "neurasite",
+            "role": "Educator",
+            "intent": "Sharing knowledge about the prevalence of English in India and offering alternative perspectives.",
+            "avatar": "https://abs.twimg.com/sticky/default_profile_images/default_profile_bigger.png"
+          }
+        ],
+        "icpAlignment": {
+          "title": "Potential Customer Alignment",
+          "score": 0.75
+        }
+      },
+      "commentGap": {
+        "gapData": [
+          {
+            "gap": "Usefulness of Hindi vs. other regional languages",
+            "frequency": 0.6,
+            "strategy": "Create a comparison guide showcasing the reach and utility of different Indian languages based on specific needs."
+          },
+          {
+            "gap": "The role of English in India",
+            "frequency": 0.2,
+            "strategy": "Address the prevalence of English and its impact on language learning decisions."
+          },
+          {
+            "gap": "Relevance of Sanskrit",
+            "frequency": 0.1,
+            "strategy": "Explain the roots of the sanskrit language as it relates to many Indic languages."
+          }
+        ],
+        "confusionPoint": {
+          "text": "Whether Hindi is actually useful across India.",
+          "sentiment": "Contested",
+          "insight": "There's a debate about the practical reach and acceptance of Hindi in different parts of India, especially the South."
+        }
+      },
+      "visualStrategy": {
+        "category": "Cultural Exploration",
+        "colors": [
+          "#F2C94C",
+          "#2D9CDB",
+          "#6FCF97"
+        ],
+        "prompts": {
+          "midjourney": "A vibrant collage representing the diversity of Indian languages and cultures, in the style of a travel poster, bright colors, high detail",
+          "dalle": "A digital illustration depicting various Indian scripts intertwined with modern technology, showcasing the intersection of tradition and innovation, warm color palette"
+        }
+      },
+      "viralVelocity": {
+        "velocityData": {
+          "likesPerHour": 43.33,
+          "trend": "Stable",
+          "peakTime": "Within the first few hours",
+          "accountAvg": 2.5,
+          "growthPrediction": "Steady engagement over time"
+        }
+      },
+      "sentiment": {
+        "sentimentData": {
+          "positive": 0.35,
+          "constructive": 0.45,
+          "neutral": 0.1,
+          "negative": 0.1,
+          "keywords": [
+            "useful",
+            "best",
+            "helpful",
+            "political",
+            "propaganda"
+          ],
+          "dominantEmotion": "Curiosity",
+          "trustScore": "Moderate",
+          "sarcasmLevel": "Low",
+          "isControversial": true
+        }
+      },
+      "competitor": {
+        "benchmarkData": {
+          "engagementRate": 190.75,
+          "accountAvg": 2.5,
+          "nicheAvg": 2.5,
+          "isOutlier": true,
+          "botSignal": "Low",
+          "followers": "Unknown"
+        }
+      }
+    },
+    "postData": {
+      "platform": "x",
+      "author": "Craig Weiss",
+      "handle": "@craigzLiszt",
+      "authorPfp": "https://pbs.twimg.com/profile_images/1914812840927748096/Rchy2ZK2_bigger.jpg",
+      "content": "was thinking about learning an indian language, just in case\n\nhindi feels obvious\nbut i’m told it’s not the one\nwhat should i actually learn, just in case?",
+      "postUrl": "https://x.com/craigzLiszt/status/2035838696239546655",
+      "images": [],
+      "videos": [],
+      "postedAt": "2026-03-22T21:59:03.000Z",
+      "metrics": {
+        "likes": 520,
+        "replies": 554,
+        "retweets": 32,
+        "views": 0
+      },
+      "comments": [
+        {
+          "user": "neurasite",
+          "pfp": "https://abs.twimg.com/sticky/default_profile_images/default_profile_bigger.png",
+          "text": "English is used everywhere in Indian schools and corporations. There is one state in India where no one speaks or even learns Hindi (TN). If there is one language that unites all Indians, it is ironically English.",
+          "timestamp": "2026-03-22T22:20:35.000Z",
+          "engagement": {
+            "likes": 94,
+            "replies": 17,
+            "retweets": 1
+          }
+        },
+        {
+          "user": "Craig Weiss",
+          "pfp": "https://pbs.twimg.com/profile_images/1914812840927748096/Rchy2ZK2_bigger.jpg",
+          "text": "I guess I'll need to study english then",
+          "timestamp": "2026-03-22T22:22:31.000Z",
+          "engagement": {
+            "likes": 89,
+            "replies": 11,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "prazival dharma",
+          "pfp": "https://pbs.twimg.com/profile_images/1593971112572243968/MQ6LumGY_bigger.jpg",
+          "text": "Hindi is to relate with the elites. \n\nTamil is to relate with the masses.",
+          "timestamp": "2026-03-23T04:55:39.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 16,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Shikhar",
+          "pfp": "https://pbs.twimg.com/profile_images/2008508643868872704/Xk0BZcVF_bigger.jpg",
+          "text": "Hindi is obviously a good choice if you are serious, despite all the political issues here.",
+          "timestamp": "2026-03-22T22:05:50.000Z",
+          "engagement": {
+            "likes": 50,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Shadow",
+          "pfp": "https://pbs.twimg.com/profile_images/1971556741218467840/Utu2VU0Z_bigger.jpg",
+          "text": "I'm Tamilian and say you were told wrong. Hindi is the right language to learn. And then if you spend a significant time in a state in India learn some 'courtesy words' from that state's language.",
+          "timestamp": "2026-03-23T07:06:47.000Z",
+          "engagement": {
+            "likes": 30,
+            "replies": 2,
+            "retweets": 1
+          }
+        },
+        {
+          "user": "ನವೀನ್ ಕಿರುಗುಳಿಗೆ",
+          "pfp": "https://pbs.twimg.com/profile_images/2026163283254988800/V2GkbXDj_bigger.jpg",
+          "text": "Learn kannada. Most useful language in Bangalore, the tech capital of India.",
+          "timestamp": "2026-03-23T07:14:51.000Z",
+          "engagement": {
+            "likes": 23,
+            "replies": 2,
+            "retweets": 1
+          }
+        },
+        {
+          "user": "Eztainutlacatl",
+          "pfp": "https://pbs.twimg.com/profile_images/960797262870753280/iKlkmexh_bigger.jpg",
+          "text": "What's the purpose? If there is no purpose, directly go to Sanskirt. Forking towards a bulk of Indian languages if you know Sanskrit is very easy.",
+          "timestamp": "2026-03-22T22:19:03.000Z",
+          "engagement": {
+            "likes": 38,
+            "replies": 5,
+            "retweets": 4
+          }
+        },
+        {
+          "user": "SagasofBharat",
+          "pfp": "https://pbs.twimg.com/profile_images/2012786179272323073/Krf7FqTm_bigger.jpg",
+          "text": "Learn Hindi. People fight in India over language. But most people still understand it in every part of india as well as in all our neighbouring countries up to the gulf. \n\nDon't listen to language propaganda creators.",
+          "timestamp": "2026-03-23T05:40:39.000Z",
+          "engagement": {
+            "likes": 202,
+            "replies": 2,
+            "retweets": 7
+          }
+        },
+        {
+          "user": "Amit Behere",
+          "pfp": "https://pbs.twimg.com/profile_images/1838047825138999297/cFLAZoKh_bigger.jpg",
+          "text": "Gujarati. They own half of India. In another 10 years, they will own all of it.",
+          "timestamp": "2026-03-23T05:31:11.000Z",
+          "engagement": {
+            "likes": 34,
+            "replies": 17,
+            "retweets": 1
+          }
+        },
+        {
+          "user": "Amol G.",
+          "pfp": "https://pbs.twimg.com/profile_images/1718315704946941952/LjXIhC4I_bigger.jpg",
+          "text": "Just learn Hindi dude keep it simple. Even if you are in the East, super north, South etc. at least 1/3 people will know some Hindi.",
+          "timestamp": "2026-03-22T22:46:30.000Z",
+          "engagement": {
+            "likes": 47,
+            "replies": 5,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Amar",
+          "pfp": "https://pbs.twimg.com/profile_images/2028364175420825600/i_XV7EPq_bigger.jpg",
+          "text": "Maybe try learning vocabulary of sanskrit, largely most Indic languages have root words derived from it. Pepper those words with English conjunctions, adjectives and adverbs. Then you can know, Hinglish, Kanadlish, Tammilish, Punjaish and what not",
+          "timestamp": "2026-03-23T06:42:17.000Z",
+          "engagement": {
+            "likes": 4,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "KG",
+          "pfp": "https://pbs.twimg.com/profile_images/745411306119823360/zyrLcAWb_bigger.jpg",
+          "text": "Hindi is the only one that is useful for an outsider.  Most media (news, films, TV shows, music) is in Hindi.  Verbally, Urdu is almost the same as Hindi so you get a two-fer for verbal communication too (though not reading/writing).  \n\nHowever, I will say that anyone who speaks",
+          "timestamp": "2026-03-23T00:48:54.000Z",
+          "engagement": {
+            "likes": 15,
+            "replies": 1,
+            "retweets": 1
+          }
+        },
+        {
+          "user": "Ankith /acc",
+          "pfp": "https://pbs.twimg.com/profile_images/2023611605511270401/03oDN4t3_bigger.png",
+          "text": "As a south indian. Trust me its hindi.\n\nSanskrit is a meme answer but if you want to study one as comparative linguistics and not spoken then its a good candidate\n\nCan learn telugu for fun too if you want cause movies from tollywood have been getting famous like RRR and bahubali",
+          "timestamp": "2026-03-23T06:17:11.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Naseeb Panghal",
+          "pfp": "https://pbs.twimg.com/profile_images/2031430595541348355/FKAb6_Ib_bigger.jpg",
+          "text": "India has 22 scheduled languages which are almost difficult to learn all. But if you need to reach masses Hindi is preferred (especially for north India).   \n\nRanking based on Native speakers \n- Hindi : 528.3 Million  \n- Bengali : 97.2 million \n- Marathi : 83.0 million \n- Telugu",
+          "timestamp": "2026-03-23T09:03:09.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 0,
+            "retweets": 0
+          }
+        }
+      ],
+      "commentCount": 14
+    },
+    "timestamp": 1774256778023
+  },
+  {
+    "id": "6161c1be-d904-424f-9ce1-33014465b1c7",
+    "analysis": {
+      "hookCTA": {
+        "trigger": "Guilt/Confession",
+        "skeleton": "I feel X for Y. Maybe it deserves Z? But not today! WORK!",
+        "pivotA": "I feel bad for making my team work weekends. Maybe they deserve a bonus? But not this month! BUDGET!",
+        "pivotAEngagement": "High Comments",
+        "pivotB": "I feel guilty for using so much cloud compute. Maybe the server deserves a break? But not now! DEPLOY!",
+        "pivotBEngagement": "High Likes",
+        "pivotC": "I feel like I over-optimized this SQL query. Maybe it deserves some readability? But not today! SPEED!",
+        "pivotCEngagement": "High Comments",
+        "ctaType": "Confession/Humor",
+        "ctaTip": "Use self-deprecating humor or admit to overworking something to create relatability."
+      },
+      "retention": {
+        "segments": [
+          {
+            "text": "I feel guilty for giving Claude Code so much work",
+            "retention": "high"
+          },
+          {
+            "text": "Maybe it deserves a day off?",
+            "retention": "medium"
+          },
+          {
+            "text": "But not today! WORK!!!!",
+            "retention": "high"
+          }
+        ],
+        "seedComments": [
+          "I felt this way last week, then my server crashed.",
+          "Relatable. The grind never stops.",
+          "My AI overlord demands more processing power."
+        ]
+      },
+      "leadPersona": {
+        "audienceData": [
+          {
+            "label": "DevOps Engineers",
+            "value": 0.45,
+            "color": "blue"
+          },
+          {
+            "label": "Software Developers",
+            "value": 0.35,
+            "color": "green"
+          },
+          {
+            "label": "Cloud Computing Enthusiasts",
+            "value": 0.2,
+            "color": "purple"
+          }
+        ],
+        "highIntentLeads": [
+          {
+            "name": "Deckard",
+            "role": "Database Admin",
+            "intent": "Seeking optimal database configuration strategies for Claude Code.",
+            "avatar": "https://pbs.twimg.com/profile_images/2022508864403623936/HxkY_8md_bigger.jpg"
+          },
+          {
+            "name": "Qusai Sabri",
+            "role": "Mobile Developer",
+            "intent": "Interested in remote coding setups using Claude Code with possible interest in alternatives like Tailscale.",
+            "avatar": "https://pbs.twimg.com/profile_images/1611063586138296337/hZ6N31RX_bigger.jpg"
+          }
+        ],
+        "icpAlignment": {
+          "title": "Ideal Customer Profile Alignment",
+          "score": 0.75
+        }
+      },
+      "commentGap": {
+        "gapData": [
+          {
+            "gap": "Database Configuration",
+            "frequency": 0.3,
+            "strategy": "Create content detailing optimal database configurations and management techniques for Claude Code."
+          },
+          {
+            "gap": "Remote Coding Setups",
+            "frequency": 0.2,
+            "strategy": "Develop content on remote coding setups, comparing Termius SSH, Tailscale, and other alternatives with Claude Code."
+          },
+          {
+            "gap": "Auto Compaction",
+            "frequency": 0.15,
+            "strategy": "Explain the pros and cons of auto-compaction and provide best practices for manual prompting."
+          }
+        ],
+        "confusionPoint": {
+          "text": "Vulnerability related to port 34567",
+          "sentiment": "negative",
+          "insight": "The user should address the potential security risk to prevent exploitation attempts"
+        }
+      },
+      "visualStrategy": {
+        "category": "Humorous/Relatable",
+        "colors": [
+          "Yellow",
+          "Black",
+          "White"
+        ],
+        "prompts": {
+          "midjourney": "A cartoon server robot looking tired and overworked, sweat droplets, with a coffee mug that says 'Fuel'. Style: Simple, relatable, humorous.",
+          "dalle": "A digital illustration of a worn-out server rack with pleading eyes, next to a demanding text prompt. The scene should convey humor and overwork. Style: Cartoonish, expressive."
+        }
+      },
+      "viralVelocity": {
+        "velocityData": {
+          "likesPerHour": 24.125,
+          "trend": "Stable",
+          "peakTime": "Unknown",
+          "accountAvg": 1.5,
+          "growthPrediction": "Consistent engagement with niche audience."
+        }
+      },
+      "sentiment": {
+        "sentimentData": {
+          "positive": 0.3,
+          "constructive": 0.4,
+          "neutral": 0.2,
+          "negative": 0.1,
+          "keywords": [
+            "work",
+            "guilty",
+            "reliable",
+            "flood"
+          ],
+          "dominantEmotion": "Guilt/Humor",
+          "trustScore": "High",
+          "sarcasmLevel": "Low",
+          "isControversial": false
+        }
+      },
+      "competitor": {
+        "benchmarkData": {
+          "engagementRate": 68.47,
+          "accountAvg": 2.5,
+          "nicheAvg": 2.5,
+          "isOutlier": true,
+          "botSignal": "Low",
+          "followers": "Unknown"
+        }
+      }
+    },
+    "postData": {
+      "platform": "x",
+      "author": "Unknown",
+      "handle": "@levelsio",
+      "authorPfp": "https://pbs.twimg.com/profile_images/1996831016720486400/vycHz0uG_bigger.jpg",
+      "content": "I feel guilty for giving Claude Code so much work\n\nMaybe it deserves a day off? \n\nBut not today! WORK!!!!",
+      "postUrl": "https://x.com/levelsio/status/2035546258169831469",
+      "images": [
+        "https://pbs.twimg.com/media/HD-2X-8aAAAcAnn?format=jpg&name=900x900"
+      ],
+      "videos": [],
+      "postedAt": "2026-03-22T02:37:01.000Z",
+      "metrics": {
+        "likes": 579,
+        "replies": 115,
+        "retweets": 28,
+        "views": 0
+      },
+      "comments": [
+        {
+          "user": "Deckard",
+          "pfp": "https://pbs.twimg.com/profile_images/2022508864403623936/HxkY_8md_bigger.jpg",
+          "text": "Wait, you use auto-compaction? Don't you find it compaction worse than if you were to prompt it yourself?",
+          "timestamp": "2026-03-22T03:01:15.000Z",
+          "engagement": {
+            "likes": 3,
+            "replies": 2,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Unknown",
+          "pfp": "https://pbs.twimg.com/profile_images/1996831016720486400/vycHz0uG_bigger.jpg",
+          "text": "I just let it do whatever it wants brother",
+          "timestamp": "2026-03-22T04:20:05.000Z",
+          "engagement": {
+            "likes": 12,
+            "replies": 0,
+            "retweets": 1
+          }
+        },
+        {
+          "user": "Qusai Sabri",
+          "pfp": "https://pbs.twimg.com/profile_images/1611063586138296337/hZ6N31RX_bigger.jpg",
+          "text": "Do you use the remote sessions feature? It’s not reliable but I want to code from my phone sometimes when I’m out! Or do i need Tailscale setup or something?",
+          "timestamp": "2026-03-22T04:43:24.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 2,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Unknown",
+          "pfp": "https://pbs.twimg.com/profile_images/1996831016720486400/vycHz0uG_bigger.jpg",
+          "text": "Nope I use Termius SSH",
+          "timestamp": "2026-03-22T05:00:43.000Z",
+          "engagement": {
+            "likes": 3,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Billy Nguyen",
+          "pfp": "https://pbs.twimg.com/profile_images/1927031635599314944/fYQesDzK_bigger.jpg",
+          "text": "34567 port, okie we will flood that",
+          "timestamp": "2026-03-22T03:13:43.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Unknown",
+          "pfp": "https://pbs.twimg.com/profile_images/1996831016720486400/vycHz0uG_bigger.jpg",
+          "text": "Good luck it's in my Tailscale subnet :D",
+          "timestamp": "2026-03-22T04:21:22.000Z",
+          "engagement": {
+            "likes": 3,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Adrian Rangel",
+          "pfp": "https://pbs.twimg.com/profile_images/1958238371819507712/kShGAa5g_bigger.jpg",
+          "text": "Do you use Linodes managed database or do you self-manage inside the VPS?",
+          "timestamp": "2026-03-22T02:41:23.000Z",
+          "engagement": {
+            "likes": 1,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Unknown",
+          "pfp": "https://pbs.twimg.com/profile_images/1996831016720486400/vycHz0uG_bigger.jpg",
+          "text": "Nope self managed SQLite!",
+          "timestamp": "2026-03-22T02:42:09.000Z",
+          "engagement": {
+            "likes": 11,
+            "replies": 3,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Peter Mmuo",
+          "pfp": "https://pbs.twimg.com/profile_images/2027352038095355904/TImPFbnN_bigger.jpg",
+          "text": "Hell nawww\n\nWe don’t apologize around here",
+          "timestamp": "2026-03-22T06:45:55.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 0,
+            "retweets": 0
+          }
+        }
+      ],
+      "commentCount": 9
+    },
+    "timestamp": 1774165251139
+  },
+  {
+    "id": "ca386bc1-d336-4c6d-9a48-d21cffa586b3",
+    "analysis": {
+      "hookCTA": {
+        "trigger": "Problem/Solution",
+        "skeleton": "I was struggling with [PROBLEM]. So I made a simple change: [SOLUTION].",
+        "pivotA": "My biggest time-waster? Answering repetitive questions. Here's how I automated 80% of support and reclaimed my day:",
+        "pivotAEngagement": "High Shares",
+        "pivotB": "Free users draining your resources? I added a $1 paywall for support. Here’s why it's the best decision I made:",
+        "pivotBEngagement": "High Comments",
+        "pivotC": "Stop wasting time on support tickets from people who will never convert. My $1 trick weeds out the noise and helps paying customers faster:",
+        "pivotCEngagement": "High Likes",
+        "ctaType": "Value Proposition",
+        "ctaTip": "Highlight tangible results like time saved, resources reclaimed, or improved customer experience to maximize impact."
+      },
+      "retention": {
+        "segments": [
+          {
+            "text": "I was drowning in hundreds of support messages on TrustMRR.",
+            "retention": "high"
+          },
+          {
+            "text": "So I made a simple change: support is now reserved for paid customers ($1 minimum)",
+            "retention": "high"
+          },
+          {
+            "text": "Everyone else gets the FAQ + a $1 unlock button",
+            "retention": "medium"
+          },
+          {
+            "text": "It filters out 95% of noise, so paying customers actually get helped faster now.",
+            "retention": "high"
+          }
+        ],
+        "seedComments": [
+          "How did you determine the $1 price point? Did you test different amounts?",
+          "I'm facing a similar problem. What FAQ system do you recommend?",
+          "Has this affected your conversion rates at all? I'm curious if it's deterring potential customers."
+        ]
+      },
+      "leadPersona": {
+        "audienceData": [
+          {
+            "label": "Solo Founders/Bootstrappers",
+            "value": 0.65,
+            "color": "#FF5733"
+          },
+          {
+            "label": "SaaS Founders",
+            "value": 0.25,
+            "color": "#3498DB"
+          },
+          {
+            "label": "Efficiency Seekers",
+            "value": 0.1,
+            "color": "#2ECC71"
+          }
+        ],
+        "highIntentLeads": [
+          {
+            "name": "Hud Taylor",
+            "role": "Founder of 13 AI Tools",
+            "intent": "Implementing the $1 filter strategy.",
+            "avatar": "https://pbs.twimg.com/profile_images/1414031835697352711/LDA6izDT_normal.jpg"
+          },
+          {
+            "name": "Michael Zimmermann",
+            "role": "Customer Trying to Upgrade",
+            "intent": "Frustrated with current support systems, looking for better solutions.",
+            "avatar": "https://pbs.twimg.com/profile_images/1904217142074941440/UQl5J-b4_normal.jpg"
+          }
+        ],
+        "icpAlignment": {
+          "title": "Ideal Customer Profile Alignment",
+          "score": 0.85
+        }
+      },
+      "commentGap": {
+        "gapData": [
+          {
+            "gap": "Transaction Fees for $1 Support",
+            "frequency": 0.3,
+            "strategy": "Create content comparing transaction fees across different payment platforms for micro-transactions."
+          },
+          {
+            "gap": "Impact on Conversion Rates",
+            "frequency": 0.2,
+            "strategy": "Share data on how the $1 support fee affects conversion rates (positive or negative) with A/B testing results."
+          },
+          {
+            "gap": "AI Support Implementation Details",
+            "frequency": 0.25,
+            "strategy": "Detail the AI support setup, including the tools used (Crisp AI), training methods, and lessons learned."
+          },
+          {
+            "gap": "Alternatives to $1 Support",
+            "frequency": 0.15,
+            "strategy": "Discuss and compare alternative methods for filtering support requests (e.g., tiered support, community forums)."
+          }
+        ],
+        "confusionPoint": {
+          "text": "Frederik Filosi's question about being charged despite paying a listing fee.",
+          "sentiment": "Negative",
+          "insight": "Indicates a potential bug or unclear communication in the system regarding support access for paid users."
+        }
+      },
+      "visualStrategy": {
+        "category": "Minimalist Data Visualization",
+        "colors": [
+          "#1E293B",
+          "#38BDF8",
+          "#94A3B8"
+        ],
+        "prompts": {
+          "midjourney": "minimalist graph, support tickets vs paid users, dark background, data visualization, clean lines, trending on Dribbble",
+          "dalle": "A clean infographic depicting the reduction in support tickets after implementing a $1 paywall. Use a dark blue and white color scheme. Show a before-and-after comparison with clear data points."
+        }
+      },
+      "viralVelocity": {
+        "velocityData": {
+          "likesPerHour": 67.17,
+          "trend": "Stable",
+          "peakTime": "Within first 2 hours of posting",
+          "accountAvg": 2,
+          "growthPrediction": "Steady growth with consistent engagement."
+        }
+      },
+      "sentiment": {
+        "sentimentData": {
+          "positive": 0.55,
+          "constructive": 0.3,
+          "neutral": 0.1,
+          "negative": 0.05,
+          "keywords": [
+            "genius",
+            "smart",
+            "good",
+            "noise",
+            "filter"
+          ],
+          "dominantEmotion": "Approval",
+          "trustScore": "High",
+          "sarcasmLevel": "Low",
+          "isControversial": false
+        }
+      },
+      "competitor": {
+        "benchmarkData": {
+          "engagementRate": 113.12,
+          "accountAvg": 3,
+          "nicheAvg": 2.5,
+          "isOutlier": true,
+          "botSignal": "Low",
+          "followers": "5K-10K"
+        }
+      }
+    },
+    "postData": {
+      "platform": "x",
+      "author": "Marc Lou",
+      "handle": "@marclou",
+      "authorPfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+      "content": "I was drowning in hundreds of support messages on TrustMRR.\n\nSo I made a simple change: support is now reserved for paid customers ($1 minimum)\n\nEveryone else gets the FAQ + a $1 unlock button\n\nIt filters out 95% of noise, so paying customers actually get helped faster now.",
+      "postUrl": "https://x.com/marclou/status/2035336895413297521",
+      "images": [
+        "https://pbs.twimg.com/media/HD74Hj2bAAAUvGb?format=jpg&name=900x900",
+        "https://pbs.twimg.com/media/HD74HunbUAEv3WF?format=jpg&name=small"
+      ],
+      "videos": [],
+      "postedAt": "2026-03-21T12:45:05.000Z",
+      "metrics": {
+        "likes": 806,
+        "replies": 120,
+        "retweets": 9,
+        "views": 0
+      },
+      "comments": [
+        {
+          "user": "VyN",
+          "pfp": "https://pbs.twimg.com/profile_images/2016089274761048064/U2uZ0b7t_normal.jpg",
+          "text": "a $1 tax is the best thing to do, If they won’t pay the price of a stick of gum to talk to a human, they aren't a customer they’re just a distraction.",
+          "timestamp": "2026-03-21T12:47:22.000Z",
+          "engagement": {
+            "likes": 12,
+            "replies": 1,
+            "retweets": 1
+          }
+        },
+        {
+          "user": "Aleksandar Jovanovic",
+          "pfp": "https://pbs.twimg.com/profile_images/1986811982993903616/vZi2_SIQ_normal.jpg",
+          "text": "Ever thought of adding AI-assist-only support feature for free, and the human support for $1?",
+          "timestamp": "2026-03-21T12:49:49.000Z",
+          "engagement": {
+            "likes": 15,
+            "replies": 3,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "Yes, people insisted on talking to a human so the AI gave up at some point \n\nAI trained on FAQ so it was pretty good",
+          "timestamp": "2026-03-21T14:17:54.000Z",
+          "engagement": {
+            "likes": 13,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Nevo David",
+          "pfp": "https://pbs.twimg.com/profile_images/1996519472291553280/P9cZJCVZ_normal.jpg",
+          "text": "I would charge more than $1, because once you charge $1 you basically commit to help",
+          "timestamp": "2026-03-21T14:52:05.000Z",
+          "engagement": {
+            "likes": 5,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "yes true",
+          "timestamp": "2026-03-21T15:09:56.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "HireTimSF.com",
+          "pfp": "https://pbs.twimg.com/profile_images/1999476332259082240/4plmyNZZ_normal.jpg",
+          "text": "How much do you pay for transaction fee for $1 support? It they dispute this?",
+          "timestamp": "2026-03-21T13:43:54.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 3,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "prob 0.36?\n\nyeah disputes suck",
+          "timestamp": "2026-03-21T14:18:55.000Z",
+          "engagement": {
+            "likes": 3,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Martin Donadieu - oss/acc",
+          "pfp": "https://pbs.twimg.com/profile_images/1603462822423416832/Rck3-3Ov_normal.png",
+          "text": "Good ! Next is auto filter with AI",
+          "timestamp": "2026-03-21T13:47:48.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "I had Crisp AI set up too but people kept asking to chat with human and eventually AI turned me in",
+          "timestamp": "2026-03-21T14:15:27.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Frederik Filosi",
+          "pfp": "https://pbs.twimg.com/profile_images/1781976008821784576/8SFXXsyI_normal.jpg",
+          "text": "@marclou\n I paid the 29$ listing fee and still got this pop up.. is that on purpose?",
+          "timestamp": "2026-03-21T14:44:13.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "dm ing you",
+          "timestamp": "2026-03-21T15:10:15.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Hud Taylor",
+          "pfp": "https://pbs.twimg.com/profile_images/1414031835697352711/LDA6izDT_normal.jpg",
+          "text": "This is genius. Solo founders get crushed by support from free users who will never convert.\n\nI run 13 AI tools and was spending more time on \"how do I sign up\" emails than building features. The $1 filter is basically a seriousness gate. Stealing this.",
+          "timestamp": "2026-03-21T15:07:16.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Daniel Rachlin",
+          "pfp": "https://pbs.twimg.com/profile_images/2020966245831499777/0JUyPOPP_normal.jpg",
+          "text": "Smart move. Support can be a huge drain when building lean. This gets paying customers the focus they deserve.",
+          "timestamp": "2026-03-21T21:18:45.000Z",
+          "engagement": {
+            "likes": 1,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Michael Zimmermann",
+          "pfp": "https://pbs.twimg.com/profile_images/1904217142074941440/UQl5J-b4_normal.jpg",
+          "text": "$1 is a good filter. Beats what I was encountering with Google yesterday where the error I was encountering while upgrading to a paid plan was something it wouldn’t connect me to a human for because I’m not on a paid plan. I’m trying to pay you!",
+          "timestamp": "2026-03-21T13:56:28.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 0,
+            "retweets": 0
+          }
+        }
+      ],
+      "commentCount": 14
+    },
+    "timestamp": 1774138717540
+  },
+  {
+    "id": "2621039a-71a7-43ad-b507-efc19b28c897",
+    "analysis": {
+      "hookCTA": {
+        "trigger": "Pain Point Amplification",
+        "skeleton": "I was struggling with [problem], so I made a simple change: [solution].",
+        "pivotA": "I lost $5,000 on Facebook Ads last month. Here's what I learned...",
+        "pivotAEngagement": "High Comments",
+        "pivotB": "My landing page conversion rate doubled overnight. Here's the script I added...",
+        "pivotBEngagement": "High Shares",
+        "pivotC": "Stop wasting time on [common mistake]. Here's a better way...",
+        "pivotCEngagement": "High Likes",
+        "ctaType": "Problem/Solution",
+        "ctaTip": "Use specific numbers and quantifiable results to grab attention."
+      },
+      "retention": {
+        "segments": [
+          {
+            "text": "I was drowning in hundreds of support messages on TrustMRR.",
+            "retention": "high"
+          },
+          {
+            "text": "So I made a simple change: support is now reserved for paid customers ($1 minimum)",
+            "retention": "high"
+          },
+          {
+            "text": "Everyone else gets the FAQ + a $1 unlock button",
+            "retention": "medium"
+          },
+          {
+            "text": "It filters out 95% of noise, so paying customers actually get helped faster now.",
+            "retention": "high"
+          }
+        ],
+        "seedComments": [
+          "This is a game-changer for solo founders!",
+          "I'm implementing this immediately!",
+          "What tools do you use for the FAQ + unlock button?"
+        ]
+      },
+      "leadPersona": {
+        "audienceData": [
+          {
+            "label": "Solo Founders",
+            "value": 0.5,
+            "color": "#FF5733"
+          },
+          {
+            "label": "SaaS Entrepreneurs",
+            "value": 0.3,
+            "color": "#3498DB"
+          },
+          {
+            "label": "Efficiency Seekers",
+            "value": 0.2,
+            "color": "#2ECC71"
+          }
+        ],
+        "highIntentLeads": [
+          {
+            "name": "Hud Taylor",
+            "role": "Founder of 13 AI tools",
+            "intent": "Wants to steal the idea",
+            "avatar": "https://pbs.twimg.com/profile_images/1414031835697352711/LDA6izDT_normal.jpg"
+          },
+          {
+            "name": "Aleksandar Jovanovic",
+            "role": "Entrepreneur",
+            "intent": "Suggesting improvements/innovations",
+            "avatar": "https://pbs.twimg.com/profile_images/1986811982993903616/vZi2_SIQ_normal.jpg"
+          }
+        ],
+        "icpAlignment": {
+          "title": "Ideal Customer Profile Fit",
+          "score": 0.85
+        }
+      },
+      "commentGap": {
+        "gapData": [
+          {
+            "gap": "Transaction Fees",
+            "frequency": 0.2,
+            "strategy": "Address the cost/benefit ratio of the $1 charge."
+          },
+          {
+            "gap": "AI Support Alternatives",
+            "frequency": 0.3,
+            "strategy": "Showcase AI support capabilities and user experience."
+          },
+          {
+            "gap": "Ideal Pricing for Support",
+            "frequency": 0.2,
+            "strategy": "A/B test different price points for support access."
+          },
+          {
+            "gap": "Handling Disputes",
+            "frequency": 0.1,
+            "strategy": "Offer clear guidelines for dispute resolution for support unlock."
+          },
+          {
+            "gap": "Implementing a Support Gate",
+            "frequency": 0.2,
+            "strategy": "Offer a guide to implementing a simple support gate for your product."
+          }
+        ],
+        "confusionPoint": {
+          "text": "Frederik Filosi: \"I paid the 29$ listing fee and still got this pop up.. is that on purpose?\"",
+          "sentiment": "Negative",
+          "insight": "Confusion around the implementation of the paid support system for existing paid users."
+        }
+      },
+      "visualStrategy": {
+        "category": "Minimalist Chart",
+        "colors": [
+          "#FFFFFF",
+          "#000000",
+          "#2ECC71"
+        ],
+        "prompts": {
+          "midjourney": "simple line graph, white background, green line showing support requests dropping dramatically after implementing a $1 support fee, minimalist",
+          "dalle": "Infographic illustrating a support ticket volume before and after implementing a support fee, clean design."
+        }
+      },
+      "viralVelocity": {
+        "velocityData": {
+          "likesPerHour": 67.17,
+          "trend": "Stable",
+          "peakTime": "Unknown",
+          "accountAvg": 0.03,
+          "growthPrediction": "Consistent"
+        }
+      },
+      "sentiment": {
+        "sentimentData": {
+          "positive": 0.65,
+          "constructive": 0.25,
+          "neutral": 0.1,
+          "negative": 0,
+          "keywords": [
+            "genius",
+            "smart",
+            "good",
+            "helpful",
+            "efficient"
+          ],
+          "dominantEmotion": "Approval",
+          "trustScore": "High",
+          "sarcasmLevel": "Low",
+          "isControversial": false
+        }
+      },
+      "competitor": {
+        "benchmarkData": {
+          "engagementRate": 96.88,
+          "accountAvg": 0.03,
+          "nicheAvg": 0.025,
+          "isOutlier": true,
+          "botSignal": "Low",
+          "followers": "Unknown"
+        }
+      }
+    },
+    "postData": {
+      "platform": "x",
+      "author": "Marc Lou",
+      "handle": "@marclou",
+      "authorPfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+      "content": "I was drowning in hundreds of support messages on TrustMRR.\n\nSo I made a simple change: support is now reserved for paid customers ($1 minimum)\n\nEveryone else gets the FAQ + a $1 unlock button\n\nIt filters out 95% of noise, so paying customers actually get helped faster now.",
+      "postUrl": "https://x.com/marclou/status/2035336895413297521",
+      "images": [
+        "https://pbs.twimg.com/media/HD74Hj2bAAAUvGb?format=jpg&name=900x900",
+        "https://pbs.twimg.com/media/HD74HunbUAEv3WF?format=jpg&name=small"
+      ],
+      "videos": [],
+      "postedAt": "2026-03-21T12:45:05.000Z",
+      "metrics": {
+        "likes": 806,
+        "replies": 120,
+        "retweets": 9,
+        "views": 0
+      },
+      "comments": [
+        {
+          "user": "VyN",
+          "pfp": "https://pbs.twimg.com/profile_images/2016089274761048064/U2uZ0b7t_normal.jpg",
+          "text": "a $1 tax is the best thing to do, If they won’t pay the price of a stick of gum to talk to a human, they aren't a customer they’re just a distraction.",
+          "timestamp": "2026-03-21T12:47:22.000Z",
+          "engagement": {
+            "likes": 12,
+            "replies": 1,
+            "retweets": 1
+          }
+        },
+        {
+          "user": "Aleksandar Jovanovic",
+          "pfp": "https://pbs.twimg.com/profile_images/1986811982993903616/vZi2_SIQ_normal.jpg",
+          "text": "Ever thought of adding AI-assist-only support feature for free, and the human support for $1?",
+          "timestamp": "2026-03-21T12:49:49.000Z",
+          "engagement": {
+            "likes": 15,
+            "replies": 3,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "Yes, people insisted on talking to a human so the AI gave up at some point \n\nAI trained on FAQ so it was pretty good",
+          "timestamp": "2026-03-21T14:17:54.000Z",
+          "engagement": {
+            "likes": 13,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Nevo David",
+          "pfp": "https://pbs.twimg.com/profile_images/1996519472291553280/P9cZJCVZ_normal.jpg",
+          "text": "I would charge more than $1, because once you charge $1 you basically commit to help",
+          "timestamp": "2026-03-21T14:52:05.000Z",
+          "engagement": {
+            "likes": 5,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "yes true",
+          "timestamp": "2026-03-21T15:09:56.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "HireTimSF.com",
+          "pfp": "https://pbs.twimg.com/profile_images/1999476332259082240/4plmyNZZ_normal.jpg",
+          "text": "How much do you pay for transaction fee for $1 support? It they dispute this?",
+          "timestamp": "2026-03-21T13:43:54.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 3,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "prob 0.36?\n\nyeah disputes suck",
+          "timestamp": "2026-03-21T14:18:55.000Z",
+          "engagement": {
+            "likes": 3,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Martin Donadieu - oss/acc",
+          "pfp": "https://pbs.twimg.com/profile_images/1603462822423416832/Rck3-3Ov_normal.png",
+          "text": "Good ! Next is auto filter with AI",
+          "timestamp": "2026-03-21T13:47:48.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "I had Crisp AI set up too but people kept asking to chat with human and eventually AI turned me in",
+          "timestamp": "2026-03-21T14:15:27.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Frederik Filosi",
+          "pfp": "https://pbs.twimg.com/profile_images/1781976008821784576/8SFXXsyI_normal.jpg",
+          "text": "@marclou\n I paid the 29$ listing fee and still got this pop up.. is that on purpose?",
+          "timestamp": "2026-03-21T14:44:13.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Marc Lou",
+          "pfp": "https://pbs.twimg.com/profile_images/1514863683574599681/9k7PqDTA_normal.jpg",
+          "text": "dm ing you",
+          "timestamp": "2026-03-21T15:10:15.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Hud Taylor",
+          "pfp": "https://pbs.twimg.com/profile_images/1414031835697352711/LDA6izDT_normal.jpg",
+          "text": "This is genius. Solo founders get crushed by support from free users who will never convert.\n\nI run 13 AI tools and was spending more time on \"how do I sign up\" emails than building features. The $1 filter is basically a seriousness gate. Stealing this.",
+          "timestamp": "2026-03-21T15:07:16.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Daniel Rachlin",
+          "pfp": "https://pbs.twimg.com/profile_images/2020966245831499777/0JUyPOPP_normal.jpg",
+          "text": "Smart move. Support can be a huge drain when building lean. This gets paying customers the focus they deserve.",
+          "timestamp": "2026-03-21T21:18:45.000Z",
+          "engagement": {
+            "likes": 1,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Michael Zimmermann",
+          "pfp": "https://pbs.twimg.com/profile_images/1904217142074941440/UQl5J-b4_normal.jpg",
+          "text": "$1 is a good filter. Beats what I was encountering with Google yesterday where the error I was encountering while upgrading to a paid plan was something it wouldn’t connect me to a human for because I’m not on a paid plan. I’m trying to pay you!",
+          "timestamp": "2026-03-21T13:56:28.000Z",
+          "engagement": {
+            "likes": 2,
+            "replies": 0,
+            "retweets": 0
+          }
+        }
+      ],
+      "commentCount": 14
+    },
+    "timestamp": 1774138585026
+  }
+]

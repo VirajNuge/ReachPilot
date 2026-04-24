@@ -487,7 +487,7 @@ const PostFatigue: React.FC<PostFatigueProps> = ({ data, pulseHeartbeat = [] }) 
           {isEmergencyBrake ? (
             <button
               onClick={() => setShowModal(true)}
-              className="w-full mt-2 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-red-500 hover:bg-red-600 text-white active:scale-[0.98] shadow-[0_4px_14px_0_rgba(239,68,68,0.3)]"
+              className="w-full mt-2 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-red-500 hover:bg-red-600 text-white active:scale-[0.98]"
             >
               <FaPause size={14} />
               Pause Queue
@@ -495,7 +495,7 @@ const PostFatigue: React.FC<PostFatigueProps> = ({ data, pulseHeartbeat = [] }) 
           ) : (
             <button
               onClick={() => setShowModal(true)}
-              className="w-full mt-2 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-[#000100] hover:bg-black text-white active:scale-[0.98] shadow-[0_4px_14px_0_rgba(26,29,35,0.2)]"
+              className="w-full mt-2 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-[#000100] hover:bg-black text-white active:scale-[0.98]"
             >
               <FaMagic className="text-[#caee55]" size={14} />
               Auto-Balance Schedule

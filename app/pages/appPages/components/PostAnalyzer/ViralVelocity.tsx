@@ -4,11 +4,25 @@ import { FaFireFlameCurved } from "react-icons/fa6";
 import { ViralVelocityProps } from "@/lib/postAnalyzerTypes";
 
 export default function ViralVelocity({ velocityData }: ViralVelocityProps) {
-  const vsAvg = Math.round(
-    ((velocityData.likesPerHour - velocityData.accountAvg) /
-      velocityData.accountAvg) *
-      100,
-  );
+  // Fix percentage calculation - ensure reasonable bounds
+  const calculateVsAvgPercentage = (): number => {
+    const { likesPerHour, accountAvg } = velocityData;
+    
+    // Handle edge cases
+    if (accountAvg === 0) {
+      return likesPerHour > 0 ? 100 : 0; // 100% increase if no baseline
+    }
+    
+    const percentageChange = ((likesPerHour - accountAvg) / accountAvg) * 100;
+    
+    // Cap extreme values to prevent display issues
+    if (percentageChange > 1000) return 1000; // Max +1000%
+    if (percentageChange < -100) return -100;  // Max -100%
+    
+    return Math.round(percentageChange);
+  };
+
+  const vsAvg = calculateVsAvgPercentage();
 
   return (
     <div className="bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col h-full border-none">

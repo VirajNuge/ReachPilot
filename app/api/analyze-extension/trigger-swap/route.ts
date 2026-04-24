@@ -28,7 +28,7 @@ function isTriggerSwapResult(v: unknown): v is TriggerSwapResult {
 }
 
 function buildTriggerSwapPrompt(
-  postContent: string,
+  postContent: string | undefined,
   currentTrigger: string,
   targetTrigger: string,
   winningTrigger: string,
@@ -48,7 +48,8 @@ function buildTriggerSwapPrompt(
       "Open a loop the reader must close. Provocative questions, 'The one thing nobody tells you about...', cliffhangers, surprising contrarian takes",
   };
 
-  return `You are an expert social media copywriter specializing in psychological persuasion.
+  if (postContent) {
+    return `You are an expert social media copywriter specializing in psychological persuasion.
 
 CURRENT POST:
 "${postContent}"
@@ -78,6 +79,34 @@ Return ONLY valid JSON (no markdown, no backticks):
   "explanation": "One sentence explaining what psychological shift you made and why it works",
   "expectedImpact": "One sentence predicting the engagement impact of this swap (e.g. '+15-25% comments from curious readers')"
 }`;
+  }
+
+  return `You are an expert social media copywriter specializing in psychological persuasion.
+
+PROFILE CONTEXT:
+- Current dominant trigger: ${currentTrigger}
+- Profile's winning trigger: ${winningTrigger}
+- AI Insight: ${insight}
+
+TASK: Create an example post that demonstrates the "${currentTrigger}" trigger, then rewrite it to use the "${targetTrigger}" trigger instead. Base the content topic and style on the AI insight above.
+
+TRIGGER GUIDE for ${targetTrigger}:
+${triggerGuides[targetTrigger] || "Apply the core principles of this psychological trigger effectively."}
+
+RULES:
+- Both posts should feel natural and realistic for this creator's voice
+- Keep the core topic identical between original and rewrite
+- Make the ${targetTrigger} trigger unmistakably dominant in the rewrite
+
+Return ONLY valid JSON (no markdown, no backticks):
+{
+  "originalTrigger": "${currentTrigger}",
+  "targetTrigger": "${targetTrigger}",
+  "originalPost": "AN EXAMPLE POST USING ${currentTrigger} TRIGGER",
+  "rewrittenPost": "THE SAME POST REWRITTEN WITH ${targetTrigger} TRIGGER",
+  "explanation": "One sentence explaining what psychological shift was made and why it works",
+  "expectedImpact": "One sentence predicting the engagement impact of this swap (e.g. '+15-25% comments from curious readers')"
+}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -98,9 +127,9 @@ export async function POST(req: NextRequest) {
       insight?: string;
     };
 
-    if (!body.postContent || !body.currentTrigger || !body.targetTrigger) {
+    if (!body.currentTrigger || !body.targetTrigger) {
       return NextResponse.json(
-        { error: "postContent, currentTrigger, and targetTrigger are required" },
+        { error: "currentTrigger and targetTrigger are required" },
         { status: 400 },
       );
     }

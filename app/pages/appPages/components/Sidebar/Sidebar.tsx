@@ -129,8 +129,6 @@ const Sidebar = () => {
                 { name: "Profile Analyzer", path: "profileAnalyzer" },
                 { name: "Post Analyzer", path: "postAnalyzer" },
                 { name: "Post Generator", path: "postGenerator" },
-                { name: "Template Library", path: "templateLibrary" },
-                { name: "ThreadPilot", path: "threadPilot" },
               ].map((item) => (
                 <Link
                   key={item.path}
@@ -148,50 +146,18 @@ const Sidebar = () => {
           )}
 
           {/* --- TOOLS: IDEA FINDER --- */}
-          <button
-            onClick={() => toggleMenu("idea")}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none outline-none mt-1 ${
-              openMenus.idea
-                ? "text-[#1A1D23] bg-white/40"
-                : "text-slate-500 hover:bg-white/60"
+          <Link
+            href={`/${accountId}/generateIdeas`}
+            className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none no-underline outline-none mt-1 ${
+              isActive("generateIdeas") ? activeMainLink : inactiveMainLink
             }`}
           >
-            <div className="flex items-center gap-3.5">
-              <FaLightbulb
-                size={15}
-                className={openMenus.idea ? "text-[#FF8A00]" : "text-slate-400"}
-              />
-              <span>Idea Finder</span>
-            </div>
-            {openMenus.idea ? (
-              <FaChevronDown size={10} className="text-slate-400" />
-            ) : (
-              <FaChevronRight size={10} className="text-slate-400" />
-            )}
-          </button>
-
-          {openMenus.idea && (
-            <div className="ml-5 mt-1 border-l-2 border-slate-200/50 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
-              <Link
-                href={`/${accountId}/explorePostIdeas`}
-                className={`${subLinkBase} ${isActive("explorePostIdeas") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
-              >
-                Explore Trending
-              </Link>
-              <Link
-                href={`/${accountId}/generateIdeas`}
-                className={`${subLinkBase} ${isActive("generateIdeas") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
-              >
-                Find Post Ideas
-              </Link>
-              <Link
-                href={`/${accountId}/questionMine`}
-                className={`${subLinkBase} ${isActive("questionMine") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
-              >
-                Question Mine
-              </Link>
-            </div>
-          )}
+            <FaLightbulb
+              size={15}
+              className={isActive("generateIdeas") ? "text-[#FF8A00]" : "text-slate-400"}
+            />
+            <span>Idea Finder</span>
+          </Link>
         </div>
 
         {/* --- PERFORMANCE & ANALYTICS --- */}

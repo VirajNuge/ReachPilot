@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminAuth } from "../../../../../lib/adminAuth";
-import { writeFile } from "fs/promises";
-import path from "path";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -34,24 +32,12 @@ export async function POST(request: NextRequest) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
-    // Sanitise filename: strip non-alphanumeric chars (except dot/dash)
-    const ext = path.extname(file.name).toLowerCase() || ".jpg";
-    const base = path
-      .basename(file.name, ext)
-      .toLowerCase()
-      .replace(/[^a-z0-9-_]/g, "-")
-      .replace(/-+/g, "-")
-      .slice(0, 60);
-    const timestamp = Date.now();
-    const filename = `${base}-${timestamp}${ext}`;
-
-    const uploadDir = path.join(process.cwd(), "public", "visual-styles");
-    await writeFile(path.join(uploadDir, filename), buffer);
+    const base64 = buffer.toString("base64");
+    const dataUrl = `data:${file.type};base64,${base64}`;
 
     return NextResponse.json({
       success: true,
-      url: `/visual-styles/${filename}`,
+      url: dataUrl,
     });
   } catch (err) {
     console.error("Visual style upload error:", err);

@@ -11,7 +11,8 @@ export type PostPlatform =
   | "instagram_post"
   | "linkedin"
   | "x"
-  | "facebook";
+  | "facebook"
+  | "threads";
 
 export interface PlatformImageSize {
   label: string;
@@ -107,6 +108,25 @@ export const PLATFORM_INTELLIGENCE: Record<PostPlatform, PlatformIntelligence> =
         "Clear CTA",
         "Question to spark comments",
         "Shareable value",
+      ],
+    },
+  },
+  threads: {
+    id: "threads",
+    name: "Threads",
+    imageSizes: [
+      { label: "Square", width: 1080, height: 1080 },
+      { label: "Portrait", width: 1080, height: 1350 },
+    ],
+    captionRules: {
+      maxLength: 500,
+      hashtagRange: [1, 3],
+      toneGuidelines: ["Conversational", "Opinionated", "Community"],
+      structureRules: [
+        "Strong first line",
+        "Short paragraphs",
+        "Question or hot take ending",
+        "Keep it authentic and human",
       ],
     },
   },
@@ -463,6 +483,7 @@ export interface PlatformCaption {
   platform: PostPlatform;
   caption: string;
   characterCount: number;
+  options?: string[];
 }
 
 export interface CaptionGeneratorOutput {
@@ -533,6 +554,7 @@ export interface PostPackage {
   imagePrompt: string;
   imageUrl?: string;
   captions: Record<string, string>;  // platform -> caption
+  captionOptions?: Record<string, string[]>;
   hashtags: {
     highReach: string[];
     niche: string[];
@@ -658,6 +680,7 @@ export interface PostGenerationDocument {
   variations: PostVariation[];
 
   status: PostGenerationStatus;
+  scheduledDate?: Date;
 }
 
 // --- UI Display Helpers ---
@@ -863,6 +886,7 @@ export const PLATFORM_DISPLAY: Record<PostPlatform, { label: string; color: stri
   linkedin: { label: "LinkedIn", color: "#0A66C2", shortLabel: "LI" },
   x: { label: "X (Twitter)", color: "#000000", shortLabel: "X" },
   facebook: { label: "Facebook", color: "#1877F2", shortLabel: "FB" },
+  threads: { label: "Threads", color: "#111827", shortLabel: "TH" },
 };
 
 export const IMAGE_MODEL_LABELS: Record<GeminiImageModel, { label: string; desc: string; badge: string }> = {

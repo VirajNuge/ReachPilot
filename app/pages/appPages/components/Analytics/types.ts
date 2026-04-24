@@ -1,12 +1,7 @@
+import type { PlatformKey } from "@/lib/analytics/platforms";
+
 // 1. Platform Keys
-export type PlatformKey =
-  | "all"
-  | "linkedin"
-  | "twitter"
-  | "instagram"
-  | "facebook"
-  | "threads"
-  | "pinterest";
+export type { PlatformKey };
 
 // 2. Velocity Metrics (For the "Live Vitals" Cards)
 // This replaces the old 'KPIMetric' to support the velocity badge

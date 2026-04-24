@@ -36,9 +36,9 @@ import {
 } from "./creativeDirector";
 import type { CreativeProfile } from "./creativeDirector";
 
-// ── Platform Aspect Ratios (local until consolidated) ────────
+// ── Platform Aspect Ratios ────────────────────────────────────
 
-const PLATFORM_ASPECT_RATIO: Record<string, string> = {
+export const PLATFORM_ASPECT_RATIO: Record<string, string> = {
   instagram_post: "1:1",
   instagram_story: "9:16",
   linkedin: "16:9",  // 1200×627 landscape — thought leadership format

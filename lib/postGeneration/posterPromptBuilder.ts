@@ -16,22 +16,13 @@ import type {
 import {
   orchestrateImagePrompt,
   buildFinalImagePrompt,
+  PLATFORM_ASPECT_RATIO,
 } from "./promptOrchestrator";
 
 import type { OrchestratorConfig } from "./promptOrchestrator";
 
 // ── Re-export PLATFORM_ASPECT_RATIO for any external consumers ──
-
-export const PLATFORM_ASPECT_RATIO: Record<string, string> = {
-  instagram_post: "1:1",
-  instagram_story: "9:16",
-  linkedin: "16:9",
-  x: "16:9",
-  facebook: "16:9",
-  tiktok: "9:16",
-  pinterest: "2:3",
-  youtube_community: "16:9",
-};
+export { PLATFORM_ASPECT_RATIO };
 
 // ── Orchestrated Prompt Builder (Generator Stage) ────────────
 

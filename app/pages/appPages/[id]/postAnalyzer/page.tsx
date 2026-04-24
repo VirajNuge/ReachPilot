@@ -238,11 +238,19 @@ export default function PostAnalyzerPage() {
                 {/* Author */}
                 <div className="flex items-center gap-3 shrink-0">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-500 p-[2px]">
-                    <div className="w-full h-full rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-slate-500 overflow-hidden text-xs font-bold">
-                      {analysisData.postData.author
-                        .substring(0, 2)
-                        .toUpperCase()}
-                    </div>
+                    {analysisData.postData.authorPfp ? (
+                      <img
+                        src={analysisData.postData.authorPfp}
+                        alt={analysisData.postData.author}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-slate-500 overflow-hidden text-xs font-bold">
+                        {analysisData.postData.author
+                          .substring(0, 2)
+                          .toUpperCase()}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h4 className="font-bold text-[#1A1D23] text-sm leading-tight">
@@ -259,7 +267,7 @@ export default function PostAnalyzerPage() {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-slate-700 leading-relaxed font-medium whitespace-pre-wrap line-clamp-4">
+                  <p className="text-sm text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
                     {analysisData.postData.content}
                   </p>
                 </div>
@@ -319,11 +327,17 @@ export default function PostAnalyzerPage() {
 
               {/* Row 2: Hook CTA (hero, spans 2 cols) + Visual Strategy */}
               <div className="md:col-span-2 xl:col-span-2 h-full">
-                <HookCTAScorecard {...analysisData.analysis.hookCTA} />
+                <HookCTAScorecard
+                  {...analysisData.analysis.hookCTA}
+                  analysisId={analysisData.id}
+                  postContent={analysisData.postData.content}
+                />
               </div>
               <div className="h-full">
                 <VisualStrategyDecoder
                   {...analysisData.analysis.visualStrategy}
+                  analysisId={analysisData.id}
+                  images={analysisData.postData.images}
                 />
               </div>
 
@@ -335,7 +349,7 @@ export default function PostAnalyzerPage() {
                 <LeadPersonaID {...analysisData.analysis.leadPersona} />
               </div>
               <div className="h-full">
-                <CommentGapDiscovery {...analysisData.analysis.commentGap} />
+                <CommentGapDiscovery {...analysisData.analysis.commentGap} analysisId={analysisData.id} />
               </div>
             </div>
           </motion.div>

@@ -776,7 +776,7 @@ const CompetitorGap: React.FC<CompetitorGapProps> = ({ data }) => {
               <button
                 onClick={handleGeneratePlan}
                 disabled={modalState === "loading"}
-                className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)] active:scale-[0.98]"
+                className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
               >
                 <FaCrosshairs size={14} />
                 Generate Hijack Plan

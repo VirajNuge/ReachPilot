@@ -2,7 +2,7 @@
 
 import React from "react";
 import { TrendingUp, TrendingDown, Minus, Zap } from "lucide-react";
-import { VelocityMetric } from "./types";
+import type { VelocityMetric } from "@/lib/analytics/types";
 
 interface VelocityCardProps {
   data: VelocityMetric;
@@ -48,10 +48,10 @@ export default function VelocityCard({ data, icon }: VelocityCardProps) {
       : Minus;
 
   return (
-    <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+    <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all relative overflow-hidden group">
       {/* Top Row: Icon & Velocity Badge */}
       <div className="flex justify-between items-start mb-4">
-        <div className="p-2.5 bg-gray-50 rounded-xl text-indigo-600 group-hover:bg-indigo-50 transition-colors">
+        <div className="p-3 bg-[#f4f8fb] rounded-2xl text-[#0052FF] group-hover:bg-[#0052FF]/10 transition-colors">
           {icon}
         </div>
 

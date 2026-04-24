@@ -19,6 +19,37 @@ export default function RemixModal({
   const [isGenerating, setIsGenerating] = useState(false);
   const [angle, setAngle] = useState("Insightful Take");
 
+  const handleCopy = async () => {
+    if (!generatedContent) return;
+    try {
+      await navigator.clipboard.writeText(generatedContent);
+      alert("Copied to clipboard!");
+    } catch {
+      alert("Could not copy. Please copy the text manually.");
+    }
+  };
+
+  const handleRegenerate = () => {
+    if (!originalPost) return;
+    setIsGenerating(true);
+    setTimeout(() => {
+      setGeneratedContent(
+        `Here is my take on ${originalPost.author.name}'s point:\n\n` +
+          `While the original post argues for "${originalPost.analysis.reason}", I believe the nuance lies in execution.\n\n` +
+          `Three things founders often miss:\n` +
+          `1. Context is key.\n` +
+          `2. Speed matters more than perfection.\n` +
+          `3. Iterate or die.\n\n` +
+          `What do you think? 👇`
+      );
+      setIsGenerating(false);
+    }, 1500);
+  };
+
+  const handleSchedule = () => {
+    alert("Scheduling — coming soon!");
+  };
+
   // Simulate AI Generation when modal opens
   useEffect(() => {
     if (isOpen && originalPost) {
@@ -108,6 +139,7 @@ export default function RemixModal({
 
             <button
               onClick={onClose}
+              aria-label="Close remix editor"
               className="p-2 rounded-full transition-colors bg-[#000100] hover:bg-black text-white"
             >
               <X size={20} />
@@ -122,7 +154,7 @@ export default function RemixModal({
             </button>
             <div className="h-4 w-px bg-gray-300 mx-2"></div>
             <button
-              onClick={() => setIsGenerating(true)}
+              onClick={handleRegenerate}
               className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700"
             >
               <RefreshCw
@@ -156,10 +188,10 @@ export default function RemixModal({
 
           {/* Footer Actions */}
           <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
-            <button className="px-4 py-2.5 rounded-xl font-bold hover: transition-all flex items-center gap-2 bg-[#000100] hover:bg-black text-white">
+            <button onClick={handleCopy} className="px-4 py-2.5 rounded-xl font-bold hover: transition-all flex items-center gap-2 bg-[#000100] hover:bg-black text-white">
               <Copy size={16} /> Copy Text
             </button>
-            <button className="px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 bg-[#000100] hover:bg-black text-white">
+            <button onClick={handleSchedule} className="px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 bg-[#000100] hover:bg-black text-white">
               <Send size={16} /> Schedule Post
             </button>
           </div>

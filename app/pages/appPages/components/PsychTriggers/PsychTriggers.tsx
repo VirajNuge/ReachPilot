@@ -17,9 +17,10 @@ import {
   FaRobot,
   FaTimes,
   FaCheck,
-  FaArrowRight,
   FaLightbulb,
   FaChartLine,
+  FaSave,
+  FaExternalLinkAlt,
 } from "react-icons/fa";
 import { BsStars } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -46,7 +47,19 @@ interface TriggerSwapResult {
   expectedImpact: string;
 }
 
-type ModalState = "closed" | "input" | "loading" | "results";
+type ModalState = "closed" | "loading" | "results" | "error";
+
+type TemplateState = "idle" | "loading" | "success" | "error";
+
+interface SavedTemplateResult {
+  templateId: string;
+  templateName: string;
+  description: string;
+  category: string;
+  platform: string;
+  structure: string;
+  examplePost: string;
+}
 
 interface PsychTriggersProps {
   data?: PsychData;
@@ -131,7 +144,9 @@ function buildRichObservation(data: PsychData): {
       gap > 40
         ? `Heavy over-reliance on ${top?.trigger} (${winnerScore}) leaves ${weakest?.trigger} severely underdeveloped (${weakScore}) — a ${gap}-point gap that creates predictable, one-dimensional content.`
         : `Trigger mix is relatively balanced, but ${weakest?.trigger} (${weakScore}) still has the most room to grow.`,
-    recommendation: recMap[weakest?.trigger ?? ""] ?? "Diversify trigger usage across post types.",
+    recommendation:
+      recMap[weakest?.trigger ?? ""] ??
+      "Diversify trigger usage across post types.",
     gapTrigger: weakest?.trigger ?? "",
   };
 }
@@ -139,12 +154,18 @@ function buildRichObservation(data: PsychData): {
 // --- Component ---
 const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
   const [modalState, setModalState] = useState<ModalState>("closed");
-  const [userCaption, setUserCaption] = useState("");
   const [selectedTrigger, setSelectedTrigger] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [swapResult, setSwapResult] = useState<TriggerSwapResult | null>(null);
   const [swapError, setSwapError] = useState(false);
-  const [copiedSide, setCopiedSide] = useState<"original" | "rewrite" | null>(null);
+  const [copiedSide, setCopiedSide] = useState<"original" | "rewrite" | null>(
+    null,
+  );
+
+  // Template generation state
+  const [templateState, setTemplateState] = useState<TemplateState>("idle");
+  const [savedTemplate, setSavedTemplate] =
+    useState<SavedTemplateResult | null>(null);
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
 
   // Mock Data
   const safeData: PsychData = data || {
@@ -169,27 +190,19 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
   // default to winningTrigger since we don't have real-time post analysis
   const currentTrigger = safeData.winningTrigger;
 
-  const openModal = () => {
-    setModalState("input");
-    setUserCaption("");
-    setSelectedTrigger(observation.gapTrigger || triggersList[0]);
-    setSwapResult(null);
-    setSwapError(false);
-  };
-
-  const handleGenerateSwap = async () => {
-    if (!userCaption.trim() || !selectedTrigger) return;
-    setIsGenerating(true);
-    setSwapError(false);
+  const handleTriggerSwap = async () => {
+    const targetTrigger = observation.gapTrigger || triggersList[0];
+    setSelectedTrigger(targetTrigger);
     setModalState("loading");
+    setSwapError(false);
+    setSwapResult(null);
     try {
       const res = await fetch("/api/analyze-extension/trigger-swap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          postContent: userCaption,
           currentTrigger,
-          targetTrigger: selectedTrigger,
+          targetTrigger,
           winningTrigger: safeData.winningTrigger,
           insight: safeData.insight,
         }),
@@ -200,9 +213,7 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
       setModalState("results");
     } catch {
       setSwapError(true);
-      setModalState("input");
-    } finally {
-      setIsGenerating(false);
+      setModalState("error");
     }
   };
 
@@ -210,6 +221,25 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
     navigator.clipboard.writeText(text);
     setCopiedSide(side);
     setTimeout(() => setCopiedSide(null), 2000);
+  };
+
+  const handleSaveTemplate = async () => {
+    setTemplateState("loading");
+    setSavedTemplate(null);
+    setTemplateModalOpen(true);
+    try {
+      const res = await fetch("/api/analyze-extension/generate-template", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const json = await res.json();
+      if (!res.ok || !json.templateId)
+        throw new Error(json.error || "bad response");
+      setSavedTemplate(json as SavedTemplateResult);
+      setTemplateState("success");
+    } catch {
+      setTemplateState("error");
+    }
   };
 
   const meta = TRIGGER_META[safeData.winningTrigger];
@@ -338,13 +368,43 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
             )}
           </div>
 
-          <div className="mt-auto">
+          <div className="mt-auto flex flex-col gap-2">
             <button
-              onClick={openModal}
-              className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)] active:scale-[0.98]"
+              onClick={handleTriggerSwap}
+              className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             >
               <FaExchangeAlt />
               Trigger Swap
+            </button>
+
+            {/* Save as Template */}
+            <button
+              onClick={handleSaveTemplate}
+              disabled={templateState === "loading"}
+              className={`w-full py-3 rounded-2xl border-0 md:border-none font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] border ${
+                templateState === "success"
+                  ? "bg-emerald-50 border-emerald-200 text-emerald-700 cursor-default"
+                  : templateState === "loading"
+                    ? "bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-white border-slate-200 text-slate-700 hover:border-[#074ed5] hover:text-[#074ed5]"
+              }`}
+            >
+              {templateState === "loading" ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin" />
+                  Generating Template...
+                </>
+              ) : templateState === "success" ? (
+                <>
+                  <FaCheck size={11} />
+                  Template Saved
+                </>
+              ) : (
+                <>
+                  <FaSave size={12} />
+                  Save as Template
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -380,114 +440,6 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
                   <FaTimes />
                 </button>
 
-                {/* INPUT state */}
-                {modalState === "input" && (
-                  <>
-                    <div>
-                      <h3 className="text-lg font-black text-[#1A1D23] flex items-center gap-2">
-                        <FaExchangeAlt className="text-[#0052FF]" /> Trigger
-                        Swap
-                      </h3>
-                      <p className="text-xs text-slate-400 font-medium mt-1">
-                        Paste your post — AI rewrites it using a different
-                        psychological lever
-                      </p>
-                    </div>
-
-                    {/* Current trigger indicator */}
-                    <div className="flex items-center gap-2 bg-[#f4f8fb] rounded-xl p-3 border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Current lever:
-                      </span>
-                      <span
-                        className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide ${TRIGGER_META[currentTrigger]?.bgColor ?? "bg-slate-100"} ${TRIGGER_META[currentTrigger]?.color ?? "text-slate-600"}`}
-                      >
-                        {currentTrigger}
-                      </span>
-                      <FaArrowRight className="text-slate-300 text-xs" />
-                      <span
-                        className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide ${TRIGGER_META[selectedTrigger]?.bgColor ?? "bg-blue-100"} ${TRIGGER_META[selectedTrigger]?.color ?? "text-blue-700"}`}
-                      >
-                        {selectedTrigger}
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">
-                        Your Post Content
-                      </label>
-                      <textarea
-                        value={userCaption}
-                        onChange={(e) => setUserCaption(e.target.value)}
-                        placeholder="Paste your current post or caption here..."
-                        rows={4}
-                        className="w-full border border-slate-200 rounded-2xl p-3 text-sm text-[#1A1D23] resize-none focus:outline-none focus:border-[#0052FF] transition-colors bg-[#f4f8fb]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">
-                        Swap to this trigger
-                      </label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {triggersList
-                          .filter((t) => t !== currentTrigger)
-                          .map((t) => {
-                            const m = TRIGGER_META[t];
-                            return (
-                              <button
-                                key={t}
-                                onClick={() => setSelectedTrigger(t)}
-                                className={`flex flex-col items-start gap-1 px-3 py-2.5 rounded-xl text-xs font-bold border transition-all ${
-                                  selectedTrigger === t
-                                    ? `${m?.bgColor ?? "bg-blue-100"} ${m?.color ?? "text-blue-700"} border-transparent`
-                                    : "bg-[#f4f8fb] border-slate-100 text-slate-600 hover:border-slate-200"
-                                }`}
-                              >
-                                <span className="font-black">{t}</span>
-                                <span
-                                  className={`text-[10px] font-medium opacity-70 ${selectedTrigger === t ? "" : "text-slate-400"}`}
-                                >
-                                  {m?.description ?? ""}
-                                </span>
-                              </button>
-                            );
-                          })}
-                      </div>
-                    </div>
-
-                    {/* Recommended swap hint */}
-                    {observation.gapTrigger && (
-                      <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl p-3">
-                        <FaLightbulb className="text-amber-500 shrink-0" size={12} />
-                        <p className="text-[11px] text-amber-700 font-medium">
-                          <span className="font-black">Recommended: </span>
-                          Swap to{" "}
-                          <span className="font-black">
-                            {observation.gapTrigger}
-                          </span>{" "}
-                          — your most underdeveloped lever with the highest
-                          growth potential.
-                        </p>
-                      </div>
-                    )}
-
-                    {swapError && (
-                      <p className="text-xs text-red-500 font-medium">
-                        Failed to generate rewrite. Try again.
-                      </p>
-                    )}
-
-                    <button
-                      onClick={handleGenerateSwap}
-                      disabled={!userCaption.trim() || !selectedTrigger}
-                      className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] disabled:opacity-40 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)]"
-                    >
-                      <FaRobot /> Generate Rewrite
-                    </button>
-                  </>
-                )}
-
                 {/* LOADING state */}
                 {modalState === "loading" && (
                   <div className="flex flex-col items-center justify-center py-14 gap-4">
@@ -512,17 +464,20 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
                         Swap Result
                       </h3>
                       <button
-                        onClick={() => setModalState("input")}
+                        onClick={() => handleTriggerSwap()}
                         className="text-xs font-bold text-[#074ed5] hover:underline"
                       >
-                        ← Try Again
+                        ↺ Regenerate
                       </button>
                     </div>
 
                     {/* Explanation & impact */}
                     <div className="bg-[#f4f8fb] rounded-2xl border border-slate-100 p-4 flex flex-col gap-2">
                       <div className="flex items-start gap-2">
-                        <FaBrain className="text-[#074ed5] shrink-0 mt-0.5" size={12} />
+                        <FaBrain
+                          className="text-[#074ed5] shrink-0 mt-0.5"
+                          size={12}
+                        />
                         <p className="text-xs text-slate-600 font-medium leading-relaxed">
                           <span className="font-black text-[#1A1D23]">
                             What changed:{" "}
@@ -607,6 +562,187 @@ const PsychTriggers: React.FC<PsychTriggersProps> = ({ data }) => {
                       </div>
                     </div>
                   </>
+                )}
+
+                {/* ERROR state */}
+                {modalState === "error" && (
+                  <div className="flex flex-col items-center justify-center py-14 gap-4">
+                    <div className="p-3 bg-red-100 text-red-500 rounded-2xl">
+                      <FaTimes size={24} />
+                    </div>
+                    <h4 className="text-base font-black text-[#1A1D23]">
+                      Failed to generate rewrite
+                    </h4>
+                    <p className="text-xs text-slate-400 font-medium">
+                      Something went wrong. Please try again.
+                    </p>
+                    <button
+                      onClick={() => handleTriggerSwap()}
+                      className="px-6 py-2.5 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center gap-2 transition-all"
+                    >
+                      <FaRobot /> Try Again
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>,
+          document.body,
+        )}
+
+      {/* --- Save as Template Portal Modal --- */}
+      {templateModalOpen &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            <motion.div
+              key="template-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+              onClick={(e) => {
+                if (
+                  e.target === e.currentTarget &&
+                  templateState !== "loading"
+                ) {
+                  setTemplateModalOpen(false);
+                }
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                transition={{ duration: 0.18 }}
+                className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 flex flex-col gap-5 relative max-h-[90vh] overflow-y-auto"
+              >
+                {/* Close button (only when not loading) */}
+                {templateState !== "loading" && (
+                  <button
+                    onClick={() => setTemplateModalOpen(false)}
+                    className="absolute top-4 right-4 text-slate-400 hover:text-[#1A1D23] transition-colors z-10"
+                  >
+                    <FaTimes />
+                  </button>
+                )}
+
+                {/* LOADING state */}
+                {templateState === "loading" && (
+                  <div className="flex flex-col items-center justify-center py-14 gap-4">
+                    <div className="p-3 bg-[#074ed5]/10 text-[#074ed5] rounded-2xl animate-pulse">
+                      <FaSave size={24} />
+                    </div>
+                    <h4 className="text-base font-black text-[#1A1D23]">
+                      Generating Template...
+                    </h4>
+                    <p className="text-xs text-slate-400 font-medium text-center max-w-xs">
+                      Analysing viral recipe, voice spectrum, and psychological
+                      triggers to build a reusable caption template.
+                    </p>
+                  </div>
+                )}
+
+                {/* SUCCESS state */}
+                {templateState === "success" && savedTemplate && (
+                  <>
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="p-1.5 bg-emerald-100 text-emerald-600 rounded-xl">
+                            <FaCheck size={11} />
+                          </div>
+                          <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                            Template Saved
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-black text-[#1A1D23] leading-tight">
+                          {savedTemplate.templateName}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#074ed5]/10 text-[#074ed5] uppercase tracking-wide">
+                            {savedTemplate.platform.toUpperCase()}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase tracking-wide">
+                            {savedTemplate.category.replace(/_/g, " ")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="bg-[#f4f8fb] rounded-2xl border border-slate-100 p-4">
+                      <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                        {savedTemplate.description}
+                      </p>
+                    </div>
+
+                    {/* Structure preview */}
+                    <div className="flex flex-col gap-2">
+                      <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <FaBrain size={10} /> Template Structure
+                      </h5>
+                      <div className="bg-[#000100] rounded-2xl p-4 max-h-36 overflow-y-auto">
+                        <pre className="text-[11px] text-slate-300 leading-relaxed whitespace-pre-wrap font-mono">
+                          {savedTemplate.structure}
+                        </pre>
+                      </div>
+                    </div>
+
+                    {/* Example post */}
+                    <div className="flex flex-col gap-2">
+                      <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <BsStars size={10} /> Example Post
+                      </h5>
+                      <div className="bg-white rounded-2xl border-2 border-[#0052FF]/20 p-4 shadow-[0_2px_12px_rgba(0,82,255,0.06)]">
+                        <p className="text-sm text-[#1A1D23] font-medium leading-relaxed whitespace-pre-wrap">
+                          {savedTemplate.examplePost}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Footer CTA */}
+                    <div className="flex items-center gap-3 pt-1">
+                      <a
+                        href="/admin/caption-templates"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-[11px] font-bold text-[#074ed5] hover:underline"
+                      >
+                        <FaExternalLinkAlt size={10} />
+                        View in Admin Templates
+                      </a>
+                      <button
+                        onClick={() => setTemplateModalOpen(false)}
+                        className="ml-auto px-5 py-2 bg-[#1A1D23] hover:bg-[#000100] text-white rounded-2xl font-bold text-xs transition-all"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* ERROR state */}
+                {templateState === "error" && (
+                  <div className="flex flex-col items-center justify-center py-14 gap-4">
+                    <div className="p-3 bg-red-100 text-red-500 rounded-2xl">
+                      <FaTimes size={24} />
+                    </div>
+                    <h4 className="text-base font-black text-[#1A1D23]">
+                      Failed to generate template
+                    </h4>
+                    <p className="text-xs text-slate-400 font-medium text-center max-w-xs">
+                      Something went wrong. Make sure the analysis is complete
+                      and try again.
+                    </p>
+                    <button
+                      onClick={() => handleSaveTemplate()}
+                      className="px-6 py-2.5 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center gap-2 transition-all"
+                    >
+                      <FaRobot /> Try Again
+                    </button>
+                  </div>
                 )}
               </motion.div>
             </motion.div>

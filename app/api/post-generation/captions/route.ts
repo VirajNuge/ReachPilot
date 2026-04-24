@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getAuthFromCookies } from "@/lib/auth";
+import { requireAuth } from "@/lib/withAuth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
 import { buildCaptionGeneratorPrompt } from "@/lib/postGenerationPrompts";
 import { parseAIJson } from "@/lib/parseAIJson";
+import { AI_MODELS } from "@/lib/aiConfig";
 import { getWritingStyleById } from "@/lib/models/adminStyles";
 import { getCaptionTemplateById } from "@/lib/models/captionTemplates";
 import type { WritingStyleDocument } from "@/lib/models/adminStyles";
@@ -64,13 +65,37 @@ function normalizeCaptionOutput(
 
   const captions = input.platforms
     .map((platform) => {
-      const caption = captionsValue[platform as PostPlatform];
-      if (typeof caption !== "string") return null;
-      return {
-        platform,
-        caption,
-        characterCount: caption.length,
-      };
+      const rawCaption = captionsValue[platform as PostPlatform];
+      if (typeof rawCaption === "string") {
+        return {
+          platform,
+          caption: rawCaption,
+          characterCount: rawCaption.length,
+          options: [rawCaption],
+        };
+      }
+
+      if (isStringArray(rawCaption) && rawCaption.length > 0) {
+        const firstCaption = rawCaption[0];
+        return {
+          platform,
+          caption: firstCaption,
+          characterCount: firstCaption.length,
+          options: rawCaption,
+        };
+      }
+
+      if (isObject(rawCaption) && isStringArray(rawCaption.options) && rawCaption.options.length > 0) {
+        const firstCaption = rawCaption.options[0];
+        return {
+          platform,
+          caption: firstCaption,
+          characterCount: firstCaption.length,
+          options: rawCaption.options,
+        };
+      }
+
+      return null;
     })
     .filter((item): item is CaptionGeneratorOutput["captions"][number] => item !== null);
 
@@ -84,11 +109,9 @@ function normalizeCaptionOutput(
   };
 }
 
-async function loadPersonaContext(accountId?: string): Promise<string> {
+async function loadPersonaContext(userId: string, accountId?: string): Promise<string> {
   try {
-    const auth = await getAuthFromCookies();
-    if (!auth?.userId) return "";
-    const persona = await getPersonaByUserAndAccount(auth.userId, accountId);
+    const persona = await getPersonaByUserAndAccount(userId, accountId);
     if (!persona) return "";
     return buildContentGenerationContext(persona);
   } catch {
@@ -96,7 +119,21 @@ async function loadPersonaContext(accountId?: string): Promise<string> {
   }
 }
 
+// Normalise loose platform aliases to canonical PostPlatform values
+const PLATFORM_ALIAS_MAP: Record<string, string> = {
+  instagram: "instagram_post",
+  twitter: "x",
+};
+
+function normalisePlatforms(platforms: string[]): string[] {
+  return platforms.map((p) => PLATFORM_ALIAS_MAP[p.toLowerCase()] ?? p);
+}
+
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -120,7 +157,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const personaContext = body.includePersona ? await loadPersonaContext(body.accountId) : "";
+    const personaContext = body.includePersona ? await loadPersonaContext(userId, body.accountId) : "";
+
+    // Normalise platform aliases (e.g. "instagram" → "instagram_post", "twitter" → "x")
+    if (body.input.platforms) {
+      body.input.platforms = normalisePlatforms(body.input.platforms) as typeof body.input.platforms;
+    }
 
     // Fetch writing style if provided
     let writingStyle: WritingStyleDocument | undefined;
@@ -153,7 +195,7 @@ export async function POST(req: NextRequest) {
     );
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
 
     let responseText = "";
     try {

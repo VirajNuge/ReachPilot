@@ -204,12 +204,14 @@ function AnalysisContent() {
   // Hook logic
   const {
     data: apiData,
+    platform: apiPlatform,
     loading: apiLoading,
     error: apiError,
   } = useAnalysisData();
 
   // Local state to handle either API data or History data
   const [data, setData] = useState<RawAnalysisData | null>(null);
+  const [platform, setPlatform] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -512,6 +514,7 @@ function AnalysisContent() {
       // 3. Load from API (standard flow)
       if (apiData) {
         setData(apiData);
+        setPlatform(apiPlatform ?? null);
         setLoading(false);
         // Auto-save only if it's a fresh analysis (no loadId and no manual data)
         if (!loadId && !manualDataParam) {
@@ -528,7 +531,7 @@ function AnalysisContent() {
     };
 
     fetchData();
-  }, [loadId, apiData, apiLoading, apiError, searchParams]);
+  }, [loadId, apiData, apiPlatform, apiLoading, apiError, searchParams]);
 
   // Sync loading state more directly
   useEffect(() => {
@@ -648,7 +651,7 @@ function AnalysisContent() {
                         {/* Engagement Vitals - Top row stats */}
                         <EngagementVitalsPanel
                           data={data.engagementVitals}
-                          contentMetrics={data.contentMetrics}
+                          platform={platform ?? undefined}
                         />
 
                         {/* Heartbeat Chart - Main wide chart */}
@@ -716,9 +719,7 @@ function AnalysisContent() {
                           aiSummary={
                             data.pillarInsight || "Analyzing pillars..."
                           }
-                          onGenerateFormula={() =>
-                            alert("Creating your custom formula...")
-                          }
+                          onGenerateFormula={undefined}
                         />
                       </div>
 

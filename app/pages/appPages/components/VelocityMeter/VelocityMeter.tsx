@@ -41,7 +41,7 @@ interface HookAlternative {
   why: string;
 }
 
-type ModalState = "closed" | "input" | "loading" | "results";
+type ModalState = "closed" | "loading" | "results" | "error";
 
 interface VelocityMeterProps {
   data?: VelocityData;
@@ -54,7 +54,6 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
   onMatchVelocity,
 }) => {
   const [modalState, setModalState] = useState<ModalState>("closed");
-  const [hookInput, setHookInput] = useState("");
   const [hookResults, setHookResults] = useState<HookAlternative[]>([]);
   const [hookError, setHookError] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -75,7 +74,6 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
   };
 
   const handleGenerateHooks = async () => {
-    if (!hookInput.trim()) return;
     setModalState("loading");
     setHookError(false);
     try {
@@ -83,7 +81,6 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          currentHook: hookInput,
           velocityCategory: safeData.category,
           hookRate: safeData.hookRate,
           insight: safeData.insight,
@@ -96,7 +93,7 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
       setModalState("results");
     } catch {
       setHookError(true);
-      setModalState("input");
+      setModalState("error");
     }
   };
 
@@ -203,13 +200,12 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
         {/* Action Button */}
         <button
           onClick={() => {
-            setModalState("input");
-            setHookInput("");
-            setHookError(false);
             setHookResults([]);
+            setHookError(false);
+            handleGenerateHooks();
             onMatchVelocity?.();
           }}
-          className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(0,82,255,0.39)] active:scale-[0.98]"
+          className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
         >
           <FaRocket />
           Boost Hook Rate
@@ -246,46 +242,6 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
                   <FaTimes />
                 </button>
 
-                {/* INPUT state */}
-                {modalState === "input" && (
-                  <>
-                    <div>
-                      <h3 className="text-lg font-black text-[#1A1D23] flex items-center gap-2">
-                        <FaRocket className="text-[#0052FF]" /> Boost Hook Rate
-                      </h3>
-                      <p className="text-xs text-slate-400 font-medium mt-1">
-                        Paste your current hook or first line
-                      </p>
-                    </div>
-                    <textarea
-                      value={hookInput}
-                      onChange={(e) => setHookInput(e.target.value)}
-                      placeholder="Your post's first line or video hook..."
-                      rows={3}
-                      className="w-full border border-slate-200 rounded-2xl p-3 text-sm text-[#1A1D23] resize-none focus:outline-none focus:border-[#0052FF] transition-colors"
-                    />
-                    <p className="text-[11px] text-slate-400 -mt-2">
-                      Generating with:{" "}
-                      <span className="font-bold text-[#074ed5]">
-                        {safeData.category}
-                      </span>{" "}
-                      velocity patterns
-                    </p>
-                    {hookError && (
-                      <p className="text-xs text-red-500 font-medium">
-                        Failed to generate hooks. Try again.
-                      </p>
-                    )}
-                    <button
-                      onClick={handleGenerateHooks}
-                      disabled={!hookInput.trim()}
-                      className="w-full py-3 bg-[#074ed5] hover:bg-[#0041CC] disabled:opacity-40 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
-                    >
-                      <FaMagic /> Generate Alternatives
-                    </button>
-                  </>
-                )}
-
                 {/* LOADING state */}
                 {modalState === "loading" && (
                   <div className="flex flex-col items-center justify-center py-10 gap-4">
@@ -310,10 +266,10 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
                         Alternatives
                       </h3>
                       <button
-                        onClick={() => setModalState("input")}
+                        onClick={() => handleGenerateHooks()}
                         className="text-xs font-bold text-[#074ed5] hover:underline"
                       >
-                        ← Back
+                        ↺ Regenerate
                       </button>
                     </div>
                     <div className="flex flex-col gap-3 overflow-y-auto max-h-[60vh] pr-1">
@@ -352,6 +308,27 @@ const VelocityMeter: React.FC<VelocityMeterProps> = ({
                       ))}
                     </div>
                   </>
+                )}
+
+                {/* ERROR state */}
+                {modalState === "error" && (
+                  <div className="flex flex-col items-center justify-center py-10 gap-4">
+                    <div className="p-3 bg-red-100 text-red-500 rounded-2xl">
+                      <FaTimes size={24} />
+                    </div>
+                    <h4 className="text-base font-black text-[#1A1D23]">
+                      Failed to generate hooks
+                    </h4>
+                    <p className="text-xs text-slate-400 font-medium">
+                      Something went wrong. Please try again.
+                    </p>
+                    <button
+                      onClick={() => handleGenerateHooks()}
+                      className="px-6 py-2.5 bg-[#074ed5] hover:bg-[#0041CC] text-white rounded-2xl font-bold text-sm flex items-center gap-2 transition-all"
+                    >
+                      <FaMagic /> Try Again
+                    </button>
+                  </div>
                 )}
               </motion.div>
             </motion.div>

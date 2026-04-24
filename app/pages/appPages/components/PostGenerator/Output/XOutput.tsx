@@ -60,7 +60,7 @@ export const XOutput: React.FC<XOutputProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-gray-50 to-slate-50/60 border border-gray-900/10 rounded-2xl p-5 flex flex-col gap-4"
+      className="bg-gradient-to-br from-gray-50 to-slate-50/60 border border-gray-900/10 rounded-2xl p-6 flex flex-col gap-5"
     >
       {/* Header */}
       <div className="flex items-center gap-2">
@@ -79,7 +79,7 @@ export const XOutput: React.FC<XOutputProps> = ({
           >
             <span className={`text-2xl font-black ${scoreColors.text}`}>{xRefined.engagementScore}</span>
           </div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center leading-tight">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center leading-tight">
             Engagement
             <br />
             Score
@@ -87,7 +87,7 @@ export const XOutput: React.FC<XOutputProps> = ({
         </div>
 
         {/* Quality flags */}
-        <div className="flex-1 flex flex-col gap-1.5">
+        <div className="flex-1 flex flex-col gap-2">
           {xRefined.qualityFlags.length === 0 ? (
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-xl">
               <CheckCircle2 className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
@@ -100,7 +100,7 @@ export const XOutput: React.FC<XOutputProps> = ({
                 className="flex items-start gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl"
               >
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
-                <span className="text-[12px] font-medium text-amber-700 leading-snug">{flag}</span>
+                <span className="text-[13px] font-medium text-amber-800 leading-snug">{flag}</span>
               </div>
             ))
           )}

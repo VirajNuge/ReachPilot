@@ -1,21 +1,15 @@
 "use client";
 
 import React from "react";
-import { BarChart3 } from "lucide-react";
-import { motion } from "framer-motion";
 import type {
   PostPlatform,
   PostPackage,
   ContentScore,
-  HookOption,
   RemixStyle,
   PostGenerationInput,
   ContentStrategyOutput,
 } from "@/lib/types/postGeneration";
 import { CaptionCard } from "./CaptionCard";
-import { ContentScoreCard } from "./ContentScoreCard";
-import { HookSelector } from "./HookSelector";
-import { HashtagPanel } from "./HashtagPanel";
 import { LinkedInOutput } from "./LinkedInOutput";
 import { XOutput } from "./XOutput";
 import { InstagramOutput } from "./InstagramOutput";
@@ -25,9 +19,11 @@ import type { InstagramPostType } from "@/lib/types/postGeneration";
 interface PlatformTabProps {
   platform: PostPlatform;
   caption: string;
+  captionOptions?: string[];
+  selectedCaptionIndex?: number;
+  onSelectCaptionIndex?: (index: number) => void;
   hashtags: { highReach: string[]; niche: string[]; branded: string[] };
   contentScore?: ContentScore;
-  hooks?: HookOption[];
   linkedInRefined?: PostPackage["linkedInRefined"];
   xRefined?: PostPackage["xRefined"];
   instagramRefined?: PostPackage["instagramRefined"];
@@ -37,8 +33,6 @@ interface PlatformTabProps {
   accountId?: string;
   onRemix: (style: RemixStyle) => void;
   onScoreRequest: () => void;
-  onSelectHook: (hook: HookOption) => void;
-  selectedHookId?: string;
   onRefinedCaption?: (newCaption: string, newScore: number, newFlags: string[]) => void;
   onXRefined?: (newCaption: string, newScore: number, newFlags: string[]) => void;
   onInstagramRefined?: (newCaption: string, newScore: number, newFlags: string[], newPostType?: InstagramPostType) => void;
@@ -51,9 +45,11 @@ interface PlatformTabProps {
 export const PlatformTab: React.FC<PlatformTabProps> = ({
   platform,
   caption,
+  captionOptions,
+  selectedCaptionIndex = 0,
+  onSelectCaptionIndex,
   hashtags,
   contentScore,
-  hooks,
   linkedInRefined,
   xRefined,
   instagramRefined,
@@ -61,16 +57,14 @@ export const PlatformTab: React.FC<PlatformTabProps> = ({
   input,
   strategy,
   accountId,
-  onRemix,
+  onRemix: _onRemix,
   onScoreRequest,
-  onSelectHook,
-  selectedHookId,
   onRefinedCaption,
   onXRefined,
   onInstagramRefined,
   onFacebookRefined,
   onCaptionChange,
-  isRemixing = false,
+  isRemixing: _isRemixing = false,
   isScoring = false,
 }) => {
   return (
@@ -79,53 +73,29 @@ export const PlatformTab: React.FC<PlatformTabProps> = ({
       <CaptionCard
         platform={platform}
         caption={caption}
+        options={captionOptions}
+        selectedOptionIndex={selectedCaptionIndex}
+        onSelectOption={onSelectCaptionIndex}
         onCopy={() => navigator.clipboard.writeText(caption)}
-        onRemix={onRemix}
-        isRemixing={isRemixing}
       />
 
-      {/* Hashtag Strategy */}
-      <HashtagPanel hashtags={hashtags} />
-
-      {/* Content Score */}
-      {contentScore ? (
-        <ContentScoreCard score={contentScore} />
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between"
+      {/* Score action (fallback when no global score tile data is available) */}
+      {!contentScore && (
+        <button
+          type="button"
+          onClick={onScoreRequest}
+          disabled={isScoring}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#0052FF] text-white rounded-xl font-bold text-[13px] hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <div className="flex items-center gap-3">
-            <BarChart3 className="w-5 h-5 text-[#0052FF]" />
-            <div>
-              <h3 className="text-sm font-bold text-gray-900">Content Score</h3>
-              <p className="text-xs text-slate-400">Analyze your content quality with AI</p>
-            </div>
-          </div>
-          <button
-            onClick={onScoreRequest}
-            disabled={isScoring}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#0052FF] text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isScoring ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Scoring...
-              </>
-            ) : (
-              <>
-                <BarChart3 className="w-4 h-4" />
-                Score Content
-              </>
-            )}
-          </button>
-        </motion.div>
-      )}
-
-      {/* Hook Selector */}
-      {hooks && hooks.length > 0 && (
-        <HookSelector hooks={hooks} onSelect={onSelectHook} selectedHookId={selectedHookId} />
+          {isScoring ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Scoring...
+            </>
+          ) : (
+            <>Score this platform</>
+          )}
+        </button>
       )}
 
       {/* LinkedIn Performance (LinkedIn tab only) */}

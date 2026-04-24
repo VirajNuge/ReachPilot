@@ -4,13 +4,19 @@
  * LLMs frequently return:
  *  - Markdown code fences (```json ... ```)
  *  - Bare control characters (real \n, \t) inside string values
+ *  - Invalid escape sequences (\p, \(, \e, Windows paths, etc.)
  *  - Extra prose before/after the JSON object
  *
  * Strategy (in order):
  *  1. Strip code fences, try direct JSON.parse
  *  2. Extract outermost {...} via brace matching, try JSON.parse
- *  3. Walk character-by-character, escaping control chars only inside strings
+ *  3. Walk character-by-character, fixing bad escapes and control chars
+ *     only inside strings — never touching structural characters.
  */
+
+// Valid single-char JSON escape sequences after the leading backslash.
+const VALID_JSON_ESCAPES = new Set(['"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u']);
+
 export function parseAIJson(text: string): unknown {
   // Step 1: Strip markdown code fences
   const stripped = text
@@ -40,48 +46,78 @@ export function parseAIJson(text: string): unknown {
     // continue to character-level repair
   }
 
-  // Step 5: Character-level repair — track whether we're inside a JSON string
-  // so we only escape control characters there, never touching structural chars.
+  // Step 5: Character-level repair.
+  // Process one character at a time, tracking whether we're inside a JSON
+  // string so we can fix:
+  //   (a) bare control characters → proper \n / \r / \t / \uXXXX escapes
+  //   (b) invalid escape sequences (e.g. \p, \() → doubled backslash (\\p)
   let repaired = "";
   let inString = false;
-  let escaped = false;
+  let i = 0;
 
-  for (let i = 0; i < extracted.length; i++) {
+  while (i < extracted.length) {
     const ch = extracted[i];
 
-    if (escaped) {
+    if (!inString) {
+      // Outside a string: just track when we enter one.
+      if (ch === '"') inString = true;
       repaired += ch;
-      escaped = false;
+      i++;
+      continue;
+    }
+
+    // --- Inside a JSON string ---
+
+    if (ch === '"') {
+      // End of string (unescaped quote).
+      inString = false;
+      repaired += ch;
+      i++;
       continue;
     }
 
     if (ch === "\\") {
-      escaped = true;
-      repaired += ch;
-      continue;
-    }
+      const next = extracted[i + 1];
 
-    if (ch === '"') {
-      inString = !inString;
-      repaired += ch;
-      continue;
-    }
-
-    if (inString) {
-      const code = ch.charCodeAt(0);
-      if (code < 0x20) {
-        switch (ch) {
-          case "\n": repaired += "\\n"; break;
-          case "\r": repaired += "\\r"; break;
-          case "\t": repaired += "\\t"; break;
-          default: repaired += "\\u" + code.toString(16).padStart(4, "0");
-        }
+      if (next === undefined) {
+        // Trailing backslash at end of input — escape it.
+        repaired += "\\\\";
+        i++;
         continue;
       }
+
+      if (VALID_JSON_ESCAPES.has(next)) {
+        // Valid escape sequence — pass both characters through as-is.
+        // For \uXXXX we also pass the next 4 chars; JSON.parse will validate them.
+        repaired += ch + next;
+        i += 2;
+        continue;
+      }
+
+      // Invalid escape (e.g. \p, \(, \e) — double the backslash so the
+      // character is preserved as a literal backslash in the parsed value.
+      repaired += "\\\\" + next;
+      i += 2;
+      continue;
+    }
+
+    // Bare control character inside a string — must be escaped.
+    const code = ch.charCodeAt(0);
+    if (code < 0x20) {
+      switch (ch) {
+        case "\n": repaired += "\\n"; break;
+        case "\r": repaired += "\\r"; break;
+        case "\t": repaired += "\\t"; break;
+        default:   repaired += "\\u" + code.toString(16).padStart(4, "0");
+      }
+      i++;
+      continue;
     }
 
     repaired += ch;
+    i++;
   }
 
   return JSON.parse(repaired);
 }
+

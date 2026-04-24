@@ -10,7 +10,7 @@ import type {
   ReferenceImage,
 } from "@/lib/types/postGeneration";
 import { POST_IMAGE_SIZES } from "@/lib/types/postGeneration";
-import { buildPosterPrompt } from "@/lib/postGeneration/posterPromptBuilder";
+import { buildPosterPrompt, PLATFORM_ASPECT_RATIO } from "@/lib/postGeneration/posterPromptBuilder";
 
 // Imagen models use generateImages(); Gemini models use generateContent()
 const IMAGEN_MODELS = new Set([
@@ -18,18 +18,6 @@ const IMAGEN_MODELS = new Set([
   "imagen-4.0-fast-generate-001",
   "imagen-4.0-ultra-generate-001",
 ]);
-
-// Platform to aspect ratio mapping
-const PLATFORM_ASPECT_RATIO: Record<string, string> = {
-  instagram_post: "1:1",
-  instagram_story: "9:16",
-  linkedin: "16:9",
-  x: "16:9",
-  facebook: "16:9",
-  tiktok: "9:16",
-  pinterest: "2:3",
-  youtube_community: "16:9",
-};
 
 /** Extract base64 string from a data URL or return as-is if already raw base64 */
 function stripDataUrlPrefix(dataUrl: string): string {
@@ -162,6 +150,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // SEC-05: Guard against oversized base64 payloads (~10MB limit per image)
+    const MAX_BASE64_BYTES = 10 * 1024 * 1024; // 10MB
+    if (body.input.brandAssets?.logoUrl && body.input.brandAssets.logoUrl.length > MAX_BASE64_BYTES) {
+      return NextResponse.json({ error: "Logo image is too large (max 10MB)" }, { status: 413 });
+    }
+    if (Array.isArray(body.input.referenceImages)) {
+      for (const ref of body.input.referenceImages) {
+        if (ref.dataUrl && ref.dataUrl.length > MAX_BASE64_BYTES) {
+          return NextResponse.json({ error: "Reference image is too large (max 10MB)" }, { status: 413 });
+        }
+      }
+    }
+
     // Server-side persona brand asset merge — fills missing brandAssets from persona
     try {
       if (auth.userId && body.accountId) {
@@ -223,9 +224,9 @@ export async function POST(req: NextRequest) {
 
     try {
       if (IMAGEN_MODELS.has(modelId)) {
-        // Imagen: single call with numberOfImages: 3
+        // Imagen: single call with numberOfImages: 1
         // Imagen doesn't support inline reference images — labels are injected into the prompt text
-        const results = await callImagenGenerateImages(ai, modelId, promptWithRefs, aspectRatio, 3);
+        const results = await callImagenGenerateImages(ai, modelId, promptWithRefs, aspectRatio, 1);
         results.forEach((result, index) => {
           imageVariations.push({
             id: index + 1,
@@ -235,25 +236,26 @@ export async function POST(req: NextRequest) {
           });
         });
       } else {
-        // Gemini: 3 parallel generateContent() calls, with reference images injected as inline parts
-        const calls = await Promise.allSettled([
-          callGeminiGenerateContent(ai, modelId, posterPrompt, logoBase64, logoMimeType, referenceImages),
-          callGeminiGenerateContent(ai, modelId, posterPrompt, logoBase64, logoMimeType, referenceImages),
-          callGeminiGenerateContent(ai, modelId, posterPrompt, logoBase64, logoMimeType, referenceImages),
-        ]);
+        // Gemini: single generateContent() call, with reference images injected as inline parts
+        const result = await callGeminiGenerateContent(
+          ai,
+          modelId,
+          posterPrompt,
+          logoBase64,
+          logoMimeType,
+          referenceImages
+        );
 
-        calls.forEach((result, index) => {
-          if (result.status === "fulfilled" && result.value) {
-            imageVariations.push({
-              id: index + 1,
-              imageUrl: `data:${result.value.mimeType};base64,${result.value.data}`,
-              model: modelId,
-              aspectRatio,
-            });
-          } else if (result.status === "rejected") {
-            console.warn(`Variation ${index + 1} failed:`, result.reason);
-          }
-        });
+        if (result) {
+          imageVariations.push({
+            id: 1,
+            imageUrl: `data:${result.mimeType};base64,${result.data}`,
+            model: modelId,
+            aspectRatio,
+          });
+        } else {
+          console.warn("Variation 1 failed: no image returned");
+        }
       }
     } catch (aiError) {
       console.error("Image generation error:", aiError);

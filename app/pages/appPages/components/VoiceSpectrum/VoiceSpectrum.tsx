@@ -108,16 +108,17 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
 
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6 h-full flex flex-col">
-      {/* Header Row */}
-      <div className="flex justify-between items-start mb-5">
+
+      {/* ── Header ── */}
+      <div className="flex justify-between items-start mb-6">
         <div>
           <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
             Tone & Personality Analysis
           </h4>
-          <h2 className="text-xl font-black text-[#000100] leading-none mb-1">
+          <h2 className="text-xl font-black text-[#000100] leading-none mb-2">
             Brand Voice Spectrum
           </h2>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#074ed5]/10 text-[#074ed5] border border-[#074ed5]/20 rounded-full mt-2 inline-flex w-fit">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#074ed5]/10 text-[#074ed5] border border-[#074ed5]/20 rounded-full inline-flex w-fit">
             <BsSoundwave size={10} />
             <span className="text-[10px] uppercase font-bold tracking-wider">
               {safeData.personaName}
@@ -129,26 +130,34 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row flex-1 gap-8 min-h-0">
-        {/* Left: Spectrum Sliders */}
-        <div className="flex-1 flex flex-col justify-center gap-6">
-          {safeData.axes.map((axis) => {
+      {/* ── Two-column body ── */}
+      <div className="flex flex-col lg:flex-row flex-1 gap-5 min-h-0">
+
+        {/* ── LEFT: Spectrum Sliders ── */}
+        <div className="w-full lg:w-[46%] bg-[#f4f8fb] rounded-2xl border border-slate-100 p-5 flex flex-col justify-between gap-0 shrink-0">
+          {safeData.axes.map((axis, idx) => {
             const percentage = ((axis.score + 100) / 200) * 100;
             const reading = axisReading(axis);
+            const isLast = idx === safeData.axes.length - 1;
             return (
-              <div key={axis.id} className="relative pb-1">
-                <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                  <span className={axis.score <= -30 ? "text-[#074ed5]" : ""}>{axis.leftLabel}</span>
-                  <span className={axis.score >= 30 ? "text-[#074ed5]" : ""}>{axis.rightLabel}</span>
+              <div key={axis.id} className={`relative py-4 ${!isLast ? "border-b border-slate-200" : ""}`}>
+                {/* Labels row */}
+                <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-3">
+                  <span className={axis.score <= -30 ? "text-[#074ed5]" : "text-slate-400"}>
+                    {axis.leftLabel}
+                  </span>
+                  <span className={axis.score >= 30 ? "text-[#074ed5]" : "text-slate-400"}>
+                    {axis.rightLabel}
+                  </span>
                 </div>
                 {/* Track */}
-                <div className="h-2.5 w-full bg-[#f4f8fb] rounded-full relative overflow-hidden">
-                  <div className="absolute inset-y-0 left-1/2 w-0.5 bg-slate-300 transform -translate-x-1/2 z-10" />
+                <div className="h-2 w-full bg-white rounded-full relative overflow-hidden border border-slate-200">
+                  <div className="absolute inset-y-0 left-1/2 w-px bg-slate-300 z-10" />
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${percentage}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
-                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#074ed5]/50 to-[#074ed5] rounded-full opacity-80"
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#074ed5]/40 to-[#074ed5] rounded-full"
                   />
                 </div>
                 {/* Thumb */}
@@ -156,12 +165,13 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
                   initial={{ left: "50%" }}
                   animate={{ left: `${percentage}%` }}
                   transition={{ duration: 1, type: "spring" }}
-                  className="absolute top-5 h-5 w-5 bg-white border-2 border-[#074ed5] rounded-full shadow-md z-20 -mt-2 transform -translate-x-1/2 flex items-center justify-center"
+                  className="absolute h-4 w-4 bg-white border-2 border-[#074ed5] rounded-full shadow z-20 transform -translate-x-1/2 flex items-center justify-center"
+                  style={{ top: "calc(50% + 2px)" }}
                 >
-                  <div className="w-2 h-2 bg-[#074ed5] rounded-full" />
+                  <div className="w-1.5 h-1.5 bg-[#074ed5] rounded-full" />
                 </motion.div>
-                {/* Reading label */}
-                <p className="text-[10px] text-slate-400 mt-3 font-medium">
+                {/* Reading */}
+                <p className="text-[10px] mt-2.5 font-medium text-slate-400">
                   <span className="text-[#074ed5] font-bold">{reading.intensity}</span>
                   {" · "}
                   {reading.label}
@@ -171,19 +181,19 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
           })}
         </div>
 
-        {/* Right: Lab Analysis Panel */}
-        <div className="w-full lg:w-[48%] flex flex-col gap-4 overflow-y-auto custom-scroll">
+        {/* ── RIGHT: Analysis Panel ── */}
+        <div className="flex-1 flex flex-col gap-4 overflow-y-auto custom-scroll min-h-0">
 
           {/* Signature Vocabulary */}
-          <div>
-            <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+          <div className="bg-[#f4f8fb] rounded-2xl border border-slate-100 p-4">
+            <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
               Signature Vocabulary
             </h5>
             <div className="flex flex-wrap gap-2">
               {safeData.signatureWords.map((word, i) => (
                 <span
                   key={i}
-                  className="px-3 py-1.5 bg-[#f4f8fb] border border-slate-100 text-[#000100] text-xs font-bold rounded-xl"
+                  className="px-3 py-1.5 bg-white border border-slate-200 text-[#000100] text-xs font-bold rounded-xl"
                 >
                   &ldquo;{word}&rdquo;
                 </span>
@@ -191,59 +201,59 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
             </div>
           </div>
 
-          {/* Overall Insight */}
-          <div className="bg-[#f4f8fb] rounded-2xl p-4 border border-slate-100">
-            <div className="flex items-center gap-1.5 mb-2">
-              <FaFingerprint className="text-[#074ed5]" size={10} />
-              <h5 className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest">
-                Lab Analysis
-              </h5>
-            </div>
-            <p className="text-sm text-slate-600 font-medium leading-relaxed">
-              {safeData.insight}
-            </p>
-          </div>
-
-          {/* Dominant Trait Callout */}
-          {dominant && dominantAxis && (
-            <div className="bg-[#074ed5]/5 border border-[#074ed5]/15 rounded-2xl p-4">
+          {/* Lab Analysis + Dominant Trait — side by side if both present */}
+          <div className={`grid gap-3 ${dominant && dominantAxis ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
+            {/* Lab Analysis */}
+            <div className="bg-[#f4f8fb] rounded-2xl p-4 border border-slate-100">
               <div className="flex items-center gap-1.5 mb-2">
-                <BsGraphUpArrow className="text-[#074ed5]" size={11} />
+                <FaFingerprint className="text-[#074ed5]" size={10} />
                 <h5 className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest">
-                  Dominant Trait
+                  Lab Analysis
                 </h5>
               </div>
-              <p className="text-xs font-bold text-[#000100] mb-1">
-                {dominant.intensity} {dominant.label}
-              </p>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                {axisImplication(dominantAxis)}
+              <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                {safeData.insight}
               </p>
             </div>
-          )}
 
-          {/* Per-Axis Breakdown */}
-          <div>
-            <div className="flex items-center gap-1.5 mb-2">
+            {/* Dominant Trait */}
+            {dominant && dominantAxis && (
+              <div className="bg-[#074ed5]/5 border border-[#074ed5]/15 rounded-2xl p-4 flex flex-col justify-between">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <BsGraphUpArrow className="text-[#074ed5]" size={11} />
+                  <h5 className="text-[10px] font-bold text-[#074ed5] uppercase tracking-widest">
+                    Dominant Trait
+                  </h5>
+                </div>
+                <p className="text-sm font-black text-[#000100] mb-1">
+                  {dominant.intensity} {dominant.label}
+                </p>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  {axisImplication(dominantAxis)}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Axis Breakdown */}
+          <div className="bg-[#f4f8fb] rounded-2xl border border-slate-100 p-4">
+            <div className="flex items-center gap-1.5 mb-3">
               <TbTargetArrow className="text-slate-400" size={12} />
               <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                 Axis Breakdown
               </h5>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col divide-y divide-slate-100">
               {safeData.axes.map((axis) => {
                 const reading = axisReading(axis);
                 const implication = axisImplication(axis);
                 return (
-                  <div
-                    key={axis.id}
-                    className="bg-[#f4f8fb] rounded-xl px-3 py-2.5 border border-slate-100"
-                  >
+                  <div key={axis.id} className="py-2.5 first:pt-0 last:pb-0">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-bold text-[#000100] uppercase tracking-wide">
                         {axis.leftLabel} / {axis.rightLabel}
                       </span>
-                      <span className="text-[10px] font-bold text-[#074ed5]">
+                      <span className="text-[10px] font-bold text-[#074ed5] shrink-0 ml-2">
                         {reading.intensity} {reading.label}
                       </span>
                     </div>
@@ -254,10 +264,10 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
             </div>
           </div>
 
-          {/* Gap / Opportunity Flags */}
+          {/* Growth Gaps */}
           {gapAxes.length > 0 && (
-            <div>
-              <div className="flex items-center gap-1.5 mb-2">
+            <div className="bg-amber-50 rounded-2xl border border-amber-100 p-4">
+              <div className="flex items-center gap-1.5 mb-3">
                 <TbAlertTriangle className="text-amber-500" size={12} />
                 <h5 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">
                   Growth Gaps
@@ -268,10 +278,7 @@ const VoiceSpectrum: React.FC<VoiceSpectrumProps> = ({ data }) => {
                   const opp = axisOpportunity(axis);
                   if (!opp) return null;
                   return (
-                    <div
-                      key={axis.id}
-                      className="bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5 flex gap-2"
-                    >
+                    <div key={axis.id} className="flex gap-2">
                       <TbBulb className="text-amber-500 shrink-0 mt-0.5" size={13} />
                       <p className="text-[11px] text-amber-800 leading-relaxed font-medium">
                         {opp}

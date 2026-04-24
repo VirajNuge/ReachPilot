@@ -5,7 +5,7 @@ export interface ConnectionDocument {
   _id?: ObjectId;
   userId: string;
   accountId: string;
-  platform: "meta" | "x" | "linkedin" | "google";
+  platform: "meta" | "x" | "linkedin" | "google" | "postiz";
   accessToken: string;
   refreshToken?: string;
   tokenExpiresAt?: Date;
@@ -26,7 +26,7 @@ async function getCollection() {
 export async function upsertConnection(
   userId: string,
   accountId: string,
-  platform: "meta" | "x" | "linkedin" | "google",
+  platform: "meta" | "x" | "linkedin" | "google" | "postiz",
   tokenData: {
     accessToken: string;
     refreshToken?: string;
@@ -82,7 +82,7 @@ export async function getConnections(
 export async function deleteConnection(
   userId: string,
   accountId: string,
-  platform: "meta" | "x" | "linkedin" | "google"
+  platform: "meta" | "x" | "linkedin" | "google" | "postiz"
 ): Promise<void> {
   const col = await getCollection();
 

@@ -10,9 +10,23 @@ import { CompetitorProps } from "@/lib/postAnalyzerTypes";
 export default function CompetitorBenchmarking({
   benchmarkData,
 }: CompetitorProps) {
-  const isExceptional =
-    benchmarkData.engagementRate > benchmarkData.nicheAvg * 2;
-  const isAboveAvg = benchmarkData.engagementRate > benchmarkData.nicheAvg;
+  // Normalize engagement rate: if over 100, it's likely a raw count instead of percentage
+  // Calculate correct percentage: engagement_rate should be (interactions/views) * 100
+  // If we get 9700, the AI calculated (129/3355)*10000 instead of *100
+  const normalizeEngagementRate = (rate: number): number => {
+    if (rate > 100) {
+      // AI multiplied by 10000 instead of 100, divide by 100 to fix
+      return parseFloat((rate / 100).toFixed(2));
+    }
+    return parseFloat(rate.toFixed(2));
+  };
+
+  const engagementRate = normalizeEngagementRate(benchmarkData.engagementRate);
+  const accountAvg = parseFloat(benchmarkData.accountAvg.toFixed(2));
+  const nicheAvg = parseFloat(benchmarkData.nicheAvg.toFixed(2));
+
+  const isExceptional = engagementRate > nicheAvg * 2;
+  const isAboveAvg = engagementRate > nicheAvg;
 
   const engagementLabel = isExceptional
     ? "Exceptional"
@@ -64,7 +78,7 @@ export default function CompetitorBenchmarking({
             <div className="flex items-baseline gap-1">
               <FaStar className="text-[#B6FF33]" size={20} />
               <span className="text-4xl font-bold text-[#1A1D23] leading-none">
-                {benchmarkData.engagementRate}%
+                {engagementRate}%
               </span>
             </div>
             <span
@@ -90,14 +104,14 @@ export default function CompetitorBenchmarking({
                 This Post
               </span>
               <span className="text-[13px] font-bold text-[#0052FF]">
-                {benchmarkData.engagementRate}%
+                {engagementRate}%
               </span>
             </div>
             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full bg-[#0052FF]"
                 style={{
-                  width: `${Math.min((benchmarkData.engagementRate / (benchmarkData.nicheAvg * 3)) * 100, 100)}%`,
+                  width: `${Math.min((engagementRate / (nicheAvg * 3)) * 100, 100)}%`,
                 }}
               />
             </div>
@@ -110,14 +124,14 @@ export default function CompetitorBenchmarking({
                 Account Avg
               </span>
               <span className="text-[13px] font-bold text-slate-500">
-                {benchmarkData.accountAvg}%
+                {accountAvg}%
               </span>
             </div>
             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full bg-[#B6FF33]"
                 style={{
-                  width: `${Math.min((benchmarkData.accountAvg / (benchmarkData.nicheAvg * 3)) * 100, 100)}%`,
+                  width: `${Math.min((accountAvg / (nicheAvg * 3)) * 100, 100)}%`,
                 }}
               />
             </div>
@@ -130,14 +144,14 @@ export default function CompetitorBenchmarking({
                 Niche Standard
               </span>
               <span className="text-[13px] font-bold text-slate-500">
-                {benchmarkData.nicheAvg}%
+                {nicheAvg}%
               </span>
             </div>
             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full bg-[#1A1D23]"
                 style={{
-                  width: `${Math.min((benchmarkData.nicheAvg / (benchmarkData.nicheAvg * 3)) * 100, 100)}%`,
+                  width: `${Math.min((nicheAvg / (nicheAvg * 3)) * 100, 100)}%`,
                 }}
               />
             </div>

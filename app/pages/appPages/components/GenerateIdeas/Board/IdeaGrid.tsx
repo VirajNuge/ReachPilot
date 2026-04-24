@@ -1,142 +1,149 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Sparkles } from "lucide-react";
-import IdeaCard, { ContentIdea } from "./IdeaCard"; // Import from previous step
+import { motion } from "framer-motion";
+import IdeaCard from "./IdeaCard";
+import type { GeneratedIdea, IdeaMode } from "@/lib/ideaFinder/types";
 
 interface IdeaGridProps {
+  ideas: GeneratedIdea[];
+  mode?: IdeaMode;
   isGenerating: boolean;
-  onIdeaClick: (idea: ContentIdea) => void;
+  generationStep?: string;
+  onIdeaClick: (idea: GeneratedIdea) => void;
+  onSave?: (idea: GeneratedIdea) => void;
+  onFeedback?: (idea: GeneratedIdea, feedback: "positive" | "negative") => void;
+  onGenerateMore?: () => void;
 }
 
-export default function IdeaGrid({ isGenerating, onIdeaClick }: IdeaGridProps) {
-  const [ideas, setIdeas] = useState<ContentIdea[]>([]);
+const MODE_HINTS: Record<string, string> = {
+  "voice-match": "Generate blueprints that perfectly match your tone and style.",
+  "trend-jacker": "Find real-time trends to jump on before your competitors do.",
+  "repurpose": "Turn your best hits into fresh, new formats instantly.",
+  "gap-filler": "Discover the topics your audience wants but you haven't covered.",
+  "prism": "Explore a single topic through 10+ distinct psychological angles.",
+};
 
-  // --- MOCK DATA SIMULATOR ---
-  // In a real app, this would be your API response
-  useEffect(() => {
-    if (isGenerating) {
-      // Clear old ideas while generating
-      setIdeas([]);
-    } else {
-      // "AI has finished" - Populate with mock data
-      // Only populate if we are NOT generating and have no ideas (initial load simulation)
-      // For this demo, we'll just populate it after a delay if empty
-      if (ideas.length === 0) {
-        setIdeas([
-          {
-            id: "1",
-            title: "The 'Anti-Hustle' Narrative",
-            description:
-              "Challenge the 4am grindset. Argue that rest is the ultimate productivity hack for creative work.",
-            platform: "linkedin",
-            score: 94,
-            strategy: { goal: "Viral Reach", tone: "Controversial" },
-          },
-          {
-            id: "2",
-            title: "SaaS Pricing: The 'Good-Better-Best' Trap",
-            description:
-              "Break down why the standard 3-tier pricing model is failing in 2025 and what to use instead.",
-            platform: "twitter",
-            score: 88,
-            strategy: { goal: "Lead Gen", tone: "Educational" },
-          },
-          {
-            id: "3",
-            title: "My Desk Setup (vs. Reality)",
-            description:
-              "A carousel showing the curated 'Instagram' view vs. the messy 'Actual Work' view. Relatability play.",
-            platform: "instagram",
-            score: 92,
-            strategy: { goal: "Community", tone: "Funny" },
-          },
-          {
-            id: "4",
-            title: "5 AI Tools I Deleted This Week",
-            description:
-              "Instead of 'Top 10 Tools', do a 'Tools I Quit' list. Negative bias drives higher CTR.",
-            platform: "twitter",
-            score: 85,
-            strategy: { goal: "Viral Reach", tone: "Controversial" },
-          },
-          {
-            id: "5",
-            title: "The ROI of Silence",
-            description:
-              "A deep dive into how deep work periods directly correlated with revenue growth last quarter.",
-            platform: "linkedin",
-            score: 79,
-            strategy: { goal: "Lead Gen", tone: "Data-Driven" },
-          },
-        ]);
-      }
-    }
-  }, [isGenerating]);
+const MODE_LABELS: Record<string, string> = {
+  "voice-match": "Voice-Match",
+  "trend-jacker": "Trend-Jacker",
+  "repurpose": "Repurpose",
+  "gap-filler": "Gap Filler",
+  "prism": "Prism 360°",
+};
 
-  // --- 1. SKELETON LOADING STATE ---
+export default function IdeaGrid({
+  ideas,
+  mode,
+  isGenerating,
+  generationStep,
+  onIdeaClick,
+  onSave,
+  onFeedback,
+  onGenerateMore,
+}: IdeaGridProps) {
+  const currentModeStr = mode ? MODE_LABELS[mode] : "Voice-Match";
+  const firstPlatform = ideas.length > 0 ? ideas[0].platform : "All Platforms";
+  
+  // --- 1. MINIMAL PROCESSING STATE ---
   if (isGenerating) {
     return (
-      <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6 pb-20">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div
-            key={i}
-            className="break-inside-avoid bg-white rounded-2xl border border-gray-100 p-5 space-y-4 shadow-sm"
-          >
-            <div className="flex justify-between items-center">
-              <div className="w-16 h-6 bg-gray-100 rounded animate-pulse" />
-              <div className="w-8 h-8 bg-gray-100 rounded-full animate-pulse" />
-            </div>
-            <div className="space-y-2">
-              <div className="w-3/4 h-6 bg-gray-100 rounded animate-pulse" />
-              <div className="w-full h-20 bg-gray-100 rounded animate-pulse" />
-            </div>
-            <div className="pt-4 border-t border-gray-50 flex justify-between">
-              <div className="w-20 h-4 bg-gray-100 rounded animate-pulse" />
-              <div className="w-8 h-8 bg-gray-100 rounded-full animate-pulse" />
-            </div>
+      <div className="flex h-[calc(100vh-140px)] items-center justify-center pb-20">
+        <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white/85 backdrop-blur-sm p-10 text-center shadow-[0_12px_32px_rgba(0,0,0,0.05)]">
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-[#0052FF] border-t-transparent animate-spin" />
+          <h3 className="text-xl font-black text-[#000100] tracking-tight">Generating your ideas...</h3>
+          <p className="mt-2 text-sm font-medium text-slate-500">
+            {generationStep ?? "Building strategy and creating the best angles for your brief."}
+          </p>
+          <div className="mt-6 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+            <div className="h-full w-1/2 animate-pulse rounded-full bg-[#0052FF]" />
           </div>
-        ))}
+        </div>
       </div>
     );
   }
 
   // --- 2. EMPTY STATE ---
   if (ideas.length === 0 && !isGenerating) {
+    const hintText = mode ? MODE_HINTS[mode] : MODE_HINTS["voice-match"];
     return (
-      <div className="flex h-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-white/60 p-12 text-center min-h-[500px]">
-        <div className="mb-6 relative">
-          <div className="absolute inset-0 bg-yellow-100 rounded-full blur-xl opacity-50"></div>
-          <div className="relative bg-white p-6 rounded-full shadow-sm ring-1 ring-gray-100">
-            <Sparkles className="h-12 w-12 text-yellow-500" />
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="flex h-[calc(100vh-140px)] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-200 bg-white/40 backdrop-blur-sm p-12 text-center"
+      >
+        <div className="mb-8 relative flex items-center justify-center">
+          <div className="absolute w-32 h-32 bg-gradient-to-br from-[#0052FF]/30 via-[#074ed5]/20 to-[#caee55]/30 rounded-full blur-2xl animate-pulse" />
+          <div className="relative bg-white w-20 h-20 rounded-2xl shadow-[0_8px_32px_rgba(0,82,255,0.1)] flex items-center justify-center ring-1 ring-slate-100 rotate-3">
+            <Sparkles className="h-10 w-10 text-[#0052FF]" strokeWidth={2.5} />
           </div>
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-3">
+        <h3 className="text-3xl font-black text-[#000100] mb-4 tracking-tight">
           Ready to Ideate?
         </h3>
-        <p className="text-gray-500 text-base max-w-lg mx-auto leading-relaxed">
-          Fill out the brief on the left to generate your first batch of content
-          blueprints.
+        <p className="text-slate-500 font-medium text-base max-w-sm mx-auto leading-relaxed">
+          {hintText} Fill out the brief on the left to get started.
         </p>
-      </div>
+      </motion.div>
     );
   }
 
   // --- 3. RESULTS GRID ---
   return (
-    <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6 pb-40">
-      {ideas.map((idea) => (
-        <div key={idea.id} className="break-inside-avoid">
-          <IdeaCard idea={idea} onClick={onIdeaClick} />
-        </div>
-      ))}
-
-      {/* End of Results Signal */}
-      <div className="break-inside-avoid py-8 text-center">
-        <button className="font-bold transition-colors uppercase tracking-widest bg-[#000100] hover:bg-black text-white">
-          + Generate More Variations
-        </button>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="flex flex-col gap-6"
+    >
+      <div className="flex items-center gap-3 px-2">
+        <span className="px-3 py-1 bg-white border border-slate-200 rounded-full text-[11px] font-black text-slate-500 uppercase tracking-widest shadow-sm">
+          {ideas.length} Blueprints
+        </span>
+        <span className="text-slate-300">•</span>
+        <span className="text-[12px] font-bold text-[#000100] uppercase tracking-wide">
+          {currentModeStr}
+        </span>
+        <span className="text-slate-300">•</span>
+        <span className="text-[12px] font-bold text-slate-500 uppercase tracking-wide">
+          {ideas[0].platform === 'all' ? 'Multi-Platform' : firstPlatform}
+        </span>
       </div>
-    </div>
+
+      <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6 pb-40">
+        {ideas.map((idea, idx) => (
+          <motion.div 
+            key={idea.id} 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: idx * 0.05 }}
+            className="break-inside-avoid"
+          >
+            <IdeaCard
+              idea={idea}
+              mode={mode}
+              onClick={onIdeaClick}
+              onSave={onSave}
+              onFeedback={onFeedback}
+            />
+          </motion.div>
+        ))}
+
+        {/* Generate More */}
+        {onGenerateMore && (
+          <div className="break-inside-avoid py-8 text-center flex justify-center">
+            <button
+              onClick={onGenerateMore}
+              className="font-black text-sm uppercase tracking-widest bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 text-[#000100] px-8 py-4 rounded-2xl transition-all hover:-translate-y-1 flex items-center gap-2"
+            >
+              <Sparkles size={16} className="text-[#0052FF]" />
+              Generate Variations
+            </button>
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 }

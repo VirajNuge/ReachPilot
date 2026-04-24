@@ -61,7 +61,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Validate platform
-    if (!["meta", "x", "linkedin", "google"].includes(platform)) {
+    if (!["meta", "x", "linkedin", "google", "postiz"].includes(platform)) {
       return NextResponse.json(
         { error: "Invalid platform" },
         { status: 400 }

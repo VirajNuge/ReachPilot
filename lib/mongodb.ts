@@ -56,6 +56,24 @@ async function ensureIndexes(db: Db): Promise<void> {
 
     // savedBrandStyles
     db.collection("savedBrandStyles").createIndex({ userId: 1 }, { background: true }),
+
+    // adminWritingStyles
+    db.collection("adminWritingStyles").createIndex({ isActive: 1 }, { background: true }),
+
+    // adminCaptionTemplates
+    db.collection("adminCaptionTemplates").createIndex({ isActive: 1, sortOrder: 1 }, { background: true }),
+    db.collection("adminCaptionTemplates").createIndex({ category: 1 }, { background: true }),
+    db.collection("adminCaptionTemplates").createIndex({ platforms: 1 }, { background: true }),
+
+    // adminVisualStyles
+    db.collection("adminVisualStyles").createIndex({ isActive: 1, sortOrder: 1 }, { background: true }),
+
+    // adminVisualStyleOptions
+    db.collection("adminVisualStyleOptions").createIndex({ tab: 1, sortOrder: 1, isActive: 1 }, { background: true }),
+
+    // savedIdeas (Idea Finder planner)
+    db.collection("savedIdeas").createIndex({ userId: 1, accountId: 1, status: 1 }, { background: true }),
+    db.collection("savedIdeas").createIndex({ createdAt: -1 }, { background: true }),
   ]);
 }
 

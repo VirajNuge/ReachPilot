@@ -49,16 +49,16 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-6"
+      className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-5"
     >
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
           <ImageIcon className="w-4 h-4 text-[#0052FF]" />
           AI Generated Poster
         </h3>
         {variations.length > 0 && (
-          <span className="text-xs font-medium text-gray-400">
+          <span className="text-[11px] font-medium text-gray-400">
             {variations.length} variation{variations.length !== 1 ? "s" : ""} generated
           </span>
         )}
@@ -66,14 +66,14 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
       {/* Variation Thumbnails */}
       {variations.length > 1 && (
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar">
           {variations.map((v) => {
             const isActive = v.id === activeId;
             return (
               <button
                 key={v.id}
                 onClick={() => setActiveId(v.id)}
-                className={`relative flex-1 aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200 ${
+                className={`relative rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 ${
                   isActive
                     ? "border-[#0052FF] shadow-[0_0_0_2px_rgba(0,82,255,0.15)]"
                     : "border-gray-200 hover:border-gray-300 opacity-70 hover:opacity-90"
@@ -117,30 +117,36 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       </div>
 
       {/* Post Details */}
-      <div className="bg-[#F6F8FF] rounded-xl p-4 flex flex-col gap-2">
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-bold text-[#0052FF] uppercase tracking-widest">Headline</span>
-          <span className="text-sm font-bold text-gray-900">{headline}</span>
+      <div className="bg-[#F6F8FF] rounded-xl p-5 grid gap-3">
+        <div>
+          <span className="text-[10px] font-semibold text-[#0052FF] uppercase tracking-[0.12em]">Headline</span>
+          <p className="text-[13px] font-bold text-gray-900 mt-1">{headline}</p>
         </div>
-        {subtext && (
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Subtext</span>
-            <span className="text-sm text-gray-600 font-medium">{subtext}</span>
-          </div>
-        )}
-        {cta && (
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">CTA</span>
-            <span className="text-sm font-bold text-[#0052FF]">{cta}</span>
-          </div>
-        )}
+        <div className="grid gap-2 sm:grid-cols-2">
+          {subtext && (
+            <div>
+              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-[0.12em]">Subtext</span>
+              <p className="text-[13px] text-gray-700 font-medium mt-1">{subtext}</p>
+            </div>
+          )}
+          {cta && (
+            <div>
+              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-[0.12em]">CTA</span>
+              <p className="text-[13px] font-bold text-[#0052FF] mt-1">{cta}</p>
+            </div>
+          )}
+        </div>
+        <details className="rounded-lg border border-[#E2E8F0] bg-white px-3 py-2">
+          <summary className="cursor-pointer text-[11px] font-semibold text-[#64748B]">View prompt used</summary>
+          <p className="text-[12px] text-gray-600 mt-2 leading-relaxed">{imagePrompt}</p>
+        </details>
       </div>
 
       {/* Download Button */}
       {activeVariation && (
         <button
           onClick={handleDownload}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-[#0052FF] hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#0052FF] hover:bg-blue-700 text-white rounded-lg font-semibold text-[13px] transition-colors"
         >
           <Download className="w-4 h-4" />
           Download Poster {variations.length > 1 ? `(V${activeVariation.id})` : ""}

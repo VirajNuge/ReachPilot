@@ -18,10 +18,21 @@ interface GenerationPipelineProps {
 export function GenerationPipeline({ currentStage, stages }: GenerationPipelineProps) {
   return (
     <div className="w-full max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center min-h-[60vh]">
-      <div className="w-full bg-white rounded-2xl shadow-sm p-8 sm:p-12 relative overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full bg-white/80 backdrop-blur-xl rounded-3xl border border-white/50 shadow-2xl shadow-black/[0.08] p-8 sm:p-12 relative overflow-hidden"
+      >
         <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Crafting Your Content</h2>
-          <p className="text-gray-500">Our AI agents are working together to build your post package.</p>
+          <motion.div 
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#0052FF] to-[#0066FF] flex items-center justify-center shadow-xl shadow-[#0052FF]/30"
+          >
+            <Loader2 className="w-10 h-10 text-white animate-spin" />
+          </motion.div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Creating Your Content</h2>
+          <p className="text-gray-500">AI agents are working together to build your post package</p>
         </div>
 
         <div className="relative max-w-lg mx-auto">
@@ -109,7 +120,7 @@ export function GenerationPipeline({ currentStage, stages }: GenerationPipelineP
             })}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

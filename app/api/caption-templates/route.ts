@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       matchKeywords: Array.isArray(body.matchKeywords) ? body.matchKeywords : [],
       bestForObjectives: Array.isArray(body.bestForObjectives) ? body.bestForObjectives : [],
       isActive: true,
-      sortOrder: 999,
+      sortOrder: 0,
     });
 
     return NextResponse.json({ id: newId }, { status: 201 });

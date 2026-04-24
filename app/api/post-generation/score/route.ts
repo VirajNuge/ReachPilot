@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { requireAuth } from "@/lib/withAuth";
 import { buildContentScorePrompt } from "@/lib/postGenerationPrompts";
 import { parseAIJson } from "@/lib/parseAIJson";
+import { AI_MODELS } from "@/lib/aiConfig";
 import type { ContentScore } from "@/lib/types/postGeneration";
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -21,6 +23,9 @@ function isContentScore(value: unknown): value is ContentScore {
 }
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -50,7 +55,7 @@ export async function POST(req: NextRequest) {
     );
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
 
     let responseText = "";
     try {

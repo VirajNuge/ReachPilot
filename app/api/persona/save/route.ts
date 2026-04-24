@@ -51,6 +51,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Guard: logoUrl must not exceed 200 KB when provided as a data URL
+    const MAX_LOGO_BYTES = 200 * 1024; // 200 KB
+    if (persona.logoUrl && typeof persona.logoUrl === "string") {
+      const base64Match = persona.logoUrl.match(/^data:[^;]+;base64,(.+)$/);
+      if (base64Match) {
+        const estimatedBytes = Math.ceil((base64Match[1].length * 3) / 4);
+        if (estimatedBytes > MAX_LOGO_BYTES) {
+          return NextResponse.json(
+            { error: "Logo image is too large. Maximum size is 200 KB." },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
     const result = await upsertPersona(userId, accountId, {
       personaName: persona.personaName || "",
       userRole: persona.userRole || "",

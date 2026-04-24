@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getAuthFromCookies } from "@/lib/auth";
+import { requireAuth } from "@/lib/withAuth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
 import { parseAIJson } from "@/lib/parseAIJson";
 import { buildXRefinePrompt } from "@/lib/postGenerationPrompts";
+import { AI_MODELS } from "@/lib/aiConfig";
 import type {
   ContentStrategyOutput,
   PostGenerationInput,
@@ -40,11 +41,9 @@ function normalizeRefineOutput(value: unknown): XRefineResult | null {
   };
 }
 
-async function loadPersonaContext(accountId?: string): Promise<string> {
+async function loadPersonaContext(userId: string, accountId?: string): Promise<string> {
   try {
-    const auth = await getAuthFromCookies();
-    if (!auth?.userId) return "";
-    const persona = await getPersonaByUserAndAccount(auth.userId, accountId);
+    const persona = await getPersonaByUserAndAccount(userId, accountId);
     if (!persona) return "";
     return buildContentGenerationContext(persona);
   } catch {
@@ -59,7 +58,7 @@ async function runRefine(
   personaContext: string,
   genAI: GoogleGenerativeAI
 ): Promise<XRefineResult | null> {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
   const prompt = buildXRefinePrompt(caption, input, strategy, personaContext);
 
   try {
@@ -74,6 +73,10 @@ async function runRefine(
 }
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -98,7 +101,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const personaContext = body.includePersona ? await loadPersonaContext(body.accountId) : "";
+    const personaContext = body.includePersona ? await loadPersonaContext(userId, body.accountId) : "";
     const genAI = new GoogleGenerativeAI(apiKey);
 
     // First refinement pass

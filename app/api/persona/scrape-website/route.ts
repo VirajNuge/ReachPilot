@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
     const cleanUrl = parsedUrl.toString();
 
     // 1. Scrape the website using existing puppeteer service
-    console.log(`[/api/persona/scrape-website] Scraping: ${cleanUrl}`);
     const rawText = await scrapeProfile(cleanUrl);
 
     if (rawText.startsWith("ERROR:") || rawText.length < 100) {

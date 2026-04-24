@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ContentScore } from "@/lib/types/postGeneration";
-import { Target, Zap, TrendingUp, Sparkles, CheckCircle2 } from "lucide-react";
+import { Target, Zap, TrendingUp, CheckCircle2 } from "lucide-react";
 
 interface ContentScoreCardProps {
   score: ContentScore;
@@ -63,35 +63,34 @@ export const ContentScoreCard: React.FC<ContentScoreCardProps> = ({ score }) => 
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-7 rounded-[32px] border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-8"
+      className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-6"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-gray-900 tracking-tight flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#0047FF] flex items-center justify-center">
-            <Target className="w-4 h-4 text-white" />
+        <h3 className="text-base font-bold text-gray-900 tracking-tight flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-[#0047FF] flex items-center justify-center">
+            <Target className="w-3.5 h-3.5 text-white" />
           </div>
           Content Score
         </h3>
-        <span className="px-3 py-1 bg-gray-50 rounded-full text-xs font-bold text-gray-500">
+        <span className="px-2.5 py-1 bg-gray-50 rounded-full text-[11px] font-semibold text-gray-500">
           AI Analysis
         </span>
       </div>
 
-      <div className="flex items-center justify-between gap-6 px-4">
-        <CircularGauge value={score.overall} label="OVERALL SCORE" icon={CheckCircle2} size={130} strokeWidth={14} />
-        <div className="grid grid-cols-2 gap-x-8 gap-y-6 flex-1 justify-items-center">
-          <CircularGauge value={score.hookStrength} label="HOOK" icon={Zap} size={70} strokeWidth={8} />
-          <CircularGauge value={score.clarity} label="CLARITY" icon={Target} size={70} strokeWidth={8} />
-          <CircularGauge value={score.engagementPotential} label="ENGAGEMENT" icon={Sparkles} size={70} strokeWidth={8} />
-          <CircularGauge value={score.virality} label="VIRALITY" icon={TrendingUp} size={70} strokeWidth={8} />
+      <div className="flex flex-col items-center gap-6 px-1">
+        <CircularGauge value={score.overall} label="OVERALL SCORE" icon={CheckCircle2} size={100} strokeWidth={10} />
+        <div className="flex items-center justify-between w-full">
+          <CircularGauge value={score.hookStrength} label="HOOK" icon={Zap} size={60} strokeWidth={6} />
+          <CircularGauge value={score.clarity} label="CLARITY" icon={Target} size={60} strokeWidth={6} />
+          <CircularGauge value={score.virality} label="VIRALITY" icon={TrendingUp} size={60} strokeWidth={6} />
         </div>
       </div>
 
-      <div className="bg-[#F8FAFC] p-5 rounded-2xl border border-gray-100/50">
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3">
+      <div className="bg-[#F8FAFC] p-4 rounded-xl border border-gray-200">
+        <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.12em] block mb-2">
           Feedback
         </span>
-        <p className="text-[15px] font-medium text-gray-700 leading-relaxed">
+        <p className="text-[14px] font-medium text-gray-800 leading-relaxed">
           {score.feedback}
         </p>
       </div>

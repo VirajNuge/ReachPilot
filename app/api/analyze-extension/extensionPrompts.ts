@@ -170,14 +170,17 @@ REQUIREMENTS:
     - insight: A detailed analysis of the competitor's weak point.
     - recommendations: 3 specific tactics to exploit the identified gap.
 
-16. **viralRecipe**: Identify the single highest-engagement post (outlier) to deconstruct:
-    - id: The post ID.
-    - engagementMultiplier: e.g. "5.2x" (compared to their average).
-    - hookType: Classify the hook (e.g., "Negative Hook", "Story", "Contrarian", "Listicle").
-    - hookText: The exact first sentence/line of the post.
+16. **viralRecipe**: Identify the TOP 5 highest-engagement posts (outliers) to deconstruct. Return an array of exactly 5 recipe objects, sorted by engagementMultiplier descending. If fewer than 5 unique high-performing posts exist, synthesize additional templates from the strongest recurring patterns in their content.
+    For EACH recipe object:
+    - id: Unique identifier (e.g. "outlier-1", "outlier-2", ...).
+    - engagementMultiplier: e.g. "5.2x" (compared to their average engagement).
+    - hookType: Classify the hook style (e.g., "Controversial Statement", "Story-driven", "Contrarian Take", "Listicle", "Curiosity Loop", "Data-Backed", "Personal Confession", "Challenge Hook").
+    - hookText: The exact first sentence/line of the post (or a representative example if synthesized).
     - ingredients: 3 key elements that made it work (e.g., {name: "Formatting", value: "line breaks every 4 words", score: 9}).
-    - whyItWorked: A psychological analysis of why this specific post resonated.
-    - templateStructure: A 4-line reusable template based on the post's structure (e.g., "1. Hook: [Call out pain point]...").
+    - whyItWorked: A psychological analysis of why this specific post resonated with the audience.
+    - templateStructure: A 4-line reusable template based on the post's structure (e.g., "HOOK: [Call out pain point]", "BODY: [Expand with evidence]", "TWIST: [Contrarian insight]", "CTA: [Invite to share or comment]").
+    
+    IMPORTANT: Each of the 5 recipes MUST use a DIFFERENT hookType. Ensure maximum variety across the 5 templates so creators get diverse replication options.
 
 17. **voiceSpectrum**: Deep brand voice analysis across 4 specific axes:
     - axes: Array of 4 objects [{id: string, leftLabel: string, rightLabel: string, score: number}]
@@ -435,14 +438,29 @@ REQUIREMENTS:
     - peakHour: The hour with most engagement on that day (e.g. "9 AM")
     - trend: "Rising" (engagement up vs prev week), "Flat", or "Dropping"
 
-36. **engagementVitals**: Medical-style engagement vitals for the Pulse Overview. Use the formulas below — these are algorithmic signals, not simple averages.
-    - engagementRate: Actual average engagement rate % from scraped data. Formula: (totalLikes + totalReplies + totalRetweets) / totalViews * 100. Round to 2 decimal places.
-    - benchmarkRate: Platform average engagement rate % (use PLATFORM_BENCHMARKS for the relevant platform).
-    - reachEfficiency: "Discovery Ratio" — how well content breaks out of the follower bubble. Formula: use (totalViews / followers) * 100 as a proxy, clamped 0–100. A score of 100 means every follower saw the content; above 100 means non-followers are discovering it (cap at 100). Thresholds: Healthy >70, Warning 40–70, Critical <40.
-    - conversationDensity: Quality-of-engagement metric. Formula: (totalComments / totalEngagements) * 100, where totalEngagements = totalLikes + totalReplies + totalRetweets. Round to 1 decimal place. Thresholds: Healthy >10 (high-intent audience), Warning 2–10 (standard), Critical <2 (surface-level / bot-like likes).
-    - amplificationPower: Virality signal. Formula: (totalRetweets / totalViews) * 100 (use retweets as shares proxy for Twitter/X; for other platforms use shares + saves if available). Round to 2 decimal places. Thresholds: Healthy >2 (strong amplification), Warning 0.5–2 (moderate), Critical <0.5 (low virality).
-    - status: Overall status for the Engagement Rate vital specifically. "Healthy" if engagementRate >= benchmarkRate, "Warning" if engagementRate is 50–99% of benchmarkRate, "Critical" if engagementRate < 50% of benchmarkRate.
-    - insight: One sentence explaining the single most actionable engagement finding based on all four vitals combined.
+ 36. **engagementVitals**: Medical-style engagement vitals for the Pulse Overview. CRITICAL - Use the RAW NUMBERS from the "ENGAGEMENT TOTALS" section above.
+     
+     STEP-BY-STEP CALCULATION (MANDATORY):
+     1. Find "Total Likes", "Total Replies", "Total Retweets/Shares", and "Total Views" from the ENGAGEMENT TOTALS section
+     2. Calculate totalEngagements = Total Likes + Total Replies + Total Retweets
+     3. Calculate engagementRate = (totalEngagements / Total Views) × 100
+     4. Round to 2 decimal places
+     
+     EXAMPLE (DO THIS EXACTLY):
+     - If you see: "Total Likes: 89, Total Replies: 37, Total Retweets/Shares: 3, Total Views: 3355"
+     - Then: totalEngagements = 89 + 37 + 3 = 129
+     - Then: engagementRate = (129 / 3355) × 100 = 3.84%
+     - CORRECT engagementRate value: 3.84
+     - WRONG engagementRate value: 0.01 or any other number
+     
+     FIELDS:
+     - engagementRate: MUST use the calculation above. Return as a NUMBER (e.g., 3.84, NOT "3.84%")
+     - benchmarkRate: Platform average engagement rate % (use PLATFORM_BENCHMARKS for the relevant platform)
+     - reachEfficiency: (totalViews / followers) × 100, clamped 0–100. Thresholds: Healthy >70, Warning 40–70, Critical <40
+     - conversationDensity: (totalComments / totalEngagements) × 100. Round to 1 decimal. Thresholds: Healthy >10, Warning 2–10, Critical <2
+     - amplificationPower: (totalRetweets / totalViews) × 100. Round to 2 decimals. Thresholds: Healthy >2, Warning 0.5–2, Critical <0.5
+     - status: "Healthy" if engagementRate >= benchmarkRate, "Warning" if 50–99% of benchmark, "Critical" if <50% of benchmark
+     - insight: One sentence actionable finding
 
 37. **audienceTemperature**: Audience heat level for the Pulse Overview.
     - tempScore: 0-100. Formula: (fanboyPercent * 1.0) + (seekerPercent * 0.5) - (criticPercent * 1.5). Clamp 0-100.

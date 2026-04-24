@@ -71,7 +71,7 @@ export const LinkedInOutput: React.FC<LinkedInOutputProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-[#EEF3FB] to-blue-50/30 border border-[#0A66C2]/15 rounded-2xl p-5 flex flex-col gap-4"
+      className="bg-gradient-to-br from-[#EEF3FB] to-blue-50/30 border border-[#0A66C2]/15 rounded-2xl p-6 flex flex-col gap-5"
     >
       {/* Header */}
       <div className="flex items-center gap-2">
@@ -90,7 +90,7 @@ export const LinkedInOutput: React.FC<LinkedInOutputProps> = ({
           >
             <span className={`text-2xl font-black ${scoreColors.text}`}>{viralityScore}</span>
           </div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center leading-tight">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center leading-tight">
             Virality
             <br />
             Score
@@ -98,7 +98,7 @@ export const LinkedInOutput: React.FC<LinkedInOutputProps> = ({
         </div>
 
         {/* Quality flags */}
-        <div className="flex-1 flex flex-col gap-1.5">
+        <div className="flex-1 flex flex-col gap-2">
           {qualityFlags.length === 0 ? (
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-xl">
               <CheckCircle2 className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
@@ -111,7 +111,7 @@ export const LinkedInOutput: React.FC<LinkedInOutputProps> = ({
                 className="flex items-start gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl"
               >
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
-                <span className="text-[12px] font-medium text-amber-700 leading-snug">{flag}</span>
+                <span className="text-[13px] font-medium text-amber-800 leading-snug">{flag}</span>
               </div>
             ))
           )}

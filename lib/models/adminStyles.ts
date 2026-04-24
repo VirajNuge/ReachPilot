@@ -32,9 +32,10 @@ async function getWritingStylesCollection() {
   return db.collection<WritingStyleDocument>(WRITING_STYLES_COLLECTION);
 }
 
-export async function getAllWritingStyles(): Promise<WritingStyleDocument[]> {
+export async function getAllWritingStyles(activeOnly = false): Promise<WritingStyleDocument[]> {
   const col = await getWritingStylesCollection();
-  return col.find({}).sort({ createdAt: -1 }).toArray() as Promise<WritingStyleDocument[]>;
+  const query = activeOnly ? { isActive: true } : {};
+  return col.find(query).sort({ createdAt: -1 }).toArray() as Promise<WritingStyleDocument[]>;
 }
 
 export async function getWritingStyleById(id: string): Promise<WritingStyleDocument | null> {

@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getAuthFromCookies } from "@/lib/auth";
+import { requireAuth } from "@/lib/withAuth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
 import { buildRemixPrompt } from "@/lib/postGenerationPrompts";
+import { AI_MODELS } from "@/lib/aiConfig";
 import type { RemixStyle } from "@/lib/types/postGeneration";
 
-async function loadPersonaContext(accountId?: string): Promise<string> {
+async function loadPersonaContext(userId: string, accountId?: string): Promise<string> {
   try {
-    const auth = await getAuthFromCookies();
-    if (!auth?.userId) return "";
-    const persona = await getPersonaByUserAndAccount(auth.userId, accountId);
+    const persona = await getPersonaByUserAndAccount(userId, accountId);
     if (!persona) return "";
     return buildContentGenerationContext(persona);
   } catch {
@@ -19,6 +18,10 @@ async function loadPersonaContext(accountId?: string): Promise<string> {
 }
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const personaContext = await loadPersonaContext(body.accountId);
+    const personaContext = await loadPersonaContext(userId, body.accountId);
     const prompt = buildRemixPrompt(
       body.caption,
       body.platform,
@@ -51,7 +54,7 @@ export async function POST(req: NextRequest) {
     );
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
 
     try {
       const result = await model.generateContent(prompt);

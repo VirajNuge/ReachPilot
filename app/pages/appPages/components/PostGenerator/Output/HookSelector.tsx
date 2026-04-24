@@ -27,7 +27,7 @@ export const HookSelector: React.FC<HookSelectorProps> = ({
           <Zap className="w-4 h-4 text-[#0052FF]" />
           Alternative Hooks
         </h3>
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-[0.12em]">
           {hooks.length} Options
         </span>
       </div>
@@ -42,12 +42,12 @@ export const HookSelector: React.FC<HookSelectorProps> = ({
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
               onClick={() => onSelect(hook)}
-              className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 flex flex-col gap-2 ${
-                isSelected
-                  ? "bg-white border-[#0052FF] shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
-                  : "bg-[#E8ECF2] border-transparent hover:bg-gray-100"
-              }`}
-            >
+                className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 flex flex-col gap-3 ${
+                  isSelected
+                    ? "bg-white border-[#0052FF] shadow-[0_8px_30px_rgba(0,82,255,0.06)] ring-2 ring-[#C7D7FF] ring-offset-1"
+                    : "bg-[#F3F6F9] border-transparent hover:bg-white/60"
+                }`}
+              >
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   {hook.style}
@@ -59,7 +59,7 @@ export const HookSelector: React.FC<HookSelectorProps> = ({
                   </span>
                 )}
               </div>
-              <p className={`text-sm font-medium leading-relaxed ${isSelected ? "text-gray-900" : "text-gray-700"}`}>
+              <p className={`text-sm font-medium leading-relaxed max-h-[5.25rem] overflow-hidden ${isSelected ? "text-gray-900" : "text-gray-800"}`}>
                 {hook.text}
               </p>
             </motion.div>

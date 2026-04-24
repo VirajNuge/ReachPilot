@@ -8,6 +8,16 @@ import {
 import { SentimentProps } from "@/lib/postAnalyzerTypes";
 
 export default function SentimentVibe({ sentimentData }: SentimentProps) {
+  // Normalize sentiment values: if they're decimals (0-1), convert to percentages (0-100)
+  const normalizePercentage = (value: number): number => {
+    return value <= 1 ? Math.round(value * 100) : Math.round(value);
+  };
+
+  const positive = normalizePercentage(sentimentData.positive);
+  const constructive = normalizePercentage(sentimentData.constructive);
+  const neutral = normalizePercentage(sentimentData.neutral);
+  const negative = normalizePercentage(sentimentData.negative);
+
   return (
     <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.03)] overflow-hidden">
       {/* ── Header ── */}
@@ -41,64 +51,97 @@ export default function SentimentVibe({ sentimentData }: SentimentProps) {
       </div>
 
       <div className="px-5 pb-5 space-y-5">
-        {/* ── Sentiment Pulse Bar ── */}
+        {/* ── Sentiment Pulse Stacked Bar ── */}
         <div>
-          <div className="flex justify-between items-end mb-2">
+          <div className="flex justify-between items-end mb-3">
             <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">
               Sentiment Pulse
             </span>
             <span className="text-xl font-bold text-[#1A1D23]">
-              {sentimentData.positive}% Positive
+              {positive}% Positive
             </span>
           </div>
 
-          <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex">
-            <div
-              style={{ width: `${sentimentData.positive}%` }}
-              className="bg-[#B6FF33] h-full"
-              title={`Positive: ${sentimentData.positive}%`}
-            />
-            <div
-              style={{ width: `${sentimentData.constructive}%` }}
-              className="bg-[#0052FF] h-full"
-              title={`Constructive: ${sentimentData.constructive}%`}
-            />
-            <div
-              style={{ width: `${sentimentData.neutral}%` }}
-              className="bg-slate-300 h-full"
-              title={`Neutral: ${sentimentData.neutral}%`}
-            />
-            <div
-              style={{ width: `${sentimentData.negative}%` }}
-              className="bg-[#1A1D23] h-full"
-              title={`Negative: ${sentimentData.negative}%`}
-            />
-          </div>
+          {/* Stacked vertical bars - each segment always visible */}
+          <div className="space-y-2">
+            {/* Positive */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 w-20 shrink-0">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#B6FF33]"></span>
+                <span className="text-[11px] font-bold text-slate-600">
+                  Positive
+                </span>
+              </div>
+              <div className="flex-1 h-8 bg-slate-100 rounded-xl overflow-hidden relative">
+                <div
+                  style={{ width: `${Math.max(positive, 2)}%` }}
+                  className="h-full bg-[#B6FF33] flex items-center justify-end pr-2 transition-all duration-300"
+                >
+                  <span className="text-[11px] font-bold text-[#1A1D23]">
+                    {positive}%
+                  </span>
+                </div>
+              </div>
+            </div>
 
-          <div className="flex justify-between mt-2 px-1">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#B6FF33]"></span>
-              <span className="text-[11px] font-semibold text-slate-500">
-                Pos
-              </span>
+            {/* Constructive */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 w-20 shrink-0">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#0052FF]"></span>
+                <span className="text-[11px] font-bold text-slate-600">
+                  Constructive
+                </span>
+              </div>
+              <div className="flex-1 h-8 bg-slate-100 rounded-xl overflow-hidden relative">
+                <div
+                  style={{ width: `${Math.max(constructive, 2)}%` }}
+                  className="h-full bg-[#0052FF] flex items-center justify-end pr-2 transition-all duration-300"
+                >
+                  <span className="text-[11px] font-bold text-white">
+                    {constructive}%
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#0052FF]"></span>
-              <span className="text-[11px] font-semibold text-slate-500">
-                Constr
-              </span>
+
+            {/* Neutral */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 w-20 shrink-0">
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                <span className="text-[11px] font-bold text-slate-600">
+                  Neutral
+                </span>
+              </div>
+              <div className="flex-1 h-8 bg-slate-100 rounded-xl overflow-hidden relative">
+                <div
+                  style={{ width: `${Math.max(neutral, 2)}%` }}
+                  className="h-full bg-slate-300 flex items-center justify-end pr-2 transition-all duration-300"
+                >
+                  <span className="text-[11px] font-bold text-slate-700">
+                    {neutral}%
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-              <span className="text-[11px] font-semibold text-slate-500">
-                Neut
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#1A1D23]"></span>
-              <span className="text-[11px] font-semibold text-slate-500">
-                Neg
-              </span>
+
+            {/* Negative */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 w-20 shrink-0">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#1A1D23]"></span>
+                <span className="text-[11px] font-bold text-slate-600">
+                  Negative
+                </span>
+              </div>
+              <div className="flex-1 h-8 bg-slate-100 rounded-xl overflow-hidden relative">
+                <div
+                  style={{ width: `${Math.max(negative, 2)}%` }}
+                  className="h-full bg-[#1A1D23] flex items-center justify-end pr-2 transition-all duration-300"
+                >
+                  <span className="text-[11px] font-bold text-white">
+                    {negative}%
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

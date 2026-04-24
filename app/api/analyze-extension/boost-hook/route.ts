@@ -28,18 +28,19 @@ function isBoostHookResponse(v: unknown): v is { hooks: HookAlternative[] } {
 }
 
 function buildBoostHookPrompt(
-  currentHook: string,
+  currentHook: string | undefined,
   velocityCategory: string,
   hookRate: number,
   insight: string,
 ): string {
+  const hookLine = currentHook
+    ? `Current hook: "${currentHook}"\nAI Observation: "${insight}"\n\nGenerate exactly 3 improved hook alternatives that inject proven emotional triggers.`
+    : `AI Observation: "${insight}"\n\nThis account's content has a ${hookRate}% Hook Rate in the "${velocityCategory}" category. Generate exactly 3 original hook examples that demonstrate the strongest hook styles for this account's niche and voice.`;
+
   return `You are an expert social media hook optimizer.
-The user's current hook has a ${hookRate}% Hook Rate (category: ${velocityCategory}).
+The account has a ${hookRate}% Hook Rate (category: ${velocityCategory}).
 
-Current hook: "${currentHook}"
-AI Observation: "${insight}"
-
-Generate exactly 3 improved hook alternatives that inject proven emotional triggers.
+${hookLine}
 Each hook must use ONE of these trigger types:
 - "Curiosity" (open loops, surprising facts, cliffhangers)
 - "FOMO" (urgency, exclusivity, "before it's too late")
@@ -73,9 +74,9 @@ export async function POST(req: NextRequest) {
       platform?: string;
     };
 
-    if (!body.currentHook || !body.velocityCategory) {
+    if (!body.velocityCategory) {
       return NextResponse.json(
-        { error: "currentHook and velocityCategory are required" },
+        { error: "velocityCategory is required" },
         { status: 400 },
       );
     }

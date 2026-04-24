@@ -18,10 +18,8 @@ export default function DashboardLayout({
     if (path.includes("/postAnalyzer")) return "Post Analyzer";
     if (path.includes("/accountPersona")) return "Account Persona Builder";
     if (path.includes("/profileAnalyzer")) return "Profile Analyzer";
-    if (path.includes("/templateLibrary")) return "Template Library";
     if (path.includes("/postGenerator")) return "Post Generator";
-    if (path.includes("/threadPilot")) return "ThreadPilot";
-    if (path.includes("/publishing")) return "Publishing";
+    if (path.includes("/publishing")) return "Scheduling & Publishing";
     if (path.includes("/analytics")) return "Analytics";
     if (path.includes("/generateIdeas")) return "Find Post Ideas";
     if (path.includes("/explorePostIdeas")) return "Explore Trending";

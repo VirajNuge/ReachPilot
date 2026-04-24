@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthFromCookies } from "@/lib/auth";
+import { requireAuth } from "@/lib/withAuth";
+import { getAccountById } from "@/lib/models/account";
 import {
   createPostGeneration,
   getPostGenerationsByUser,
@@ -45,10 +46,9 @@ function isSavePostBody(value: unknown): value is SavePostBody {
 
 export async function POST(req: NextRequest) {
   try {
-    const auth = await getAuthFromCookies();
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireAuth();
+    if (authResult instanceof NextResponse) return authResult;
+    const auth = authResult;
 
     const body = (await req.json()) as unknown;
     if (!isSavePostBody(body)) {
@@ -56,6 +56,14 @@ export async function POST(req: NextRequest) {
         { error: "Invalid request body" },
         { status: 400 },
       );
+    }
+
+    // SEC-02: Verify account ownership if accountId provided
+    if (body.accountId) {
+      const account = await getAccountById(body.accountId);
+      if (!account || account.userId !== auth.userId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
     }
 
     const createData: Omit<PostGenerationDocument, "_id" | "createdAt" | "updatedAt"> = {
@@ -80,10 +88,9 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const auth = await getAuthFromCookies();
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireAuth();
+    if (authResult instanceof NextResponse) return authResult;
+    const auth = authResult;
 
     const { searchParams } = new URL(req.url);
     const accountIdParam = searchParams.get("accountId");
@@ -93,7 +100,10 @@ export async function GET(req: NextRequest) {
     const parsedLimit = limitParam ? Number.parseInt(limitParam, 10) : 50;
     const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 50;
 
-    const posts = await getPostGenerationsByUser(auth.userId, accountId, limit);
+    const statusParam = searchParams.get("status") as import("@/lib/types/postGeneration").PostGenerationStatus | null;
+    const status = statusParam && ["draft", "scheduled", "published"].includes(statusParam) ? statusParam : undefined;
+
+    const posts = await getPostGenerationsByUser(auth.userId, accountId, limit, status);
     return NextResponse.json({ posts });
   } catch (error) {
     console.error("Save post generation GET error:", error);

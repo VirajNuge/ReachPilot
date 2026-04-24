@@ -6,6 +6,7 @@ import { FaHeartbeat, FaChartLine, FaComments, FaBolt } from "react-icons/fa";
 
 interface EngagementVitalsProps {
   data: EngagementVitals;
+  platform?: string;
 }
 
 interface VitalCardProps {
@@ -18,6 +19,102 @@ interface VitalCardProps {
   /** Progress bar fill 0–100 */
   progress: number;
 }
+
+// ─── Platform-specific benchmarks ────────────────────────────────────────────
+// Sources: Hootsuite 2024, Socialinsider 2024, RivalIQ 2025 benchmarks
+// reachEfficiency  = reach-to-follower ratio (0–100 scale; 100 = perfect reach)
+// conversationDensity = comments as % of total engagements
+// amplificationPower  = shares/saves as % of reach
+// engagementRate      = used only for progress-bar scaling (AI provides the actual status)
+
+interface PlatformVitals {
+  reachEfficiency: { healthy: number; warning: number };
+  conversationDensity: { healthy: number; warning: number };
+  amplificationPower: { healthy: number; warning: number };
+  /** Upper bound used to scale the progress bar for each metric */
+  progressScale: {
+    reachEfficiency: number;
+    conversationDensity: number;
+    amplificationPower: number;
+    engagementRate: number; // 2× benchmark ceiling
+  };
+  label: string;
+}
+
+const PLATFORM_VITALS: Record<string, PlatformVitals> = {
+  instagram: {
+    reachEfficiency:    { healthy: 20,  warning: 10  },
+    conversationDensity:{ healthy: 8,   warning: 3   },
+    amplificationPower: { healthy: 2,   warning: 0.5 },
+    progressScale:      { reachEfficiency: 40, conversationDensity: 20, amplificationPower: 5,  engagementRate: 6   },
+    label: "Instagram",
+  },
+  tiktok: {
+    reachEfficiency:    { healthy: 70,  warning: 30  },
+    conversationDensity:{ healthy: 12,  warning: 5   },
+    amplificationPower: { healthy: 8,   warning: 2   },
+    progressScale:      { reachEfficiency: 100, conversationDensity: 25, amplificationPower: 15, engagementRate: 16  },
+    label: "TikTok",
+  },
+  linkedin: {
+    reachEfficiency:    { healthy: 12,  warning: 5   },
+    conversationDensity:{ healthy: 18,  warning: 8   },
+    amplificationPower: { healthy: 10,  warning: 3   },
+    progressScale:      { reachEfficiency: 25, conversationDensity: 35, amplificationPower: 20, engagementRate: 10  },
+    label: "LinkedIn",
+  },
+  x: {
+    reachEfficiency:    { healthy: 20,  warning: 8   },
+    conversationDensity:{ healthy: 15,  warning: 5   },
+    amplificationPower: { healthy: 15,  warning: 5   },
+    progressScale:      { reachEfficiency: 40, conversationDensity: 30, amplificationPower: 30, engagementRate: 2   },
+    label: "X / Twitter",
+  },
+  facebook: {
+    reachEfficiency:    { healthy: 8,   warning: 2   },
+    conversationDensity:{ healthy: 8,   warning: 3   },
+    amplificationPower: { healthy: 4,   warning: 1   },
+    progressScale:      { reachEfficiency: 15, conversationDensity: 15, amplificationPower: 8,  engagementRate: 1   },
+    label: "Facebook",
+  },
+  youtube: {
+    reachEfficiency:    { healthy: 15,  warning: 5   },
+    conversationDensity:{ healthy: 8,   warning: 3   },
+    amplificationPower: { healthy: 2,   warning: 0.5 },
+    progressScale:      { reachEfficiency: 30, conversationDensity: 15, amplificationPower: 5,  engagementRate: 4   },
+    label: "YouTube",
+  },
+  unknown: {
+    reachEfficiency:    { healthy: 20,  warning: 8   },
+    conversationDensity:{ healthy: 10,  warning: 2   },
+    amplificationPower: { healthy: 2,   warning: 0.5 },
+    progressScale:      { reachEfficiency: 40, conversationDensity: 20, amplificationPower: 5,  engagementRate: 4   },
+    label: "Social",
+  },
+};
+
+function normalizePlatform(p?: string | null): string {
+  if (!p) return "unknown";
+  const s = p.toLowerCase();
+  if (s.includes("instagram")) return "instagram";
+  if (s.includes("tiktok")) return "tiktok";
+  if (s.includes("linkedin")) return "linkedin";
+  if (s === "x" || s.includes("twitter")) return "x";
+  if (s.includes("facebook")) return "facebook";
+  if (s.includes("youtube")) return "youtube";
+  return "unknown";
+}
+
+function getStatus(
+  value: number,
+  thresholds: { healthy: number; warning: number }
+): "Healthy" | "Warning" | "Critical" {
+  if (value >= thresholds.healthy) return "Healthy";
+  if (value >= thresholds.warning) return "Warning";
+  return "Critical";
+}
+
+// ─── VitalCard ────────────────────────────────────────────────────────────────
 
 const VitalCard = ({
   title,
@@ -106,43 +203,58 @@ const VitalCard = ({
   );
 };
 
-/** Reach Efficiency (Discovery Ratio) status: >70 Healthy, 40–70 Warning, <40 Critical */
-function reachEfficiencyStatus(score: number): "Healthy" | "Warning" | "Critical" {
-  if (score > 70) return "Healthy";
-  if (score >= 40) return "Warning";
-  return "Critical";
-}
+// ─── Main component ───────────────────────────────────────────────────────────
 
-/** Conversation Density status: >10% Healthy, 2–10% Warning, <2% Critical */
-function conversationDensityStatus(pct: number): "Healthy" | "Warning" | "Critical" {
-  if (pct > 10) return "Healthy";
-  if (pct >= 2) return "Warning";
-  return "Critical";
-}
-
-/** Amplification Power status: >2% Healthy, 0.5–2% Warning, <0.5% Critical */
-function amplificationPowerStatus(pct: number): "Healthy" | "Warning" | "Critical" {
-  if (pct > 2) return "Healthy";
-  if (pct >= 0.5) return "Warning";
-  return "Critical";
-}
-
-export default function EngagementVitalsPanel({ data }: EngagementVitalsProps) {
+export default function EngagementVitalsPanel({
+  data,
+  platform,
+}: EngagementVitalsProps) {
   if (!data) return null;
+
+  const key = normalizePlatform(platform);
+  const vitals = PLATFORM_VITALS[key] ?? PLATFORM_VITALS.unknown;
+
+  const reachStatus = getStatus(data.reachEfficiency ?? 0, vitals.reachEfficiency);
+  const convStatus  = getStatus(data.conversationDensity ?? 0, vitals.conversationDensity);
+  const ampStatus   = getStatus(data.amplificationPower ?? 0, vitals.amplificationPower);
+
+  const erProgress = Math.min(
+    100,
+    ((data.engagementRate ?? 0) / Math.max(vitals.progressScale.engagementRate, 0.01)) * 100
+  );
+  const reachProgress = Math.min(
+    100,
+    ((data.reachEfficiency ?? 0) / vitals.progressScale.reachEfficiency) * 100
+  );
+  const convProgress = Math.min(
+    100,
+    ((data.conversationDensity ?? 0) / vitals.progressScale.conversationDensity) * 100
+  );
+  const ampProgress = Math.min(
+    100,
+    ((data.amplificationPower ?? 0) / vitals.progressScale.amplificationPower) * 100
+  );
 
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.05)] p-6">
       <div className="flex justify-between items-start mb-6 gap-4">
-        <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-          Engagement Vitals
-        </h3>
+        <div className="flex items-center gap-2.5">
+          <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            Engagement Vitals
+          </h3>
+          {key !== "unknown" && (
+            <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+              {vitals.label}
+            </span>
+          )}
+        </div>
         <p className="text-[10px] text-slate-400 font-medium italic text-right max-w-[60%] leading-relaxed">
           {data.insight}
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* 1. Engagement Rate — vs platform benchmark */}
+        {/* 1. Engagement Rate — AI-provided status, platform-scaled progress */}
         <VitalCard
           title="Engagement Rate"
           value={`${data.engagementRate ?? 0}%`}
@@ -150,43 +262,40 @@ export default function EngagementVitalsPanel({ data }: EngagementVitalsProps) {
           status={data.status ?? "Warning"}
           icon={<FaHeartbeat className="text-sm" />}
           delay={0}
-          // Progress: scale relative to 2× the benchmark so healthy ER fills the bar nicely
-          progress={Math.min(100, ((data.engagementRate ?? 0) / Math.max((data.benchmarkRate ?? 1) * 2, 0.01)) * 100)}
+          progress={erProgress}
         />
 
-        {/* 2. Reach Efficiency — Discovery Ratio 0–100 */}
+        {/* 2. Reach Efficiency — platform-aware thresholds */}
         <VitalCard
           title="Reach Efficiency"
           value={`${data.reachEfficiency ?? 0}`}
           subValue="/ 100"
-          status={reachEfficiencyStatus(data.reachEfficiency ?? 0)}
+          status={reachStatus}
           icon={<FaChartLine className="text-sm" />}
           delay={150}
-          progress={data.reachEfficiency ?? 0}
+          progress={reachProgress}
         />
 
-        {/* 3. Conversation Density — comments / total engagements % */}
+        {/* 3. Conversation Density — platform-aware thresholds */}
         <VitalCard
           title="Conversation Density"
           value={`${(data.conversationDensity ?? 0).toFixed(1)}%`}
           subValue="of engagements"
-          status={conversationDensityStatus(data.conversationDensity ?? 0)}
+          status={convStatus}
           icon={<FaComments className="text-sm" />}
           delay={300}
-          // Progress: 20% density = full bar (>10% is already Healthy, so 20 gives headroom)
-          progress={Math.min(100, ((data.conversationDensity ?? 0) / 20) * 100)}
+          progress={convProgress}
         />
 
-        {/* 4. Amplification Power — shares+saves / reach % */}
+        {/* 4. Amplification Power — platform-aware thresholds */}
         <VitalCard
           title="Amplification Power"
           value={`${(data.amplificationPower ?? 0).toFixed(2)}%`}
           subValue="of reach shared"
-          status={amplificationPowerStatus(data.amplificationPower ?? 0)}
+          status={ampStatus}
           icon={<FaBolt className="text-sm" />}
           delay={450}
-          // Progress: 5% amplification = full bar (>2% is Healthy)
-          progress={Math.min(100, ((data.amplificationPower ?? 0) / 5) * 100)}
+          progress={ampProgress}
         />
       </div>
     </div>

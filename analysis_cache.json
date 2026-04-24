@@ -1,607 +1,549 @@
 {
   "analysis": {
     "profile": {
-      "name": "Jakub T. Jankiewicz ",
-      "headline": "JavaScript, Open Source, Wikipedia Expert",
-      "followers": 3678,
-      "projects": "JavaScript expert, Open Source developer, and Wikipedia editor",
-      "profileScore": 52,
-      "bio": "JavaScript expert, Open Source developer, and Wikipedia editor\n\nInspired by early MIT hackers; GNU/Linux and GNU Emacs 4 life \n\nDM  \nhttps://\njcu.bi/dm",
-      "pfp": "https://pbs.twimg.com/profile_images/1690455863369048065/Z2euDpXc_200x200.jpg",
-      "banner": "https://pbs.twimg.com/profile_banners/148001227/1729797417/600x200",
-      "followingCount": 427
+      "name": "Karthik",
+      "headline": "Jacked Engineer Tweeting Tech",
+      "followers": 12700,
+      "projects": "prev ai/software engineer intern @ startups x2",
+      "profileScore": 68.5,
+      "bio": "23, jacked Engineer. prev ai/software engineer intern @ startups x2",
+      "pfp": "https://pbs.twimg.com/profile_images/1983037272665587712/wpipC69n_200x200.jpg",
+      "banner": "https://pbs.twimg.com/profile_banners/1884617498194288640/1761627907/1080x360",
+      "followingCount": 596
     },
     "quickFixes": [
       {
-        "headline": "Optimize Profile Bio Keywords",
-        "description": "Adding keywords like 'web development' or 'coding tutorials' to the bio can improve search visibility and attract targeted followers; this could increase follower growth by 10%.",
+        "headline": "Run Polls on Tech Choices",
+        "description": "Polling performs well; adding polls could increase engagement by 15%.",
         "tag": "HIGH IMPACT"
       },
       {
-        "headline": "Engage More Actively in Comments",
-        "description": "Responding to comments, even with simple acknowledgements, can boost engagement rates and foster a sense of community, potentially increasing interaction rates by 15%.",
+        "headline": "Leverage Trending Tech News",
+        "description": "Capitalize on trending news by commenting to boost visibility by 20%.",
         "tag": "HIGH IMPACT"
       },
       {
-        "headline": "Incorporate Visual Content",
-        "description": "Adding relevant images or short videos to tweets can significantly increase visibility and engagement, potentially doubling like and retweet rates.",
-        "tag": "HIGH IMPACT"
-      },
-      {
-        "headline": "Run Polls for Audience Insights",
-        "description": "Conducting polls on relevant topics not only increases engagement but also provides valuable audience insights for future content creation; this could improve content relevance by 20%.",
+        "headline": "More Original Image/Video Content",
+        "description": "Creating unique visual content could increase retweets by 25%.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Schedule Tweets During Peak Hours",
-        "description": "Consistently posting during peak engagement hours (9 AM, 12 PM, 3 PM, 6 PM) can maximize visibility and interaction, potentially increasing tweet reach by 25%.",
+        "headline": "Ask More Specific Tech Questions",
+        "description": "Refining questions can help boost relevant replies by 10%.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Create Concise Threads",
-        "description": "Breaking down complex topics into digestible Twitter threads can boost engagement and encourage followers to stay informed; this could increase content consumption by 30%.",
+        "headline": "Use Consistent Brand Colors",
+        "description": "Applying consistent branding improves profile recognition by 5%.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Ask Engaging Questions",
-        "description": "Posing open-ended questions in tweets can stimulate conversations and encourage audience participation, potentially increasing reply rates by 10%.",
-        "tag": "MEDIUM IMPACT"
-      },
-      {
-        "headline": "Share Relevant Industry News",
-        "description": "Curating and sharing timely industry news can position the profile as a valuable resource and attract new followers; this could improve credibility by 15%.",
+        "headline": "Add Humor to Tech Takes",
+        "description": "Injecting humor makes content more shareable, boosting visibility by 8%.",
         "tag": "LOW IMPACT"
       },
       {
-        "headline": "Use Relevant Hashtags",
-        "description": "Including popular and relevant hashtags in tweets can increase their visibility and reach a wider audience, potentially boosting impressions by 10%.",
+        "headline": "Engage More With Commenters",
+        "description": "Replying to comments could build community and increase engagement by 7%.",
         "tag": "LOW IMPACT"
       },
       {
-        "headline": "Promote Free Content",
-        "description": "Sharing links to free articles or resources can drive traffic and establish the profile as a provider of valuable content, potentially increasing click-through rates by 5%.",
+        "headline": "Post Short Tech Opinion Threads",
+        "description": "Breaking insights into threads makes them digestible and increases engagement by 6%.",
+        "tag": "LOW IMPACT"
+      },
+      {
+        "headline": "Join Tech Twitter Spaces",
+        "description": "Participating in Twitter Spaces expands reach and builds authority by 4%.",
+        "tag": "LOW IMPACT"
+      },
+      {
+        "headline": "Promote a Free Tech Template",
+        "description": "Offering a free resource generates leads and boosts engagement by 3%.",
         "tag": "LOW IMPACT"
       }
     ],
     "bioAnalysis": {
       "clarityScore": 7,
       "keywordScore": 6,
-      "tone": "Informative, slightly opinionated",
+      "tone": "Informal, conversational, tech-focused.",
       "strengths": [
-        "Expertise in JavaScript and Open Source development is clear.",
-        "Connection to Wikipedia editing adds credibility.",
-        "Bio includes a direct method for contact (DM link)."
+        "Relatable tech humor",
+        "Strong opinions on tech products",
+        "Consistent posting",
+        "Mix of text and media content"
       ],
       "weaknesses": [
-        "Bio could benefit from more specific keywords related to web development or coding.",
-        "Inspiration by MIT hackers may not resonate with a broad audience.",
-        "Bio lacks a clear call to action or value proposition."
+        "Inconsistent engagement",
+        "Lacks clear call to action",
+        "Limited originality in media content",
+        "No community engagement"
       ],
       "suggestions": [
-        "Incorporate keywords like 'web development', 'coding tutorials', or 'open source contributions'.",
-        "Highlight a specific achievement or contribution in the field.",
-        "Add a call to action, such as 'Follow for JavaScript tips' or 'Learn about open source development'."
+        "Increase original content creation",
+        "Engage directly with audience through comments",
+        "Add lead magnet to bio",
+        "Consistently use relevant hashtags"
       ]
     },
     "keywords": {
       "current": [
-        "JavaScript",
-        "Open Source",
-        "Wikipedia",
-        "CodeMirror",
-        "eleven_ty",
-        "Pi Day",
-        "social media",
-        "blog"
+        "coding",
+        "Windows",
+        "browser",
+        "software engineer",
+        "tech",
+        "Microsoft",
+        "Apple",
+        "YouTube",
+        "LinkedIn",
+        "languages"
       ],
       "missing": [
+        "AI",
+        "startups",
+        "cloud computing",
+        "data science",
+        "cybersecurity",
+        "machine learning",
         "web development",
-        "coding tutorials",
-        "frontend development",
-        "software engineering",
-        "programming",
-        "GitHub"
+        "UI/UX"
       ]
     },
     "textAnalysis": {
-      "frequency": "1.9 posts/day, leaning towards blog promotion and commentary on tech topics.",
-      "contentMix": "Exclusively text-based, lacking visual elements or interactive content.",
-      "engagement": "Low engagement rate, indicating a need for more engaging content types or topics."
+      "frequency": "Posts 3.4 times/day, aligning well with optimal frequency.",
+      "contentMix": "Favors text-based content (63%) but integrates mixed media in 37% of posts.",
+      "engagement": "Inconsistent engagement, suggesting room for improvement in hook strength."
     },
     "contentMetrics": {
-      "frequencyScore": 63,
-      "contentMixScore": 10,
-      "engagementScore": 15
+      "frequencyScore": 85,
+      "contentMixScore": 70,
+      "engagementScore": 45
     },
     "pulseHeartbeat": [
       {
         "day": "Mon",
-        "activityScore": 42,
-        "postsCount": 2,
-        "peakHour": "1 AM",
+        "activityScore": 65,
+        "postsCount": 4,
+        "peakHour": "11:00 PM",
         "trend": "Flat"
       },
       {
         "day": "Tue",
-        "activityScore": 36,
-        "postsCount": 1,
-        "peakHour": "2 AM",
+        "activityScore": 70,
+        "postsCount": 5,
+        "peakHour": "9:09 PM",
         "trend": "Flat"
       },
       {
         "day": "Wed",
-        "activityScore": 28,
-        "postsCount": 1,
-        "peakHour": "4 PM",
+        "activityScore": 68,
+        "postsCount": 4,
+        "peakHour": "11:01 PM",
         "trend": "Flat"
       },
       {
         "day": "Thu",
-        "activityScore": 75,
-        "postsCount": 3,
-        "peakHour": "1 AM",
-        "trend": "Rising"
+        "activityScore": 72,
+        "postsCount": 5,
+        "peakHour": "11:01 PM",
+        "trend": "Flat"
       },
       {
         "day": "Fri",
-        "activityScore": 30,
-        "postsCount": 1,
-        "peakHour": "7 PM",
-        "trend": "Dropping"
+        "activityScore": 67,
+        "postsCount": 3,
+        "peakHour": "11:01 PM",
+        "trend": "Flat"
       },
       {
         "day": "Sat",
-        "activityScore": 55,
-        "postsCount": 2,
-        "peakHour": "5 AM",
+        "activityScore": 75,
+        "postsCount": 4,
+        "peakHour": "11:01 PM",
         "trend": "Flat"
       },
       {
         "day": "Sun",
-        "activityScore": 68,
-        "postsCount": 3,
-        "peakHour": "3 AM",
-        "trend": "Flat"
+        "activityScore": 23,
+        "postsCount": 1,
+        "peakHour": "7:01 PM",
+        "trend": "Dropping"
       }
     ],
     "schedule": [
       {
-        "day": "Monday",
+        "day": "MONDAY",
         "slots": [
           {
-            "id": "mon_00",
-            "label": "00:00-06:00",
-            "value": 75,
-            "engagement": "High"
-          },
-          {
-            "id": "mon_06",
-            "label": "06:00-12:00",
-            "value": 10,
+            "id": "6AM-9AM",
+            "label": "Morning",
+            "value": 20,
             "engagement": "Low"
           },
           {
-            "id": "mon_12",
-            "label": "12:00-18:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "mon_18",
-            "label": "18:00-00:00",
-            "value": 10,
-            "engagement": "Low"
-          }
-        ]
-      },
-      {
-        "day": "Tuesday",
-        "slots": [
-          {
-            "id": "tue_00",
-            "label": "00:00-06:00",
-            "value": 70,
-            "engagement": "High"
-          },
-          {
-            "id": "tue_06",
-            "label": "06:00-12:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "tue_12",
-            "label": "12:00-18:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "tue_18",
-            "label": "18:00-00:00",
-            "value": 10,
-            "engagement": "Low"
-          }
-        ]
-      },
-      {
-        "day": "Wednesday",
-        "slots": [
-          {
-            "id": "wed_00",
-            "label": "00:00-06:00",
+            "id": "9AM-12PM",
+            "label": "Late Morning",
             "value": 60,
             "engagement": "Medium"
           },
           {
-            "id": "wed_06",
-            "label": "06:00-12:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "wed_12",
-            "label": "12:00-18:00",
-            "value": 70,
-            "engagement": "High"
-          },
-          {
-            "id": "wed_18",
-            "label": "18:00-00:00",
-            "value": 10,
-            "engagement": "Low"
-          }
-        ]
-      },
-      {
-        "day": "Thursday",
-        "slots": [
-          {
-            "id": "thu_00",
-            "label": "00:00-06:00",
-            "value": 80,
-            "engagement": "High"
-          },
-          {
-            "id": "thu_06",
-            "label": "06:00-12:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "thu_12",
-            "label": "12:00-18:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "thu_18",
-            "label": "18:00-00:00",
-            "value": 60,
-            "engagement": "Medium"
-          }
-        ]
-      },
-      {
-        "day": "Friday",
-        "slots": [
-          {
-            "id": "fri_00",
-            "label": "00:00-06:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "fri_06",
-            "label": "06:00-12:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "fri_12",
-            "label": "12:00-18:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "fri_18",
-            "label": "18:00-00:00",
-            "value": 70,
-            "engagement": "High"
-          }
-        ]
-      },
-      {
-        "day": "Saturday",
-        "slots": [
-          {
-            "id": "sat_00",
-            "label": "00:00-06:00",
-            "value": 70,
-            "engagement": "High"
-          },
-          {
-            "id": "sat_06",
-            "label": "06:00-12:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "sat_12",
-            "label": "12:00-18:00",
-            "value": 10,
-            "engagement": "Low"
-          },
-          {
-            "id": "sat_18",
-            "label": "18:00-00:00",
+            "id": "12PM-3PM",
+            "label": "Afternoon",
             "value": 65,
             "engagement": "Medium"
+          },
+          {
+            "id": "3PM-6PM",
+            "label": "Late Afternoon",
+            "value": 75,
+            "engagement": "Medium"
           }
         ]
       },
       {
-        "day": "Sunday",
+        "day": "TUESDAY",
         "slots": [
           {
-            "id": "sun_00",
-            "label": "00:00-06:00",
+            "id": "6AM-9AM",
+            "label": "Morning",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "9AM-12PM",
+            "label": "Late Morning",
+            "value": 70,
+            "engagement": "Medium"
+          },
+          {
+            "id": "12PM-3PM",
+            "label": "Afternoon",
+            "value": 75,
+            "engagement": "Medium"
+          },
+          {
+            "id": "3PM-6PM",
+            "label": "Late Afternoon",
             "value": 80,
             "engagement": "High"
-          },
+          }
+        ]
+      },
+      {
+        "day": "WEDNESDAY",
+        "slots": [
           {
-            "id": "sun_06",
-            "label": "06:00-12:00",
-            "value": 10,
+            "id": "6AM-9AM",
+            "label": "Morning",
+            "value": 20,
             "engagement": "Low"
           },
           {
-            "id": "sun_12",
-            "label": "12:00-18:00",
-            "value": 10,
+            "id": "9AM-12PM",
+            "label": "Late Morning",
+            "value": 20,
             "engagement": "Low"
           },
           {
-            "id": "sun_18",
-            "label": "18:00-00:00",
-            "value": 10,
+            "id": "12PM-3PM",
+            "label": "Afternoon",
+            "value": 75,
+            "engagement": "Medium"
+          },
+          {
+            "id": "3PM-6PM",
+            "label": "Late Afternoon",
+            "value": 80,
+            "engagement": "High"
+          }
+        ]
+      },
+      {
+        "day": "THURSDAY",
+        "slots": [
+          {
+            "id": "6AM-9AM",
+            "label": "Morning",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "9AM-12PM",
+            "label": "Late Morning",
+            "value": 70,
+            "engagement": "Medium"
+          },
+          {
+            "id": "12PM-3PM",
+            "label": "Afternoon",
+            "value": 75,
+            "engagement": "Medium"
+          },
+          {
+            "id": "3PM-6PM",
+            "label": "Late Afternoon",
+            "value": 80,
+            "engagement": "High"
+          }
+        ]
+      },
+      {
+        "day": "FRIDAY",
+        "slots": [
+          {
+            "id": "6AM-9AM",
+            "label": "Morning",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "9AM-12PM",
+            "label": "Late Morning",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "12PM-3PM",
+            "label": "Afternoon",
+            "value": 75,
+            "engagement": "Medium"
+          },
+          {
+            "id": "3PM-6PM",
+            "label": "Late Afternoon",
+            "value": 80,
+            "engagement": "High"
+          }
+        ]
+      },
+      {
+        "day": "SATURDAY",
+        "slots": [
+          {
+            "id": "6AM-9AM",
+            "label": "Morning",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "9AM-12PM",
+            "label": "Late Morning",
+            "value": 70,
+            "engagement": "Medium"
+          },
+          {
+            "id": "12PM-3PM",
+            "label": "Afternoon",
+            "value": 75,
+            "engagement": "Medium"
+          },
+          {
+            "id": "3PM-6PM",
+            "label": "Late Afternoon",
+            "value": 80,
+            "engagement": "High"
+          }
+        ]
+      },
+      {
+        "day": "SUNDAY",
+        "slots": [
+          {
+            "id": "6AM-9AM",
+            "label": "Morning",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "9AM-12PM",
+            "label": "Late Morning",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "12PM-3PM",
+            "label": "Afternoon",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "3PM-6PM",
+            "label": "Late Afternoon",
+            "value": 20,
             "engagement": "Low"
           }
         ]
       }
     ],
-    "scheduleHighlight": "Posting consistently between 1:00 AM and 3:00 AM seems to yield the best engagement, but try varying times for broader reach.",
-    "csiScore": 65,
+    "scheduleHighlight": "Post consistently in the late afternoon (3PM-6PM) for the best engagement.",
+    "csiScore": 55,
     "contentPillars": [
       {
-        "name": "Technology Commentary",
-        "percentage": 0.38,
-        "count": 5,
+        "name": "Tech Commentary",
+        "percentage": 0.3,
+        "count": 8,
         "avgEngagement": "Medium",
-        "description": "Posts offering opinions on tech-related news, spam, social media cards, and general observations.",
+        "description": "Posts that offer observations and opinions on tech products and industry trends.",
         "topPosts": [
           {
-            "id": "6",
+            "id": "2",
             "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "Comments on a spammer being suspended and which rule they broke. This post got 1 reply.",
+            "engagementRate": "High",
+            "captionSnippet": "Asks which is best for coding: MacBook or Windows Laptop.",
             "thumbnail": ""
           },
           {
-            "id": "4",
+            "id": "15",
             "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "Asks about social media card appearance. This post is seeking engagement and feedback.",
+            "engagementRate": "Medium",
+            "captionSnippet": "Notes Microsoft Edge is most used browser for downloading Google Chrome.",
             "thumbnail": ""
           }
         ],
         "color": "#8b5cf6"
       },
       {
-        "name": "JavaScript and Coding",
-        "percentage": 0.23,
-        "count": 3,
+        "name": "Coding Culture",
+        "percentage": 0.25,
+        "count": 7,
         "avgEngagement": "Medium",
-        "description": "Content related to JavaScript, coding tools (CodeMirror), and development techniques.",
+        "description": "Relatable content about the life and struggles of a software engineer.",
         "topPosts": [
           {
-            "id": "5",
+            "id": "25",
             "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "Sharing news about Wikipedia Code Editor's syntax highlighting using CodeMirror 6. This post received moderate likes and retweets.",
+            "engagementRate": "Very High",
+            "captionSnippet": "Asks how to reach a high level of intelligence, relatable to programmers.",
             "thumbnail": ""
           },
           {
-            "id": "8",
+            "id": "24",
             "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "Discusses adding social cards to a blog using @eleven_ty, seeking feedback on the card's appearance. This post received a few likes and a retweet.",
+            "engagementRate": "Medium",
+            "captionSnippet": "Simple statement: \"deleted LinkedIn\".",
+            "thumbnail": ""
+          }
+        ],
+        "color": "#3b82f6"
+      },
+      {
+        "name": "Nostalgic Tech",
+        "percentage": 0.2,
+        "count": 5,
+        "avgEngagement": "Medium",
+        "description": "Content that evokes nostalgia for past tech, e.g., Windows 3.1.",
+        "topPosts": [
+          {
+            "id": "5",
+            "type": "Mixed Media",
+            "engagementRate": "Medium",
+            "captionSnippet": "Demonstrates how to start Windows 3.1 in 1994.",
+            "thumbnail": "Image/Video"
+          },
+          {
+            "id": "22",
+            "type": "Text",
+            "engagementRate": "Medium",
+            "captionSnippet": "Details the evolution of programming languages from 1940s to 2026.",
             "thumbnail": ""
           }
         ],
         "color": "#10b981"
       },
       {
-        "name": "Education and Training",
-        "percentage": 0.15,
-        "count": 2,
-        "avgEngagement": "High",
-        "description": "Posts about conducting training sessions, particularly related to Wikipedia editing.",
+        "name": "Visual Humor",
+        "percentage": 0.25,
+        "count": 7,
+        "avgEngagement": "Low",
+        "description": "Funny images/videos related to tech or coding.",
         "topPosts": [
           {
-            "id": "3",
-            "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "Sharing experience of conducting a Wikipedia editing training for charity and securing a paid gig. This post received the highest likes and a retweet.",
-            "thumbnail": ""
+            "id": "6",
+            "type": "Mixed Media",
+            "engagementRate": "Low",
+            "captionSnippet": "Humorous take on math, enhanced with a video.",
+            "thumbnail": "Image/Video"
           },
           {
-            "id": "11",
-            "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "Promoting an article on adding a table of contents using DevTools on @FreeCodeCamp. This post received several likes and a retweet.",
-            "thumbnail": ""
+            "id": "16",
+            "type": "Mixed Media",
+            "engagementRate": "Low",
+            "captionSnippet": "Depicts the struggle of finding a YouTube video while eating.",
+            "thumbnail": "Image/Video"
           }
         ],
         "color": "#f59e0b"
-      },
-      {
-        "name": "Random Musings",
-        "percentage": 0.15,
-        "count": 2,
-        "avgEngagement": "Low",
-        "description": "Posts with general thoughts or statements, often lacking specific context or call to action.",
-        "topPosts": [
-          {
-            "id": "1",
-            "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "Repeating 'BLOGS ARE WEBSITES. BLOG POSTS ARE ARTICLES' multiple times. This post received very little engagement.",
-            "thumbnail": ""
-          },
-          {
-            "id": "13",
-            "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "A short, somewhat assertive statement: 'You can just do shit and be good at it.' This post received minimal engagement.",
-            "thumbnail": ""
-          }
-        ],
-        "color": "#ef4444"
-      },
-      {
-        "name": "Pi Day",
-        "percentage": 0.08,
-        "count": 1,
-        "avgEngagement": "Medium",
-        "description": "Posts celebrating Pi Day with ASCII-generated images and mentions of @openclipart.",
-        "topPosts": [
-          {
-            "id": "9",
-            "type": "Text",
-            "engagementRate": "N/A",
-            "captionSnippet": "Celebrating Pi Day with an ASCII-Block generated image and providing the Python code.  This post received a reply.",
-            "thumbnail": ""
-          }
-        ],
-        "color": "#3b82f6"
       }
     ],
-    "pillarInsight": "The 'Education and Training' pillar receives the highest engagement, suggesting a strong interest in practical knowledge and tutorials.",
+    "pillarInsight": "Double down on coding culture and tech commentary; they drive more engagement than visual humor.",
     "postDNA": [
       {
-        "hookType": "Statement",
-        "format": "Text",
-        "topic": "Blogs are Websites",
-        "verdict": "Poor Performance: Repetitive content lacked engagement."
+        "hookType": "Comparative Question",
+        "format": "Mixed Media",
+        "topic": "Mobile Phones",
+        "verdict": "Started strong, but needs more specific hooks to increase engagement"
       },
       {
-        "hookType": "Question",
+        "hookType": "Open-Ended Question",
         "format": "Text",
-        "topic": "Potential Problems",
-        "verdict": "Poor Performance: Vague and lacked context."
+        "topic": "Coding",
+        "verdict": "Highly successful, proving conversational tone resonates"
       },
       {
-        "hookType": "Announcement",
+        "hookType": "Comparative Question",
         "format": "Text",
-        "topic": "Wikipedia Training",
-        "verdict": "Good Performance: Showcased expertise and a positive outcome."
+        "topic": "Coding",
+        "verdict": "Good, showing interest in coding setups"
       },
       {
-        "hookType": "Question",
+        "hookType": "Humorous Question",
         "format": "Text",
-        "topic": "Social Media Card",
-        "verdict": "Poor Performance: Seeking feedback, but lacked visual appeal."
+        "topic": "Corporate Culture",
+        "verdict": "Moderate, the humor can be hit or miss"
       },
       {
-        "hookType": "Announcement",
-        "format": "Text",
-        "topic": "CodeMirror Integration",
-        "verdict": "Good Performance: Shared valuable tech news."
-      },
-      {
-        "hookType": "Report",
-        "format": "Text",
-        "topic": "Spammer Suspension",
-        "verdict": "Poor Performance: Limited relatability and impact."
-      },
-      {
-        "hookType": "Statement",
-        "format": "Text",
-        "topic": "Free Things",
-        "verdict": "Poor Performance: Too generic and lacked a specific offering."
-      },
-      {
-        "hookType": "Question",
-        "format": "Text",
-        "topic": "11ty Blog Social Cards",
-        "verdict": "Poor Performance: Technical details without a clear visual."
-      },
-      {
-        "hookType": "Celebration",
-        "format": "Text",
-        "topic": "Pi Day",
-        "verdict": "Poor Performance: Relevant for a niche audience."
-      },
-      {
-        "hookType": "Mention",
-        "format": "Text",
-        "topic": "Pi Day",
-        "verdict": "Poor Performance: Directed at a specific account."
-      },
-      {
-        "hookType": "Announcement",
-        "format": "Text",
-        "topic": "FreeCodeCamp Article",
-        "verdict": "Good Performance: Shared a valuable resource."
-      },
-      {
-        "hookType": "Statement",
-        "format": "Text",
-        "topic": "Blank Content",
-        "verdict": "Poor Performance: No content."
-      },
-      {
-        "hookType": "Statement",
-        "format": "Text",
-        "topic": "General Assertion",
-        "verdict": "Poor Performance: Lacked context or value."
+        "hookType": "Nostalgic Showcase",
+        "format": "Mixed Media",
+        "topic": "Old Tech",
+        "verdict": "Good, evoking past memories"
       }
     ],
     "engagementVitals": {
       "engagementRate": 0,
       "benchmarkRate": 1.5,
       "reachEfficiency": 0,
-      "conversationDensity": 10.3,
+      "conversationDensity": 29,
       "amplificationPower": 0,
       "status": "Critical",
-      "insight": "The engagement rate is critically low, indicating a significant need to improve content relevance and engagement tactics to meet even the average platform benchmark."
+      "insight": "Engagement rate is critically low because total views are missing; focus on increasing visibility with stronger hooks."
     },
     "velocity": {
-      "hookRate": 2,
+      "hookRate": 2.5,
       "category": "Pulse",
       "velocityGraph": [
         {
           "hour": "1h",
-          "engagement": 0.2
+          "engagement": 5
         },
         {
           "hour": "2h",
-          "engagement": 0.4
+          "engagement": 12
         },
         {
           "hour": "4h",
-          "engagement": 0.7
+          "engagement": 25
         },
         {
           "hour": "12h",
-          "engagement": 1.5
+          "engagement": 60
         },
         {
           "hour": "24h",
-          "engagement": 2
+          "engagement": 100
         }
       ],
-      "insight": "The hooks are not very effective, leading to low initial engagement and slow growth."
+      "insight": "The hook effectiveness is low, indicating weak initial grabbing power, resulting in mostly a pulse category engagement."
     },
     "psychTriggers": {
       "radarData": [
@@ -612,244 +554,379 @@
         },
         {
           "trigger": "Curiosity",
-          "score": 40,
+          "score": 70,
           "fullMark": 100
         },
         {
           "trigger": "Social Proof",
-          "score": 20,
+          "score": 30,
           "fullMark": 100
         },
         {
           "trigger": "Authority",
-          "score": 50,
+          "score": 40,
           "fullMark": 100
         },
         {
           "trigger": "FOMO",
-          "score": 15,
+          "score": 20,
           "fullMark": 100
         },
         {
           "trigger": "Reciprocity",
-          "score": 35,
+          "score": 50,
           "fullMark": 100
         }
       ],
-      "winningTrigger": "Authority",
-      "insight": "Leveraging his expertise and credentials can be effective in driving engagement."
+      "winningTrigger": "Curiosity",
+      "insight": "Curiosity is the strongest trigger, suggesting that questions and teasers effectively engage the audience."
     },
     "postFatigue": {
       "status": "Warning",
       "fatigueScore": 60,
-      "optimalFrequency": "Once a day",
-      "saturationPoint": 2,
+      "optimalFrequency": "3x per day",
+      "saturationPoint": 4,
       "weeklyImpact": [
         {
           "day": "Mon",
-          "posts": 2,
-          "impactScore": 0.8
-        },
-        {
-          "day": "Tue",
-          "posts": 1,
-          "impactScore": 1.2
-        },
-        {
-          "day": "Wed",
-          "posts": 1,
+          "posts": 4,
           "impactScore": 0.9
         },
         {
-          "day": "Thu",
-          "posts": 3,
-          "impactScore": 0.7
-        },
-        {
-          "day": "Fri",
-          "posts": 1,
-          "impactScore": 1.1
-        },
-        {
-          "day": "Sat",
-          "posts": 2,
+          "day": "Tue",
+          "posts": 5,
           "impactScore": 0.8
         },
         {
-          "day": "Sun",
+          "day": "Wed",
+          "posts": 4,
+          "impactScore": 0.75
+        },
+        {
+          "day": "Thu",
+          "posts": 5,
+          "impactScore": 0.85
+        },
+        {
+          "day": "Fri",
           "posts": 3,
-          "impactScore": 0.7
+          "impactScore": 1
+        },
+        {
+          "day": "Sat",
+          "posts": 5,
+          "impactScore": 1.1
+        },
+        {
+          "day": "Sun",
+          "posts": 1,
+          "impactScore": 0.6
         }
       ]
     },
     "viralRecipe": [
       {
-        "id": "3",
-        "engagementMultiplier": "4x",
-        "hookType": "Story",
-        "hookText": "Last weekend I conducted my first complete training about Wikipedia editing that I've put on for the @fundacjawosp charity.",
+        "id": "outlier-1",
+        "engagementMultiplier": "21.86x",
+        "hookType": "Curiosity Loop",
+        "hookText": "how to reach his level of intelligence ?",
         "ingredients": [
           {
-            "name": "Personal Story",
-            "value": "Sharing a personal experience",
+            "name": "Relatability",
+            "value": "Targets a universal desire for self-improvement.",
+            "score": 9
+          },
+          {
+            "name": "Open-Ended Question",
+            "value": "Invites audience participation and personal anecdotes.",
             "score": 8
           },
           {
-            "name": "Charity Mention",
-            "value": "Mentioning a known charity",
+            "name": "Humor",
+            "value": "Subtle comedic tone makes the content shareable.",
             "score": 7
-          },
-          {
-            "name": "Positive Outcome",
-            "value": "Highlighting a successful result",
-            "score": 6
           }
         ],
-        "whyItWorked": "The post resonated because it told a personal story with a positive outcome and mentioned a charitable organization, creating a sense of goodwill and interest.",
+        "whyItWorked": "Capitalizes on a common aspiration, triggering a desire for knowledge and connection with others sharing the same goal.",
         "templateStructure": [
-          "1. Hook: [Share a personal experience]",
-          "2. Detail: [Elaborate on the experience]",
-          "3. Result: [Highlight a positive outcome]",
-          "4. Call to action: [Ask for engagement or feedback]"
+          "HOOK: [Pose a desirable but seemingly unattainable goal]",
+          "BODY: [Present a relatable scenario]",
+          "TWIST: [Offer a humorous or thought-provoking solution]",
+          "CTA: [Invite commentary or personal experiences]"
+        ]
+      },
+      {
+        "id": "outlier-2",
+        "engagementMultiplier": "5.45x",
+        "hookType": "Contrarian Take",
+        "hookText": "Microsoft Edge is most used browser for downloading Google Chrome",
+        "ingredients": [
+          {
+            "name": "Irony",
+            "value": "Highlights an amusing contradiction in user behavior.",
+            "score": 10
+          },
+          {
+            "name": "Simplicity",
+            "value": "Presents a clear, easily understandable observation.",
+            "score": 8
+          },
+          {
+            "name": "Familiarity",
+            "value": "Relates to a common user experience.",
+            "score": 7
+          }
+        ],
+        "whyItWorked": "The ironic statement challenges assumptions and triggers a reflective response about their own experiences.",
+        "templateStructure": [
+          "HOOK: [State a surprising or paradoxical observation]",
+          "BODY: [Provide a relatable context]",
+          "TWIST: [Highlight the underlying irony]",
+          "CTA: [Encourage reflection or sharing of similar experiences]"
+        ]
+      },
+      {
+        "id": "outlier-3",
+        "engagementMultiplier": "5.38x",
+        "hookType": "Listicle",
+        "hookText": "evolution of programming languages:",
+        "ingredients": [
+          {
+            "name": "Historical Context",
+            "value": "Provides a timeline of technological development.",
+            "score": 9
+          },
+          {
+            "name": "Informative",
+            "value": "Offers valuable knowledge about the subject.",
+            "score": 8
+          },
+          {
+            "name": "Completeness",
+            "value": "Presents a sense of thoroughness, making the information trustworthy.",
+            "score": 7
+          }
+        ],
+        "whyItWorked": "Provides an informative, chronological overview that satisfies curiosity and inspires reflection.",
+        "templateStructure": [
+          "HOOK: [Introduce a structured list or historical overview]",
+          "BODY: [Provide a timeline of events or items]",
+          "TWIST: [Add a modern or unexpected twist]",
+          "CTA: [Invite further discussion or expansion on the topic]"
+        ]
+      },
+      {
+        "id": "outlier-4",
+        "engagementMultiplier": "4.64x",
+        "hookType": "Challenge Hook",
+        "hookText": "be honest, which one is best for coding ?",
+        "ingredients": [
+          {
+            "name": "Simplicity",
+            "value": "Poses a straightforward question.",
+            "score": 10
+          },
+          {
+            "name": "Relevance",
+            "value": "Addresses a practical concern for the target audience.",
+            "score": 9
+          },
+          {
+            "name": "Engagement",
+            "value": "Encourages audience participation.",
+            "score": 8
+          }
+        ],
+        "whyItWorked": "Addresses a practical concern for the target audience and encourages direct engagement, facilitating a sense of community.",
+        "templateStructure": [
+          "HOOK: [Pose a direct question about a common issue]",
+          "BODY: [Provide context or options]",
+          "TWIST: [Offer a surprising insight]",
+          "CTA: [Prompt for a quick choice]"
+        ]
+      },
+      {
+        "id": "outlier-5",
+        "engagementMultiplier": "4.58x",
+        "hookType": "Controversial Statement",
+        "hookText": "deleted LinkedIn",
+        "ingredients": [
+          {
+            "name": "Boldness",
+            "value": "Makes a provocative statement that deviates from the norm.",
+            "score": 10
+          },
+          {
+            "name": "Brevity",
+            "value": "Short, punchy statement captures immediate attention.",
+            "score": 8
+          },
+          {
+            "name": "Relatability",
+            "value": "Resonates with common frustrations.",
+            "score": 7
+          }
+        ],
+        "whyItWorked": "Deviates from the norm and resonates with common frustrations in professional contexts, sparking discussion and validation.",
+        "templateStructure": [
+          "HOOK: [State a bold action or opinion]",
+          "BODY: [Expand on the reasoning]",
+          "TWIST: [Include a relatable insight]",
+          "CTA: [Prompt for reaction or agreement]"
         ]
       }
     ],
     "voiceSpectrum": {
-      "personaName": "The Pragmatic Coder",
+      "personaName": "The Tech Alchemist",
       "axes": [
         {
-          "id": "Formal ↔ Casual",
+          "id": "formal-casual",
           "leftLabel": "Formal",
           "rightLabel": "Casual",
+          "score": 60
+        },
+        {
+          "id": "technical-simple",
+          "leftLabel": "Technical",
+          "rightLabel": "Simple",
           "score": 30
         },
         {
-          "id": "Technical ↔ Simple",
-          "leftLabel": "Technical",
-          "rightLabel": "Simple",
-          "score": -20
-        },
-        {
-          "id": "Serious ↔ Playful",
+          "id": "serious-playful",
           "leftLabel": "Serious",
           "rightLabel": "Playful",
-          "score": -10
+          "score": 70
         },
         {
-          "id": "Data-driven ↔ Story-driven",
+          "id": "data-story",
           "leftLabel": "Data-driven",
           "rightLabel": "Story-driven",
-          "score": -5
+          "score": 40
         }
       ],
       "signatureWords": [
-        "Wikipedia",
-        "CodeMirror",
-        "Social cards",
-        "Open Source",
-        "Pi Day"
+        "Bro",
+        "So real",
+        "Weird",
+        "Just found out",
+        "Guess"
       ],
-      "insight": "The voice is technical and slightly casual, fitting for a developer sharing insights and projects."
+      "insight": "This voice strikes a balance between approachability and expertise, making complex topics engaging for a wide audience."
     },
     "crowdPersonas": {
       "primaryArchetype": {
-        "id": "dev_1",
+        "id": "mid-level-dev",
         "role": "The Mid-Level Dev",
         "iconName": "LaptopCode",
         "color": "#3b82f6",
-        "bio": "A developer seeking practical coding tips and tools to improve their skills and projects.",
+        "bio": "Struggling with real-world challenges, they seek practical advice and community validation. They are trying to increase their coding abilities and relevance.",
         "percentage": 50,
         "triggers": [
-          "JavaScript",
-          "Code Editor",
-          "Syntax Highlighting"
+          "New Frameworks",
+          "Code Efficiency",
+          "Career Growth"
         ],
         "painPoints": [
-          "Finding efficient coding solutions",
-          "Keeping up with new technologies"
+          "Tech Debt",
+          "Imposter Syndrome"
         ]
       },
       "secondaryArchetypes": [
         {
-          "id": "wiki_1",
-          "role": "The Wikipedia Editor",
-          "iconName": "UserTie",
+          "id": "student-coder",
+          "role": "The Student Coder",
+          "iconName": "Users",
           "color": "#8b5cf6",
-          "bio": "A Wikipedia enthusiast interested in contributing and learning about Wikipedia editing.",
+          "bio": "Starting their coding journey, they are eager to learn and explore fundamental concepts. They are building a foundation for future career aspirations.",
           "percentage": 30,
           "triggers": [
-            "Wikipedia",
-            "Editing",
-            "Training"
+            "Beginner Tutorials",
+            "Basic Algorithms",
+            "Coding Bootcamps"
           ],
           "painPoints": [
-            "Improving Wikipedia articles",
-            "Learning new editing techniques"
+            "Syntax Errors",
+            "Lack of Direction"
           ]
         },
         {
-          "id": "oss_1",
-          "role": "The Open Source Contributor",
-          "iconName": "Users",
+          "id": "tech-enthusiast",
+          "role": "The Tech Enthusiast",
+          "iconName": "Rocket",
           "color": "#10b981",
-          "bio": "An open-source advocate looking for projects and tools to contribute to.",
+          "bio": "Following the latest industry trends, they enjoy engaging in high-level discussions and comparing technologies. They are looking for validation and insight.",
           "percentage": 20,
           "triggers": [
-            "Open Source",
-            "CodeMirror",
-            "eleven_ty"
+            "Latest Tech Releases",
+            "Future Predictions",
+            "Industry Debates"
           ],
           "painPoints": [
-            "Finding valuable open-source projects",
-            "Contributing effectively to projects"
+            "Information Overload",
+            "Lack of Practical Application"
           ]
         }
       ],
       "insight": {
-        "title": "Focus on Developer Content",
-        "description": "The audience is primarily composed of developers interested in coding and open-source projects. Content should cater to their needs and interests.",
-        "actionable": "Prioritize content related to JavaScript, code editors, and practical coding tips to engage the core audience."
+        "title": "Focus on Practical Applications",
+        "description": "The audience distribution leans towards mid-level developers and students, emphasizing the need for content that offers practical solutions and guidance.",
+        "actionable": "Shift content towards real-world coding challenges and hands-on tutorials to increase engagement and provide direct value to the target audience."
       }
     },
     "crowdSentiment": {
-      "totalComments": 4,
+      "totalComments": 750,
       "vibeScore": 6.5,
       "vibes": [
         {
           "type": "Fanboys",
-          "percentage": 25,
-          "count": 1,
+          "percentage": 30,
+          "count": 225,
           "keywords": [
-            "Happy Pi Day"
+            "amazing",
+            "obsessed",
+            "love this",
+            "fire",
+            "need this"
           ],
           "color": "#8b5cf6",
           "description": "Social Proof & Loyalty"
         },
         {
           "type": "Seekers",
-          "percentage": 50,
-          "count": 2,
+          "percentage": 40,
+          "count": 300,
           "keywords": [
-            "What would you do",
-            ""
+            "price?",
+            "does this work with X?",
+            "how to install?",
+            "where to buy?"
           ],
           "color": "#3b82f6",
           "description": "Unmet Demand (High Intent)"
         },
         {
           "type": "Skeptics",
-          "percentage": 0,
-          "count": 0,
-          "keywords": [],
+          "percentage": 20,
+          "count": 150,
+          "keywords": [
+            "is this real?",
+            "X is cheaper",
+            "any reviews?",
+            "looks too good to be true"
+          ],
           "color": "#f59e0b",
           "description": "Trust Barriers"
         },
         {
           "type": "Critics",
-          "percentage": 25,
-          "count": 1,
+          "percentage": 10,
+          "count": 75,
           "keywords": [
-            "spam"
+            "broken",
+            "slow",
+            "bad support",
+            "no response",
+            "scam"
           ],
           "color": "#ef4444",
           "description": "Vulnerabilities"
@@ -857,34 +934,68 @@
       ],
       "sentimentTrend": [
         {
-          "post": 9,
-          "score": 7
+          "post": 1,
+          "score": 6.2
         },
         {
-          "post": 10,
-          "score": 7
+          "post": 2,
+          "score": 7.1
         },
         {
-          "post": 12,
-          "score": 5
+          "post": 3,
+          "score": 6.8
         },
         {
-          "post": 6,
-          "score": 7
+          "post": 4,
+          "score": 6.5
+        },
+        {
+          "post": 5,
+          "score": 6.9
         }
       ]
     },
     "questionCloud": [
       {
         "id": "kw_1",
-        "word": "Improve card look",
-        "count": 1,
-        "engagement": 0,
+        "word": "Coding Laptop",
+        "count": 87,
+        "engagement": 75,
         "intent": "Educational",
         "sampleQuestions": [
           {
-            "text": "What would you do to improve the look of the card?",
-            "likes": 0
+            "text": "which one is best for coding ?",
+            "likes": 67
+          },
+          {
+            "text": "MacBook or Windows Laptop?",
+            "likes": 103
+          }
+        ]
+      },
+      {
+        "id": "kw_2",
+        "word": "Setup Additions",
+        "count": 15,
+        "engagement": 33,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "what should i add more to my setup ?",
+            "likes": 33
+          }
+        ]
+      },
+      {
+        "id": "kw_3",
+        "word": "Browser Choice",
+        "count": 76,
+        "engagement": 67,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "guess the browser ?",
+            "likes": 67
           }
         ]
       }
@@ -892,163 +1003,157 @@
     "activeHours": [
       {
         "hour": 0,
-        "creatorPosts": 1,
-        "audienceActivity": 25
+        "creatorPosts": 0,
+        "audienceActivity": 5
       },
       {
         "hour": 1,
-        "creatorPosts": 3,
-        "audienceActivity": 75
+        "creatorPosts": 0,
+        "audienceActivity": 3
       },
       {
         "hour": 2,
-        "creatorPosts": 1,
-        "audienceActivity": 25
+        "creatorPosts": 0,
+        "audienceActivity": 2
       },
       {
         "hour": 3,
-        "creatorPosts": 3,
-        "audienceActivity": 100
+        "creatorPosts": 0,
+        "audienceActivity": 1
       },
       {
         "hour": 4,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 1
       },
       {
         "hour": 5,
-        "creatorPosts": 1,
-        "audienceActivity": 25
+        "creatorPosts": 0,
+        "audienceActivity": 2
       },
       {
         "hour": 6,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 4
       },
       {
         "hour": 7,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 6
       },
       {
         "hour": 8,
-        "creatorPosts": 1,
-        "audienceActivity": 25
+        "creatorPosts": 0,
+        "audienceActivity": 8
       },
       {
         "hour": 9,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 10
       },
       {
         "hour": 10,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 20
       },
       {
         "hour": 11,
-        "creatorPosts": 0,
-        "audienceActivity": 0
+        "creatorPosts": 4,
+        "audienceActivity": 60
       },
       {
         "hour": 12,
-        "creatorPosts": 1,
-        "audienceActivity": 25
+        "creatorPosts": 0,
+        "audienceActivity": 40
       },
       {
         "hour": 13,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 30
       },
       {
         "hour": 14,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 20
       },
       {
         "hour": 15,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 30
       },
       {
         "hour": 16,
-        "creatorPosts": 1,
-        "audienceActivity": 25
+        "creatorPosts": 5,
+        "audienceActivity": 70
       },
       {
         "hour": 17,
-        "creatorPosts": 0,
-        "audienceActivity": 0
+        "creatorPosts": 7,
+        "audienceActivity": 80
       },
       {
         "hour": 18,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 70
       },
       {
         "hour": 19,
-        "creatorPosts": 1,
-        "audienceActivity": 25
+        "creatorPosts": 5,
+        "audienceActivity": 100
       },
       {
         "hour": 20,
-        "creatorPosts": 1,
-        "audienceActivity": 25
+        "creatorPosts": 0,
+        "audienceActivity": 80
       },
       {
         "hour": 21,
-        "creatorPosts": 1,
-        "audienceActivity": 25
+        "creatorPosts": 3,
+        "audienceActivity": 70
       },
       {
         "hour": 22,
         "creatorPosts": 0,
-        "audienceActivity": 0
+        "audienceActivity": 60
       },
       {
         "hour": 23,
-        "creatorPosts": 0,
-        "audienceActivity": 0
+        "creatorPosts": 3,
+        "audienceActivity": 70
       }
     ],
     "tribes": [
       {
-        "name": "JavaScript Developers",
+        "name": "Code Newbies",
         "size": 35,
         "growth": "Stable",
-        "sentiment": "Neutral"
-      },
-      {
-        "name": "Wikipedia Editors",
-        "size": 30,
-        "growth": "Stable",
         "sentiment": "Positive"
       },
       {
-        "name": "Open Source Contributors",
-        "size": 25,
-        "growth": "Stable",
+        "name": "Mid-Career Devs",
+        "size": 45,
+        "growth": "Growing",
         "sentiment": "Neutral"
       },
       {
-        "name": "Pi Day Enthusiasts",
-        "size": 10,
+        "name": "Tech Bro",
+        "size": 20,
         "growth": "Declining",
-        "sentiment": "Positive"
+        "sentiment": "Skeptical"
       }
     ],
     "shadowAudience": {
-      "lurkersPercent": 98,
-      "engagersPercent": 2,
-      "insight": "The audience is largely composed of passive lurkers, with very few active commenters."
+      "lurkersPercent": 80,
+      "engagersPercent": 20,
+      "insight": "There are more lurkers than engagers, indicating a need to encourage active participation."
     },
     "audienceTemperature": {
-      "tempScore": 50,
+      "tempScore": 56,
       "label": "Warm",
-      "fanboyPercent": 25,
-      "criticPercent": 25,
-      "dominantEmotion": "Neutral",
-      "recommendation": "Incorporate more engaging content formats and ask for opinions to boost audience interaction."
+      "fanboyPercent": 30,
+      "criticPercent": 10,
+      "dominantEmotion": "Curiosity",
+      "recommendation": "Increase temperature by addressing skeptics and critics to foster trust."
     },
     "hypeValueScore": {
       "hype": 40,
@@ -1056,331 +1161,324 @@
     },
     "ideaBank": [
       {
-        "concept": "Share a thread on lesser-known Emacs tips.",
-        "impact": "Showcase expertise and provide practical value to followers."
+        "concept": "Create a tutorial on setting up a perfect coding environment.",
+        "impact": "Addresses audience's interest in coding and provides actionable value."
       },
       {
-        "concept": "Create a poll asking about preferred coding editors.",
-        "impact": "Increase engagement and gather audience insights."
+        "concept": "Start a thread about the pros and cons of different programming languages for specific tasks.",
+        "impact": "Taps into the coding debate and encourages high engagement."
       },
       {
-        "concept": "Post a mini-tutorial on using DevTools for debugging.",
-        "impact": "Offer a quick, actionable solution that attracts shares."
+        "concept": "Share a video showing a day in the life of a software engineer.",
+        "impact": "Provides relatable content and attracts views with behind-the-scenes glimpses."
       },
       {
-        "concept": "Write a thread about the history of GNU/Linux.",
-        "impact": "Appeal to the 'hacker' ethos of your audience."
+        "concept": "Host a poll asking about the audience's biggest challenges in their current projects.",
+        "impact": "Gathers valuable insights for future content creation and increases interaction."
       },
       {
-        "concept": "Share a 'day in the life' post as an open-source developer.",
-        "impact": "Humanize your brand and connect with followers on a personal level."
+        "concept": "Post a comparison of different cloud service providers for developers.",
+        "impact": "Offers practical advice and caters to the audience's professional interests."
       }
     ],
     "leadMagnet": {
       "type": "Checklist",
-      "title": "Top 10 Emacs Customizations",
-      "hook": "Supercharge your Emacs workflow with these essential tweaks.",
+      "title": "Ultimate Coding Environment Checklist",
+      "hook": "Optimize your coding setup for maximum productivity.",
       "friction": "Low",
       "temp": "Cold",
-      "suggestion": "Offer a 'done-for-you' Emacs configuration file for a small fee.",
-      "whyItWorks": "Emacs users are highly customizable and appreciate curated settings."
+      "suggestion": "Offer a 'Done-For-You' coding environment setup for those who prefer a hands-off approach.",
+      "whyItWorks": "Addresses the audience's desire to improve their coding efficiency and productivity."
     },
     "ctaAnalysis": {
       "mix": [
         {
           "type": "Engagement",
-          "score": 30,
+          "score": 65,
           "fullMark": 100
         },
         {
           "type": "Bridge",
-          "score": 20,
+          "score": 15,
           "fullMark": 100
         },
         {
           "type": "Conversion",
-          "score": 10,
+          "score": 5,
           "fullMark": 100
         },
         {
           "type": "Conversation",
-          "score": 40,
+          "score": 15,
           "fullMark": 100
         }
       ],
       "topTrigger": {
-        "keyword": "SHARE",
-        "count": 3
+        "keyword": "OPINIONS",
+        "count": 10
       },
-      "urgencyScore": 5,
-      "dominantStyle": "Community Builder",
+      "urgencyScore": 10,
+      "dominantStyle": "Reach Hunter",
       "placementHeatmap": [
         {
           "location": "First Line",
-          "count": 1
+          "count": 2
         },
         {
           "location": "Bottom",
-          "count": 10
+          "count": 20
         },
         {
           "location": "P.S.",
-          "count": 2
+          "count": 5
         }
       ]
     },
     "techStack": {
       "tools": [
         {
-          "category": "Development",
-          "name": "Emacs",
+          "category": "Code Editor",
+          "name": "VS Code",
           "confidence": "High"
         },
         {
-          "category": "Hosting",
-          "name": "Eleventy",
+          "category": "Operating System",
+          "name": "Windows",
           "confidence": "Medium"
         },
         {
-          "category": "AI",
-          "name": "Opus",
-          "confidence": "Low"
+          "category": "Browser",
+          "name": "Chrome",
+          "confidence": "High"
         }
       ],
-      "businessClass": "Pro Creator",
-      "verdict": "They have a developer-centric setup with a static site generator and AI-assisted content creation."
+      "businessClass": "Hobbyist",
+      "verdict": "Karthik is running a basic setup focused on exploring various topics."
     },
     "valueLadder": {
-      "products": {
-        "Bait": {
-          "name": "Emacs Configuration Snippets",
-          "price": "Free",
-          "type": "Template",
-          "intensity": "Low"
-        },
-        "Core": {
-          "name": "Advanced JavaScript Course",
-          "price": "$299",
-          "type": "Course",
-          "intensity": "Medium"
-        }
-      },
-      "gap": "Missing Tripwire",
-      "insight": "They jump from free resources to a high-ticket course. Offer a lower-priced workshop or template pack."
+      "products": {},
+      "gap": "Missing Bait",
+      "insight": "Offer a free checklist or ebook to capture leads and build an audience."
     },
     "growthTasks": [
       {
-        "id": "gt_1",
-        "title": "Create a $49 Emacs Starter Kit",
-        "category": "Quick Win",
-        "impact": 6,
-        "effort": 3,
-        "type": "Funnel",
-        "status": "Pending",
-        "reasoning": "Captures leads interested in Emacs but not ready for a full course.",
-        "actionType": "Content"
-      },
-      {
-        "id": "gt_2",
-        "title": "Run a Twitter Poll on DevTools Preferences",
-        "category": "Quick Win",
-        "impact": 5,
-        "effort": 2,
-        "type": "Crowd",
-        "status": "Pending",
-        "reasoning": "Engages audience and provides insights for future content.",
-        "actionType": "Content"
-      },
-      {
-        "id": "gt_3",
-        "title": "Write a Thread on the History of GNU/Linux",
-        "category": "Big Bet",
-        "impact": 8,
-        "effort": 7,
-        "type": "Content",
-        "status": "Pending",
-        "reasoning": "Appeals to core audience and positions as a knowledgeable authority.",
-        "actionType": "Content"
-      },
-      {
-        "id": "gt_4",
-        "title": "Optimize Bio for Keyword 'JavaScript Expert'",
+        "id": "task-1",
+        "title": "Create a free coding resource",
         "category": "Quick Win",
         "impact": 7,
-        "effort": 2,
+        "effort": 3,
         "type": "Funnel",
-        "status": "Pending",
-        "reasoning": "Improves search visibility for relevant skills.",
+        "status": "To Do",
+        "reasoning": "Captures lost leads and builds an audience base.",
+        "actionType": "Content"
+      },
+      {
+        "id": "task-2",
+        "title": "Optimize profile bio",
+        "category": "Quick Win",
+        "impact": 6,
+        "effort": 2,
+        "type": "Content",
+        "status": "To Do",
+        "reasoning": "Improves profile clarity and attracts targeted followers.",
         "actionType": "Bio"
       },
       {
-        "id": "gt_5",
-        "title": "Schedule Tweets During Peak Engagement Times",
+        "id": "task-3",
+        "title": "Engage with audience in comment sections",
         "category": "Quick Win",
-        "impact": 6,
+        "impact": 7,
         "effort": 3,
-        "type": "Content",
-        "status": "Pending",
-        "reasoning": "Increases visibility and engagement with existing content.",
+        "type": "Crowd",
+        "status": "To Do",
+        "reasoning": "Increases community interaction and builds rapport.",
         "actionType": "Strategy"
+      },
+      {
+        "id": "task-4",
+        "title": "Implement a consistent posting schedule",
+        "category": "Big Bet",
+        "impact": 8,
+        "effort": 5,
+        "type": "Content",
+        "status": "To Do",
+        "reasoning": "Maintains audience interest and visibility.",
+        "actionType": "Strategy"
+      },
+      {
+        "id": "task-5",
+        "title": "Experiment with different content formats",
+        "category": "Big Bet",
+        "impact": 7,
+        "effort": 4,
+        "type": "Content",
+        "status": "To Do",
+        "reasoning": "Attracts a wider audience and keeps content fresh.",
+        "actionType": "Content"
       }
     ],
     "disruptor": {
-      "score": 70,
-      "focus": "Value-Driven Engagement",
+      "score": 75,
+      "focus": "Tech Humor & Insightful Debates",
       "schedule": [
         {
           "day": "Monday",
-          "time": "08:00 AM",
-          "pillar": "Authority",
-          "topic": "Debunking Common JavaScript Myths",
+          "time": "10:00 AM",
+          "pillar": "Debate",
+          "topic": "Best coding setup: Windows vs. Mac",
           "hookStyle": "Controversial",
-          "suggestedHook": "Think you know JavaScript? Here are three myths that even experts get wrong.",
-          "strategicReason": "Challenges existing knowledge and drives curiosity."
+          "suggestedHook": "Windows vs. Mac for coding in 2026: What's your weapon of choice?",
+          "strategicReason": "Start the week with a hot debate to capture early attention."
         },
         {
           "day": "Tuesday",
-          "time": "12:00 PM",
-          "pillar": "Educational",
-          "topic": "Emacs Productivity Hacks",
+          "time": "03:00 PM",
+          "pillar": "Tutorial",
+          "topic": "VS Code extensions for productivity",
           "hookStyle": "Actionable",
-          "suggestedHook": "Boost your coding speed by 50% with these simple Emacs shortcuts.",
-          "strategicReason": "Provides direct value to the audience and positions as an Emacs expert."
+          "suggestedHook": "Level up your VS Code with these top 5 extensions!",
+          "strategicReason": "Provide practical tips to those coding during the day."
         },
         {
           "day": "Wednesday",
-          "time": "03:00 PM",
-          "pillar": "Community",
-          "topic": "JavaScript Community Q&A",
-          "hookStyle": "Interactive",
-          "suggestedHook": "Ask me anything about JavaScript development! I'm here to help.",
-          "strategicReason": "Fosters a sense of community and engagement."
+          "time": "07:00 PM",
+          "pillar": "Humor",
+          "topic": "Coding memes",
+          "hookStyle": "Humorous",
+          "suggestedHook": "Share your most relatable coding meme!",
+          "strategicReason": "Mid-week humor boosts engagement."
         },
         {
           "day": "Thursday",
-          "time": "06:00 PM",
-          "pillar": "Authority",
-          "topic": "The Future of Open Source",
-          "hookStyle": "Visionary",
-          "suggestedHook": "Open source is changing the world. Here's what I see coming next.",
-          "strategicReason": "Positions as a thought leader in the open-source space."
+          "time": "10:00 AM",
+          "pillar": "Discussion",
+          "topic": "Future of programming languages",
+          "hookStyle": "Insightful",
+          "suggestedHook": "Is English the next big programming language?",
+          "strategicReason": "Start a deep discussion on a trending topic."
         },
         {
           "day": "Friday",
-          "time": "09:00 AM",
-          "pillar": "Personal",
-          "topic": "My Coding Journey",
-          "hookStyle": "Story-driven",
-          "suggestedHook": "From beginner to expert, here's how I learned to code and what I wish I knew then.",
-          "strategicReason": "Humanizes your brand and connects with followers on a personal level."
+          "time": "03:00 PM",
+          "pillar": "List",
+          "topic": "Top 5 coding tools for 2026",
+          "hookStyle": "Data-backed",
+          "suggestedHook": "The ultimate list of coding tools to master in 2026!",
+          "strategicReason": "Provide a quick and useful Friday resource."
         },
         {
           "day": "Saturday",
-          "time": "11:00 AM",
-          "pillar": "Educational",
-          "topic": "DevTools Debugging Secrets",
-          "hookStyle": "Actionable",
-          "suggestedHook": "Stop wasting time debugging. These DevTools tricks will save you hours.",
-          "strategicReason": "Offers practical solutions to common problems."
+          "time": "07:00 PM",
+          "pillar": "Humor",
+          "topic": "Share coding fails",
+          "hookStyle": "Humorous",
+          "suggestedHook": "Share your most hilarious coding fail story!",
+          "strategicReason": "End the week with lighthearted and relatable content."
         },
         {
           "day": "Sunday",
-          "time": "04:00 PM",
-          "pillar": "Community",
-          "topic": "Weekend Coding Challenge",
-          "hookStyle": "Interactive",
-          "suggestedHook": "What are you coding this weekend? Share your projects and let's inspire each other!",
-          "strategicReason": "Encourages participation and builds a sense of community."
+          "time": "01:00 PM",
+          "pillar": "Reflection",
+          "topic": "Best thing you learned about coding this week",
+          "hookStyle": "Curiosity",
+          "suggestedHook": "What was your coding \"aha!\" moment this week?",
+          "strategicReason": "Close out the week by fostering thoughtful reflection."
         }
       ]
     },
     "funnelTactics": [
       {
-        "title": "Add Tripwire Product",
-        "problem": "Missing a low-cost product to capture leads.",
-        "solution": "Create a $47 Emacs configuration template.",
-        "impact": "+15% Conversion",
-        "difficulty": "Medium",
-        "status": "Pending"
-      },
-      {
-        "title": "Optimize Bio Link",
-        "problem": "Bio link leads to a generic page.",
-        "solution": "Create a dedicated landing page with a clear call to action.",
-        "impact": "+20% Click-through",
+        "title": "Offer a free coding checklist",
+        "problem": "Missing top-of-funnel offer to capture potential leads.",
+        "solution": "Create a free checklist for setting up a coding environment.",
+        "impact": "+15% Lead Capture",
         "difficulty": "Easy",
-        "status": "Pending"
+        "status": "Pending",
+        "id": "ft-1"
       },
       {
-        "title": "Offer Free Consultation",
-        "problem": "No high-touch offer to close premium clients.",
-        "solution": "Offer a free 15-minute consultation for potential clients.",
-        "impact": "+10% High-Ticket Sales",
+        "title": "Promote free resources more prominently",
+        "problem": "Existing free resources are not easily discoverable.",
+        "solution": "Add a clear call-to-action link in the profile bio.",
+        "impact": "+10% Click-through",
+        "difficulty": "Easy",
+        "status": "Pending",
+        "id": "ft-2"
+      },
+      {
+        "title": "Run targeted ads",
+        "problem": "Not actively reaching a broader audience.",
+        "solution": "Create simple ads promoting the free coding resource.",
+        "impact": "+20% New Followers",
         "difficulty": "Medium",
-        "status": "Pending"
+        "status": "Pending",
+        "id": "ft-3"
       }
     ],
     "crowdTactics": [
       {
-        "title": "Address Skepticism",
+        "title": "Address skeptics directly",
         "audienceState": "Skeptical",
-        "action": "Reply to top 5 skeptical comments with case studies.",
+        "action": "Reply to top comments with case studies.",
         "targetParams": "Builds Trust",
-        "status": "Ready"
+        "status": "Ready",
+        "id": "ct-1"
       },
       {
-        "title": "Respond to Questions",
+        "title": "Provide detailed solutions",
         "audienceState": "Frustrated",
-        "action": "Answer top 5 questions about Emacs compatibility.",
-        "targetParams": "Demonstrates Expertise",
-        "status": "Ready"
+        "action": "Offer step-by-step guides for common issues.",
+        "targetParams": "Reduces Friction",
+        "status": "Ready",
+        "id": "ct-2"
       },
       {
-        "title": "Engage Fanboys",
+        "title": "Engage fan base",
         "audienceState": "Engaged",
-        "action": "Retweet and reply to positive comments with additional resources.",
-        "targetParams": "Reinforces Loyalty",
-        "status": "Ready"
+        "action": "Ask for opinions and feedback on new ideas.",
+        "targetParams": "Fosters Community",
+        "status": "Ready",
+        "id": "ct-3"
       }
     ],
     "competitorGap": {
       "metrics": [
         {
           "category": "Engagement Rate",
-          "profileValue": 0.07,
+          "profileValue": 0,
           "benchmarkValue": 1.5,
           "gapType": "Opportunity"
         },
         {
           "category": "Post Frequency",
-          "profileValue": 1.9,
+          "profileValue": 3.4,
           "benchmarkValue": 4,
           "gapType": "Opportunity"
         },
         {
           "category": "Content Quality",
           "profileValue": 60,
-          "benchmarkValue": 75,
+          "benchmarkValue": 70,
           "gapType": "Opportunity"
         },
         {
           "category": "Hook Strength",
-          "profileValue": 40,
+          "profileValue": 50,
           "benchmarkValue": 65,
           "gapType": "Opportunity"
         }
       ],
       "topOpportunity": "Engagement Rate",
-      "insight": "The biggest weakness is engagement rate, indicating content isn't resonating effectively with the audience. ",
+      "insight": "The profile has a significant opportunity to improve its engagement rate by optimizing content and posting strategy.",
       "recommendations": [
-        "Focus on crafting stronger hooks to capture attention.",
-        "Increase posting frequency to stay top-of-mind.",
-        "Improve content quality by providing more actionable tips and insights."
+        "Increase posting frequency to 4 posts/day to align with the platform's optimal range.",
+        "Improve hook strength by using more controversial or curiosity-inducing opening lines.",
+        "Engage more actively with the audience by replying to comments and asking for feedback."
       ]
     }
   },
   "platform": "x",
-  "postCount": 13,
+  "postCount": 27,
   "source": "extension_scrape",
-  "timestamp": 1773937965919
+  "timestamp": 1774257262405
 }

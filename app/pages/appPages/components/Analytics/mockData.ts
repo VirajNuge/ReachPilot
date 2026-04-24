@@ -1,4 +1,5 @@
-import { PlatformKey, VelocityMetric } from "./types";
+import type { PlatformKey } from "@/lib/analytics/platforms";
+import type { VelocityMetric } from "@/lib/analytics/types";
 
 // --- TYPES ---
 type AnalyticsData = Record<

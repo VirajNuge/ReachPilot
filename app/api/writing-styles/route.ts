@@ -9,8 +9,7 @@ export async function GET(_request: NextRequest) {
   }
 
   try {
-    const allStyles = await getAllWritingStyles();
-    const activeStyles = allStyles.filter((s) => s.isActive);
+    const activeStyles = await getAllWritingStyles(true);
 
     return NextResponse.json({
       styles: activeStyles.map((s) => ({

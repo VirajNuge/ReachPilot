@@ -3,6 +3,7 @@ import { RawAnalysisData } from "../lib/types/analysis";
 
 interface UseAnalysisResult {
   data: RawAnalysisData | null;
+  platform: string | null;
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -10,6 +11,7 @@ interface UseAnalysisResult {
 
 export function useAnalysisData(initialData?: any): UseAnalysisResult {
   const [data, setData] = useState<RawAnalysisData | null>(initialData || null);
+  const [platform, setPlatform] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(!initialData);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,6 +28,7 @@ export function useAnalysisData(initialData?: any): UseAnalysisResult {
       interface ApiResponse {
         success: boolean;
         analysis: RawAnalysisData;
+        platform?: string;
         error?: string;
       }
 
@@ -39,11 +42,12 @@ export function useAnalysisData(initialData?: any): UseAnalysisResult {
 
       if (result.success && result.analysis) {
         setData(result.analysis);
+        setPlatform(result.platform ?? null);
       } else {
         setError(result.error || "Failed to fetch analysis data");
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -57,5 +61,5 @@ export function useAnalysisData(initialData?: any): UseAnalysisResult {
     }
   }, []);
 
-  return { data, loading, error, refetch: fetchData };
+  return { data, platform, loading, error, refetch: fetchData };
 }

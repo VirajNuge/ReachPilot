@@ -50,7 +50,7 @@ export default function TopicInput({
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
           placeholder="e.g. 'SaaS Pricing Models' or 'Sustainable Living'"
-          className="w-[340px] px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none transition-all shadow-sm"
+          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none transition-all shadow-sm"
         />
       </div>
 
@@ -65,7 +65,7 @@ export default function TopicInput({
           value={audience}
           onChange={(e) => setAudience(e.target.value)}
           placeholder="e.g. 'Early-stage Founders' or 'Fitness Beginners'"
-          className="w-[340px] px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none transition-all shadow-sm"
+          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none transition-all shadow-sm"
         />
       </div>
     </div>

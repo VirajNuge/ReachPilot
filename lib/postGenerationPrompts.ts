@@ -305,7 +305,10 @@ Blend location into topic-relevant hashtags where natural.`);
 
   // Build expected JSON shape dynamically
   const captionFields = input.platforms
-    .map((p) => `    "${p}": "Full caption for ${PLATFORMS[p]?.name || p}"`)
+    .map(
+      (p) =>
+        `    "${p}": ["Caption option 1 for ${PLATFORMS[p]?.name || p}", "Caption option 2 for ${PLATFORMS[p]?.name || p}", "Caption option 3 for ${PLATFORMS[p]?.name || p}"]`
+    )
     .join(",\n");
 
   sections.push(`## YOUR TASK
@@ -324,6 +327,7 @@ ${captionFields}
 }
 
 Rules:
+- Generate EXACTLY 3 distinct caption options per platform
 - Each caption MUST follow its platform's specific rules (length, tone, structure)
 - Hashtags MUST be relevant to the post topic, niche, and audience — never generic
 - High reach hashtags = broad audience appeal (100K+ posts), derived from primary niche terms

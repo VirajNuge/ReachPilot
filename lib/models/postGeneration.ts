@@ -42,6 +42,7 @@ export async function createPostGeneration(
 export async function getPostGenerationById(
   id: string
 ): Promise<PostGenerationDocument | null> {
+  if (!ObjectId.isValid(id)) return null;
   const col = await getCollection();
   return col.findOne({ _id: new ObjectId(id) }) as Promise<PostGenerationDocument | null>;
 }
@@ -52,10 +53,13 @@ export async function getPostGenerationById(
 export async function getPostGenerationsByUser(
   userId: string,
   accountId?: string,
-  limit = 50
+  limit = 50,
+  status?: PostGenerationStatus
 ): Promise<PostGenerationDocument[]> {
   const col = await getCollection();
-  const query = accountId ? { userId, accountId } : { userId };
+  const query: Record<string, unknown> = { userId };
+  if (accountId) query.accountId = accountId;
+  if (status) query.status = status;
   return col
     .find(query)
     .sort({ createdAt: -1 })
@@ -65,14 +69,19 @@ export async function getPostGenerationsByUser(
 
 /**
  * Update a post generation record (partial update).
+ * Pass userId to scope the update to the owning user (recommended for API routes).
  */
 export async function updatePostGeneration(
   id: string,
-  update: Partial<PostGenerationDocument>
+  update: Partial<PostGenerationDocument>,
+  userId?: string
 ): Promise<boolean> {
+  if (!ObjectId.isValid(id)) return false;
   const col = await getCollection();
+  const filter: Record<string, unknown> = { _id: new ObjectId(id) };
+  if (userId) filter.userId = userId;
   const result = await col.updateOne(
-    { _id: new ObjectId(id) },
+    filter,
     {
       $set: {
         ...update,
@@ -95,10 +104,14 @@ export async function updatePostGenerationStatus(
 
 /**
  * Delete a post generation record.
+ * Pass userId to scope the delete to the owning user (recommended for API routes).
  */
-export async function deletePostGeneration(id: string): Promise<boolean> {
+export async function deletePostGeneration(id: string, userId?: string): Promise<boolean> {
+  if (!ObjectId.isValid(id)) return false;
   const col = await getCollection();
-  const result = await col.deleteOne({ _id: new ObjectId(id) });
+  const filter: Record<string, unknown> = { _id: new ObjectId(id) };
+  if (userId) filter.userId = userId;
+  const result = await col.deleteOne(filter);
   return result.deletedCount > 0;
 }
 
@@ -148,6 +161,7 @@ export async function deleteBrandStyle(
   id: string,
   userId: string
 ): Promise<boolean> {
+  if (!ObjectId.isValid(id)) return false;
   const col = await getBrandStylesCollection();
   const result = await col.deleteOne({
     _id: new ObjectId(id),

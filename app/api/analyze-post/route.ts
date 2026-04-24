@@ -58,6 +58,25 @@ export async function POST(req: Request) {
     const responseText = result.response.text();
     const analysis = JSON.parse(responseText);
 
+    // Patch highIntentLeads with real pfps from scraped comments
+    if (analysis.leadPersona?.highIntentLeads && postData.comments) {
+      const pfpMap: Record<string, string> = {};
+      for (const comment of postData.comments) {
+        if (comment.user && comment.pfp) {
+          pfpMap[comment.user.toLowerCase().trim()] = comment.pfp;
+        }
+      }
+      analysis.leadPersona.highIntentLeads = analysis.leadPersona.highIntentLeads.map(
+        (lead: { name: string; role: string; intent: string; avatar: string }) => {
+          const realPfp = pfpMap[lead.name.toLowerCase().trim()];
+          return {
+            ...lead,
+            avatar: realPfp || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(lead.name)}`,
+          };
+        }
+      );
+    }
+
     const analysisId = uuidv4();
     const cacheData = {
       id: analysisId,

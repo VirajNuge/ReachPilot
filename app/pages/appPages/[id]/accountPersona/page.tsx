@@ -740,6 +740,7 @@ export default function AccountPersona() {
           { key: "meta",     name: "Meta",        subtitle: "Facebook & Instagram",  color: "#1877F2", emoji: "📘", canDisconnect: true  },
           { key: "linkedin", name: "LinkedIn",     subtitle: "Professional network",  color: "#0A66C2", emoji: "💼", canDisconnect: true  },
           { key: "x",        name: "X (Twitter)",  subtitle: "Real-time social",      color: "#000000", emoji: "🐦", canDisconnect: true  },
+          { key: "postiz",   name: "Postiz",       subtitle: "Unified social hub",    color: "#6D28D9", emoji: "🚀", canDisconnect: true  },
           { key: "pinterest",name: "Pinterest",    subtitle: "Visual discovery",      color: "#E60023", emoji: "📌", canDisconnect: false },
         ];
 

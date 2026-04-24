@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getAuthFromCookies } from "@/lib/auth";
+import { requireAuth } from "@/lib/withAuth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
 import { parseAIJson } from "@/lib/parseAIJson";
 import { buildPosterPromptGeneratorPrompt } from "@/lib/postGeneration/posterPromptBuilder";
+import { AI_MODELS } from "@/lib/aiConfig";
 import type {
   ContentStrategyOutput,
   PosterPromptOutput,
@@ -41,16 +42,14 @@ function isPosterPromptOutput(value: unknown): value is PosterPromptOutput {
 /**
  * Load persona context text and return persona document for brand asset merging.
  */
-async function loadPersonaData(accountId?: string): Promise<{
+async function loadPersonaData(userId: string, accountId?: string): Promise<{
   personaContext: string;
   colorPalette: string[];
   fontFamily: string;
   logoUrl: string;
 }> {
   try {
-    const auth = await getAuthFromCookies();
-    if (!auth?.userId) return { personaContext: "", colorPalette: [], fontFamily: "", logoUrl: "" };
-    const persona = await getPersonaByUserAndAccount(auth.userId, accountId);
+    const persona = await getPersonaByUserAndAccount(userId, accountId);
     if (!persona) return { personaContext: "", colorPalette: [], fontFamily: "", logoUrl: "" };
 
     const personaContext = buildContentGenerationContext(persona);
@@ -115,7 +114,7 @@ OUTPUT REQUIREMENTS:
 - DO NOT include any text or typography description — focus purely on the visual scene
 - Output the concept text only, nothing else`;
 
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
   try {
     const result = await model.generateContent(conceptPrompt);
     return result.response.text().trim();
@@ -126,6 +125,10 @@ OUTPUT REQUIREMENTS:
 }
 
 export async function POST(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -149,7 +152,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const personaData = await loadPersonaData(body.accountId);
+    const personaData = await loadPersonaData(userId, body.accountId);
 
     // Server-side merge: fill missing brand assets from persona (always — visual assets are not framing)
     const mergedBrandAssets = { ...body.input.brandAssets };
@@ -182,7 +185,7 @@ export async function POST(req: NextRequest) {
     );
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: AI_MODELS.TEXT,
       systemInstruction: systemPrompt,
     });
 

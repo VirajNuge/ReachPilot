@@ -2,12 +2,16 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { FileText, CalendarDays, Globe, Tag } from "lucide-react";
+import { FileText, CalendarDays, Globe, Tag, Sparkles } from "lucide-react";
 import { PostQueue } from "../../components/Publishing/PostQueue";
 import { ScheduleCalendar } from "../../components/Publishing/ScheduleCalendar";
 import { PostEditor } from "../../components/Publishing/PostEditor";
 import { PostDraft, Platform } from "../../components/Publishing/types";
 import { postGenerationsToDrafts } from "../../components/Publishing/utils";
+import type { PlatformPublishResult } from "../../components/Publishing/PublishToast";
+import { PublishToast } from "../../components/Publishing/PublishToast";
+import { CustomPostModal } from "../../components/Publishing/CustomPostModal";
+import { OptimalSlot } from "../../components/Publishing/OptimalTimesPanel";
 
 /* ── Stat card ───────────────────────────────────────────────────────────── */
 
@@ -39,24 +43,82 @@ function StatCard({ label, value, sub, icon, iconBg }: StatCardProps) {
 
 export default function PublishingPage() {
   const params = useParams();
-  const accountId = params.id as string;
+  const routeAccountId = params.id as string;
   const router = useRouter();
+  const [resolvedAccountId, setResolvedAccountId] = useState<string | null>(null);
 
-  const navigateToPostGenerator = () => router.push(`/${accountId}/postGenerator`);
+  const navigateToPostGenerator = () => router.push(`/${routeAccountId}/postGenerator`);
 
   const [drafts,       setDrafts]       = useState<PostDraft[]>([]);
   const [loading,      setLoading]      = useState(true);
   const [selectedId,   setSelectedId]   = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const [globalPublishResults, setGlobalPublishResults] = useState<PlatformPublishResult[] | null>(null);
+  const [isCustomPostModalOpen, setIsCustomPostModalOpen] = useState(false);
+  const [calendarViewMode, setCalendarViewMode] = useState<"month" | "week">("week");
+  const [optimalSlots, setOptimalSlots] = useState<OptimalSlot[]>([]);
+  const [isOptimalTimesLoading, setIsOptimalTimesLoading] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("reachpilot_optimal_times");
+    if (saved) {
+      try {
+        setOptimalSlots(JSON.parse(saved));
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
+
+  const handleApplyOptimalSlots = (slots: OptimalSlot[]) => {
+    setOptimalSlots(slots);
+    localStorage.setItem("reachpilot_optimal_times", JSON.stringify(slots));
+    setCalendarViewMode("week");
+  };
+
+  useEffect(() => {
+    let mounted = true;
+
+    const resolveAccountId = async () => {
+      try {
+        const activeRes = await fetch("/api/accounts/active");
+        if (activeRes.ok) {
+          const activeData = await activeRes.json();
+          if (mounted && typeof activeData?.accountId === "string" && activeData.accountId) {
+            setResolvedAccountId(activeData.accountId);
+            return;
+          }
+        }
+
+        const accountsRes = await fetch("/api/accounts");
+        if (accountsRes.ok) {
+          const accountsData = await accountsRes.json();
+          const firstAccountId = accountsData?.accounts?.[0]?._id;
+          if (mounted && typeof firstAccountId === "string" && firstAccountId) {
+            setResolvedAccountId(firstAccountId);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to resolve active account for publishing:", error);
+      }
+    };
+
+    resolveAccountId();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Ref mirrors activeDragId for capture-phase handler (avoids stale closure)
   const activeDragIdRef = useRef<string | null>(null);
 
   // Fetch posts from API on mount
   const fetchPosts = useCallback(async () => {
+    if (!resolvedAccountId) return;
     try {
-      const res = await fetch(`/api/post-generation/save?accountId=${accountId}`);
+      const res = await fetch(`/api/post-generation/save?accountId=${resolvedAccountId}`);
       if (!res.ok) return;
       const data = await res.json();
       setDrafts(postGenerationsToDrafts(data.posts ?? []));
@@ -65,7 +127,7 @@ export default function PublishingPage() {
     } finally {
       setLoading(false);
     }
-  }, [accountId]);
+  }, [resolvedAccountId]);
 
   useEffect(() => {
     fetchPosts();
@@ -105,6 +167,24 @@ export default function PublishingPage() {
           d.id === draftId ? { ...d, status: "draft" as const, scheduledDate: undefined } : d
         )
       );
+    }
+  };
+
+  const handleUnschedule = async (draftId: string) => {
+    // Optimistic UI
+    setDrafts((prev) =>
+      prev.map((d) =>
+        d.id === draftId ? { ...d, status: "draft" as const, scheduledDate: undefined } : d
+      )
+    );
+    try {
+      await fetch(`/api/post-generation/save/${draftId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "draft", scheduledDate: null }),
+      });
+    } catch {
+      fetchPosts();
     }
   };
 
@@ -161,6 +241,46 @@ export default function PublishingPage() {
       // Silent fail — edits remain in local state
     }
   };
+
+  const handleDelete = async (draftId: string) => {
+    // Optimistic UI update
+    setDrafts((prev) => prev.filter((d) => d.id !== draftId));
+    if (selectedId === draftId) setSelectedId(null);
+    try {
+      const res = await fetch(`/api/post-generation/save/${draftId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Delete failed");
+    } catch {
+      // Revert if failed
+      fetchPosts();
+    }
+  };
+
+  const handlePublishNow = async (draftId: string): Promise<PlatformPublishResult[]> => {
+    try {
+      const res = await fetch(`/api/post-generation/publish/${draftId}`, {
+        method: "POST",
+      });
+      const data = await res.json() as { results?: PlatformPublishResult[]; error?: string };
+
+      if (!res.ok) {
+        return [{ platform: "all", success: false, error: data.error || "Publish failed" }];
+      }
+
+      const results: PlatformPublishResult[] = data.results ?? [];
+
+      // Optimistically update local state if any platform succeeded
+      if (results.some((r) => r.success)) {
+        setDrafts((prev) => prev.filter((d) => d.id !== draftId));
+        if (selectedId === draftId) setSelectedId(null);
+      }
+
+      return results;
+    } catch {
+      return [{ platform: "all", success: false, error: "Network error" }];
+    }
+  };
   const totalPlatforms = [...new Set(drafts.flatMap((d) => d.platforms))].length;
   const totalHashtags  = drafts.reduce(
     (acc, d) =>
@@ -179,14 +299,27 @@ export default function PublishingPage() {
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
             SCHEDULING & PUBLISHING
           </p>
-          <h1 className="text-2xl font-black text-[#1A1D23] leading-none">Content Planner</h1>
+          <div className="flex items-center gap-6 mt-0.5">
+            <h1 className="text-2xl font-black text-[#1A1D23] leading-none">Content Planner</h1>
+            
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={navigateToPostGenerator}
+                className="bg-[#0052FF] hover:bg-[#003DD4] text-white px-4 py-2 rounded-xl font-bold shadow-[0_4px_14px_rgba(0,82,255,0.2)] text-[13px] transition-all flex items-center gap-2 border-none outline-none"
+              >
+                <Sparkles size={15} />
+                Generate Post
+              </button>
+              <button
+                onClick={() => setIsCustomPostModalOpen(true)}
+                className="bg-white hover:bg-slate-50 border border-slate-200 text-[#1A1D23] px-4 py-2 rounded-xl font-bold shadow-sm text-[13px] transition-all flex items-center gap-2 outline-none"
+              >
+                <FileText size={15} />
+                Custom Post
+              </button>
+            </div>
+          </div>
         </div>
-        <button
-          onClick={navigateToPostGenerator}
-          className="bg-[#0052FF] hover:bg-[#003DD4] text-white px-4 py-2.5 rounded-2xl font-bold shadow-[0_4px_14px_rgba(0,82,255,0.2)] text-[13px] transition-all"
-        >
-          + New Post
-        </button>
       </div>
 
       {/* Stat cards */}
@@ -206,25 +339,59 @@ export default function PublishingPage() {
           onReorder={handleReorder}
           onDragStart={handleDragStart}
           onNewPost={navigateToPostGenerator}
-        />
-
-        <ScheduleCalendar
-          selectedDate={selectedDate}
-          onDateSelect={setSelectedDate}
-          scheduledDrafts={drafts.filter((d) => d.status === "scheduled")}
-          activeDragId={activeDragId}
+          onDelete={handleDelete}
           onSchedule={handleSchedule}
+          onUnschedule={handleUnschedule}
         />
 
-        {selectedPost && (
-          <PostEditor
-            post={selectedPost}
-            onChange={handleDraftChange}
+        <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
+          <ScheduleCalendar
+            selectedDate={selectedDate}
+            onDateSelect={setSelectedDate}
+            scheduledDrafts={drafts.filter((d) => d.status === "scheduled")}
+            activeDragId={activeDragId}
             onSchedule={handleSchedule}
-            onSaveDraft={handleSaveDraft}
+            viewMode={calendarViewMode}
+            setViewMode={setCalendarViewMode}
+            optimalSlots={optimalSlots}
+            onApplyOptimalSlots={handleApplyOptimalSlots}
+            isOptimalTimesLoading={isOptimalTimesLoading}
+            setIsOptimalTimesLoading={setIsOptimalTimesLoading}
           />
-        )}
+        </div>
+
       </div>
+
+      {selectedPost && (
+        <PostEditor
+          post={selectedPost}
+          onChange={handleDraftChange}
+          onClose={() => setSelectedId(null)}
+          onSchedule={handleSchedule}
+          onSaveDraft={handleSaveDraft}
+          onPublishNow={handlePublishNow}
+        />
+      )}
+
+      {globalPublishResults && (
+        <PublishToast
+          results={globalPublishResults}
+          onDismiss={() => setGlobalPublishResults(null)}
+        />
+      )}
+
+      {isCustomPostModalOpen && resolvedAccountId && (
+        <CustomPostModal
+          accountId={resolvedAccountId}
+          onClose={() => setIsCustomPostModalOpen(false)}
+          onSuccess={(draftId) => {
+            setIsCustomPostModalOpen(false);
+            fetchPosts().then(() => {
+              setSelectedId(draftId);
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

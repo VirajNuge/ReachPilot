@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const auth = await getAuthFromCookies();
   if (!auth) {
     return NextResponse.redirect(
-      new URL("/login", req.url)
+      new URL("/login", process.env.NEXTAUTH_URL || req.url)
     );
   }
 
@@ -108,3 +108,4 @@ export async function GET(req: NextRequest) {
     return response;
   }
 }
+

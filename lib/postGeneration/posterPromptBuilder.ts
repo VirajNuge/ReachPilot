@@ -8,6 +8,7 @@
 // ============================================================
 
 import type {
+  CreativeHandoffV2,
   PostGenerationInput,
   ContentStrategyOutput,
   PosterPromptOutput,
@@ -52,8 +53,9 @@ export function buildPosterPromptGeneratorPrompt(
 // ── Orchestrated Prompt Builder (Image Model Stage) ──────────
 
 /**
- * Builds the AI image generation prompt for a complete social media poster.
- * The AI model generates the entire poster — text is BAKED IN, not overlaid.
+ * Builds the AI image generation prompt for a text-free campaign background.
+ * ReachPilot owns the final composition layer; the image model only generates
+ * the visual background/focal scene.
  *
  * Now delegates to the Prompt Orchestration Layer for rich design tokens,
  * camera presets, composition rules, and visual metaphor injection.
@@ -66,6 +68,7 @@ export function buildPosterPromptGeneratorPrompt(
 export function buildPosterPrompt(
   input: PostGenerationInput,
   posterOutput: PosterPromptOutput,
+  creativeHandoff?: CreativeHandoffV2,
   _aspectRatio?: string
 ): string {
   // Strategy is not available at this stage, but buildFinalImagePrompt
@@ -84,5 +87,5 @@ export function buildPosterPrompt(
     strategy: minimalStrategy,
   };
 
-  return buildFinalImagePrompt(config, posterOutput);
+  return buildFinalImagePrompt(config, posterOutput, creativeHandoff);
 }

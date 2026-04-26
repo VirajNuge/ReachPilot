@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
 } from "recharts";
+import type { PieLabelRenderProps } from "recharts";
 import { BsCollectionFill, BsLightningChargeFill } from "react-icons/bs";
 import { FaMagic, FaArrowRight, FaChartLine } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -101,20 +102,13 @@ function buildWhyItWorks(optimal: OptimalPillar[]): string {
 }
 
 const renderCustomizedLabel = ({
-  cx,
-  cy,
-  midAngle,
-  innerRadius,
-  outerRadius,
-  percent,
-}: {
-  cx: number;
-  cy: number;
-  midAngle: number;
-  innerRadius: number;
-  outerRadius: number;
-  percent: number;
-}) => {
+  cx = 0,
+  cy = 0,
+  midAngle = 0,
+  innerRadius = 0,
+  outerRadius = 0,
+  percent = 0,
+}: PieLabelRenderProps) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);

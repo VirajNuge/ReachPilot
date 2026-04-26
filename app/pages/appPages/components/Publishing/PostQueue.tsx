@@ -9,7 +9,10 @@ import {
   FaGripVertical,
   FaPlus,
   FaHashtag,
+  FaPinterest,
 } from "react-icons/fa";
+import { Trash2, CalendarDays } from "lucide-react";
+import { SiThreads } from "react-icons/si";
 import type { PostDraft, Platform } from "./types";
 import { PLATFORM_META } from "./types";
 
@@ -22,6 +25,12 @@ interface PostQueueProps {
   onDragStart?: (draftId: string) => void;
   /** Called when user clicks the empty-state "New Post" button */
   onNewPost?: () => void;
+  /** Called when user clicks delete on a draft */
+  onDelete?: (draftId: string) => void;
+  /** Called to schedule a draft directly */
+  onSchedule?: (draftId: string, date: Date) => void;
+  /** Called to unschedule a scheduled draft */
+  onUnschedule?: (draftId: string) => void;
 }
 
 const PLATFORM_ICONS: Record<Platform, { icon: React.ElementType; color: string }> = {
@@ -29,6 +38,8 @@ const PLATFORM_ICONS: Record<Platform, { icon: React.ElementType; color: string 
   x:              { icon: FaTwitter,   color: "#000000" },
   instagram_post: { icon: FaInstagram, color: "#E1306C" },
   facebook:       { icon: FaFacebook,  color: "#1877F2" },
+  threads:        { icon: SiThreads,   color: "#111827" },
+  pinterest:      { icon: FaPinterest, color: "#E60023" },
 };
 
 const STATUS_BADGE: Record<PostDraft["status"], string> = {
@@ -59,9 +70,11 @@ function firstCaption(draft: PostDraft): string {
   return "";
 }
 
-export function PostQueue({ drafts, selectedId, onSelect, onReorder, onDragStart, onNewPost }: PostQueueProps) {
+export function PostQueue({ drafts, selectedId, onSelect, onReorder, onDragStart, onNewPost, onDelete, onSchedule, onUnschedule }: PostQueueProps) {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
+  const [schedulingId, setSchedulingId] = useState<string | null>(null);
+  const [scheduleDate, setScheduleDate] = useState("");
 
   /* ── Refs to avoid stale closures inside document-level handlers ─────── */
   const dragIndexRef    = useRef<number | null>(null);
@@ -148,7 +161,18 @@ export function PostQueue({ drafts, selectedId, onSelect, onReorder, onDragStart
     document.addEventListener("pointerup",   upHandler);
   };
 
+  /* ── Inline scheduling helper ────────────────────────────────────────── */
+
+  const handleInlineSchedule = (draftId: string) => {
+    if (scheduleDate && onSchedule) {
+      onSchedule(draftId, new Date(scheduleDate));
+      setSchedulingId(null);
+      setScheduleDate("");
+    }
+  };
+
   /* ── Render ─────────────────────────────────────────────────────────── */
+
 
   return (
     <div className="bg-white rounded-[20px] shadow-[0_2px_20px_rgba(0,0,0,0.06)] flex flex-col h-full overflow-hidden w-[280px] shrink-0">
@@ -228,16 +252,72 @@ export function PostQueue({ drafts, selectedId, onSelect, onReorder, onDragStart
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1">
-                          <h3 className="text-[12px] font-bold text-[#1A1D23] truncate leading-tight">
+                        <div className="flex items-center justify-between gap-1 relative">
+                          <h3 className="text-[12px] font-bold text-[#1A1D23] truncate leading-tight pr-6">
                             {draft.title}
                           </h3>
+                          <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex items-center gap-1">
+                            {draft.status === "scheduled" && onUnschedule ? (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onUnschedule(draft.id);
+                                }}
+                                className="text-slate-400 hover:text-amber-500 hover:bg-amber-50 p-1 rounded transition-colors"
+                                title="Remove from Schedule"
+                              >
+                                <CalendarDays size={12} />
+                              </button>
+                            ) : draft.status === "draft" && onSchedule ? (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSchedulingId(schedulingId === draft.id ? null : draft.id);
+                                }}
+                                className="text-slate-400 hover:text-[#0052FF] hover:bg-[#EEF3FF] p-1 rounded transition-colors"
+                                title="Schedule Post"
+                              >
+                                <CalendarDays size={12} />
+                              </button>
+                            ) : null}
+
+                            {onDelete && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (window.confirm("Are you sure you want to delete this post?")) {
+                                    onDelete(draft.id);
+                                  }
+                                }}
+                                className="text-slate-300 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-colors"
+                                title="Delete Post"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        <div className="mt-1 flex items-center justify-start gap-2">
                           <span
                             className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0 capitalize flex items-center gap-1 ${STATUS_BADGE[draft.status]}`}
                           >
                             <span className={`w-1 h-1 rounded-full inline-block ${STATUS_DOT[draft.status]}`} />
                             {draft.status}
                           </span>
+                          
+                          {draft.status === "scheduled" && draft.scheduledDate && (
+                            <span className="text-[9px] font-bold text-slate-400">
+                              {new Date(draft.scheduledDate).toLocaleString(undefined, { 
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: 'numeric',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -274,6 +354,38 @@ export function PostQueue({ drafts, selectedId, onSelect, onReorder, onDragStart
                         </span>
                       )}
                     </div>
+
+                    {/* Inline schedule picker */}
+                    {schedulingId === draft.id && (
+                      <div
+                        className="mt-2 p-2 bg-[#EEF3FF] rounded-xl border border-[#0052FF]/20 shadow-sm"
+                        onClick={e => e.stopPropagation()}
+                        onPointerDown={e => e.stopPropagation()}
+                      >
+                        <label className="block text-[9px] font-bold text-[#0052FF] uppercase tracking-widest mb-1.5">Pick a date &amp; time</label>
+                        <div className="flex gap-1.5">
+                          <input
+                            type="datetime-local"
+                            value={scheduleDate}
+                            onChange={(e) => setScheduleDate(e.target.value)}
+                            className="flex-1 bg-white rounded-lg px-2 py-1 text-[11px] font-bold text-[#1A1D23] outline-none focus:ring-1 focus:ring-[#0052FF]/40 border border-slate-200"
+                          />
+                          <button
+                            onClick={() => handleInlineSchedule(draft.id)}
+                            disabled={!scheduleDate}
+                            className="bg-[#0052FF] disabled:opacity-50 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors hover:bg-[#003DD4]"
+                          >
+                            Set
+                          </button>
+                          <button
+                            onClick={() => { setSchedulingId(null); setScheduleDate(""); }}
+                            className="text-slate-400 hover:text-slate-600 px-1 rounded-lg text-[10px] font-bold"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Scheduled date */}
                     {draft.status === "scheduled" && draft.scheduledDate && (

@@ -14,7 +14,6 @@ import {
   FaChrome,
   FaArrowRight,
   FaRegQuestionCircle,
-  FaUserCog,
   FaUser,
   FaRocket,
   FaSignOutAlt,
@@ -36,7 +35,6 @@ const Sidebar = () => {
     content: true,
     idea: false,
     publishing: false,
-    client: false,
   });
 
   const toggleMenu = (menu: string) => {
@@ -194,47 +192,6 @@ const Sidebar = () => {
             <span>Analytics</span>
           </Link>
 
-          <button
-            onClick={() => toggleMenu("client")}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none outline-none mt-1 ${
-              openMenus.client
-                ? "text-[#1A1D23] bg-white/40"
-                : "text-slate-500 hover:bg-white/60"
-            }`}
-          >
-            <div className="flex items-center gap-3.5">
-              <FaUserCog
-                size={15}
-                className={
-                  openMenus.client ? "text-[#0052FF]" : "text-slate-400"
-                }
-              />
-              <span>Client Manager</span>
-            </div>
-            {openMenus.client ? (
-              <FaChevronDown size={10} className="text-slate-400" />
-            ) : (
-              <FaChevronRight size={10} className="text-slate-400" />
-            )}
-          </button>
-
-          {openMenus.client && (
-            <div className="ml-5 mt-1 border-l-2 border-slate-200/50 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
-              {/* Keep a few links for brevity */}
-              <Link
-                href={`/${accountId}/crm-pipeline`}
-                className={`${subLinkBase} ${isActive("crm-pipeline") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
-              >
-                CRM Pipeline
-              </Link>
-              <Link
-                href={`/${accountId}/client-workspace`}
-                className={`${subLinkBase} ${isActive("client-workspace") ? "text-[#0052FF] bg-white shadow-sm" : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"}`}
-              >
-                Client Workspace
-              </Link>
-            </div>
-          )}
 
           <Link
             href="/account"

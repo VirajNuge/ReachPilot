@@ -1,42 +1,86 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { requireAuth } from "@/lib/withAuth";
-import { getPersonaByUserAndAccount } from "@/lib/models/persona";
-import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
-import { parseAIJson } from "@/lib/parseAIJson";
-import { buildPosterPromptGeneratorPrompt } from "@/lib/postGeneration/posterPromptBuilder";
+
 import { AI_MODELS } from "@/lib/aiConfig";
+import { getPersonaByUserAndAccount } from "@/lib/models/persona";
+import { parseAIJson } from "@/lib/parseAIJson";
+import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
 import type {
   ContentStrategyOutput,
+  LayoutStyle,
   PosterPromptOutput,
   PostGenerationInput,
-  LayoutStyle,
 } from "@/lib/types/postGeneration";
+import { requireAuth } from "@/lib/withAuth";
 
-const VALID_LAYOUTS: LayoutStyle[] = [
-  "hero_center",
-  "top_headline",
-  "split_layout",
-  "bottom_overlay",
-  "minimal_card",
-];
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+function firstTextBlock(input: PostGenerationInput, labels: string[]): string | undefined {
+  return input.textBlocks
+    ?.find((block) => labels.includes(block.label.toLowerCase().trim()))
+    ?.text?.trim();
 }
 
-function isPosterPromptOutput(value: unknown): value is PosterPromptOutput {
-  if (!isObject(value)) return false;
-  return (
-    typeof value.posterPrompt === "string" &&
-    typeof value.headline === "string" &&
-    typeof value.subtext === "string" &&
-    typeof value.cta === "string" &&
-    typeof value.layout === "string" &&
-    VALID_LAYOUTS.includes(value.layout as LayoutStyle) &&
-    typeof value.typographyStyle === "string" &&
-    typeof value.compositionNotes === "string"
-  );
+function buildPosterPromptPrompt(
+  input: PostGenerationInput,
+  strategy: ContentStrategyOutput,
+  personaContext: string,
+): string {
+  const platform = input.platforms[0] ?? "linkedin";
+  const tone = (input.tones[0] ?? "professional").replace(/_/g, " ");
+  const visualStyle = (input.visualStyles[0] ?? "minimal").replace(/_/g, " ");
+  const title = firstTextBlock(input, ["title", "headline"]);
+  const subtitle = firstTextBlock(input, ["subtitle", "subtext"]);
+  const ctaText = firstTextBlock(input, ["cta", "cta text"]);
+  const colors = input.brandAssets.colorPalette.length > 0
+    ? input.brandAssets.colorPalette.join(", ")
+    : "brand-aligned accent colors";
+
+  return [
+    "You are ReachPilot's AI poster director.",
+    "Generate a finished social media poster plan for one-shot image generation.",
+    "Return only JSON.",
+    "",
+    "NON-NEGOTIABLE RULES:",
+    "- The final image model will generate the complete poster in one shot.",
+    "- The poster must include the actual headline, subtext, CTA, and logo placement if provided.",
+    "- Do not include any extra text beyond the requested copy.",
+    "- Keep spelling and capitalization precise.",
+    "",
+    "TASK:",
+    "Design a high-quality final poster spec for a social media campaign asset.",
+    "The poster should feel cinematic, premium, and campaign-ready.",
+    "",
+    `PRIMARY PLATFORM: ${platform}`,
+    `CORE MESSAGE: ${input.coreMessage}`,
+    `POST ANGLE: ${strategy.postAngle}`,
+    `HOOK IDEA: ${strategy.hookIdea}`,
+    `CONTENT STRUCTURE: ${strategy.contentStructure}`,
+    `VISUAL IDEA: ${strategy.visualIdea}`,
+    `TONE: ${tone}`,
+    `VISUAL STYLE: ${visualStyle}`,
+    `BRAND COLORS: ${colors}`,
+    `IMAGE CONCEPT: ${input.imageConcept?.trim() || "Generate the strongest concept from the context."}`,
+    `IMAGE REFERENCES: ${input.imageReferences?.trim() || "None provided"}`,
+    input.brandAssets.fontFamily ? `FONT FAMILY: ${input.brandAssets.fontFamily}` : "FONT FAMILY: Auto",
+    title ? `USER TITLE (use exactly): ${title}` : "USER TITLE: none",
+    subtitle ? `USER SUBTITLE (use exactly): ${subtitle}` : "USER SUBTITLE: none",
+    ctaText ? `USER CTA (use exactly): ${ctaText}` : "USER CTA: none",
+    personaContext ? `PERSONA CONTEXT:\n${personaContext}` : "PERSONA CONTEXT: none",
+    "",
+    "QUALITY BAR:",
+    "- The full poster should feel specific, not generic.",
+    "- Use the brand colors in both scene mood and graphic treatment.",
+    "- Prefer a clear focal subject and a believable environment.",
+    "- Make the poster look deliberately designed, not like a raw photo.",
+    "- Avoid cliché scenes like handshakes, light bulbs, generic laptops, stock-office poses, and cheesy growth arrows.",
+    "",
+    "COPY RULES:",
+    title ? "- Use the exact user title as the headline." : "- Headline should be short and punchy.",
+    subtitle ? "- Use the exact user subtitle as the subtext." : "- Subtext should be concise and supportive.",
+    ctaText ? "- Use the exact user CTA." : "- CTA should be short and action-oriented.",
+    "",
+    "JSON FORMAT:",
+    '{"masterPrompt":"100-200 word cinematic full-poster brief","posterPrompt":"","headline":"3-8 words or exact provided text","subtext":"5-16 words or exact provided text","cta":"2-6 words or exact provided text","layout":"hero_center","typographyStyle":"modern_sans","compositionNotes":"1-2 sentences on text placement, logo integration, and readability"}',
+  ].join("\n");
 }
 
 /**
@@ -53,13 +97,12 @@ async function loadPersonaData(userId: string, accountId?: string): Promise<{
     if (!persona) return { personaContext: "", colorPalette: [], fontFamily: "", logoUrl: "" };
 
     const personaContext = buildContentGenerationContext(persona);
-    // Derive color palette: prefer colorPalette array, fall back to single brandColorHex
     const colorPalette =
       persona.colorPalette?.length
         ? persona.colorPalette
         : persona.brandColorHex
-        ? [persona.brandColorHex]
-        : [];
+          ? [persona.brandColorHex]
+          : [];
 
     return {
       personaContext,
@@ -86,42 +129,144 @@ async function autoGenerateImageConcept(
   const style = (input.visualStyles?.[0] ?? "minimal").replace(/_/g, " ");
   const colors = input.brandAssets.colorPalette.length
     ? input.brandAssets.colorPalette.join(", ")
-    : "modern brand colors";
+    : "the brand's signature colors";
 
   const textBlocks = input.textBlocks ?? [];
   const titleBlock = textBlocks.find((b) => b.label.toLowerCase() === "title")?.text?.trim();
   const subtitleBlock = textBlocks.find((b) => b.label.toLowerCase() === "subtitle")?.text?.trim();
 
-  const conceptPrompt = `You are an expert AI image prompt engineer for social media marketing.
+  const conceptPrompt = `You are a world-class creative director and AI image prompt engineer specializing in social media marketing.
 
-The user left the "Image Concept" field blank. Based on their post details, generate exactly ONE highly descriptive, visually striking image concept for a ${platform} post. Output only the concept — no preamble, no explanation, no quotation marks.
+The user left the "Image Concept" field blank. Your job is to invent a visually stunning, unexpected, and highly specific scene concept for their post. Do NOT be generic. Think deeply before writing.
+
+CREATIVE REASONING — do this mentally before writing:
+1. What is the core FEELING of this post? (not the words — the emotion)
+2. What unexpected visual metaphor, scale contrast, or slightly surreal scene could convey that feeling?
+3. What specific world does this brand live in? Make it cinematic and specific.
+4. How do the brand colors live in this scene as light, material, or atmosphere — NOT as flat fills?
 
 POST DETAILS:
 - Core Message: ${input.coreMessage}
 - Platform: ${platform}
 - Post Angle: ${strategy.postAngle}
-- Visual Idea from Strategy: ${strategy.visualIdea}
+- Visual Strategy from AI: ${strategy.visualIdea}
 - Tone: ${tone}
 - Visual Style: ${style}
 - Brand Colors: ${colors}
-${titleBlock ? `- Title: ${titleBlock}` : ""}
-${subtitleBlock ? `- Subtitle: ${subtitleBlock}` : ""}
+${titleBlock ? `- Post Title: ${titleBlock}` : ""}
+${subtitleBlock ? `- Post Subtitle: ${subtitleBlock}` : ""}
 
 OUTPUT REQUIREMENTS:
-- One vivid, specific visual scene description (2-3 sentences)
-- Include [Subject] + [Setting/Background] + [Lighting/Mood] + reference to the brand colors
-- Suitable for B2B/professional social media marketing
-- DO NOT include any text or typography description — focus purely on the visual scene
-- Output the concept text only, nothing else`;
+- Write 3-4 sentences of flowing cinematic scene description (NOT a bullet list)
+- Include: [Subject] in [specific environment] under [specific lighting] — make it feel like a film still
+- Weave the brand colors (${colors}) into the scene as light gels, reflections, glowing elements, or atmospheric haze — never as flat color blocks
+- Use unexpected visual metaphors — avoid the literal (no laptops, handshakes, light bulbs, or generic offices)
+- Include at least one specific material or texture detail (e.g., "matte obsidian concrete", "brushed titanium", "rain-slicked glass")
+- Include a specific lens/lighting feel (e.g., "shot at f/1.4 on an 85mm lens", "backlit by a neon glow")
+- Suitable for professional social media marketing but visually arresting
+- Output the scene description ONLY — no preamble, no explanation, no quotation marks`;
 
-  const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
+  const model = genAI.getGenerativeModel({
+    model: AI_MODELS.TEXT,
+    generationConfig: {
+      temperature: 1.0,
+      maxOutputTokens: 512,
+    },
+  } as Parameters<typeof genAI.getGenerativeModel>[0]);
   try {
     const result = await model.generateContent(conceptPrompt);
     return result.response.text().trim();
   } catch {
-    // Non-fatal — return empty string so generation continues without concept
     return "";
   }
+}
+
+const VALID_LAYOUTS = ["hero_center", "top_headline", "split_layout", "bottom_overlay", "minimal_card"] as const;
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function coerceNonEmptyString(value: unknown, fallback = ""): string {
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : fallback;
+}
+
+function trimToWordLimit(value: string, maxWords: number): string {
+  const words = value.split(/\s+/).filter(Boolean);
+  if (words.length <= maxWords) return value;
+  return words.slice(0, maxWords).join(" ");
+}
+
+function buildFallbackPosterPrompt(
+  input: PostGenerationInput,
+  strategy: ContentStrategyOutput,
+): PosterPromptOutput {
+  const primaryPlatform = input.platforms[0] ?? "linkedin";
+  const primaryColor = input.brandAssets.colorPalette[0] ?? "#111827";
+  const visualStyle = (input.visualStyles[0] ?? "minimal").replace(/_/g, " ");
+  const tone = (input.tones[0] ?? "professional").replace(/_/g, " ");
+
+  const masterPrompt = [
+    `Create a polished ${visualStyle} social media poster for ${primaryPlatform}.`,
+    `Center the visual around "${strategy.postAngle || input.coreMessage}" with a ${tone} tone.`,
+    `Use ${primaryColor} as the lead brand accent, clean composition, premium lighting, and strong editorial hierarchy.`,
+    `The final artwork should feel campaign-ready and readable in-feed with visible text and any provided logo integrated into the design.`,
+  ].join(" ");
+
+  return {
+    masterPrompt,
+    posterPrompt: masterPrompt,
+    headline: coerceNonEmptyString(strategy.postAngle, input.coreMessage.slice(0, 72) || "Generated post"),
+    subtext: coerceNonEmptyString(strategy.visualIdea, strategy.contentStructure || input.coreMessage.slice(0, 96)),
+    cta: input.ctas[0] === "none" ? "Learn more" : "Read more",
+    layout: "hero_center",
+    typographyStyle: "modern_sans",
+    compositionNotes: "Keep the hierarchy clean with one focal element and readable text placement. Integrate the logo cleanly if it exists.",
+  };
+}
+
+function normalizePosterPromptOutput(
+  value: unknown,
+  input: PostGenerationInput,
+  strategy: ContentStrategyOutput,
+): PosterPromptOutput | null {
+  if (!isObject(value)) return null;
+
+  const masterPrompt = coerceNonEmptyString(value.masterPrompt, coerceNonEmptyString(value.posterPrompt));
+  const posterPrompt = coerceNonEmptyString(value.posterPrompt, masterPrompt);
+  const headline = trimToWordLimit(
+    coerceNonEmptyString(value.headline, strategy.postAngle || input.coreMessage.slice(0, 72) || "Generated post"),
+    8,
+  );
+  const subtext = coerceNonEmptyString(
+    value.subtext,
+    strategy.visualIdea || strategy.contentStructure || input.coreMessage.slice(0, 96),
+  );
+  const cta = trimToWordLimit(
+    coerceNonEmptyString(value.cta, input.ctas[0] === "none" ? "Learn more" : "Read more"),
+    6,
+  );
+  const layout: LayoutStyle = typeof value.layout === "string" && VALID_LAYOUTS.includes(value.layout as typeof VALID_LAYOUTS[number])
+    ? (value.layout as LayoutStyle)
+    : "hero_center";
+  const typographyStyle = coerceNonEmptyString(value.typographyStyle, "modern_sans");
+  const compositionNotes = coerceNonEmptyString(
+    value.compositionNotes,
+    "Keep the hierarchy clean with one focal element and readable text placement. Integrate the logo cleanly if it exists.",
+  );
+
+  if (!masterPrompt) return null;
+
+  return {
+    masterPrompt,
+    posterPrompt,
+    headline,
+    subtext: trimToWordLimit(subtext, 16),
+    cta,
+    layout,
+    typographyStyle,
+    compositionNotes,
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -132,10 +277,7 @@ export async function POST(req: NextRequest) {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "GEMINI_API_KEY is not set" }, { status: 500 });
     }
 
     const body = (await req.json()) as {
@@ -146,15 +288,11 @@ export async function POST(req: NextRequest) {
     };
 
     if (!body.input || !body.strategy) {
-      return NextResponse.json(
-        { error: "input and strategy are required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "input and strategy are required" }, { status: 400 });
     }
 
     const personaData = await loadPersonaData(userId, body.accountId);
 
-    // Server-side merge: fill missing brand assets from persona (always — visual assets are not framing)
     const mergedBrandAssets = { ...body.input.brandAssets };
     if (mergedBrandAssets.colorPalette.length === 0 && personaData.colorPalette.length > 0) {
       mergedBrandAssets.colorPalette = personaData.colorPalette;
@@ -165,11 +303,10 @@ export async function POST(req: NextRequest) {
     if (!mergedBrandAssets.logoUrl && personaData.logoUrl) {
       mergedBrandAssets.logoUrl = personaData.logoUrl;
     }
-    // Only inject persona text framing when the toggle is ON
+
     const personaContext = body.includePersona ? personaData.personaContext : "";
     let mergedInput: PostGenerationInput = { ...body.input, brandAssets: mergedBrandAssets };
 
-    // ── Auto-generate imageConcept if user left it blank ──────────────────────
     const genAI = new GoogleGenerativeAI(apiKey);
     if (!mergedInput.imageConcept?.trim()) {
       const autoConcept = await autoGenerateImageConcept(mergedInput, body.strategy, genAI);
@@ -178,49 +315,27 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const { systemPrompt, generatorPrompt } = buildPosterPromptGeneratorPrompt(
-      mergedInput,
-      body.strategy,
-      personaContext,
-    );
+    const prompt = buildPosterPromptPrompt(mergedInput, body.strategy, personaContext);
 
-    const model = genAI.getGenerativeModel({
-      model: AI_MODELS.TEXT,
-      systemInstruction: systemPrompt,
-    });
-
-    let responseText = "";
+    let imagePrompt: PosterPromptOutput;
     try {
-      const result = await model.generateContent(generatorPrompt);
-      responseText = result.response.text();
+      const model = genAI.getGenerativeModel({
+        model: AI_MODELS.TEXT,
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature: 0.9,
+          maxOutputTokens: 2048,
+        },
+      } as Parameters<typeof genAI.getGenerativeModel>[0]);
+      const result = await model.generateContent(prompt);
+      const parsed = parseAIJson(result.response.text());
+      imagePrompt = normalizePosterPromptOutput(parsed, mergedInput, body.strategy) ?? buildFallbackPosterPrompt(mergedInput, body.strategy);
     } catch (error) {
-      console.error("Poster prompt AI generation error:", error);
-      return NextResponse.json(
-        { error: "AI Generation failed" },
-        { status: 500 },
-      );
+      console.error("Poster prompt generation error:", error);
+      imagePrompt = buildFallbackPosterPrompt(mergedInput, body.strategy);
     }
 
-    let parsed: unknown;
-    try {
-      parsed = parseAIJson(responseText);
-    } catch (error) {
-      console.error("Poster prompt JSON parse error:", error);
-      return NextResponse.json(
-        { error: "Failed to parse AI response" },
-        { status: 500 },
-      );
-    }
-
-    if (!isPosterPromptOutput(parsed)) {
-      console.error("Invalid poster prompt shape:", parsed);
-      return NextResponse.json(
-        { error: "Invalid AI response shape" },
-        { status: 500 },
-      );
-    }
-
-    return NextResponse.json({ imagePrompt: parsed });
+    return NextResponse.json({ imagePrompt });
   } catch (error) {
     console.error("Image prompt route error:", error);
     return NextResponse.json({ error: "Request failed" }, { status: 500 });

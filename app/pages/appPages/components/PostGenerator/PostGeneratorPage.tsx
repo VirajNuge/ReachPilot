@@ -21,9 +21,9 @@ import {
   PenLine,
   ClipboardList,
   History,
-  CheckCircle2,
   ArrowRight,
   Zap,
+  Trash2,
 } from "lucide-react";
 
 import type {
@@ -70,7 +70,6 @@ import {
   IMAGE_MODEL_LABELS,
   TONE_LABELS,
   CTA_LABELS,
-  PLATFORM_DISPLAY,
   PLATFORM_INTELLIGENCE,
   POST_IMAGE_SIZES,
   NICHE_CATEGORY_LABELS,
@@ -88,6 +87,7 @@ import { GenerationPipeline, PipelineStage } from "./Pipeline/GenerationPipeline
 import { OutputDashboard } from "./Output/OutputDashboard";
 import StylePickerModal from "./Modals/StylePickerModal";
 import WritingStyleModal from "./Modals/WritingStyleModal";
+import { PLATFORM_BRANDS, PlatformLogo } from "./platformBranding";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -113,6 +113,7 @@ type HistoryPostRecord = Omit<PostGenerationDocument, "_id" | "createdAt" | "upd
 
 const POST_GENERATOR_PREVIEW_KEY = "reachpilot_post_generator_preview_snapshot";
 const POST_GENERATOR_SEED_INPUT_KEY = "reachpilot_post_generator_seed_input";
+const CAPTION_OPTION_LIMIT = 3;
 
 function isDataUrl(value: string | undefined): boolean {
   return typeof value === "string" && value.startsWith("data:");
@@ -133,16 +134,9 @@ function sanitizeInputForPersistence(input: PostGenerationInput): PostGeneration
 }
 
 function sanitizeOutputForPersistence(output: PostPackage): PostPackage {
-  const safeImageUrl = isDataUrl(output.imageUrl) ? undefined : output.imageUrl;
-      const safeVariations = (output.imageVariations ?? []).filter(
-        (item) => typeof item.imageUrl === "string" && item.imageUrl.length > 0 && !isDataUrl(item.imageUrl)
-      );
-
-  return {
-    ...output,
-    imageUrl: safeImageUrl,
-    imageVariations: safeVariations,
-  };
+  // Do NOT strip dataUrls for generated images. They are needed for publishing.
+  // The backend API handles the base64 conversion during platform upload.
+  return output;
 }
 
 function normalizeMongoId(value: unknown): string | null {
@@ -158,6 +152,72 @@ function normalizeMongoId(value: unknown): string | null {
   return null;
 }
 
+function mergePostPackageForPersistence(
+  base: PostPackage,
+  hooks: HookOption[] | null,
+  contentScore: ContentScore | null
+): PostPackage {
+  return {
+    ...base,
+    ...(hooks ? { hooks } : {}),
+    ...(contentScore ? { contentScore } : {}),
+  };
+}
+
+function normalizeCaptionOptionsMap(
+  captionOptions: PostPackage["captionOptions"],
+  captions: PostPackage["captions"]
+): NonNullable<PostPackage["captionOptions"]> {
+  const entries = Object.entries(captionOptions ?? {}).map(([platform, options]) => {
+    const normalized = Array.from(
+      new Set(
+        (options ?? [])
+          .map((option) => option.trim())
+          .filter((option) => option.length > 0)
+      )
+    ).slice(0, CAPTION_OPTION_LIMIT);
+
+    const fallbackCaption = captions[platform] ?? "";
+    const finalOptions = normalized.length > 0 ? normalized : fallbackCaption ? [fallbackCaption] : [];
+    return [platform, finalOptions];
+  });
+
+  return Object.fromEntries(entries);
+}
+
+function normalizePostPackage(postPackage: PostPackage): PostPackage {
+  const normalizedCaptionOptions = normalizeCaptionOptionsMap(postPackage.captionOptions, postPackage.captions);
+
+  return {
+    ...postPackage,
+    imagePrompt: postPackage.imagePrompt || "",
+    headline: postPackage.headline || "",
+    subtext: postPackage.subtext || "",
+    cta: postPackage.cta || "",
+    captionOptions: normalizedCaptionOptions,
+  };
+}
+
+// Status badge config for history panel
+const STATUS_BADGE: Record<string, { label: string; className: string }> = {
+  draft:     { label: "Draft",     className: "bg-[#F1F5F9] text-[#64748B]" },
+  scheduled: { label: "Scheduled", className: "bg-[#EEF3FF] text-[#2563EB]" },
+  published: { label: "Published", className: "bg-[#F0FDF4] text-[#16A34A]" },
+};
+
+// Empty package used as placeholder when creating a shell draft at pipeline start
+const EMPTY_POST_PACKAGE: PostPackage = {
+  imagePrompt: "",
+  captions: {},
+  captionOptions: {},
+  hashtags: { highReach: [], niche: [], branded: [] },
+  sizes: {},
+  headline: "",
+  subtext: "",
+  cta: "",
+  designStyle: "minimal",
+};
+
 const DUMMY_PREVIEW_SNAPSHOT: OutputPreviewSnapshot = {
   input: {
     objective: "lead_generation",
@@ -165,6 +225,7 @@ const DUMMY_PREVIEW_SNAPSHOT: OutputPreviewSnapshot = {
     coreMessage: "Launching our AI social studio that turns one idea into multi-platform content in minutes.",
     platforms: ["linkedin", "x", "instagram_post", "facebook", "threads"],
     generationFocus: "balanced",
+    generateImage: true,
     brandType: "startup_saas",
     visualStyles: ["minimal", "tech"],
     imageGenType: "ai_background",
@@ -344,7 +405,7 @@ const INITIAL_STAGES: PipelineStage[] = [
   },
 ];
 
-function buildPipelineStages(platforms: PostPlatform[]): PipelineStage[] {
+function buildPipelineStages(platforms: PostPlatform[], shouldGenerateImage: boolean): PipelineStage[] {
   const stages: PipelineStage[] = [
     { name: "Content Strategist", description: "Analyzing your brief and creating a content strategy", status: "pending" },
     { name: "Caption Generator", description: "Writing platform-optimized captions", status: "pending" },
@@ -361,8 +422,13 @@ function buildPipelineStages(platforms: PostPlatform[]): PipelineStage[] {
   if (platforms.includes("facebook")) {
     stages.push({ name: "Facebook Optimizer", description: "Refining your Facebook post for maximum discussion and reach", status: "pending" });
   }
-  stages.push({ name: "Image Prompt Generator", description: "Designing visual concepts for your post", status: "pending" });
-  stages.push({ name: "Image Render", description: "Generating your social media image with AI", status: "pending" });
+  if (platforms.includes("threads")) {
+    stages.push({ name: "Threads Optimizer", description: "Refining your Threads post for punch and flow", status: "pending" });
+  }
+  if (shouldGenerateImage) {
+    stages.push({ name: "Image Prompt Generator", description: "Designing visual concepts for your post", status: "pending" });
+    stages.push({ name: "Image Render", description: "Generating your social media image with AI", status: "pending" });
+  }
   return stages;
 }
 
@@ -372,6 +438,7 @@ const DEFAULT_INPUT: PostGenerationInput = {
   coreMessage: "",
   platforms: ["linkedin"],
   generationFocus: "balanced",
+  generateImage: true,
   brandType: "personal_brand",
   visualStyles: ["minimal"],
   imageGenType: "ai_background",
@@ -470,6 +537,61 @@ function deriveObjective(primaryObjective: string[] | undefined): PostObjective 
   return "educational";
 }
 
+function nextPreferredWeekday(targetDay: number, targetHour: number, targetMinute = 0): Date {
+  const now = new Date();
+  const candidate = new Date(now);
+  candidate.setHours(targetHour, targetMinute, 0, 0);
+
+  const dayOffset = (targetDay - candidate.getDay() + 7) % 7;
+  candidate.setDate(candidate.getDate() + dayOffset);
+
+  if (candidate <= now) {
+    candidate.setDate(candidate.getDate() + 7);
+  }
+
+  return candidate;
+}
+
+function getSuggestedSchedule(input: PostGenerationInput): Date {
+  const niche = input.niche ?? "other";
+  const market = (input.location ?? "").toLowerCase();
+  const isB2B =
+    input.platforms.includes("linkedin") ||
+    ["tech_saas", "finance", "legal", "agency_marketing", "education", "personal_brand"].includes(niche);
+  const isLifestyle = ["fitness", "beauty", "fashion", "food_restaurant", "travel", "ecommerce"].includes(niche);
+  const isWeekendFriendly = ["travel", "food_restaurant", "beauty", "fashion"].includes(niche);
+
+  let weekday = 2;
+  let hour = isB2B ? 9 : 18;
+  let minute = 30;
+
+  if (isLifestyle) {
+    weekday = 4;
+    hour = market.includes("dubai") || market.includes("uae") ? 20 : 18;
+    minute = 0;
+  } else if (niche === "finance" || niche === "legal" || niche === "healthcare") {
+    weekday = 2;
+    hour = 8;
+    minute = 30;
+  } else if (niche === "education") {
+    weekday = 3;
+    hour = 12;
+    minute = 0;
+  } else if (niche === "tech_saas" || niche === "agency_marketing") {
+    weekday = 2;
+    hour = market.includes("uk") || market.includes("london") ? 10 : 9;
+  }
+
+  if (!isB2B && isWeekendFriendly) {
+    const saturday = nextPreferredWeekday(6, 10, 0);
+    if (saturday.getTime() - Date.now() < 3 * 24 * 60 * 60 * 1000) {
+      return saturday;
+    }
+  }
+
+  return nextPreferredWeekday(weekday, hour, minute);
+}
+
 // ── Dropdown component helper ─────────────────────────────────────────────────
 
 interface SelectFieldProps {
@@ -565,7 +687,7 @@ function MultiSelectPills({ label, options, selected, onChange }: MultiSelectPil
 
 export function PostGeneratorPage() {
   const params = useParams();
-  const accountId = params?.id as string;
+  const routeAccountId = params?.id as string;
   const searchParams = useSearchParams();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -611,6 +733,8 @@ export function PostGeneratorPage() {
   const [isRemixing, setIsRemixing] = useState(false);
   const [isScoring, setIsScoring] = useState(false);
   const [isSavingToQueue, setIsSavingToQueue] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
+  const [isPublishingNow, setIsPublishingNow] = useState(false);
   const [activeGenerationId, setActiveGenerationId] = useState<string | null>(null);
 
   const [historyItems, setHistoryItems] = useState<HistoryPostRecord[]>([]);
@@ -619,6 +743,50 @@ export function PostGeneratorPage() {
 
   const [hasPreviewSnapshot, setHasPreviewSnapshot] = useState(false);
   const [seedImported, setSeedImported] = useState(false);
+  const [resolvedAccountId, setResolvedAccountId] = useState<string | null>(null);
+  const effectiveAccountId = resolvedAccountId;
+  // Ref mirror so saveGenerationToDb always has the latest accountId without stale closures
+  const resolvedAccountIdRef = useRef<string | null>(null);
+  useEffect(() => { resolvedAccountIdRef.current = resolvedAccountId; }, [resolvedAccountId]);
+  const suggestedScheduleIso = useMemo(() => {
+    const basis = lastInput ?? formInput;
+    if (!basis?.platforms?.length) return null;
+    return getSuggestedSchedule(basis).toISOString();
+  }, [formInput, lastInput]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const resolveAccountId = async () => {
+      try {
+        const activeRes = await fetch("/api/accounts/active");
+        if (activeRes.ok) {
+          const activeData = await activeRes.json();
+          if (mounted && typeof activeData?.accountId === "string" && activeData.accountId) {
+            setResolvedAccountId(activeData.accountId);
+            return;
+          }
+        }
+
+        const accountsRes = await fetch("/api/accounts");
+        if (accountsRes.ok) {
+          const accountsData = await accountsRes.json();
+          const firstAccountId = accountsData?.accounts?.[0]?._id;
+          if (mounted && typeof firstAccountId === "string" && firstAccountId) {
+            setResolvedAccountId(firstAccountId);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to resolve active account:", error);
+      }
+    };
+
+    resolveAccountId();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const savePreviewSnapshot = React.useCallback(
     (snapshot: OutputPreviewSnapshot) => {
@@ -637,7 +805,7 @@ export function PostGeneratorPage() {
       const raw = localStorage.getItem(POST_GENERATOR_PREVIEW_KEY);
       if (!raw) {
         savePreviewSnapshot(DUMMY_PREVIEW_SNAPSHOT);
-        setPostPackage(DUMMY_PREVIEW_SNAPSHOT.postPackage);
+        setPostPackage(normalizePostPackage(DUMMY_PREVIEW_SNAPSHOT.postPackage));
         setLastInput(DUMMY_PREVIEW_SNAPSHOT.input);
         setFormInput(DUMMY_PREVIEW_SNAPSHOT.input);
         setStrategy(DUMMY_PREVIEW_SNAPSHOT.strategy ?? null);
@@ -653,7 +821,7 @@ export function PostGeneratorPage() {
       const parsed = JSON.parse(raw) as OutputPreviewSnapshot;
       if (!parsed?.postPackage || !parsed?.input) {
         savePreviewSnapshot(DUMMY_PREVIEW_SNAPSHOT);
-        setPostPackage(DUMMY_PREVIEW_SNAPSHOT.postPackage);
+        setPostPackage(normalizePostPackage(DUMMY_PREVIEW_SNAPSHOT.postPackage));
         setLastInput(DUMMY_PREVIEW_SNAPSHOT.input);
         setFormInput(DUMMY_PREVIEW_SNAPSHOT.input);
         setStrategy(DUMMY_PREVIEW_SNAPSHOT.strategy ?? null);
@@ -667,7 +835,7 @@ export function PostGeneratorPage() {
         return true;
       }
 
-      setPostPackage(parsed.postPackage);
+      setPostPackage(normalizePostPackage(parsed.postPackage));
       setLastInput(parsed.input);
       setFormInput(parsed.input);
       setStrategy(parsed.strategy ?? null);
@@ -683,7 +851,7 @@ export function PostGeneratorPage() {
     } catch (err) {
       console.warn("Failed to load output preview snapshot:", err);
       savePreviewSnapshot(DUMMY_PREVIEW_SNAPSHOT);
-      setPostPackage(DUMMY_PREVIEW_SNAPSHOT.postPackage);
+      setPostPackage(normalizePostPackage(DUMMY_PREVIEW_SNAPSHOT.postPackage));
       setLastInput(DUMMY_PREVIEW_SNAPSHOT.input);
       setFormInput(DUMMY_PREVIEW_SNAPSHOT.input);
       setStrategy(DUMMY_PREVIEW_SNAPSHOT.strategy ?? null);
@@ -776,10 +944,10 @@ export function PostGeneratorPage() {
   ]);
 
   const fetchHistory = React.useCallback(async () => {
-    if (!accountId) return;
+    if (!effectiveAccountId) return;
     setIsHistoryLoading(true);
     try {
-      const res = await fetch(`/api/post-generation/save?accountId=${encodeURIComponent(accountId)}&limit=20`);
+      const res = await fetch(`/api/post-generation/save?accountId=${encodeURIComponent(effectiveAccountId)}&limit=20`);
       if (!res.ok) throw new Error("Failed to load history");
       const data = await res.json();
       const posts = Array.isArray(data?.posts) ? data.posts : [];
@@ -797,7 +965,7 @@ export function PostGeneratorPage() {
             updatedAt: typeof asRecord.updatedAt === "string" ? asRecord.updatedAt : new Date().toISOString(),
           };
         })
-        .filter((p): p is HistoryPostRecord => p !== null);
+        .filter((p: HistoryPostRecord | null): p is HistoryPostRecord => p !== null);
 
       setHistoryItems(normalized);
     } catch (err) {
@@ -805,11 +973,14 @@ export function PostGeneratorPage() {
     } finally {
       setIsHistoryLoading(false);
     }
-  }, [accountId]);
+  }, [effectiveAccountId]);
 
+  // Re-fetch history whenever the account ID resolves (fixes first-load empty state)
   useEffect(() => {
-    fetchHistory();
-  }, [fetchHistory]);
+    if (effectiveAccountId) {
+      fetchHistory();
+    }
+  }, [effectiveAccountId, fetchHistory]);
 
   // ── Form helpers ──────────────────────────────────────────────────────────
 
@@ -873,7 +1044,7 @@ export function PostGeneratorPage() {
       setImportStatus(null);
       return;
     }
-    if (!accountId) {
+    if (!effectiveAccountId) {
       setImportStatus("No account ID provided");
       return;
     }
@@ -882,7 +1053,7 @@ export function PostGeneratorPage() {
     setImportStatus(null);
 
     try {
-      const res = await fetch(`/api/persona?accountId=${accountId}`);
+      const res = await fetch(`/api/persona?accountId=${effectiveAccountId}`);
       if (!res.ok) {
         setImportStatus("No persona found for this account");
         return;
@@ -971,7 +1142,8 @@ export function PostGeneratorPage() {
     const hasInstagram = wizardInput.platforms.includes("instagram_post");
     const hasFacebook = wizardInput.platforms.includes("facebook");
     const hasThreads = wizardInput.platforms.includes("threads");
-    const dynamicStages = buildPipelineStages(wizardInput.platforms);
+    const shouldGenerateImage = wizardInput.generateImage !== false;
+    const dynamicStages = buildPipelineStages(wizardInput.platforms, shouldGenerateImage);
     setPipelineStages(dynamicStages.map((s, i) => i === 0 ? { ...s, status: "active" } : s));
 
     // Dynamic stage indices
@@ -984,16 +1156,24 @@ export function PostGeneratorPage() {
       instagramOptimizer: hasInstagram ? offset++ : -1,
       facebookOptimizer: hasFacebook ? offset++ : -1,
       threadsOptimizer: hasThreads ? offset++ : -1,
-      imagePrompt: offset++,
-      imageRender: offset,
+      imagePrompt: shouldGenerateImage ? offset++ : -1,
+      imageRender: shouldGenerateImage ? offset : -1,
     };
 
     try {
+      // ── Shell draft: create a DB record immediately so no generation is ever lost ──
+      try {
+        const shellId = await saveGenerationToDb(wizardInput, null, EMPTY_POST_PACKAGE, "draft");
+        if (shellId) setActiveGenerationId(shellId);
+      } catch (shellErr) {
+        console.warn("[PostGenerator] Shell draft save failed (non-fatal):", shellErr);
+      }
+
       // Stage 1: Strategist
       const strategyRes = await fetch("/api/post-generation/strategist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: wizardInput, accountId, includePersona: usePersonaImport }),
+        body: JSON.stringify({ input: wizardInput, accountId: effectiveAccountId, includePersona: usePersonaImport }),
         signal,
       });
 
@@ -1012,7 +1192,7 @@ export function PostGeneratorPage() {
       const captionsRes = await fetch("/api/post-generation/captions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId, includePersona: usePersonaImport }),
+        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId: effectiveAccountId, includePersona: usePersonaImport }),
         signal,
       });
 
@@ -1045,7 +1225,7 @@ export function PostGeneratorPage() {
               caption: captionsRecord["linkedin"],
               input: wizardInput,
               strategy: strategyData,
-              accountId,
+              accountId: effectiveAccountId,
               includePersona: usePersonaImport,
             }),
             signal,
@@ -1076,7 +1256,7 @@ export function PostGeneratorPage() {
               caption: captionsRecord["x"],
               input: wizardInput,
               strategy: strategyData,
-              accountId,
+              accountId: effectiveAccountId,
               includePersona: usePersonaImport,
             }),
             signal,
@@ -1107,7 +1287,7 @@ export function PostGeneratorPage() {
               caption: captionsRecord["instagram_post"],
               input: wizardInput,
               strategy: strategyData,
-              accountId,
+              accountId: effectiveAccountId,
               includePersona: usePersonaImport,
             }),
             signal,
@@ -1139,7 +1319,7 @@ export function PostGeneratorPage() {
               caption: captionsRecord["facebook"],
               input: wizardInput,
               strategy: strategyData,
-              accountId,
+              accountId: effectiveAccountId,
               includePersona: usePersonaImport,
             }),
             signal,
@@ -1169,7 +1349,7 @@ export function PostGeneratorPage() {
               caption: captionsRecord["threads"],
               input: wizardInput,
               strategy: strategyData,
-              accountId,
+              accountId: effectiveAccountId,
               includePersona: usePersonaImport,
             }),
             signal,
@@ -1184,60 +1364,74 @@ export function PostGeneratorPage() {
         updateStageStatus(stageIdx.threadsOptimizer, "completed");
       }
 
-      updateStageStatus(stageIdx.imagePrompt, "active");
-
-      // Stage 3: Image Prompt
-      const imagePromptRes = await fetch("/api/post-generation/image-prompt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId, includePersona: usePersonaImport }),
-        signal,
-      });
-
-      if (!imagePromptRes.ok) {
-        const errBody = await imagePromptRes.json().catch(() => ({}));
-        throw new Error((errBody as { error?: string }).error || `Image prompt failed (${imagePromptRes.status})`);
-      }
-      const imagePromptJson = await imagePromptRes.json();
-      const imagePromptData: PosterPromptOutput = imagePromptJson.imagePrompt;
-      setImagePrompt(imagePromptData);
-
-      updateStageStatus(stageIdx.imagePrompt, "completed");
-      updateStageStatus(stageIdx.imageRender, "active");
-
-      // Stage 4: Generate poster variations
+      let imagePromptData: PosterPromptOutput = {
+        masterPrompt: "",
+        posterPrompt: "",
+        headline: strategyData.postAngle.slice(0, 72) || "Generated post",
+        subtext: strategyData.visualIdea || strategyData.contentStructure,
+        cta: wizardInput.ctas?.[0] && wizardInput.ctas[0] !== "none" ? CTA_LABELS[wizardInput.ctas[0]] : "Ready to publish",
+        layout: "minimal_card",
+        typographyStyle: "modern_sans",
+        compositionNotes: "Caption-first post without generated image.",
+      };
       let generatedVariations: ImageVariation[] = [];
-      try {
-        const generateImageRes = await fetch("/api/post-generation/generate-image", {
+
+      if (shouldGenerateImage) {
+        updateStageStatus(stageIdx.imagePrompt, "active");
+
+        const imagePromptRes = await fetch("/api/post-generation/image-prompt", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            posterOutput: imagePromptData,
-            input: wizardInput,
-            imageModel: wizardInput.imageModel,
-            accountId,
-          }),
+          body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId: effectiveAccountId, includePersona: usePersonaImport }),
           signal,
         });
 
-        if (generateImageRes.ok) {
-          const imageGenJson = await generateImageRes.json();
-          generatedVariations = imageGenJson.images ?? [];
-        } else {
-          const errBody = await generateImageRes.json().catch(() => ({}));
-          const errMsg = (errBody as { error?: string }).error || `Image generation failed (${generateImageRes.status})`;
-          setImageGenError(errMsg);
-          console.warn("Image generation failed:", errMsg);
+        if (!imagePromptRes.ok) {
+          const errBody = await imagePromptRes.json().catch(() => ({}));
+          throw new Error((errBody as { error?: string }).error || `Image prompt failed (${imagePromptRes.status})`);
         }
-      } catch (imageGenError) {
-        if ((imageGenError as Error)?.name !== "AbortError") {
-          const msg = imageGenError instanceof Error ? imageGenError.message : "Image generation error";
-          setImageGenError(msg);
-          console.warn("Image generation error (non-fatal):", imageGenError);
-        }
-      }
+        const imagePromptJson = await imagePromptRes.json();
+        imagePromptData = imagePromptJson.imagePrompt;
+        setImagePrompt(imagePromptData);
 
-      updateStageStatus(stageIdx.imageRender, "completed");
+        updateStageStatus(stageIdx.imagePrompt, "completed");
+        updateStageStatus(stageIdx.imageRender, "active");
+
+        try {
+          const generateImageRes = await fetch("/api/post-generation/generate-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              posterOutput: imagePromptData,
+              input: wizardInput,
+              imageModel: wizardInput.imageModel,
+              accountId: effectiveAccountId,
+            }),
+            signal,
+          });
+
+          if (generateImageRes.ok) {
+            const imageGenJson = await generateImageRes.json();
+            generatedVariations = imageGenJson.images ?? [];
+          } else {
+            const errBody = await generateImageRes.json().catch(() => ({}));
+            const errMsg = (errBody as { error?: string }).error || `Image generation failed (${generateImageRes.status})`;
+            setImageGenError(errMsg);
+            console.warn("Image generation failed:", errMsg);
+          }
+        } catch (imageGenError) {
+          if ((imageGenError as Error)?.name !== "AbortError") {
+            const msg = imageGenError instanceof Error ? imageGenError.message : "Image generation error";
+            setImageGenError(msg);
+            console.warn("Image generation error (non-fatal):", imageGenError);
+          }
+        }
+
+        updateStageStatus(stageIdx.imageRender, "completed");
+      } else {
+        setImagePrompt(null);
+        setImageGenError(null);
+      }
 
       const sizesRecord = Object.fromEntries(
         wizardInput.platforms.map((p) => [
@@ -1246,7 +1440,7 @@ export function PostGeneratorPage() {
         ])
       );
 
-      const newPostPackage: PostPackage = {
+      const newPostPackage: PostPackage = normalizePostPackage({
         imagePrompt: imagePromptData.posterPrompt,
         imageUrl: generatedVariations[0]?.imageUrl,
         imageVariations: generatedVariations,
@@ -1259,15 +1453,15 @@ export function PostGeneratorPage() {
         headline: imagePromptData.headline,
         subtext: imagePromptData.subtext,
         cta: imagePromptData.cta,
+        selectedImageVariationId: generatedVariations[0]?.id,
         designStyle: wizardInput.visualStyles[0] ?? "minimal",
         linkedInRefined: linkedInRefinedData,
         xRefined: xRefinedData,
         instagramRefined: instagramRefinedData,
         facebookRefined: facebookRefinedData,
-      };
+      });
 
       setPostPackage(newPostPackage);
-      setActiveGenerationId(null);
       savePreviewSnapshot({
         postPackage: newPostPackage,
         input: wizardInput,
@@ -1280,12 +1474,9 @@ export function PostGeneratorPage() {
       });
       setView("output");
 
-      let savedId: string | null = null;
+      // Update the existing shell draft with the completed output
       try {
-        savedId = await saveGenerationToDb(wizardInput, strategyData, newPostPackage, "draft", null);
-        if (savedId) {
-          setActiveGenerationId(savedId);
-        }
+        await saveGenerationToDb(wizardInput, strategyData, newPostPackage, "draft", null);
       } catch (saveErr) {
         console.error("Auto-save failed:", saveErr);
       }
@@ -1294,15 +1485,16 @@ export function PostGeneratorPage() {
       fetch("/api/post-generation/hooks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId, includePersona: usePersonaImport }),
+        body: JSON.stringify({ input: wizardInput, strategy: strategyData, accountId: effectiveAccountId, includePersona: usePersonaImport }),
       })
         .then((res) => res.json())
         .then(async (data) => {
           setHooks(data.hooks);
-          const postWithHooks: PostPackage = {
+          const postWithHooks: PostPackage = normalizePostPackage({
             ...newPostPackage,
             hooks: data.hooks ?? undefined,
-          };
+          });
+          setPostPackage(postWithHooks);
           savePreviewSnapshot({
             postPackage: postWithHooks,
             input: wizardInput,
@@ -1314,7 +1506,7 @@ export function PostGeneratorPage() {
             imageGenError,
           });
           try {
-            await saveGenerationToDb(wizardInput, strategyData, postWithHooks, "draft", savedId);
+            await saveGenerationToDb(wizardInput, strategyData, postWithHooks, "draft");
           } catch (saveErr) {
             console.error("History save after hooks failed:", saveErr);
           }
@@ -1331,34 +1523,74 @@ export function PostGeneratorPage() {
     }
   };
 
-  const handleSaveToQueue = async () => {
-    if (!postPackage || !lastInput) return;
+  const handleSaveToQueue = async (updatedPackage?: PostPackage) => {
+    const pkgToSave = updatedPackage ?? postPackage;
+    if (!pkgToSave || !lastInput) return;
     setIsSavingToQueue(true);
     try {
-      const res = await fetch("/api/post-generation/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          accountId,
-          input: lastInput,
-          design: {
-            brandColors: lastInput.brandAssets.colorPalette,
-            fontFamily: lastInput.brandAssets.fontFamily ?? "Inter",
-            visualStyle: lastInput.visualStyles[0] ?? "minimal",
-            logoUrl: lastInput.brandAssets.logoUrl,
-          },
-          strategy: strategy ?? undefined,
-          output: postPackage,
-          variations: [],
-          status: "draft" as const,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to save");
-      router.push(`/${accountId}/publishing`);
+      await saveGenerationToDb(lastInput, strategy, pkgToSave, "draft");
+      router.push(`/${routeAccountId}/publishing`);
     } catch (err) {
       console.error("Save to queue error:", err);
     } finally {
       setIsSavingToQueue(false);
+    }
+  };
+
+  const handleSchedulePost = async (scheduledIso: string, updatedPackage?: PostPackage) => {
+    const pkgToSave = updatedPackage ?? postPackage;
+    if (!pkgToSave || !lastInput) return;
+    setIsScheduling(true);
+    try {
+      const scheduledId = await saveGenerationToDb(
+        lastInput,
+        strategy,
+        pkgToSave,
+        "scheduled",
+        activeGenerationId,
+        scheduledIso
+      );
+
+      if (!scheduledId) {
+        throw new Error("Failed to schedule post");
+      }
+
+      setActiveGenerationId(scheduledId);
+      await fetchHistory();
+      router.push(`/${routeAccountId}/publishing`);
+    } catch (err) {
+      console.error("Schedule post error:", err);
+    } finally {
+      setIsScheduling(false);
+    }
+  };
+
+  const handlePublishNow = async (updatedPackage?: PostPackage) => {
+    const pkgToSave = updatedPackage ?? postPackage;
+    if (!pkgToSave || !lastInput) return [];
+    setIsPublishingNow(true);
+    try {
+      // Always save before publish to capture latest manual edits
+      const publishId = await saveGenerationToDb(lastInput, strategy, pkgToSave, "draft", activeGenerationId);
+      if (publishId) setActiveGenerationId(publishId);
+      
+      if (!publishId) return [{ platform: "all", success: false, error: "Could not save post before publishing" }];
+
+      const res = await fetch(`/api/post-generation/publish/${publishId}`, { method: "POST" });
+      const data = await res.json() as { results?: Array<{ platform: string; success: boolean; platformPostId?: string; error?: string }> };
+
+      if (!res.ok) return [{ platform: "all", success: false, error: "Publish failed" }];
+
+      const results = data.results ?? [];
+      if (results.some((r) => r.success)) {
+        await fetchHistory();
+      }
+      return results;
+    } catch (err) {
+      console.error("Publish now error:", err);
+      return [{ platform: "all", success: false, error: "Network error" }];
+    } finally {
+      setIsPublishingNow(false);
     }
   };
 
@@ -1369,14 +1601,14 @@ export function PostGeneratorPage() {
       const res = await fetch("/api/post-generation/remix", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ caption, platform, remixStyle: style, accountId }),
+        body: JSON.stringify({ caption, platform, remixStyle: style, accountId: effectiveAccountId }),
       });
       if (!res.ok) throw new Error("Failed to remix caption");
       const data = await res.json();
-      const updatedPackage: PostPackage = {
+      const updatedPackage: PostPackage = normalizePostPackage({
         ...postPackage,
         captions: { ...postPackage.captions, [platform]: data.remixedCaption },
-      };
+      });
       setPostPackage(updatedPackage);
       if (lastInput) {
         try {
@@ -1406,7 +1638,7 @@ export function PostGeneratorPage() {
       const scoreJson = await res.json();
       const data: ContentScore = scoreJson.score;
       setContentScore(data);
-      const updatedPackage: PostPackage = { ...postPackage, contentScore: data };
+      const updatedPackage: PostPackage = normalizePostPackage({ ...postPackage, contentScore: data });
       setPostPackage(updatedPackage);
       if (lastInput) {
         try {
@@ -1439,10 +1671,10 @@ export function PostGeneratorPage() {
       if (!post) return;
 
       setActiveGenerationId(id);
-      setLastInput(post.input);
-      setFormInput(post.input);
+      setLastInput(post.input ?? null);
+      setFormInput(post.input ?? DEFAULT_INPUT);
       setStrategy(post.strategy ?? null);
-      setPostPackage(post.output ?? null);
+      setPostPackage(post.output ? normalizePostPackage(post.output) : null);
       setHooks(post.output?.hooks ?? null);
       setContentScore(post.output?.contentScore ?? null);
       setImageGenError(null);
@@ -1452,8 +1684,8 @@ export function PostGeneratorPage() {
 
       if (post.output) {
         savePreviewSnapshot({
-          postPackage: post.output,
-          input: post.input,
+          postPackage: normalizePostPackage(post.output),
+          input: post.input ?? DEFAULT_INPUT,
           strategy: post.strategy ?? null,
           hooks: post.output.hooks ?? null,
           contentScore: post.output.contentScore ?? null,
@@ -1467,18 +1699,66 @@ export function PostGeneratorPage() {
     }
   };
 
+  const handleDeleteHistoryItem = async (id: string) => {
+    try {
+      const res = await fetch(`/api/post-generation/save/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      setHistoryItems((prev) => prev.filter((item) => item._id !== id));
+      if (activeGenerationId === id) setActiveGenerationId(null);
+    } catch (err) {
+      console.error("Failed to delete history item:", err);
+    }
+  };
+
+  const handleSelectImageVariation = async (variationId: number) => {
+    if (!postPackage || !lastInput) return;
+
+    const selectedVariation = postPackage.imageVariations?.find((item) => item.id === variationId);
+    const updatedPackage: PostPackage = normalizePostPackage({
+      ...postPackage,
+      selectedImageVariationId: variationId,
+      ...(selectedVariation ? { imageUrl: selectedVariation.imageUrl } : {}),
+    });
+
+    setPostPackage(updatedPackage);
+    savePreviewSnapshot({
+      postPackage: updatedPackage,
+      input: lastInput,
+      strategy,
+      hooks,
+      contentScore,
+      usedTemplateName,
+      templateAICurated,
+      imageGenError,
+    });
+
+    try {
+      await saveGenerationToDb(lastInput, strategy, updatedPackage, "draft");
+    } catch (saveErr) {
+      console.error("Failed to persist selected variation:", saveErr);
+    }
+  };
+
   const saveGenerationToDb = React.useCallback(
     async (
       input: PostGenerationInput,
       strategyData: ContentStrategyOutput | null,
       output: PostPackage,
       status: "draft" | "scheduled" | "published" = "draft",
-      existingId?: string | null
+      existingId?: string | null,
+      scheduledDate?: string
     ): Promise<string | null> => {
-      if (!accountId) return null;
+      // Use ref so we always have the latest accountId even if effectiveAccountId
+      // hasn't propagated into this useCallback closure yet (async race fix)
+      const accountId = resolvedAccountIdRef.current ?? effectiveAccountId;
+      if (!accountId) {
+        console.warn("[PostGenerator] saveGenerationToDb skipped — accountId not yet resolved");
+        return null;
+      }
 
       const safeInput = sanitizeInputForPersistence(input);
-      const safeOutput = sanitizeOutputForPersistence(output);
+      const mergedOutput = mergePostPackageForPersistence(output, hooks, contentScore);
+      const safeOutput = sanitizeOutputForPersistence(mergedOutput);
 
       const targetId = existingId ?? activeGenerationId;
 
@@ -1495,6 +1775,7 @@ export function PostGeneratorPage() {
         output: safeOutput,
         variations: [],
         status,
+        ...(scheduledDate ? { scheduledDate } : {}),
       };
 
       if (targetId) {
@@ -1504,9 +1785,10 @@ export function PostGeneratorPage() {
           body: JSON.stringify({
             status,
             input: safeInput,
-            strategy: strategyData,
+            ...(strategyData ? { strategy: strategyData } : {}),
             output: safeOutput,
             variations: [],
+            ...(scheduledDate ? { scheduledDate } : {}),
           }),
         });
 
@@ -1536,7 +1818,7 @@ export function PostGeneratorPage() {
         return null;
       }
     },
-    [accountId, activeGenerationId, fetchHistory]
+    [effectiveAccountId, activeGenerationId, contentScore, fetchHistory, hooks]
   );
 
   const handleNewPost = () => {
@@ -1743,9 +2025,76 @@ export function PostGeneratorPage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#EEF2F8] via-[#F5F7FA] to-[#E8EDF3]">
+    <div className="min-h-screen bg-[#EEF3F8]">
       {view !== "output" ? (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="max-w-5xl mx-auto mb-6 rounded-[36px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,250,252,0.74))] p-6 shadow-[0_30px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-8">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#64748B]">ReachPilot Studio</p>
+                <h1 className="mt-3 max-w-2xl text-[34px] font-black leading-[1.05] text-[#0F172A] sm:text-[44px]">
+                  Turn one sharp idea into a polished multi-platform campaign.
+                </h1>
+                <p className="mt-4 max-w-2xl text-[15px] leading-7 text-[#475569]">
+                  Shape the brief, tune the voice, decide whether the visual matters, and let the generator assemble something that already feels publishable.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {steps.map((step) => {
+                    const active = currentStep === step.id;
+                    const done = currentStep > step.id;
+                    return (
+                      <div
+                        key={`hero-step-${step.id}`}
+                        className={`rounded-full px-3 py-2 text-[12px] font-bold transition-colors ${
+                          active
+                            ? "bg-[linear-gradient(135deg,#0F172A,#1D4ED8)] text-white shadow-[0_10px_24px_rgba(29,78,216,0.18)]"
+                            : done
+                              ? "bg-[#E8F0FF] text-[#0052FF]"
+                              : "bg-white text-[#64748B] border border-[#E2E8F0]"
+                        }`}
+                      >
+                        {step.id}. {step.title}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                <div className="rounded-[28px] border border-white/80 bg-white/80 p-4 shadow-[0_12px_35px_rgba(15,23,42,0.06)]">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#94A3B8]">Platforms</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {(formInput.platforms.length > 0 ? formInput.platforms : ALL_PLATFORMS.slice(0, 1)).map((platform) => {
+                      const brand = PLATFORM_BRANDS[platform];
+                      return (
+                        <span
+                          key={`hero-platform-${platform}`}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#F8FAFC]"
+                          style={{ color: brand.color }}
+                          title={brand.label}
+                        >
+                          <PlatformLogo platform={platform} className="h-4 w-4" />
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="rounded-[28px] border border-white/80 bg-white/80 p-4 shadow-[0_12px_35px_rgba(15,23,42,0.06)]">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#94A3B8]">Mode</p>
+                  <p className="mt-3 text-sm font-bold text-[#0F172A]">
+                    {formInput.generateImage !== false ? "Caption + visual" : "Caption-only run"}
+                  </p>
+                </div>
+                <div className="rounded-[28px] border border-white/80 bg-[#111827] p-4 text-white shadow-[0_12px_35px_rgba(15,23,42,0.12)]">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/55">Core brief</p>
+                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-white/90">
+                    {formInput.coreMessage.trim() || "Your central message will appear here as you shape the brief."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="max-w-2xl mx-auto mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <button
@@ -1793,27 +2142,52 @@ export function PostGeneratorPage() {
                   <div className="divide-y divide-[#EEF2F6]">
                     {historyItems.map((item) => {
                       const itemId = item._id;
-                      const createdLabel = new Date(item.createdAt).toLocaleString();
+                      const createdLabel = new Date(item.createdAt).toLocaleDateString("en-US", {
+                        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+                      });
                       const previewText = item.output?.headline || item.input?.coreMessage || "Untitled post";
-                      const platformsLabel = (item.input?.platforms ?? []).join(", ") || "No platforms";
+                      const angle = (item.strategy as { postAngle?: string } | undefined)?.postAngle;
+                      const platforms = (item.input?.platforms ?? []) as string[];
+                      const status = (item.status ?? "draft") as string;
+                      const badge = STATUS_BADGE[status] ?? STATUS_BADGE.draft;
                       const isActive = activeGenerationId === itemId;
                       return (
-                        <button
+                        <div
                           key={itemId}
-                          type="button"
-                          onClick={() => loadHistoryItem(itemId)}
-                          className={`w-full text-left px-4 py-3 transition-colors ${
+                          className={`group relative flex items-start gap-2 border-b border-[#EEF2F6] transition-colors ${
                             isActive ? "bg-[#EEF3FF]" : "hover:bg-[#F8FAFD]"
                           }`}
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
+                          <button
+                            type="button"
+                            onClick={() => loadHistoryItem(itemId)}
+                            className="flex-1 min-w-0 text-left px-4 py-3"
+                          >
+                            <div className="flex items-center gap-2 mb-0.5">
                               <p className="text-sm font-bold text-[#1A1D23] truncate">{previewText}</p>
-                              <p className="text-xs text-[#64748B] mt-0.5 truncate">{platformsLabel}</p>
+                              <span className={`shrink-0 text-[9px] font-bold px-2 py-0.5 rounded-full ${badge.className}`}>
+                                {badge.label}
+                              </span>
                             </div>
-                            <span className="text-[10px] font-semibold text-[#94A3B8] whitespace-nowrap">{createdLabel}</span>
-                          </div>
-                        </button>
+                            {angle && (
+                              <p className="text-xs text-[#64748B] truncate mb-1">{angle}</p>
+                            )}
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-[10px] text-[#94A3B8] truncate">{platforms.join(", ") || "No platforms"}</p>
+                              <span className="text-[10px] font-semibold text-[#94A3B8] whitespace-nowrap shrink-0">
+                                {createdLabel}
+                              </span>
+                            </div>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); void handleDeleteHistoryItem(itemId); }}
+                            className="opacity-0 group-hover:opacity-100 self-center mr-3 shrink-0 w-6 h-6 flex items-center justify-center text-[#94A3B8] hover:text-red-500 transition-all rounded-md hover:bg-red-50"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       );
                     })}
                   </div>
@@ -1848,16 +2222,17 @@ export function PostGeneratorPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="max-w-2xl mx-auto bg-white/80 backdrop-blur-xl rounded-3xl border border-white/50 shadow-xl shadow-black/[0.06] overflow-hidden"
+              className="max-w-3xl mx-auto overflow-hidden rounded-[36px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.76))] shadow-[0_40px_100px_rgba(15,23,42,0.10)] backdrop-blur-xl"
             >
-              <div className="px-6 py-6 border-b border-[#E2E8F0] bg-white rounded-t-3xl">
+              <div className="border-b border-[#E2E8F0]/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(238,243,255,0.76))] px-6 py-6 rounded-t-[36px]">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-[#EEF3FF] flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-[#0052FF]" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,#111827,#0052FF)] shadow-[0_10px_25px_rgba(0,82,255,0.25)]">
+                      <FileText className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-[20px] font-bold text-[#1A1D23]">{steps[currentStep - 1].title}</h2>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#94A3B8]">Build</p>
+                      <h2 className="text-[22px] font-black text-[#1A1D23]">{steps[currentStep - 1].title}</h2>
                       <p className="text-[13px] text-[#64748B]">{steps[currentStep - 1].subtitle}</p>
                     </div>
                   </div>
@@ -1865,7 +2240,7 @@ export function PostGeneratorPage() {
                   <button
                     type="button"
                     onClick={() => setAdvancedOpen(true)}
-                    className="text-[13px] font-bold text-[#475569] hover:text-[#0052FF] flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFD] transition-colors self-start sm:self-auto"
+                    className="self-start rounded-full border border-[#D8E0EC] bg-white/90 px-3.5 py-2 text-[13px] font-bold text-[#475569] transition-colors hover:border-[#0052FF]/30 hover:text-[#0052FF] sm:self-auto"
                   >
                     <SlidersHorizontal className="w-3.5 h-3.5" />
                     Advanced
@@ -1873,7 +2248,7 @@ export function PostGeneratorPage() {
                 </div>
 
                 {/* Integrated stepper */}
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   {steps.map((step) => {
                     const active = currentStep === step.id;
                     const done = currentStep > step.id;
@@ -1890,7 +2265,7 @@ export function PostGeneratorPage() {
                         }}
                         className={`relative flex items-center gap-2 px-4 py-2 rounded-full border text-[13px] font-bold transition-all ${
                           active
-                            ? "border-[#1A1D23] text-[#1A1D23] bg-white shadow-sm"
+                            ? "border-[#BFD2FF] text-[#0F172A] bg-[#F8FBFF] shadow-sm"
                             : done || canClick
                               ? "border-[#E2E8F0] text-[#64748B] bg-white hover:border-[#CBD5E1]"
                               : "border-[#F1F5F9] text-[#94A3B8] bg-[#F8FAFD] cursor-not-allowed"
@@ -1943,38 +2318,37 @@ export function PostGeneratorPage() {
                       <LayoutGrid className="w-3.5 h-3.5 text-[#0052FF]" />
                       Platforms <span className="text-red-500 normal-case">*</span>
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="flex flex-wrap gap-3">
                       {ALL_PLATFORMS.map((platform) => {
                         const isSelected = formInput.platforms.includes(platform);
-                        const { label, color } = PLATFORM_DISPLAY[platform];
+                        const brand = PLATFORM_BRANDS[platform];
                         return (
                           <button
                             key={platform}
                             type="button"
                             onClick={() => handlePlatformToggle(platform)}
+                            title={brand.label}
                             className={`group relative flex items-center gap-3 px-4 py-3 rounded-full border transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[#0052FF]/20 ${
                               isSelected
-                                ? "border-[#0052FF] bg-[#EEF3FF]"
+                                ? "border-[#BFD2FF] bg-[#F8FBFF] shadow-sm"
                                 : "bg-white border-[#E2E8F0] hover:border-[#CBD5E1]"
                             }`}
                           >
-                            <div className="relative w-3.5 h-3.5 rounded-full flex-shrink-0 flex items-center justify-center">
-                              <div className="absolute inset-0 rounded-full bg-[#CBD5E1]" />
-                              <div
-                                className={`absolute inset-0 rounded-full transition-opacity duration-200 ${
-                                  isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                                }`}
-                                style={{ backgroundColor: color }}
-                              />
-                            </div>
-                              <span className={`text-[14px] font-bold ${isSelected ? "text-[#0052FF]" : "text-[#475569]"}`}>
-                                {label}
-                              </span>
-                              {isSelected && (
-                              <span className="ml-auto text-[11px] font-bold text-[#0052FF]">
-                                Selected
-                              </span>
-                            )}
+                            <span
+                              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#F9FAFB]"
+                              style={{ color: brand.color }}
+                            >
+                              <PlatformLogo platform={platform} className="h-4 w-4" />
+                            </span>
+                            <span className={`text-[14px] font-bold ${isSelected ? "text-[#111827]" : "text-[#475569]"}`}>
+                              {brand.label}
+                            </span>
+                            <span
+                              className={`ml-auto h-2.5 w-2.5 rounded-full transition-opacity ${
+                                isSelected ? "opacity-100" : "opacity-30 group-hover:opacity-60"
+                              }`}
+                              style={{ backgroundColor: brand.color }}
+                            />
                           </button>
                         );
                       })}
@@ -1985,6 +2359,33 @@ export function PostGeneratorPage() {
 
               {currentStep === 2 && (
                 <>
+                  <div className="rounded-2xl border border-[#E2E8F0] bg-white p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-[13px] font-bold text-[#111827]">Generate post image</p>
+                        <p className="text-[11px] text-[#64748B] mt-1">When this is off, ReachPilot builds captions only and hides the visual controls.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateInput({
+                            generateImage: !(formInput.generateImage !== false),
+                            generationFocus: formInput.generateImage === false ? "balanced" : "caption",
+                          })
+                        }
+                        className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300 ${
+                          formInput.generateImage !== false ? "bg-[#2563EB]" : "bg-gray-200"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                            formInput.generateImage !== false ? "translate-x-8" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
                   <SelectField
                     label="Objective"
                     value={formInput.objective}
@@ -1997,7 +2398,9 @@ export function PostGeneratorPage() {
                       Generation Focus
                     </label>
                     <div className="bg-white p-1.5 rounded-xl flex items-center gap-1 border border-[#E2E8F0]">
-                      {(["caption", "balanced", "image"] as const).map((focus) => {
+                      {(["caption", "balanced", "image"] as const)
+                        .filter((focus) => formInput.generateImage !== false || focus !== "image")
+                        .map((focus) => {
                         const isActive = (formInput.generationFocus ?? "balanced") === focus;
                         const labels = { caption: "Caption", balanced: "Balanced", image: "Image" };
                         return (
@@ -2016,6 +2419,8 @@ export function PostGeneratorPage() {
                     </div>
                   </div>
 
+                  {formInput.generateImage !== false && (
+                    <>
                   <div className="grid gap-4 md:grid-cols-2">
                     <SelectField
                       label="Image Model"
@@ -2142,6 +2547,8 @@ export function PostGeneratorPage() {
                       <Plus className="w-3.5 h-3.5" /> Add Reference Image
                     </button>
                   </div>
+                    </>
+                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
@@ -2265,11 +2672,11 @@ export function PostGeneratorPage() {
               )}
             </div>
 
-            <div className="px-6 py-6 bg-white rounded-b-2xl flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3 border-t border-[#E2E8F0]/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,253,0.92))] px-6 py-6 rounded-b-[36px]">
               <button
                 type="button"
                 onClick={() => setCurrentStep((s) => (s > 1 ? ((s - 1) as InputStep) : s))}
-                className="px-6 py-3 rounded-xl border border-[#E2E8F0] text-[14px] font-bold text-[#64748B] hover:bg-[#F8FAFD] disabled:opacity-50 flex items-center gap-2 transition-all"
+                className="flex items-center gap-2 rounded-full border border-[#D8E0EC] bg-white px-6 py-3 text-[14px] font-bold text-[#64748B] transition-all hover:border-[#CBD5E1] hover:bg-[#F8FAFD] disabled:opacity-50"
                 disabled={currentStep === 1}
               >
                 <ArrowRight className="w-4 h-4 rotate-180" />
@@ -2280,10 +2687,10 @@ export function PostGeneratorPage() {
                   type="button"
                   onClick={() => setCurrentStep((s) => (s < 3 ? ((s + 1) as InputStep) : s))}
                   disabled={(currentStep === 1 && !canGoStep2) || (currentStep === 2 && !canGoStep3)}
-                  className={`px-6 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all ${
+                  className={`flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[14px] font-bold transition-all ${
                     (currentStep === 1 && !canGoStep2) || (currentStep === 2 && !canGoStep3)
                       ? "bg-[#F8FAFD] text-[#CBD5E1] border border-[#E2E8F0] cursor-not-allowed"
-                      : "bg-[#0052FF] text-white hover:bg-blue-700"
+                      : "bg-[linear-gradient(135deg,#111827,#0052FF)] text-white shadow-[0_12px_30px_rgba(0,82,255,0.24)] hover:brightness-105"
                   }`}
                 >
                   Continue
@@ -2294,9 +2701,9 @@ export function PostGeneratorPage() {
                   type="button"
                   disabled={!canGenerate || view === "generating"}
                   onClick={() => handleGenerate(formInput)}
-                  className={`px-6 py-3 rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 transition-all ${
+                  className={`flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[14px] font-bold transition-all ${
                     canGenerate && view !== "generating"
-                      ? "bg-[#0052FF] text-white hover:bg-blue-700"
+                      ? "bg-[linear-gradient(135deg,#111827,#0052FF)] text-white shadow-[0_12px_30px_rgba(0,82,255,0.24)] hover:brightness-105"
                       : "bg-[#F8FAFD] text-[#CBD5E1] border border-[#E2E8F0] cursor-not-allowed"
                   }`}
                 >
@@ -2318,36 +2725,113 @@ export function PostGeneratorPage() {
             </AnimatePresence>
 
           {view === "generating" && (
-            <div className="max-w-2xl mx-auto mt-6 bg-white rounded-3xl border border-[#E2E8F0] p-6">
+            <div className="max-w-3xl mx-auto mt-6 rounded-[32px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,253,0.88))] p-6 shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
               <GenerationPipeline currentStage={getCurrentStageIndex()} stages={pipelineStages} />
             </div>
           )}
         </div>
       ) : (
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between mb-6"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#AAFF50] to-[#6FD670] flex items-center justify-center shadow-lg shadow-[#AAFF50]/30">
-                <CheckCircle2 className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <span className="text-lg font-bold text-[#1A1D23]">Content Ready</span>
-                <p className="text-xs text-[#64748B]">Your multi-platform post has been generated</p>
-              </div>
-            </div>
+        <div className="relative max-w-7xl mx-auto px-6 py-8">
+          {/* Output view toolbar: History + New Post */}
+          <div className="flex items-center justify-end gap-2 mb-4">
+            <button
+              type="button"
+              onClick={() => {
+                setIsHistoryOpen((prev) => !prev);
+                if (!isHistoryOpen) fetchHistory();
+              }}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-[#E2E8F0] bg-white text-xs font-bold text-[#1A1D23] hover:border-[#0052FF]/30 hover:text-[#0052FF] transition-colors"
+            >
+              <History className="w-3.5 h-3.5" />
+              History
+              {historyItems.length > 0 && (
+                <span className="ml-0.5 bg-[#0052FF] text-white text-[9px] font-black rounded-full px-1.5 py-0.5">
+                  {historyItems.length}
+                </span>
+              )}
+            </button>
             <button
               type="button"
               onClick={handleNewPost}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/80 backdrop-blur hover:bg-[#EEF3FF] border border-white/50 text-[#1A1D23] hover:text-[#0052FF] text-[12px] font-bold transition-all shadow-sm hover:shadow-md"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-[#E2E8F0] bg-white text-xs font-bold text-[#1A1D23] hover:border-[#0052FF]/30 hover:text-[#0052FF] transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               New Post
             </button>
-          </motion.div>
+          </div>
+
+          {/* Output view history panel — same data as idle-view history */}
+          {isHistoryOpen && (
+            <div className="mb-5 bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
+              <div className="px-4 py-3 border-b border-[#E2E8F0] bg-[#F8FAFD] flex items-center justify-between">
+                <h3 className="text-sm font-bold text-[#1A1D23]">Post History</h3>
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={fetchHistory} className="text-xs font-semibold text-[#64748B] hover:text-[#0052FF]">
+                    Refresh
+                  </button>
+                  <button type="button" onClick={() => setIsHistoryOpen(false)} className="text-xs font-semibold text-[#64748B] hover:text-[#0052FF]">
+                    Close
+                  </button>
+                </div>
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                {isHistoryLoading ? (
+                  <div className="px-4 py-6 text-sm text-[#64748B]">Loading history...</div>
+                ) : historyItems.length === 0 ? (
+                  <div className="px-4 py-6 text-sm text-[#64748B]">No saved posts yet.</div>
+                ) : (
+                  <div className="divide-y divide-[#EEF2F6]">
+                    {historyItems.map((item) => {
+                      const itemId = item._id;
+                      const createdLabel = new Date(item.createdAt).toLocaleDateString("en-US", {
+                        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+                      });
+                      const previewText = item.output?.headline || item.input?.coreMessage || "Untitled post";
+                      const angle = (item.strategy as { postAngle?: string } | undefined)?.postAngle;
+                      const platforms = (item.input?.platforms ?? []) as string[];
+                      const status = (item.status ?? "draft") as string;
+                      const badge = STATUS_BADGE[status] ?? STATUS_BADGE.draft;
+                      const isActive = activeGenerationId === itemId;
+                      return (
+                        <div
+                          key={itemId}
+                          className={`group relative flex items-start gap-2 border-b border-[#EEF2F6] transition-colors ${
+                            isActive ? "bg-[#EEF3FF]" : "hover:bg-[#F8FAFD]"
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => loadHistoryItem(itemId)}
+                            className="flex-1 min-w-0 text-left px-4 py-3"
+                          >
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <p className="text-sm font-bold text-[#1A1D23] truncate">{previewText}</p>
+                              <span className={`shrink-0 text-[9px] font-bold px-2 py-0.5 rounded-full ${badge.className}`}>
+                                {badge.label}
+                              </span>
+                            </div>
+                            {angle && <p className="text-xs text-[#64748B] truncate mb-1">{angle}</p>}
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-[10px] text-[#94A3B8] truncate">{platforms.join(", ") || "No platforms"}</p>
+                              <span className="text-[10px] font-semibold text-[#94A3B8] whitespace-nowrap shrink-0">{createdLabel}</span>
+                            </div>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); void handleDeleteHistoryItem(itemId); }}
+                            className="opacity-0 group-hover:opacity-100 self-center mr-3 shrink-0 w-6 h-6 flex items-center justify-center text-[#94A3B8] hover:text-red-500 transition-all rounded-md hover:bg-red-50"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {(usedTemplateName || templateAICurated) && (
             <motion.div 
@@ -2388,13 +2872,19 @@ export function PostGeneratorPage() {
               }}
               input={lastInput ?? formInput}
               strategy={strategy ?? undefined}
-              accountId={accountId}
+              accountId={effectiveAccountId ?? undefined}
               onRemix={handleRemix}
               onScoreRequest={handleScoreRequest}
               onSaveToQueue={handleSaveToQueue}
               isSavingToQueue={isSavingToQueue}
+              onSchedulePost={handleSchedulePost}
+              isScheduling={isScheduling}
+              onPublishNow={handlePublishNow}
+              isPublishingNow={isPublishingNow}
+              suggestedScheduleIso={suggestedScheduleIso}
               isRemixing={isRemixing}
               isScoring={isScoring}
+              onSelectImageVariation={handleSelectImageVariation}
             />
           )}
         </div>

@@ -13,34 +13,27 @@ export async function GET(req: NextRequest) {
   }
 
   if (
-    !process.env.POSTIZ_FRONTEND_URL ||
-    !process.env.POSTIZ_CLIENT_ID ||
-    !process.env.POSTIZ_REDIRECT_URI
+    !process.env.THREADS_APP_ID ||
+    !process.env.THREADS_REDIRECT_URI
   ) {
     return NextResponse.json(
-      { error: "Missing Postiz OAuth environment variables" },
+      { error: "Missing Threads OAuth environment variables" },
       { status: 500 }
     );
   }
 
-  const state = `${accountId}:${Date.now()}`;
   const params = new URLSearchParams({
-    client_id: process.env.POSTIZ_CLIENT_ID,
+    client_id: process.env.THREADS_APP_ID,
+    redirect_uri: process.env.THREADS_REDIRECT_URI,
+    scope: "threads_basic,threads_content_publish,threads_manage_insights",
     response_type: "code",
-    state,
+    state: accountId,
   });
 
-  const authUrl = `${process.env.POSTIZ_FRONTEND_URL}/oauth/authorize?${params.toString()}`;
+  const authUrl = `https://threads.net/oauth/authorize?${params.toString()}`;
 
   const response = NextResponse.redirect(authUrl);
   response.cookies.set("rp_oauth_account", accountId, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 600,
-  });
-  response.cookies.set("rp_postiz_state", state, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

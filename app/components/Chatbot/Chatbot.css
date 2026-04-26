@@ -18,6 +18,10 @@
   transition: all 0.3s ease;
 }
 
+.chatbot-fab.publishing-offset {
+  bottom: 104px;
+}
+
 .chatbot-fab:hover {
   box-shadow: 0 6px 30px rgba(79, 70, 229, 0.6);
 }
@@ -67,6 +71,10 @@
   transition:
     height 0.3s ease,
     width 0.3s ease;
+}
+
+.chatbot-panel.publishing-offset {
+  bottom: 180px;
 }
 
 /* Minimized State */

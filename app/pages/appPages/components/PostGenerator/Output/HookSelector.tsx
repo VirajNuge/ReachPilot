@@ -1,9 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
-import { HookOption } from "@/lib/types/postGeneration";
-import { Zap, Check } from "lucide-react";
+import type { HookOption } from "@/lib/types/postGeneration";
 
 interface HookSelectorProps {
   hooks: HookOption[];
@@ -17,55 +15,35 @@ export const HookSelector: React.FC<HookSelectorProps> = ({
   selectedHookId,
 }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-4"
-    >
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-          <Zap className="w-4 h-4 text-[#0052FF]" />
-          Alternative Hooks
-        </h3>
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-[0.12em]">
-          {hooks.length} Options
-        </span>
+    <section className="space-y-3">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]">Hooks</p>
+        <h3 className="mt-1 text-sm font-semibold text-[#111827]">Switch the opening angle</h3>
       </div>
 
-      <div className="flex flex-col gap-3">
-        {hooks.map((hook, index) => {
-          const isSelected = selectedHookId === hook.id;
+      <div className="space-y-2">
+        {hooks.map((hook) => {
+          const isSelected = hook.id === selectedHookId;
           return (
-            <motion.div
+            <button
               key={hook.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
+              type="button"
               onClick={() => onSelect(hook)}
-                className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 flex flex-col gap-3 ${
-                  isSelected
-                    ? "bg-white border-[#0052FF] shadow-[0_8px_30px_rgba(0,82,255,0.06)] ring-2 ring-[#C7D7FF] ring-offset-1"
-                    : "bg-[#F3F6F9] border-transparent hover:bg-white/60"
-                }`}
-              >
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  {hook.style}
-                </span>
-                {isSelected && (
-                  <span className="flex items-center gap-1 text-[10px] font-bold text-[#0052FF] uppercase tracking-widest">
-                    <Check className="w-3 h-3" />
-                    Selected
-                  </span>
-                )}
-              </div>
-              <p className={`text-sm font-medium leading-relaxed max-h-[5.25rem] overflow-hidden ${isSelected ? "text-gray-900" : "text-gray-800"}`}>
-                {hook.text}
+              className={[
+                "w-full rounded-[20px] border px-4 py-3 text-left transition-colors",
+                isSelected
+                  ? "border-[#C7D7FF] bg-[#F7FAFF] text-[#0F172A] shadow-[0_10px_24px_rgba(59,130,246,0.10)]"
+                  : "border-[#E5E7EB] bg-white text-[#111827] hover:border-[#9CA3AF]",
+              ].join(" ")}
+            >
+              <p className={["text-[11px] font-semibold uppercase tracking-[0.16em]", isSelected ? "text-[#2563EB]" : "text-[#6B7280]"].join(" ")}>
+                {hook.style}
               </p>
-            </motion.div>
+              <p className="mt-2 text-sm leading-6">{hook.text}</p>
+            </button>
           );
         })}
       </div>
-    </motion.div>
+    </section>
   );
 };

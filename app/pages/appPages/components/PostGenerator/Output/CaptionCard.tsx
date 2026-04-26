@@ -2,8 +2,9 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Copy, Check } from "lucide-react";
-import { PostPlatform, PLATFORM_DISPLAY, RemixStyle } from "@/lib/types/postGeneration";
+import { Check, Copy } from "lucide-react";
+import type { PostPlatform } from "@/lib/types/postGeneration";
+import { PLATFORM_BRANDS, PlatformLogo } from "../platformBranding";
 
 interface CaptionCardProps {
   platform: string;
@@ -12,8 +13,6 @@ interface CaptionCardProps {
   selectedOptionIndex?: number;
   onSelectOption?: (index: number) => void;
   onCopy: () => void;
-  onRemix?: (style: RemixStyle) => void;
-  isRemixing?: boolean;
 }
 
 export const CaptionCard: React.FC<CaptionCardProps> = ({
@@ -23,92 +22,85 @@ export const CaptionCard: React.FC<CaptionCardProps> = ({
   selectedOptionIndex = 0,
   onSelectOption,
   onCopy,
-  onRemix: _onRemix,
-  isRemixing: _isRemixing = false,
 }) => {
   const [copied, setCopied] = React.useState(false);
+  const brand =
+    PLATFORM_BRANDS[platform as PostPlatform] ??
+    {
+      label: platform,
+      shortLabel: platform,
+      color: "#0052FF",
+      Icon: () => null,
+    };
 
   const handleCopy = () => {
     onCopy();
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const platformData = PLATFORM_DISPLAY[platform as PostPlatform] || {
-    label: platform,
-    color: "#0052FF",
-    shortLabel: platform,
+    window.setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-5"
+      className="min-h-[420px] bg-white px-6 py-5 sm:px-8 sm:py-7"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-4 h-4 rounded-full flex-shrink-0"
-            style={{ backgroundColor: platformData.color }}
-          />
-          <span className="text-base font-bold text-gray-900 tracking-tight">{platformData.label}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 bg-gray-50 rounded-full text-[11px] font-semibold text-gray-600">
-            {caption.length} Chars
-          </span>
-          <span className="px-2.5 py-1 bg-[#EEF3FF] rounded-full text-[11px] font-semibold text-[#0052FF]">
-            Draft
-          </span>
-        </div>
-      </div>
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E5E7EB] pb-4">
+          <div className="flex items-center gap-3">
+            <span
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#F9FAFB]"
+              style={{ color: brand.color }}
+            >
+              <PlatformLogo platform={platform as PostPlatform} className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-base font-semibold text-[#111827]">{brand.label}</p>
+              <p className="text-xs text-[#6B7280]">{caption.length} characters</p>
+            </div>
+          </div>
 
-      <div className="bg-[#F8FAFC] p-5 rounded-xl text-gray-900 whitespace-pre-wrap font-medium text-[15px] leading-relaxed border border-gray-200 min-h-[4rem]">
-        {caption}
-      </div>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className={[
+              "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors",
+              copied
+                ? "border-[#C7E8B4] bg-[#F3FBEA] text-[#3F6212]"
+                : "border-[#D1D5DB] text-[#374151] hover:border-[#9CA3AF]",
+            ].join(" ")}
+          >
+            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? "Copied" : "Copy caption"}
+          </button>
+        </div>
 
-      {options && options.length > 1 && (
-        <div className="space-y-2">
-          <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.12em]">Caption Options</span>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
-            {options.map((option, index) => {
+        {options && options.length > 1 && (
+          <div className="flex flex-wrap gap-2">
+            {options.map((_, index) => {
               const isActive = index === selectedOptionIndex;
               return (
                 <button
-                  key={`${platform}-caption-option-${index}`}
+                  key={`${platform}-option-${index}`}
                   type="button"
                   onClick={() => onSelectOption?.(index)}
-                  className={`text-left px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all ${
+                  className={[
+                    "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
                     isActive
-                      ? "border-[#0052FF] bg-[#EEF3FF] text-[#0052FF]"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
-                  }`}
-                  title={option}
+                      ? "bg-[#EEF4FF] text-[#1D4ED8] ring-1 ring-[#C7D7FF]"
+                      : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]",
+                  ].join(" ")}
                 >
-                  Option {index + 1}
+                  Version {index + 1}
                 </button>
               );
             })}
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-        <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-400 uppercase tracking-[0.12em]">
-          Actions
+        <div className="min-h-[280px] whitespace-pre-wrap text-[15px] leading-[1.75] text-[#111827]">
+          {caption}
         </div>
-        <button
-          onClick={handleCopy}
-          className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 font-semibold text-[13px] ${
-            copied
-              ? "bg-[#A5E338] text-gray-900"
-              : "bg-[#0047FF] text-white hover:bg-blue-700"
-          }`}
-        >
-          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          {copied ? "Copied!" : "Copy"}
-        </button>
       </div>
     </motion.div>
   );

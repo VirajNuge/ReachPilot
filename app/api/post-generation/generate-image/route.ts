@@ -3,6 +3,7 @@ import { GoogleGenAI, Modality } from "@google/genai";
 import { getAuthFromCookies } from "@/lib/auth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import type {
+  CreativeHandoffV2,
   GeminiImageModel,
   PostGenerationInput,
   PosterPromptOutput,
@@ -138,6 +139,7 @@ export async function POST(req: NextRequest) {
 
     const body = (await req.json()) as {
       posterOutput: PosterPromptOutput;
+      creativeHandoff?: CreativeHandoffV2;
       input: PostGenerationInput;
       imageModel?: GeminiImageModel;
       accountId?: string;
@@ -196,7 +198,7 @@ export async function POST(req: NextRequest) {
       : undefined;
 
     // Build the complete poster prompt
-    const posterPrompt = buildPosterPrompt(body.input, body.posterOutput, aspectRatio);
+    const posterPrompt = buildPosterPrompt(body.input, body.posterOutput, body.creativeHandoff, aspectRatio);
 
     // Append reference image labels to the prompt text for Imagen (which can't take inline images)
     const referenceImages = body.input.referenceImages ?? [];
@@ -208,12 +210,10 @@ export async function POST(req: NextRequest) {
       promptWithRefs = `${posterPrompt}\n\nIncorporate the following subjects/elements in the image: ${refDescriptions}.`;
     }
 
-    // Extract logo base64 if provided
     let logoBase64: string | undefined;
     let logoMimeType: string | undefined;
     if (body.input.brandAssets.logoUrl) {
       const raw = body.input.brandAssets.logoUrl;
-      // Detect mime type from data URL prefix
       const mimeMatch = raw.match(/^data:([^;]+);base64,/);
       logoMimeType = mimeMatch ? mimeMatch[1] : "image/png";
       logoBase64 = stripDataUrlPrefix(raw);

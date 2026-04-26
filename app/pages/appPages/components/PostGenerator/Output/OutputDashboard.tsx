@@ -2,22 +2,33 @@
 
 import React, { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import {
+  CalendarDays,
+  ChevronRight,
+  PanelRightClose,
+  PanelRightOpen,
+  Save,
+  Send,
+  Sparkles,
+} from "lucide-react";
+import type { PlatformPublishResult } from "../../Publishing/PublishToast";
+import { PublishToast } from "../../Publishing/PublishToast";
 import type {
-  PostPackage,
-  RemixStyle,
-  HookOption,
-  PostPlatform,
-  PostGenerationInput,
   ContentStrategyOutput,
+  HookOption,
   InstagramPostType,
+  PostGenerationInput,
+  PostPackage,
+  PostPlatform,
+  RemixStyle,
 } from "@/lib/types/postGeneration";
-import { ImagePreview } from "./ImagePreview";
-import { PlatformTab } from "./PlatformTab";
-import { HashtagPanel } from "./HashtagPanel";
 import { ContentScoreCard } from "./ContentScoreCard";
+import { HashtagPanel } from "./HashtagPanel";
 import { HookSelector } from "./HookSelector";
-import { RemixPanel } from "./RemixPanel";
+import { ImagePreview } from "./ImagePreview";
 import { PlatformNav } from "./PlatformNav";
+import { PlatformTab } from "./PlatformTab";
+import { RemixPanel } from "./RemixPanel";
 
 interface OutputDashboardProps {
   postPackage: PostPackage;
@@ -28,8 +39,23 @@ interface OutputDashboardProps {
   onSelectHook?: (hook: HookOption) => void;
   onScoreRequest: (platform: string) => void;
   onRefinedCaption?: (platform: string, newCaption: string, newScore: number, newFlags: string[]) => void;
+  onSaveToQueue?: (updatedPackage: PostPackage) => void;
+  isSavingToQueue?: boolean;
+  onSchedulePost?: (scheduledIso: string, updatedPackage: PostPackage) => Promise<void>;
+  isScheduling?: boolean;
+  onPublishNow?: (updatedPackage: PostPackage) => Promise<PlatformPublishResult[]>;
+  isPublishingNow?: boolean;
+  suggestedScheduleIso?: string | null;
   isRemixing?: boolean;
   isScoring?: boolean;
+  onSelectImageVariation?: (variationId: number) => void;
+}
+
+function toLocalInputValue(iso: string) {
+  const date = new Date(iso);
+  const offset = date.getTimezoneOffset();
+  const local = new Date(date.getTime() - offset * 60_000);
+  return local.toISOString().slice(0, 16);
 }
 
 export const OutputDashboard: React.FC<OutputDashboardProps> = ({
@@ -41,24 +67,49 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
   onSelectHook,
   onScoreRequest,
   onRefinedCaption,
+  onSaveToQueue,
+  isSavingToQueue = false,
+  onSchedulePost,
+  isScheduling = false,
+  onPublishNow,
+  isPublishingNow = false,
+  suggestedScheduleIso,
   isRemixing = false,
   isScoring = false,
+  onSelectImageVariation,
 }) => {
   const platforms = useMemo(() => Object.keys(postPackage.captions) as PostPlatform[], [postPackage.captions]);
   const [activeTab, setActiveTab] = useState<PostPlatform>(platforms[0] ?? "linkedin");
+  const [selectedCaptionIndices, setSelectedCaptionIndices] = useState<Record<string, number>>({});
   const [selectedHookId, setSelectedHookId] = useState<string | undefined>(undefined);
+  const [utilityOpen, setUtilityOpen] = useState(true);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [scheduleValue, setScheduleValue] = useState(
+    suggestedScheduleIso ? toLocalInputValue(suggestedScheduleIso) : ""
+  );
+  const [publishResults, setPublishResults] = useState<PlatformPublishResult[] | null>(null);
 
-  // Local state for captions + linkedInRefined + xRefined + instagramRefined so re-refine updates reflect immediately
   const [localCaptions, setLocalCaptions] = useState<Record<string, string>>(postPackage.captions);
   const [localLinkedInRefined, setLocalLinkedInRefined] = useState(postPackage.linkedInRefined);
   const [localXRefined, setLocalXRefined] = useState(postPackage.xRefined);
   const [localInstagramRefined, setLocalInstagramRefined] = useState(postPackage.instagramRefined);
   const [localFacebookRefined, setLocalFacebookRefined] = useState(postPackage.facebookRefined);
 
-  // Sync if postPackage changes (e.g. remix updates)
   React.useEffect(() => {
     setLocalCaptions(postPackage.captions);
-  }, [postPackage.captions]);
+    setLocalLinkedInRefined(postPackage.linkedInRefined);
+    setLocalXRefined(postPackage.xRefined);
+    setLocalInstagramRefined(postPackage.instagramRefined);
+    setLocalFacebookRefined(postPackage.facebookRefined);
+    setSelectedCaptionIndices(
+      Object.fromEntries(
+        Object.entries(postPackage.captionOptions ?? {}).map(([platform, options]) => {
+          const selectedIndex = Math.max(0, options?.findIndex((option) => option === postPackage.captions[platform]) ?? 0);
+          return [platform, selectedIndex];
+        })
+      )
+    );
+  }, [postPackage]);
 
   React.useEffect(() => {
     if (!platforms.includes(activeTab)) {
@@ -67,22 +118,29 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
   }, [activeTab, platforms]);
 
   React.useEffect(() => {
-    setLocalLinkedInRefined(postPackage.linkedInRefined);
-  }, [postPackage.linkedInRefined]);
-
-  React.useEffect(() => {
-    setLocalXRefined(postPackage.xRefined);
-  }, [postPackage.xRefined]);
-
-  React.useEffect(() => {
-    setLocalInstagramRefined(postPackage.instagramRefined);
-  }, [postPackage.instagramRefined]);
-
-  React.useEffect(() => {
-    setLocalFacebookRefined(postPackage.facebookRefined);
-  }, [postPackage.facebookRefined]);
+    if (suggestedScheduleIso) {
+      setScheduleValue(toLocalInputValue(suggestedScheduleIso));
+    }
+  }, [suggestedScheduleIso]);
 
   const activeCaption = localCaptions[activeTab] ?? "";
+
+  const getCurrentPackage = (): PostPackage => {
+    return {
+      ...postPackage,
+      captions: localCaptions,
+      linkedInRefined: localLinkedInRefined,
+      xRefined: localXRefined,
+      instagramRefined: localInstagramRefined,
+      facebookRefined: localFacebookRefined,
+    };
+  };
+
+  const handleSelectHook = (hook: HookOption) => {
+    setSelectedHookId(hook.id);
+    setLocalCaptions((prev) => ({ ...prev, [activeTab]: hook.text }));
+    onSelectHook?.(hook);
+  };
 
   const handleRefinedCaption = (newCaption: string, newScore: number, newFlags: string[]) => {
     setLocalCaptions((prev) => ({ ...prev, [activeTab]: newCaption }));
@@ -93,12 +151,6 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
       postType: prev?.postType,
     }));
     onRefinedCaption?.(activeTab, newCaption, newScore, newFlags);
-  };
-
-  const handleSelectHook = (hook: HookOption) => {
-    setSelectedHookId(hook.id);
-    setLocalCaptions((prev) => ({ ...prev, [activeTab]: hook.text }));
-    onSelectHook?.(hook);
   };
 
   const handleXRefined = (newCaption: string, newScore: number, newFlags: string[]) => {
@@ -128,87 +180,89 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
     onRefinedCaption?.(activeTab, newCaption, newScore, newFlags);
   };
 
+  const handleSelectCaptionIndex = (platform: PostPlatform, index: number) => {
+    const options = postPackage.captionOptions?.[platform] ?? [];
+    const nextCaption = options[index];
+    if (!nextCaption) return;
+
+    setSelectedCaptionIndices((prev) => ({ ...prev, [platform]: index }));
+    setLocalCaptions((prev) => ({ ...prev, [platform]: nextCaption }));
+  };
+
+  const hasImage = !!postPackage.imageUrl || (postPackage.imageVariations?.length ?? 0) > 0;
+
   return (
-    <div className="w-full max-w-6xl mx-auto">
-      {/* Bento layout */}
-      <div className="grid gap-5 md:grid-cols-12 lg:grid-cols-12">
-        {/* Platform nav (desktop) */}
-        <div className="hidden lg:block lg:col-span-2">
-          <div className="sticky top-6">
-            <div className="bg-white p-3 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="px-2 pt-1 pb-2">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.14em]">Platforms</p>
-              </div>
-              <PlatformNav
-                platforms={platforms}
-                activePlatform={activeTab}
-                onChange={setActiveTab}
-                variant="vertical"
-              />
-            </div>
-          </div>
-        </div>
+    <>
+      <div className="w-full max-w-[1320px] mx-auto">
+        <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <section className="min-w-0 space-y-6">
+            <div className="overflow-hidden rounded-[34px] border border-white/80 bg-[linear-gradient(135deg,rgba(17,24,39,0.96),rgba(0,82,255,0.90))] px-5 py-5 text-white shadow-[0_30px_80px_rgba(15,23,42,0.18)] sm:px-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Generated post</p>
+                  <h2 className="mt-1 text-2xl font-semibold text-white">Review, remix, publish</h2>
+                  <p className="mt-2 max-w-xl text-sm leading-6 text-white/75">
+                    Move through each platform version, keep the best hook, and push the finished draft into your calendar.
+                  </p>
+                </div>
 
-        {/* Center Content Column: Poster + Editor */}
-        <div className="md:col-span-6 lg:col-span-6 flex flex-col gap-5">
-          <ImagePreview
-            imagePrompt={postPackage.imagePrompt}
-            headline={postPackage.headline}
-            subtext={postPackage.subtext}
-            cta={postPackage.cta}
-            imageUrl={postPackage.imageUrl}
-            imageVariations={postPackage.imageVariations}
-          />
-
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-white to-[#F8FAFD]">
-              <div>
-                <h3 className="text-sm font-bold text-gray-900">Platform Output</h3>
-                <p className="text-[11px] text-gray-500">Switch tabs to review and iterate</p>
-              </div>
-            </div>
-            {/* Platform nav (mobile/tablet) */}
-            <div className="lg:hidden px-4 py-3 border-b border-gray-100">
-              <PlatformNav
-                platforms={platforms}
-                activePlatform={activeTab}
-                onChange={setActiveTab}
-                variant="horizontal"
-              />
-            </div>
-
-            {/* Quick Remix actions (global) */}
-            <div className="px-5 py-4 border-b border-gray-100">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.12em]">Quick Remix</p>
-                  <p className="text-[11px] text-gray-500 mt-1">Applies to the active platform caption</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <PlatformNav
+                    platforms={platforms}
+                    activePlatform={activeTab}
+                    onChange={setActiveTab}
+                    variant="horizontal"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setUtilityOpen((value) => !value)}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/15"
+                  >
+                    {utilityOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
+                    Utilities
+                  </button>
                 </div>
               </div>
-              <div className="mt-3">
-                <RemixPanel
-                  onRemix={(style) => onRemix(activeCaption, activeTab, style)}
-                  isRemixing={isRemixing}
-                />
-              </div>
             </div>
 
-            <div className="p-5">
-              {platforms.map((platform) =>
-                platform === activeTab ? (
-                  <motion.div
-                    key={platform}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.18 }}
-                  >
+            {hasImage && input?.generateImage !== false && (
+              <ImagePreview
+                imagePrompt={postPackage.imagePrompt}
+                headline={postPackage.headline}
+                subtext={postPackage.subtext}
+                cta={postPackage.cta}
+                imageUrl={postPackage.imageUrl}
+                imageVariations={postPackage.imageVariations}
+                selectedImageVariationId={postPackage.selectedImageVariationId}
+                onSelectVariation={onSelectImageVariation}
+              />
+            )}
+
+            <div className="overflow-hidden rounded-[34px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(252,252,253,0.88))] shadow-[0_28px_70px_rgba(15,23,42,0.08)]">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E5E7EB] px-6 py-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]">Caption</p>
+                  <h3 className="mt-1 text-lg font-semibold text-[#111827]">Platform-ready copy</h3>
+                </div>
+                <RemixPanel onRemix={(style) => onRemix(activeCaption, activeTab, style)} isRemixing={isRemixing} />
+              </div>
+
+              <div className="px-2 py-2 sm:px-3 sm:py-3">
+                {platforms.map((platform) =>
+                  platform === activeTab ? (
                     <PlatformTab
+                      key={platform}
                       platform={platform}
                       caption={activeCaption}
+                      captionOptions={postPackage.captionOptions?.[platform]}
+                      selectedCaptionIndex={selectedCaptionIndices[platform] ?? 0}
+                      onSelectCaptionIndex={(index) => handleSelectCaptionIndex(platform, index)}
                       hashtags={postPackage.hashtags}
                       contentScore={postPackage.contentScore}
                       linkedInRefined={platform === "linkedin" ? localLinkedInRefined : undefined}
                       xRefined={platform === "x" ? localXRefined : undefined}
+                      instagramRefined={platform === "instagram_post" ? localInstagramRefined : undefined}
+                      facebookRefined={platform === "facebook" ? localFacebookRefined : undefined}
                       input={input ?? ({} as PostGenerationInput)}
                       strategy={strategy}
                       accountId={accountId}
@@ -216,86 +270,210 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
                       onScoreRequest={() => onScoreRequest(platform)}
                       onRefinedCaption={handleRefinedCaption}
                       onXRefined={handleXRefined}
-                      instagramRefined={platform === "instagram_post" ? localInstagramRefined : undefined}
                       onInstagramRefined={handleInstagramRefined}
-                      facebookRefined={platform === "facebook" ? localFacebookRefined : undefined}
                       onFacebookRefined={handleFacebookRefined}
                       onCaptionChange={(newCaption) =>
-                         setLocalCaptions((prev) => ({ ...prev, [platform]: newCaption }))
+                        setLocalCaptions((prev) => ({ ...prev, [platform]: newCaption }))
                       }
                       isRemixing={isRemixing}
                       isScoring={isScoring}
                     />
-                  </motion.div>
-                ) : null
+                  ) : null
+                )}
+              </div>
+            </div>
+          </section>
+
+          {utilityOpen && (
+            <motion.aside
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="space-y-6 border-l border-white/70 pl-0 xl:pl-8"
+            >
+              <section className="relative overflow-hidden rounded-[30px] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+                <div className="absolute top-0 right-0 p-32 bg-blue-500/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+                <div className="flex flex-col gap-4 relative z-10">
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600">Distribution</p>
+                    </div>
+                    <h3 className="text-[15px] font-semibold text-gray-900 leading-tight">Publishing Actions</h3>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    {onPublishNow && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="button"
+                        disabled={isPublishingNow}
+                        onClick={async () => {
+                          const results = await onPublishNow(getCurrentPackage());
+                          setPublishResults(results);
+                        }}
+                        className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-[linear-gradient(110deg,#1e293b,45%,#0f172a,55%,#1e293b)] bg-[length:200%_100%] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(15,23,42,0.15)] transition-all hover:shadow-[0_10px_30px_rgba(15,23,42,0.25)] hover:bg-[position:-100%_0] disabled:opacity-50"
+                      >
+                        <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        <span>{isPublishingNow ? "Publishing..." : "Publish Now"}</span>
+                      </motion.button>
+                    )}
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="button"
+                      onClick={() => setScheduleOpen(true)}
+                      disabled={!onSchedulePost}
+                      className="group flex w-full flex-col items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50/30 hover:text-blue-700 disabled:opacity-50"
+                    >
+                      <div className="flex items-center gap-2">
+                        <CalendarDays className="h-4 w-4 text-gray-400 transition-colors group-hover:text-blue-500" />
+                        <span>Schedule Post</span>
+                      </div>
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="button"
+                      onClick={() => onSaveToQueue?.(getCurrentPackage())}
+                      disabled={isSavingToQueue}
+                      className="group flex w-full items-center justify-center gap-2 rounded-full bg-gray-50/80 px-5 py-3 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50"
+                    >
+                      <Save className="h-4 w-4 text-gray-400 transition-colors group-hover:text-gray-600" />
+                      <span>{isSavingToQueue ? "Saving..." : "Save to Queue"}</span>
+                    </motion.button>
+                  </div>
+
+                  {suggestedScheduleIso && (
+                    <div className="mt-1 flex items-center justify-center rounded-2xl bg-indigo-50/50 py-2.5 px-3 border border-indigo-100/50">
+                      <p className="text-[11px] text-indigo-800 font-medium">
+                        <span className="opacity-70 mr-1">Smart slot:</span>
+                        <span className="font-bold">{new Date(suggestedScheduleIso).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              {postPackage.contentScore ? (
+                <ContentScoreCard score={postPackage.contentScore} />
+              ) : (
+                <section className="relative overflow-hidden rounded-[24px] bg-white p-5 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100">
+                  <div className="absolute top-0 left-0 p-24 bg-amber-500/5 blur-3xl rounded-full -ml-12 -mt-12 pointer-events-none"></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-600">Analytics</p>
+                        </div>
+                        <h3 className="text-[15px] font-semibold text-gray-900 leading-tight">Run AI Scoring</h3>
+                      </div>
+                      <div className="rounded-full bg-amber-50 p-2 text-amber-500">
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="button"
+                      onClick={() => onScoreRequest(activeTab)}
+                      disabled={isScoring}
+                      className="mt-4 group flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-amber-200 hover:bg-amber-50/50 hover:text-amber-700 disabled:opacity-50"
+                    >
+                      {isScoring ? "Scoring..." : "Score active platform"}
+                    </motion.button>
+                  </div>
+                </section>
               )}
+
+              <HashtagPanel hashtags={postPackage.hashtags} />
+
+              {postPackage.hooks && postPackage.hooks.length > 0 && (
+                <HookSelector
+                  hooks={postPackage.hooks}
+                  onSelect={handleSelectHook}
+                  selectedHookId={selectedHookId}
+                />
+              )}
+            </motion.aside>
+          )}
+        </div>
+      </div>
+
+      {scheduleOpen && onSchedulePost && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#111827]/30 p-4"
+          onClick={() => setScheduleOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-[28px] border border-[#E5E7EB] bg-white p-6 shadow-[0_30px_80px_rgba(15,23,42,0.2)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]">Schedule</p>
+                <h3 className="mt-1 text-lg font-semibold text-[#111827]">Pick a publish time</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScheduleOpen(false)}
+                className="rounded-full border border-[#D8E4F8] p-2 text-[#6B7280]"
+              >
+                <ChevronRight className="h-4 w-4 rotate-45" />
+              </button>
+            </div>
+
+            {suggestedScheduleIso && (
+              <button
+                type="button"
+                onClick={() => setScheduleValue(toLocalInputValue(suggestedScheduleIso))}
+                className="mt-5 w-full rounded-[20px] border border-[#E5E7EB] bg-[#FCFCFD] px-4 py-3 text-left"
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B7280]">Suggested slot</p>
+                <p className="mt-2 text-sm font-semibold text-[#111827]">
+                  {new Date(suggestedScheduleIso).toLocaleString()}
+                </p>
+              </button>
+            )}
+
+            <div className="mt-5">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-[#6B7280]">
+                Publish at
+              </label>
+              <input
+                type="datetime-local"
+                value={scheduleValue}
+                onChange={(event) => setScheduleValue(event.target.value)}
+                className="w-full rounded-[18px] border border-[#D1D5DB] px-4 py-3 text-sm text-[#111827] outline-none focus:border-[#111827]"
+              />
+            </div>
+
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setScheduleOpen(false)}
+                className="flex-1 rounded-full border border-[#D8E4F8] px-4 py-2.5 text-sm font-semibold text-[#374151]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!scheduleValue || isScheduling}
+                onClick={async () => {
+                  const iso = new Date(scheduleValue).toISOString();
+                  await onSchedulePost(iso, getCurrentPackage());
+                  setScheduleOpen(false);
+                }}
+                className="flex-1 rounded-full bg-[linear-gradient(135deg,#2563EB,#60A5FA)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(37,99,235,0.22)] disabled:opacity-50"
+              >
+                {isScheduling ? "Scheduling..." : "Schedule"}
+              </button>
             </div>
           </div>
         </div>
-
-        {/* Right Sidebar Column: Metrics, Hooks, Hashtags */}
-        <div className="md:col-span-6 lg:col-span-4 flex flex-col gap-5">
-          {postPackage.contentScore ? (
-            <ContentScoreCard score={postPackage.contentScore} />
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-4"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900">Content Score</h3>
-                  <p className="text-[11px] text-gray-500">Run AI scoring for the active platform</p>
-                </div>
-                <div className="px-2.5 py-1 rounded-full bg-[#EEF3FF] text-[10px] font-bold text-[#0052FF]">
-                  {platforms.length} platforms
-                </div>
-              </div>
-              <button
-                onClick={() => onScoreRequest(activeTab)}
-                disabled={isScoring}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#0052FF] text-white rounded-xl font-bold text-[13px] hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isScoring ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Scoring...
-                  </>
-                ) : (
-                  <>Score active platform</>
-                )}
-              </button>
-              <p className="text-[12px] text-gray-500 leading-relaxed">
-                This score reflects hook strength, clarity, and virality. It updates the dashboard once complete.
-              </p>
-            </motion.div>
-          )}
-
-          <HashtagPanel hashtags={postPackage.hashtags} />
-
-          {postPackage.hooks && postPackage.hooks.length > 0 ? (
-            <HookSelector
-              hooks={postPackage.hooks}
-              onSelect={handleSelectHook}
-              selectedHookId={selectedHookId}
-            />
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-3"
-            >
-              <h3 className="text-sm font-bold text-gray-900">Alternative Hooks</h3>
-              <p className="text-[12px] text-gray-500 leading-relaxed">
-                Generate hooks in step 2 to unlock quick hook switching.
-              </p>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Replaced by Center Column */}
-      </div>
-    </div>
+      )}
+    </>
   );
 };

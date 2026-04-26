@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import {
   BsChatDotsFill,
   BsX,
@@ -58,6 +59,7 @@ const getInitialMessages = (): Message[] => {
 };
 
 const Chatbot: React.FC = () => {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>(getInitialMessages);
@@ -282,11 +284,13 @@ const Chatbot: React.FC = () => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  const isPublishingPage = pathname?.includes("/publishing");
+
   return (
     <>
       {/* Floating Action Button */}
       <motion.button
-        className="chatbot-fab"
+        className={`chatbot-fab${isPublishingPage ? " publishing-offset" : ""}`}
         onClick={toggleChat}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
@@ -305,7 +309,7 @@ const Chatbot: React.FC = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className={`chatbot-panel ${isMinimized ? "minimized" : ""}`}
+            className={`chatbot-panel ${isMinimized ? "minimized" : ""}${isPublishingPage ? " publishing-offset" : ""}`}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}

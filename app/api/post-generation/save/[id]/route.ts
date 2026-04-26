@@ -92,16 +92,18 @@ export async function PATCH(
     }
 
     if (body.output !== undefined) {
-      update.output = body.output;
+      for (const [key, value] of Object.entries(body.output)) {
+        update[`output.${key}`] = value;
+      }
     }
 
     if (body.variations !== undefined) {
       update.variations = body.variations;
     }
 
-    if (body.output?.captions !== undefined) {
-      update["output.captions"] = body.output.captions;
-    }
+    // Only use dot-notation caption patching when a full output object
+    // was not provided, otherwise MongoDB will reject conflicting paths.
+    // (Removed contradictory logic that caused TS errors since body.output === undefined means body.output.captions is also undefined)
 
     if (Object.keys(update).length === 0) {
       return NextResponse.json(
@@ -167,3 +169,41 @@ export async function GET(
     );
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const authResult = await requireAuth();
+    if (authResult instanceof NextResponse) return authResult;
+    const auth = authResult;
+
+    const { id } = await params;
+
+    const { db } = await (await import("@/lib/mongodb")).connectToDatabase();
+    const { ObjectId } = await import("mongodb");
+
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+    }
+
+    const result = await db.collection("postGenerations").deleteOne({
+      _id: new ObjectId(id),
+      userId: auth.userId, // Scoped to owner only — prevents cross-user deletion
+    });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Post generation DELETE error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete post generation" },
+      { status: 500 }
+    );
+  }
+}
+

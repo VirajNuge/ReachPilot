@@ -1,17 +1,23 @@
 import { connectToDatabase } from "../mongodb";
 import { ObjectId } from "mongodb";
 
+export type Platform = "facebook" | "instagram" | "threads" | "linkedin" | "x" | "google" | "pinterest";
+
 export interface ConnectionDocument {
   _id?: ObjectId;
   userId: string;
   accountId: string;
-  platform: "meta" | "x" | "linkedin" | "google" | "postiz";
+  platform: Platform;
   accessToken: string;
   refreshToken?: string;
   tokenExpiresAt?: Date;
   platformUserId?: string;
   platformUsername?: string;
   scope?: string;
+  /** Facebook Page ID or Instagram Business Account ID — required for publishing */
+  pageId?: string;
+  /** Page-scoped access token — required for publishing to FB Pages / IG Business */
+  pageAccessToken?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,7 +32,7 @@ async function getCollection() {
 export async function upsertConnection(
   userId: string,
   accountId: string,
-  platform: "meta" | "x" | "linkedin" | "google" | "postiz",
+  platform: Platform,
   tokenData: {
     accessToken: string;
     refreshToken?: string;
@@ -34,6 +40,8 @@ export async function upsertConnection(
     platformUserId?: string;
     platformUsername?: string;
     scope?: string;
+    pageId?: string;
+    pageAccessToken?: string;
   }
 ): Promise<void> {
   const col = await getCollection();
@@ -50,6 +58,8 @@ export async function upsertConnection(
         platformUserId: tokenData.platformUserId,
         platformUsername: tokenData.platformUsername,
         scope: tokenData.scope,
+        ...(tokenData.pageId !== undefined ? { pageId: tokenData.pageId } : {}),
+        ...(tokenData.pageAccessToken !== undefined ? { pageAccessToken: tokenData.pageAccessToken } : {}),
         updatedAt: now,
       },
       $setOnInsert: {
@@ -82,7 +92,7 @@ export async function getConnections(
 export async function deleteConnection(
   userId: string,
   accountId: string,
-  platform: "meta" | "x" | "linkedin" | "google" | "postiz"
+  platform: Platform
 ): Promise<void> {
   const col = await getCollection();
 

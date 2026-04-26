@@ -310,6 +310,7 @@ export function selectCaptionTemplate(
     x: "hook_value_cta",
     instagram_post: "hook_value_cta",
     facebook: "story_format",
+    threads: "hook_value_cta",
   };
 
   return platformFallback[platform] ?? "hook_value_cta";

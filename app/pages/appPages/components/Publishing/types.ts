@@ -1,5 +1,5 @@
 // Aligned with PostGenerator platform names
-export type Platform = "linkedin" | "x" | "instagram_post" | "facebook";
+export type Platform = "linkedin" | "x" | "instagram_post" | "facebook" | "threads" | "pinterest";
 
 export interface PlatformMeta {
   label: string;
@@ -13,9 +13,11 @@ export const PLATFORM_META: Record<Platform, PlatformMeta> = {
   x:             { label: "X",         shortLabel: "X",  color: "#000000", charLimit: 280   },
   instagram_post:{ label: "Instagram", shortLabel: "IG", color: "#E1306C", charLimit: 2200  },
   facebook:      { label: "Facebook",  shortLabel: "FB", color: "#1877F2", charLimit: 63206 },
+  threads:       { label: "Threads",   shortLabel: "TH", color: "#111827", charLimit: 500   },
+  pinterest:     { label: "Pinterest", shortLabel: "PIN", color: "#E60023", charLimit: 500   },
 };
 
-export const ALL_PLATFORMS: Platform[] = ["linkedin", "x", "instagram_post", "facebook"];
+export const ALL_PLATFORMS: Platform[] = ["linkedin", "x", "instagram_post", "facebook", "threads", "pinterest"];
 
 export interface PostHashtags {
   highReach: string[];

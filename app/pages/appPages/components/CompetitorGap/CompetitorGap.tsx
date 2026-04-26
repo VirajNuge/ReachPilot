@@ -25,6 +25,7 @@ import {
   FaStar,
 } from "react-icons/fa";
 import { BsGraphUpArrow } from "react-icons/bs";
+import { GiCrossedSwords } from "react-icons/gi";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoMdClose } from "react-icons/io";
 
@@ -546,7 +547,7 @@ const CompetitorGap: React.FC<CompetitorGapProps> = ({ data }) => {
                 <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 shrink-0">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 bg-[#000100] text-[#caee55] rounded-2xl">
-                      <FaSwords size={16} />
+                      <GiCrossedSwords size={16} />
                     </div>
                     <div>
                       <h3 className="text-lg font-black text-[#000100] leading-none">

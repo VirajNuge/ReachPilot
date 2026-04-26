@@ -421,6 +421,7 @@ export interface PostGenerationInput {
 
   // Step 1 — Generation Focus
   generationFocus?: "caption" | "balanced" | "image";
+  generateImage?: boolean;
 
   // Step 2 — Visual Identity
   brandType: BrandType;
@@ -510,14 +511,96 @@ export interface ImagePromptOutput {
   suggestedLayout: string;
 }
 
+// --- Creative Handoff V2 (Phase 0) ---
+
+export type CreativeHandoffSchemaVersion = "v2";
+
+export type TemplateId =
+  | "hero-bottom-overlay"
+  | "split-editorial"
+  | "minimal-card"
+  | "quote-focus";
+
+export type NegativeSpaceZone =
+  | "top_left"
+  | "top_center"
+  | "top_right"
+  | "center_left"
+  | "center"
+  | "center_right"
+  | "bottom_left"
+  | "bottom_center"
+  | "bottom_right";
+
+export type TextTheme = "light-on-dark" | "dark-on-light" | "brand-accent";
+
+export type TemplateAlignment = "left" | "center" | "right";
+
+export type OverlayStyle =
+  | "none"
+  | "black-gradient-80"
+  | "black-gradient-60"
+  | "dark-glass"
+  | "brand-tint";
+
+export interface VisualBrief {
+  prompt: string;
+  subject: string;
+  environment: string;
+  lighting: string;
+  mood: string;
+  composition: CompositionPreference;
+  negativeSpaceZone: NegativeSpaceZone;
+  renderStyle: ImageStyle;
+  brandColorUsage: string[];
+  avoid: string[];
+}
+
+export interface CopyBrief {
+  headline: string;
+  subtext: string;
+  cta: string;
+}
+
+export interface LayoutBrief {
+  templateId: TemplateId;
+  alignment: TemplateAlignment;
+  textTheme: TextTheme;
+  safeArea: NegativeSpaceZone;
+  overlay: OverlayStyle;
+}
+
+export interface CreativeHandoffV2 {
+  schemaVersion: CreativeHandoffSchemaVersion;
+  visualBrief: VisualBrief;
+  copyBrief: CopyBrief;
+  layoutBrief: LayoutBrief;
+}
+
 export interface PosterPromptOutput {
-  posterPrompt: string;       // The full prompt sent to the image model
+  /**
+   * A rich, 100-200 word Midjourney/Imagen-style scene description synthesized
+   * by the LLM from all design tokens, brand context, and visual metaphors.
+   * This is the PRIMARY driver for image generation — not static bullet points.
+   * Example: "A hyper-cinematic anamorphic wide shot of a lone entrepreneur standing
+   * at the edge of a vast glass skyscraper terrace at golden hour, silhouetted
+   * against a sky bleeding from deep crimson into electric violet..."
+   *
+   * Legacy note: this belongs to the v1 baked-text poster flow. New work should
+   * prefer `CreativeHandoffV2`, which separates visual generation from copy/layout.
+   */
+  masterPrompt: string;
+  /**
+   * @deprecated Use masterPrompt for image generation. posterPrompt is kept for
+   * backward compatibility only and may be empty in new responses.
+   */
+  posterPrompt: string;
   headline: string;           // 3-6 words
   subtext: string;            // 5-12 words
   cta: string;                // 2-4 words
   layout: LayoutStyle;
   typographyStyle: string;    // e.g. "modern_sans", "bold_serif"
-  compositionNotes: string;   // AI composition guidance
+  compositionNotes: string;   // Supporting composition/mood notes for reference
 }
 
 export interface ImageVariation {
@@ -525,6 +608,11 @@ export interface ImageVariation {
   imageUrl: string;     // base64 data URL
   model: string;        // model ID used
   aspectRatio: string;  // e.g. "1:1"
+}
+
+export interface ImagePromptRouteResponse {
+  imagePrompt: PosterPromptOutput;
+  creativeHandoff: CreativeHandoffV2;
 }
 
 export interface ContentScore {
@@ -568,6 +656,17 @@ export interface PostPackage {
   hooks?: HookOption[];
   cta?: string;
   imageVariations?: ImageVariation[];
+  creativeHandoff?: CreativeHandoffV2;
+  selectedImageVariationId?: number;
+  renderSettings?: {
+    templateId: TemplateId;
+    alignment: TemplateAlignment;
+    textTheme: TextTheme;
+    safeArea: NegativeSpaceZone;
+    overlay: OverlayStyle;
+    exportSizeId?: string;
+    logoVisible: boolean;
+  };
   linkedInRefined?: {
     viralityScore: number;       // 1-10
     qualityFlags: string[];      // e.g. ["Hook could be stronger", "Remove buzzwords"]
@@ -654,7 +753,15 @@ export interface SavedBrandStyle {
 
 // --- Database Document ---
 
-export type PostGenerationStatus = "draft" | "published" | "scheduled";
+export type PostGenerationStatus = "draft" | "published" | "scheduled" | "failed";
+
+export interface PublishPlatformResult {
+  platform: string;
+  success: boolean;
+  platformPostId?: string;
+  error?: string;
+  publishedAt?: Date;
+}
 
 export interface PostGenerationDocument {
   _id?: ObjectId;
@@ -664,9 +771,12 @@ export interface PostGenerationDocument {
   createdAt: Date;
   updatedAt: Date;
 
-  input: PostGenerationInput;
+  /** True if created manually via the Publishing page, bypassing the AI generator */
+  isCustom?: boolean;
 
-  design: {
+  input?: PostGenerationInput;
+
+  design?: {
     brandColors: string[];
     fontFamily: string;
     visualStyle: VisualStyle;
@@ -677,10 +787,14 @@ export interface PostGenerationDocument {
 
   output?: PostPackage;
 
-  variations: PostVariation[];
+  variations?: PostVariation[];
 
   status: PostGenerationStatus;
   scheduledDate?: Date;
+
+  /** Set when the post is published — tracks per-platform results */
+  publishResults?: PublishPlatformResult[];
+  publishedAt?: Date;
 }
 
 // --- UI Display Helpers ---

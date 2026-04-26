@@ -25,6 +25,21 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
 
+function clampCaptionOptions(options: string[], fallback?: string): string[] {
+  const normalized = options
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+
+  const unique = Array.from(new Set(normalized));
+  const limited = unique.slice(0, 3);
+
+  if (limited.length > 0) {
+    return limited;
+  }
+
+  return fallback ? [fallback] : [];
+}
+
 function normalizeCaptionOutput(
   value: unknown,
   input: PostGenerationInput,
@@ -64,7 +79,7 @@ function normalizeCaptionOutput(
   if (!isObject(captionsValue)) return null;
 
   const captions = input.platforms
-    .map((platform) => {
+    .map((platform): CaptionGeneratorOutput["captions"][number] | null => {
       const rawCaption = captionsValue[platform as PostPlatform];
       if (typeof rawCaption === "string") {
         return {
@@ -76,22 +91,24 @@ function normalizeCaptionOutput(
       }
 
       if (isStringArray(rawCaption) && rawCaption.length > 0) {
-        const firstCaption = rawCaption[0];
+        const options = clampCaptionOptions(rawCaption);
+        const firstCaption = options[0];
         return {
           platform,
           caption: firstCaption,
           characterCount: firstCaption.length,
-          options: rawCaption,
+          options,
         };
       }
 
       if (isObject(rawCaption) && isStringArray(rawCaption.options) && rawCaption.options.length > 0) {
-        const firstCaption = rawCaption.options[0];
+        const options = clampCaptionOptions(rawCaption.options);
+        const firstCaption = options[0];
         return {
           platform,
           caption: firstCaption,
           characterCount: firstCaption.length,
-          options: rawCaption.options,
+          options,
         };
       }
 

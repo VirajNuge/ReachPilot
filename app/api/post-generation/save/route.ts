@@ -18,6 +18,7 @@ import type {
 type SavePostBody = {
   personaId?: string;
   accountId?: string;
+  scheduledDate?: string;
   input: PostGenerationInput;
   design: {
     brandColors: string[];
@@ -41,6 +42,7 @@ function isSavePostBody(value: unknown): value is SavePostBody {
   if (!isObject(value.design)) return false;
   if (!Array.isArray(value.variations)) return false;
   if (typeof value.status !== "string") return false;
+  if (value.scheduledDate !== undefined && typeof value.scheduledDate !== "string") return false;
   return true;
 }
 
@@ -66,6 +68,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    let parsedScheduledDate: Date | undefined;
+    if (body.scheduledDate) {
+      parsedScheduledDate = new Date(body.scheduledDate);
+      if (Number.isNaN(parsedScheduledDate.getTime())) {
+        return NextResponse.json(
+          { error: "Invalid scheduledDate format" },
+          { status: 400 },
+        );
+      }
+    }
+
     const createData: Omit<PostGenerationDocument, "_id" | "createdAt" | "updatedAt"> = {
       userId: auth.userId,
       ...(body.personaId ? { personaId: body.personaId } : {}),
@@ -76,6 +89,7 @@ export async function POST(req: NextRequest) {
       ...(body.output ? { output: body.output } : {}),
       variations: body.variations,
       status: body.status,
+      ...(parsedScheduledDate ? { scheduledDate: parsedScheduledDate } : {}),
     };
 
     const id = await createPostGeneration(createData);

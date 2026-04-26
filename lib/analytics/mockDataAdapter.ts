@@ -37,7 +37,7 @@ export function buildMockAnalyticsDataset(platform: PlatformKey): AnalyticsDatas
     radar: RADAR_DATA[platform] ?? RADAR_DATA.all,
     contentInsights: CONTENT_INSIGHTS[platform] ?? CONTENT_INSIGHTS.all,
     demographics: DEMOGRAPHICS_DATA[platform] ?? DEMOGRAPHICS_DATA.all,
-    anomalies: ANOMALY_DATA,
+    anomalies: ANOMALY_DATA as any[],
     topPosts: TOP_POSTS_DATA,
     correlation,
   });

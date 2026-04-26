@@ -1,58 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthFromCookies } from "@/lib/auth";
+import { upsertConnection } from "@/lib/models/connection";
 
-// Pinterest OAuth Callback - Exchanges code for access token
-// GET /api/auth/pinterest/callback?code=xxx&state=xxx
-
-const PINTEREST_TOKEN_URL = "https://api.pinterest.com/v5/oauth/token";
-
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const code = searchParams.get("code");
-  const stateParam = searchParams.get("state");
-  const error = searchParams.get("error");
-
-  if (error) {
-    return NextResponse.redirect(
-      new URL(
-        "/1/profileAnalyzer?error=auth_denied",
-        request.url,
-      ),
-    );
+export async function GET(req: NextRequest) {
+  const auth = await getAuthFromCookies();
+  if (!auth) {
+    return NextResponse.redirect(new URL("/login", process.env.NEXTAUTH_URL || req.url));
   }
 
-  if (!code) {
-    return NextResponse.json(
-      { success: false, error: "No authorization code received" },
-      { status: 400 },
-    );
+  const accountId = req.cookies.get("rp_oauth_account")?.value;
+  if (!accountId) {
+    return NextResponse.json({ error: "Missing accountId from OAuth state" }, { status: 400 });
   }
 
-  // Decode state
-  let state: { profileUrl: string } = { profileUrl: "" };
-  if (stateParam) {
-    try {
-      state = JSON.parse(Buffer.from(stateParam, "base64url").toString());
-    } catch (e) {
-      console.error("Failed to decode state:", e);
-    }
-  }
+  const code = req.nextUrl.searchParams.get("code");
+  const error = req.nextUrl.searchParams.get("error");
 
-  const appId = process.env.PINTEREST_APP_ID;
-  const appSecret = process.env.PINTEREST_APP_SECRET;
-  const redirectUri = process.env.PINTEREST_REDIRECT_URI;
-
-  if (!appId || !appSecret || !redirectUri) {
-    return NextResponse.json(
-      { success: false, error: "Pinterest API credentials not configured" },
-      { status: 503 },
-    );
+  if (error || !code) {
+    const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?error=auth_denied`, process.env.NEXTAUTH_URL || req.url));
+    response.cookies.delete("rp_oauth_account");
+    return response;
   }
 
   try {
-    // Exchange code for access token
-    const credentials = Buffer.from(`${appId}:${appSecret}`).toString("base64");
-
-    const tokenResponse = await fetch(PINTEREST_TOKEN_URL, {
+    // 1. Exchange code for token
+    // Pinterest uses Basic Auth for the token exchange
+    const credentials = Buffer.from(`${process.env.PINTEREST_APP_ID}:${process.env.PINTEREST_APP_SECRET}`).toString("base64");
+    
+    const tokenResponse = await fetch("https://api.pinterest.com/v5/oauth/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -61,54 +36,43 @@ export async function GET(request: NextRequest) {
       body: new URLSearchParams({
         grant_type: "authorization_code",
         code,
-        redirect_uri: redirectUri,
+        redirect_uri: process.env.PINTEREST_REDIRECT_URI!,
       }).toString(),
     });
 
     const tokenData = await tokenResponse.json();
-
     if (!tokenResponse.ok || tokenData.error) {
-      throw new Error(
-        tokenData.message || tokenData.error || "Token exchange failed",
-      );
+      throw new Error(tokenData.error_description || tokenData.error || "Token exchange failed");
     }
 
-    // Store tokens in cookies
-    const response = NextResponse.redirect(
-      new URL(
-        "/1/profileAnalyzer?platform=pinterest&auth=success",
-        request.url,
-      ),
-    );
+    // 2. Fetch user profile
+    const userResponse = await fetch("https://api.pinterest.com/v5/user_account", {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const userData = await userResponse.json();
 
-    response.cookies.set("pinterest_access_token", tokenData.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: tokenData.expires_in || 86400, // Default 24 hours
-      path: "/",
+    const tokenExpiresAt = tokenData.expires_in
+      ? new Date(Date.now() + tokenData.expires_in * 1000)
+      : undefined;
+
+    // 3. Upsert connection
+    await upsertConnection(auth.userId, accountId, "pinterest", {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      tokenExpiresAt,
+      platformUserId: userData.username || userData.id,
+      platformUsername: userData.username,
+      scope: tokenData.scope,
     });
 
-    if (tokenData.refresh_token) {
-      response.cookies.set("pinterest_refresh_token", tokenData.refresh_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 365, // 1 year
-        path: "/",
-      });
-    }
-
+    const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?connected=pinterest`, process.env.NEXTAUTH_URL || req.url));
+    response.cookies.delete("rp_oauth_account");
     return response;
   } catch (error) {
     console.error("Pinterest OAuth error:", error);
-    return NextResponse.redirect(
-      new URL(
-        `/1/profileAnalyzer?error=auth_failed&message=${encodeURIComponent(
-          error instanceof Error ? error.message : "Unknown error",
-        )}`,
-        request.url,
-      ),
-    );
+    const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?error=auth_failed`, process.env.NEXTAUTH_URL || req.url));
+    response.cookies.delete("rp_oauth_account");
+    return response;
   }
 }
+

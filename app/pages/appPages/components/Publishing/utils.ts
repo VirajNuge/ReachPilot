@@ -14,12 +14,14 @@ export function postGenerationToPostDraft(
   // Build title: prefer headline from output, fall back to coreMessage
   const title =
     doc.output?.headline ??
-    (doc.input.coreMessage.length > 50
+    (doc.input?.coreMessage && doc.input.coreMessage.length > 50
       ? doc.input.coreMessage.slice(0, 50) + "…"
-      : doc.input.coreMessage);
+      : doc.input?.coreMessage ?? "Custom Post");
 
   // Platforms — PostPlatform and Platform are identical unions
-  const platforms = doc.input.platforms as Platform[];
+  const inputPlatforms = doc.input?.platforms ?? [];
+  const outputPlatforms = Object.keys(doc.output?.captions ?? {});
+  const platforms = (inputPlatforms.length > 0 ? inputPlatforms : outputPlatforms) as Platform[];
 
   // Captions — direct pass-through (Record<string, string> → Partial<Record<Platform, string>>)
   const captions = (doc.output?.captions ?? {}) as Partial<Record<Platform, string>>;

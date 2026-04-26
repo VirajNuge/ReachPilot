@@ -737,11 +737,12 @@ export default function AccountPersona() {
 
       case 7: {
         const PLATFORMS = [
-          { key: "meta",     name: "Meta",        subtitle: "Facebook & Instagram",  color: "#1877F2", emoji: "📘", canDisconnect: true  },
-          { key: "linkedin", name: "LinkedIn",     subtitle: "Professional network",  color: "#0A66C2", emoji: "💼", canDisconnect: true  },
-          { key: "x",        name: "X (Twitter)",  subtitle: "Real-time social",      color: "#000000", emoji: "🐦", canDisconnect: true  },
-          { key: "postiz",   name: "Postiz",       subtitle: "Unified social hub",    color: "#6D28D9", emoji: "🚀", canDisconnect: true  },
-          { key: "pinterest",name: "Pinterest",    subtitle: "Visual discovery",      color: "#E60023", emoji: "📌", canDisconnect: false },
+          { key: "facebook",          name: "Facebook",           subtitle: "Facebook Pages",        color: "#1877F2", emoji: "📘", canDisconnect: true  },
+          { key: "instagram",         name: "Instagram",          subtitle: "Instagram Professional", color: "#E1306C", emoji: "📸", canDisconnect: true  },
+          { key: "threads",           name: "Threads",            subtitle: "Text-based conversations", color: "#000000", emoji: "🧵", canDisconnect: true  },
+          { key: "linkedin",          name: "LinkedIn",           subtitle: "Professional network",  color: "#0A66C2", emoji: "💼", canDisconnect: true  },
+          { key: "x",                 name: "X (Twitter)",        subtitle: "Real-time social",      color: "#000000", emoji: "🐦", canDisconnect: true  },
+          { key: "pinterest",         name: "Pinterest",          subtitle: "Visual discovery",      color: "#E60023", emoji: "📌", canDisconnect: true  },
         ];
 
         const handleDisconnect = async (platformKey: string) => {
@@ -818,14 +819,10 @@ export default function AccountPersona() {
                           ? <><Loader2 size={12} className="animate-spin" /> Disconnecting…</>
                           : <><Link2Off size={12} /> Disconnect</>}
                       </button>
-                    ) : platform.key === "pinterest" ? (
-                      <span className="px-4 py-2 rounded-full text-[11px] font-bold text-slate-400 bg-slate-50 border border-dashed border-slate-200 shrink-0">
-                        OAuth via settings
-                      </span>
                     ) : (
                       <button
                         type="button"
-                        onClick={() => { window.location.href = `/api/auth/${platform.key}?accountId=${accountId}`; }}
+                        onClick={() => { window.open(`/api/auth/${platform.key}?accountId=${accountId}`, '_blank'); }}
                         className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[12px] font-bold text-white transition-all hover:opacity-90 active:scale-95 border-none shrink-0"
                         style={{ backgroundColor: platform.color }}
                       >

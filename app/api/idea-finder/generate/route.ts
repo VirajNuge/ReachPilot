@@ -13,8 +13,10 @@ import type {
   IdeaMode,
   IdeaPlatform,
   GeneratedIdea,
+  IdeaTemplateId,
 } from "@/lib/ideaFinder/types";
 import { randomUUID } from "crypto";
+import type { PostPlatform } from "@/lib/types/postGeneration";
 
 // ---- Validation ----
 
@@ -31,19 +33,26 @@ const VALID_PLATFORMS: IdeaPlatform[] = [
   "linkedin",
   "x",
   "facebook",
+  "pinterest",
   "all",
 ];
 
 function isValidRequest(body: unknown): body is IdeaFinderRequest {
   if (typeof body !== "object" || body === null) return false;
   const b = body as Record<string, unknown>;
+  const hasValidCoreMessage =
+    b.coreMessage === undefined || typeof b.coreMessage === "string";
+  const hasValidPersonaToggle =
+    b.importPersona === undefined || typeof b.importPersona === "boolean";
   return (
     typeof b.mode === "string" &&
     VALID_MODES.includes(b.mode as IdeaMode) &&
     typeof b.platform === "string" &&
     VALID_PLATFORMS.includes(b.platform as IdeaPlatform) &&
     typeof b.accountId === "string" &&
-    b.accountId.length > 0
+    b.accountId.length > 0 &&
+    hasValidCoreMessage &&
+    hasValidPersonaToggle
   );
 }
 
@@ -92,34 +101,231 @@ async function generateStandard(
 
 // ---- Post-processing ----
 
+function asObject(value: unknown): Record<string, unknown> | null {
+  return typeof value === "object" && value !== null ? (value as Record<string, unknown>) : null;
+}
+
+function asString(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : undefined;
+}
+
+function asStringArray(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const out = value
+    .map((v) => (typeof v === "string" ? v.trim() : ""))
+    .filter(Boolean);
+  return out.length ? out : undefined;
+}
+
+function normalizeTemplateId(value: unknown): IdeaTemplateId | undefined {
+  const id = asString(value);
+  if (!id) return undefined;
+  const valid: IdeaTemplateId[] = [
+    "problem_solution",
+    "hook_value_cta",
+    "story_format",
+    "authority_format",
+    "listicle_format",
+    "engagement_question",
+  ];
+  return valid.includes(id as IdeaTemplateId) ? (id as IdeaTemplateId) : undefined;
+}
+
+function normalizePostPlatform(value: unknown): PostPlatform {
+  const platform = (asString(value) || "").toLowerCase();
+  if (platform === "instagram") return "instagram_post";
+  if (platform === "instagram_post") return "instagram_post";
+  if (platform === "linkedin") return "linkedin";
+  if (platform === "x") return "x";
+  if (platform === "facebook") return "facebook";
+  if (platform === "pinterest") return "pinterest";
+  if (platform === "threads") return "threads";
+  return "linkedin";
+}
+
+function parseAiPlatformTemplate(i: Record<string, unknown>) {
+  const tpl = asObject(i.platformTemplate);
+  if (!tpl) return null;
+
+  return {
+    platform: normalizePostPlatform(tpl.platform),
+    templateId: normalizeTemplateId(tpl.templateId),
+    templateName: asString(tpl.templateName),
+    hookAngle: asString(tpl.hookAngle),
+    captionTone: asStringArray(tpl.captionTone),
+    ctaPattern: asString(tpl.ctaPattern),
+    formatRecommendation: asString(tpl.formatRecommendation),
+    visualRecommendation: asString(tpl.visualRecommendation),
+    imageRatio: asString(tpl.imageRatio),
+    hashtagGuidance: asString(tpl.hashtagGuidance),
+    lengthGuidance: asString(tpl.lengthGuidance),
+    do: asStringArray(tpl.do),
+    dont: asStringArray(tpl.dont),
+    confidenceReason: asString(tpl.confidenceReason),
+  };
+}
+
+function normalizeText(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function tokenSet(value: string): Set<string> {
+  return new Set(normalizeText(value).split(" ").filter((t) => t.length > 2));
+}
+
+function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
+  if (!a.size || !b.size) return 0;
+  let intersection = 0;
+  for (const token of a) {
+    if (b.has(token)) intersection += 1;
+  }
+  const union = a.size + b.size - intersection;
+  return union > 0 ? intersection / union : 0;
+}
+
+function isPotentialDuplicate(
+  idea: Pick<GeneratedIdea, "title" | "hook" | "angle">,
+  recentPosts: Array<{ caption: string; hooks: string[]; contentScore: number; platform: string }>,
+): { duplicate: boolean; similarity: number } {
+  const ideaTokens = tokenSet(`${idea.title} ${idea.hook} ${idea.angle}`);
+  let bestSimilarity = 0;
+
+  for (const post of recentPosts) {
+    const sample = `${post.caption} ${(post.hooks || []).join(" ")}`;
+    const score = jaccardSimilarity(ideaTokens, tokenSet(sample));
+    if (score > bestSimilarity) bestSimilarity = score;
+  }
+
+  return { duplicate: bestSimilarity >= 0.55, similarity: bestSimilarity };
+}
+
+function modeSpecificBackfill(idea: GeneratedIdea, mode: IdeaMode): GeneratedIdea {
+  if (mode === "trend-jacker") {
+    return {
+      ...idea,
+      trendTopic: idea.trendTopic || idea.title,
+      trendContext: idea.trendContext || "Timely topic with active conversation momentum.",
+      urgency: idea.urgency || "medium",
+    };
+  }
+
+  if (mode === "repurpose") {
+    return {
+      ...idea,
+      originalContentRef: idea.originalContentRef || "Recent high-performing post",
+      remixStrategy: idea.remixStrategy || "Reframe the original insight for a new platform-native angle",
+    };
+  }
+
+  if (mode === "gap-filler") {
+    return {
+      ...idea,
+      gapTopic: idea.gapTopic || idea.title,
+      audienceDemandSignal:
+        idea.audienceDemandSignal ||
+        "Audience demand inferred from recurring questions and missing topical coverage.",
+    };
+  }
+
+  if (mode === "prism") {
+    return {
+      ...idea,
+      angleFramework: idea.angleFramework || "Educational breakdown",
+    };
+  }
+
+  return idea;
+}
+
+function evaluateQuality(
+  idea: GeneratedIdea,
+  requestedPlatform: string,
+): GeneratedIdea["qualityChecks"] {
+  const notes: string[] = [];
+
+  const hookLength = (idea.hook || "").trim().length;
+  const hookQuality = hookLength >= 18 ? "pass" : hookLength >= 10 ? "warn" : "fail";
+  if (hookQuality !== "pass") {
+    notes.push("Hook is short; consider adding a stronger conflict or outcome promise.");
+  }
+
+  const visualLength = (idea.visualDirection || "").trim().length;
+  const visualClarity = visualLength >= 25 ? "pass" : visualLength >= 12 ? "warn" : "fail";
+  if (visualClarity !== "pass") {
+    notes.push("Visual direction is not specific enough for image execution.");
+  }
+
+  const platformFit =
+    requestedPlatform === "all" || normalizeText(idea.platform) === normalizeText(requestedPlatform)
+      ? "pass"
+      : "warn";
+  if (platformFit !== "pass") {
+    notes.push("Returned platform differs from request; verify platform targeting.");
+  }
+
+  return { hookQuality, platformFit, visualClarity, notes };
+}
+
+function buildSourceAttribution(sources?: Array<{ title: string; url: string }>) {
+  const safeSources = (sources || []).filter((src) => src?.url);
+  const domains = Array.from(
+    new Set(
+      safeSources
+        .map((src) => {
+          try {
+            return new URL(src.url).hostname.replace(/^www\./, "");
+          } catch {
+            return null;
+          }
+        })
+        .filter((value): value is string => Boolean(value)),
+    ),
+  );
+
+  return {
+    totalSources: safeSources.length,
+    domains,
+  };
+}
+
+function normalizeSinglePostVisualDirection(input: string): string {
+  return input
+    .replace(/\b(carousel|carousels|slide|slides|multi-slide|multi frame|thread cards?|swipe)\b/gi, "single post")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function postProcessIdeas(
   raw: unknown,
   mode: IdeaMode,
   platform: string,
   audience?: string,
   sources?: Array<{ title: string; url: string }>,
-  searchQueries?: string[]
+  searchQueries?: string[],
+  recentPosts: Array<{ caption: string; hooks: string[]; contentScore: number; platform: string }> = [],
 ): GeneratedIdea[] {
   if (typeof raw !== "object" || raw === null) return [];
 
   const obj = raw as Record<string, unknown>;
-  const ideasArr = Array.isArray(obj.ideas) ? obj.ideas : [];
+  const ideasArr = Array.isArray(obj.ideas) ? obj.ideas.slice(0, 1) : [];
 
   return ideasArr.map((idea: unknown) => {
     const i = (typeof idea === "object" && idea !== null ? idea : {}) as Record<
       string,
       unknown
     >;
-    const baseIdea = {
+    const preBaseIdea = {
       id: randomUUID(),
       title: String(i.title || ""),
       hook: String(i.hook || ""),
       angle: String(i.angle || ""),
-      format: (i.format as GeneratedIdea["format"]) || "post",
-      platform: String(i.platform || platform),
+      format: "post",
+      platform: platform === "all" ? "all" : String(i.platform || platform),
       whyItFits: String(i.whyItFits || ""),
       suggestedCTA: String(i.suggestedCTA || ""),
-      visualDirection: String(i.visualDirection || ""),
+      visualDirection: normalizeSinglePostVisualDirection(String(i.visualDirection || "")),
       confidenceScore:
         typeof i.confidenceScore === "number"
           ? Math.min(100, Math.max(0, i.confidenceScore))
@@ -131,6 +337,7 @@ function postProcessIdeas(
         trendContext: i.trendContext ? String(i.trendContext) : undefined,
         urgency: (i.urgency as GeneratedIdea["urgency"]) || "medium",
         sources: sources?.length ? sources : undefined,
+        sourceAttribution: buildSourceAttribution(sources),
         searchQueries: searchQueries?.length ? searchQueries : undefined,
         groundedAt: new Date().toISOString(),
       }),
@@ -155,13 +362,79 @@ function postProcessIdeas(
       }),
     } satisfies GeneratedIdea;
 
-    const { postSeed, postPreview, platformStyles } = mapIdeaToPostSeed(baseIdea, mode, audience);
+    const duplicateCheck = isPotentialDuplicate(preBaseIdea, recentPosts);
+    const baseIdea = modeSpecificBackfill(
+      {
+        ...preBaseIdea,
+        ...(duplicateCheck.duplicate
+          ? {
+              title: `${preBaseIdea.title} (fresh angle)`,
+              uniqueReason: `Adjusted to reduce overlap with recent outputs (similarity ${Math.round(
+                duplicateCheck.similarity * 100,
+              )}%).`,
+              confidenceScore: Math.max(45, preBaseIdea.confidenceScore - 10),
+            }
+          : {
+              uniqueReason:
+                "Distinct from recent outputs based on hook/angle token overlap analysis.",
+            }),
+      },
+      mode,
+    );
+
+    const {
+      postSeed,
+      postPreview,
+      platformStyles,
+      platformTemplate,
+      draftFieldRequirements,
+    } = mapIdeaToPostSeed(baseIdea, mode, audience);
+
+    const aiTemplate = parseAiPlatformTemplate(i);
+    const mergedTemplate = aiTemplate
+      ? {
+          ...platformTemplate,
+          platform: aiTemplate.platform || platformTemplate.platform,
+          templateId: aiTemplate.templateId || platformTemplate.templateId,
+          templateName: aiTemplate.templateName || platformTemplate.templateName,
+          hookAngle: aiTemplate.hookAngle || platformTemplate.hookAngle,
+          captionTone: aiTemplate.captionTone || platformTemplate.captionTone,
+          ctaPattern: aiTemplate.ctaPattern || platformTemplate.ctaPattern,
+          formatRecommendation:
+            aiTemplate.formatRecommendation || platformTemplate.formatRecommendation,
+          visualRecommendation:
+            aiTemplate.visualRecommendation || platformTemplate.visualRecommendation,
+          imageRatio: aiTemplate.imageRatio || platformTemplate.imageRatio,
+          hashtagGuidance: aiTemplate.hashtagGuidance || platformTemplate.hashtagGuidance,
+          lengthGuidance: aiTemplate.lengthGuidance || platformTemplate.lengthGuidance,
+          do: aiTemplate.do || platformTemplate.do,
+          dont: aiTemplate.dont || platformTemplate.dont,
+          confidenceReason:
+            aiTemplate.confidenceReason || platformTemplate.confidenceReason,
+        }
+      : platformTemplate;
+
+    const confidenceReason =
+      mergedTemplate.confidenceReason ||
+      baseIdea.whyItFits ||
+      "Confidence is based on platform fit, strategy depth, and mode-specific signal quality.";
+
+    const qualityChecks = evaluateQuality(baseIdea, platform);
+
+    const sourceAttribution =
+      baseIdea.sourceAttribution ||
+      (baseIdea.sources?.length ? buildSourceAttribution(baseIdea.sources) : undefined);
 
     return {
       ...baseIdea,
       postSeed,
       postPreview,
       platformStyles,
+      platformTemplate: mergedTemplate,
+      draftFieldRequirements,
+      confidenceReason,
+      sourceAttribution,
+      qualityChecks,
     } satisfies GeneratedIdea;
   });
 }
@@ -196,18 +469,21 @@ export async function POST(req: NextRequest) {
       accountId,
       topic = "",
       audience = "",
+      coreMessage = "",
+      importPersona = true,
       vibe = "",
       count = 8,
     } = body;
 
-    const clampedCount = Math.min(12, Math.max(3, count));
+    const clampedCount = 1;
 
     // 1. Assemble context
     const context = await assembleIdeaFinderContext(
       userId,
       accountId,
       mode,
-      platform
+      platform,
+      { importPersona }
     );
 
     // 2. Build prompt
@@ -216,6 +492,7 @@ export async function POST(req: NextRequest) {
       mode,
       topic,
       audience,
+      coreMessage,
       vibe,
       count: clampedCount,
     });
@@ -253,7 +530,8 @@ export async function POST(req: NextRequest) {
       platform,
       audience,
       groundingSources,
-      groundingQueries
+      groundingQueries,
+      context.postHistory.recentPosts,
     );
 
     if (!ideas.length) {

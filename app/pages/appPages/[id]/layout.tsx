@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Sidebar from "../components/Sidebar/Sidebar";
 import TopMenu from "../components/topMenu/topMenu";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../../../contexts/AuthContext";
 
 export default function DashboardLayout({
@@ -12,6 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const getTitle = (path: string | null): string => {
     if (!path) return "Dashboard";
@@ -30,6 +31,12 @@ export default function DashboardLayout({
   const title = getTitle(pathname);
   const { user, loading } = useAuth();
 
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [loading, user, router]);
+
   // Show loading spinner while checking auth
   if (loading) {
     return (
@@ -44,9 +51,6 @@ export default function DashboardLayout({
 
   // Redirect to login if not authenticated
   if (!user) {
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
-    }
     return null;
   }
 

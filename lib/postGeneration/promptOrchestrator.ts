@@ -6,6 +6,7 @@
 
 import type {
   CreativeHandoffV2,
+  ImageCreativeDirectorOutput,
   PostGenerationInput,
   ContentStrategyOutput,
   VisualStyle,
@@ -280,6 +281,10 @@ function buildGeneratorPrompt(
   const aspectRatio = resolvedTokens.aspectRatio;
   const ctaLabel = (input.ctas?.[0] ?? "none").replace(/_/g, " ");
   const toneLabel = (input.tones?.[0] ?? "professional").replace(/_/g, " ");
+  const selectedVisualStyles =
+    (input.visualStyles ?? [])
+      .map((style) => style.replace(/_/g, " "))
+      .join(", ") || "Auto";
 
   // Resolve brand colors: user's palette > color theme palette > auto
   const userColors = input.brandAssets.colorPalette ?? [];
@@ -302,6 +307,7 @@ function buildGeneratorPrompt(
   // ── VISUAL IDENTITY ──
   sections.push(`## VISUAL IDENTITY
 - Design System: ${stylePreset.base}
+- Selected Visual Styles: ${selectedVisualStyles}
 - Image Rendering Style: ${imageStylePreset.description}
 - Lighting Direction: ${lightingPreset.description}
 - Lighting Rig: ${lightingPreset.rig}
@@ -394,19 +400,21 @@ Texture Direction:
   sections.push(`## YOUR TASK
 You are a world-class Creative Director AND an expert AI image prompt engineer (Midjourney/Imagen specialist).
 
-Your primary goal is to generate a **masterPrompt** — a rich, hyper-descriptive, cinematic scene description (100–200 words) that the image model will bring to life. This is the most critical field. Think of it as a creative brief written by a Ridley Scott cinematographer meeting a Pentagram designer.
+Your primary goal is to generate a **masterPrompt** — a rich, hyper-descriptive, cinematic scene description (400–500 words) that the image model will bring to life. This is the most critical field. Think of it as a creative brief written by a Ridley Scott cinematographer meeting a Pentagram designer.
 
 ABSOLUTELY CRITICAL — HOW TO WRITE masterPrompt:
 - Lead with the primary visual scene: lens, angle, what exists in the frame, how light falls
 - Describe material textures, atmospheric conditions, and the emotional world of the image
 - Weave in brand colors as lighting gels, environmental reflections, material tints, or background gradients — NOT as flat color blocks
+- Translate the chosen visual styles into a coherent art direction. If multiple styles are selected, blend them into one premium visual language instead of naming them separately.
+- Use the selected visual styles as the basis for atmosphere, palette behavior, composition energy, contrast level, and finishing details.
 - Use surrealism, metaphor, or scale contrast to elevate the concept beyond the literal
 - Reference the user's Visual Brief (if provided) and treat it as the conceptual anchor
 - Include technical photography/rendering language: focal length, aperture feel, depth of field, shading style, atmosphere
 - The image model should be able to close its eyes, picture the scene perfectly, and paint it
 - DO NOT write a list of instructions. Write flowing, evocative prose like a film director's visual memo.
 - NEVER use stock photo clichés (handshakes, light bulbs, generic office, puzzle pieces)
-- Minimum 100 words. Maximum 200 words. Every word earns its place.
+- Minimum 400 words. Target 400–500 words. Every word earns its place.
 
 EXAMPLE OF A GOOD masterPrompt (for a fintech brand):
 "A hyper-cinematic anamorphic wide shot at golden hour, a lone figure in a tailored charcoal suit stands at the edge of a glass skyscraper terrace, silhouetted against a sky bleeding from deep crimson into electric gold (#C9A84C). Below, the city glitters like scattered circuit boards. Shot on a 24mm anamorphic lens at f/1.4 — the foreground glass railing is a dream-soft blur of prismatic bokeh while the subject remains razor-sharp. Volumetric atmospheric haze softens the middle distance. A faint grid of golden light rays angles down from upper left, catching the lapel of the suit and the corner of a rising graph etched in gold light on the glass behind them. The mood: quiet power, earned wealth, inevitable ascent."
@@ -445,6 +453,7 @@ Typography style options:
 
 Design Constraints (inform masterPrompt but do not limit creativity):
 - Visual world: ${stylePreset.base}
+- Chosen visual styles: ${selectedVisualStyles}
 - Image rendering: ${imageStylePreset.description}
 - Lighting character: ${lightingPreset.description}
 - Shading quality: ${shadingPreset.description !== '' ? shadingPreset.description : 'auto'}
@@ -491,6 +500,10 @@ function buildImageModelPromptTemplate(
   const imageStylePreset = IMAGE_STYLE_PRESETS[profile.imageStyle];
   const textStyleToken = TEXT_STYLE_PRESETS[profile.textStylePreference];
   const colorThemeDesc = COLOR_THEME_DESCRIPTIONS[profile.colorThemePreset];
+  const selectedVisualStyles =
+    (input.visualStyles ?? [])
+      .map((style) => style.replace(/_/g, " "))
+      .join(", ") || "Auto";
 
   // This is a template — the real image prompt is built by buildFinalImagePrompt
   // which has the posterOutput available. Return a structural preview for debugging.
@@ -498,6 +511,7 @@ function buildImageModelPromptTemplate(
 
 OUTPUT FORMAT: ${aspectRatio} aspect ratio social media graphic.
 DESIGN STYLE: ${stylePreset.base}
+SELECTED VISUAL STYLES: ${selectedVisualStyles}
 IMAGE STYLE: ${imageStylePreset.description}
 LIGHTING: ${lightingPreset.description}
 LIGHTING RIG: ${lightingPreset.rig}
@@ -622,6 +636,10 @@ export function buildFinalImagePrompt(
   const imageStylePreset = IMAGE_STYLE_PRESETS[creativeProfile.imageStyle];
   const textStyleToken = TEXT_STYLE_PRESETS[creativeProfile.textStylePreference];
   const colorThemeDesc = COLOR_THEME_DESCRIPTIONS[creativeProfile.colorThemePreset];
+  const selectedVisualStyles =
+    (input.visualStyles ?? [])
+      .map((style) => style.replace(/_/g, " "))
+      .join(", ") || "Auto";
 
   // Resolve brand colors: user's palette > color theme palette > auto
   const userColors = input.brandAssets.colorPalette ?? [];
@@ -694,6 +712,9 @@ PRIMARY CREATIVE DIRECTION (this is your main brief — follow every detail):
 ${creativeHandoff?.visualBrief.prompt || posterOutput.masterPrompt || posterOutput.posterPrompt}
 ${imageConceptSection}
 ${metaphorSection}
+SELECTED VISUAL STYLE STACK:
+${selectedVisualStyles}
+Interpret the chosen styles as a single coherent visual language that informs composition, textures, contrast, color behavior, and finishing details.
 ═══════════════════════════════════════════════════════
 ADDITIONAL VISUAL MOOD (supplement the above, do not override):
 ═══════════════════════════════════════════════════════
@@ -756,4 +777,68 @@ CRITICAL REQUIREMENTS:
 
 OUTPUT:
 A polished, complete social media graphic ready to post. No placeholder elements. No watermarks. No artifacts.`;
+}
+
+export function applyCreativeDirectorEnhancements(
+  basePrompt: string,
+  input: PostGenerationInput,
+  creativeDirector?: ImageCreativeDirectorOutput,
+): string {
+  if (!creativeDirector) return basePrompt;
+
+  const palette = (input.brandAssets.colorPalette ?? []).filter(Boolean);
+  const selectedVisualStyles =
+    (input.visualStyles ?? [])
+      .map((style) => style.replace(/_/g, " "))
+      .join(", ") || "Auto";
+  const paletteLine =
+    palette.length > 0
+      ? `- Brand color hex codes to honor exactly: ${palette.join(", ")}.`
+      : "- If brand colors are missing, keep a premium neutral palette.";
+  const fontLine = input.brandAssets.fontFamily
+    ? `- Typography preference: ${input.brandAssets.fontFamily}.`
+    : "- Typography preference: use an editorial sans-serif with high readability.";
+  const logoLine = input.brandAssets.logoUrl
+    ? "- A logo asset is provided; preserve recognizability and clean placement."
+    : "- No logo is provided; do not invent one.";
+  const referenceLine =
+    (input.referenceImages ?? []).length > 0
+      ? `- Reference cues to preserve: ${(input.referenceImages ?? [])
+          .map((img) => img.label?.trim())
+          .filter((label): label is string => Boolean(label))
+          .join(", ") || "provided reference images"}`
+      : "- No reference images provided.";
+
+  const constraints =
+    creativeDirector.visualConstraints.length > 0
+      ? creativeDirector.visualConstraints.map((item) => `- ${item}`).join("\n")
+      : "- Preserve legibility and spacing for all copy zones.";
+  const risks =
+    creativeDirector.riskWarnings.length > 0
+      ? creativeDirector.riskWarnings.map((item) => `- ${item}`).join("\n")
+      : "- Avoid text crowding, weak contrast, and unreadable detail.";
+
+  return `${creativeDirector.renderPrompt}
+
+CREATIVE DIRECTOR SUMMARY:
+${creativeDirector.creativeDirectionSummary}
+
+COPY PLACEMENT PLAN:
+${creativeDirector.copyPlacementPlan}
+
+HARD VISUAL CONSTRAINTS:
+${constraints}
+
+RISK WARNINGS TO MITIGATE:
+${risks}
+
+BRAND + ASSET ENFORCEMENT:
+${paletteLine}
+${fontLine}
+${logoLine}
+${referenceLine}
+- Visual style stack to preserve: ${selectedVisualStyles}
+
+BASE POSTER SPEC (fallback guardrail):
+${basePrompt}`;
 }

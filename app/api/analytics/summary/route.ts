@@ -3,12 +3,23 @@ import { getAuthFromCookies } from "@/lib/auth";
 import { PLATFORM_KEYS, type PlatformKey } from "@/lib/analytics/platforms";
 import type { AnalyticsSummaryResponse, DateRangeKey } from "@/lib/analytics/types";
 import { buildMockAnalyticsSummary } from "@/lib/analytics/mockDataAdapter";
+import { buildRealAnalyticsSummary } from "@/lib/analytics/realDataAdapter";
+import {
+  initializeCache,
+  buildCacheKey,
+  getCachedAnalytics,
+  setCachedAnalytics,
+  getCacheStats,
+} from "@/lib/analytics/cacheLayer";
+import { queueFullAccountSync } from "@/lib/analytics/backgroundSyncService";
+import { productionMetrics, errorTracker } from "@/lib/analytics/productionMonitoring";
 
-const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour
-const memoryCache = new Map<
-  string,
-  { expiresAt: number; payload: AnalyticsSummaryResponse }
->();
+// Initialize cache on module load
+try {
+  initializeCache(50, 100); // 50MB max, 100 entries
+} catch (e) {
+  // Already initialized
+}
 
 function parsePlatform(value: string | null): PlatformKey {
   if (!value) return "all";
@@ -59,6 +70,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const startTime = performance.now();
   const { searchParams } = new URL(request.url);
   const platform = parsePlatform(searchParams.get("platform"));
   const requestedRange = parseRange(searchParams.get("range"));
@@ -66,14 +78,49 @@ export async function GET(request: NextRequest) {
   const accountId = searchParams.get("accountId") ?? "";
 
   const effectiveRange = plan === "core" ? "7D" : requestedRange;
-  const cacheKey = `${auth.userId}:${accountId}:${platform}:${effectiveRange}:${plan}`;
-  const cached = memoryCache.get(cacheKey);
+  const cacheKey = buildCacheKey(auth.userId, accountId, platform, effectiveRange, plan);
 
-  if (cached && cached.expiresAt > Date.now()) {
-    return NextResponse.json(cached.payload);
+  // Check multi-level cache
+  let cached = getCachedAnalytics(cacheKey);
+  if (cached) {
+    const duration = performance.now() - startTime;
+    productionMetrics.recordRequest(request.url, duration, 200, true);
+    
+    const response = NextResponse.json(cached);
+    response.headers.set("X-Cache", "HIT");
+    return response;
   }
 
-  let summary = buildMockAnalyticsSummary(platform, effectiveRange, plan);
+  let summary: AnalyticsSummaryResponse;
+
+  try {
+    // Try to fetch real data first
+    summary = await buildRealAnalyticsSummary(
+      auth.userId,
+      accountId,
+      platform,
+      effectiveRange,
+      plan
+    );
+
+    // Queue background sync for next refresh
+    if (accountId) {
+      try {
+        queueFullAccountSync(auth.userId, accountId);
+      } catch (e) {
+        // Silently fail if queuing fails
+      }
+    }
+  } catch (error) {
+    // Fallback to mock data if real data fetch fails
+    errorTracker.trackError("analytics-summary", String(error), "medium");
+    console.warn(
+      "Real analytics data fetch failed, falling back to mock data:",
+      error
+    );
+    summary = buildMockAnalyticsSummary(platform, effectiveRange, plan);
+  }
+
   summary = withRangeLimits(summary, effectiveRange);
 
   if (plan === "core") {
@@ -83,10 +130,28 @@ export async function GET(request: NextRequest) {
     };
   }
 
-  memoryCache.set(cacheKey, {
-    expiresAt: Date.now() + CACHE_TTL_MS,
-    payload: summary,
-  });
+  // Cache with 1-hour TTL
+  setCachedAnalytics(cacheKey, summary, 1000 * 60 * 60);
 
-  return NextResponse.json(summary);
+  const duration = performance.now() - startTime;
+  productionMetrics.recordRequest(request.url, duration, 200, false);
+
+  const response = NextResponse.json(summary);
+  response.headers.set("X-Cache", "MISS");
+  response.headers.set("X-Response-Time", `${duration.toFixed(2)}ms`);
+  return response;
+}
+
+/**
+ * Optional: Cache statistics endpoint
+ * GET /api/analytics/cache-stats
+ */
+export async function OPTIONS(request: NextRequest) {
+  // Health check endpoint
+  if (request.url.includes("cache-stats")) {
+    const stats = getCacheStats();
+    return NextResponse.json(stats);
+  }
+
+  return NextResponse.json({ ok: true });
 }

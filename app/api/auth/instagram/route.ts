@@ -19,8 +19,9 @@ export async function GET(req: NextRequest) {
   const params = new URLSearchParams({
     client_id: process.env.FACEBOOK_APP_ID,
     redirect_uri: process.env.INSTAGRAM_REDIRECT_URI,
-    scope: "instagram_basic,instagram_content_publish,instagram_manage_insights,pages_show_list,pages_read_engagement",
+    scope: "instagram_basic,instagram_content_publish,instagram_manage_insights,pages_show_list,pages_read_engagement,business_management",
     response_type: "code",
+    auth_type: "rerequest",
     state: accountId,
   });
 

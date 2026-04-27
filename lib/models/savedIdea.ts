@@ -71,7 +71,10 @@ export async function updateIdeaFeedback(
 ): Promise<boolean> {
   const col = await getCollection();
   const result = await col.updateOne(
-    { _id: new ObjectId(ideaId), userId },
+    {
+      userId,
+      $or: [{ _id: new ObjectId(ideaId) }, { "idea.id": ideaId }],
+    },
     { $set: { feedback, updatedAt: new Date() } }
   );
   return result.modifiedCount > 0;

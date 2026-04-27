@@ -32,9 +32,223 @@ export type IdeaPlatform =
   | "linkedin"
   | "x"
   | "facebook"
+  | "pinterest"
   | "all";
 
 export type IdeaUrgency = "high" | "medium" | "low";
+export type IdeaQualityStatus = "pass" | "warn" | "fail";
+
+export type IdeaTemplateId =
+  | "problem_solution"
+  | "hook_value_cta"
+  | "story_format"
+  | "authority_format"
+  | "listicle_format"
+  | "engagement_question";
+
+export interface IdeaPlatformTemplate {
+  platform: PostPlatform;
+  templateId: IdeaTemplateId;
+  templateName: string;
+  hookAngle: string;
+  captionTone: string[];
+  captionStyle: CaptionStylePreference;
+  ctaPattern: string;
+  formatRecommendation: string;
+  visualRecommendation: string;
+  imageRatio: string;
+  hashtagGuidance: string;
+  lengthGuidance: string;
+  do: string[];
+  dont: string[];
+  confidenceReason: string;
+}
+
+export interface IdeaDraftFieldRequirements {
+  platform: PostPlatform;
+  mandatory: string[];
+  inferred: string[];
+}
+
+export interface IdeaQualityChecks {
+  hookQuality: IdeaQualityStatus;
+  platformFit: IdeaQualityStatus;
+  visualClarity: IdeaQualityStatus;
+  notes: string[];
+}
+
+export const IDEA_DRAFT_FIELD_REQUIREMENTS: Record<PostPlatform, IdeaDraftFieldRequirements> = {
+  linkedin: {
+    platform: "linkedin",
+    mandatory: [
+      "objective",
+      "targetAudiences",
+      "coreMessage",
+      "platforms",
+      "brandType",
+      "visualStyles",
+      "imageGenType",
+      "brandAssets",
+      "tones",
+      "ctas",
+      "emojiLevel",
+      "hashtagIntensity",
+      "selectedTemplateId",
+      "linkedInPostType",
+      "linkedInStyleProfile",
+    ],
+    inferred: [
+      "contentAngles",
+      "textBlocks",
+      "captionStyle",
+      "imageConcept",
+      "imageReferences",
+      "generationFocus",
+      "writingStyleId",
+      "visualStylePresetId",
+    ],
+  },
+  x: {
+    platform: "x",
+    mandatory: [
+      "objective",
+      "targetAudiences",
+      "coreMessage",
+      "platforms",
+      "brandType",
+      "visualStyles",
+      "imageGenType",
+      "brandAssets",
+      "tones",
+      "ctas",
+      "emojiLevel",
+      "hashtagIntensity",
+      "selectedTemplateId",
+    ],
+    inferred: [
+      "contentAngles",
+      "textBlocks",
+      "captionStyle",
+      "imageConcept",
+      "imageReferences",
+      "generationFocus",
+      "writingStyleId",
+      "visualStylePresetId",
+    ],
+  },
+  instagram_post: {
+    platform: "instagram_post",
+    mandatory: [
+      "objective",
+      "targetAudiences",
+      "coreMessage",
+      "platforms",
+      "brandType",
+      "visualStyles",
+      "imageGenType",
+      "brandAssets",
+      "tones",
+      "ctas",
+      "emojiLevel",
+      "hashtagIntensity",
+      "selectedTemplateId",
+    ],
+    inferred: [
+      "contentAngles",
+      "textBlocks",
+      "captionStyle",
+      "imageConcept",
+      "imageReferences",
+      "generationFocus",
+      "writingStyleId",
+      "visualStylePresetId",
+    ],
+  },
+  facebook: {
+    platform: "facebook",
+    mandatory: [
+      "objective",
+      "targetAudiences",
+      "coreMessage",
+      "platforms",
+      "brandType",
+      "visualStyles",
+      "imageGenType",
+      "brandAssets",
+      "tones",
+      "ctas",
+      "emojiLevel",
+      "hashtagIntensity",
+      "selectedTemplateId",
+    ],
+    inferred: [
+      "contentAngles",
+      "textBlocks",
+      "captionStyle",
+      "imageConcept",
+      "imageReferences",
+      "generationFocus",
+      "writingStyleId",
+      "visualStylePresetId",
+    ],
+  },
+  pinterest: {
+    platform: "pinterest",
+    mandatory: [
+      "objective",
+      "targetAudiences",
+      "coreMessage",
+      "platforms",
+      "brandType",
+      "visualStyles",
+      "imageGenType",
+      "brandAssets",
+      "tones",
+      "ctas",
+      "emojiLevel",
+      "hashtagIntensity",
+      "selectedTemplateId",
+      "imageConcept",
+    ],
+    inferred: [
+      "contentAngles",
+      "textBlocks",
+      "captionStyle",
+      "imageReferences",
+      "generationFocus",
+      "writingStyleId",
+      "visualStylePresetId",
+    ],
+  },
+  threads: {
+    platform: "threads",
+    mandatory: [
+      "objective",
+      "targetAudiences",
+      "coreMessage",
+      "platforms",
+      "brandType",
+      "visualStyles",
+      "imageGenType",
+      "brandAssets",
+      "tones",
+      "ctas",
+      "emojiLevel",
+      "hashtagIntensity",
+      "selectedTemplateId",
+    ],
+    inferred: [
+      "contentAngles",
+      "textBlocks",
+      "captionStyle",
+      "imageConcept",
+      "imageReferences",
+      "generationFocus",
+      "writingStyleId",
+      "visualStylePresetId",
+    ],
+  },
+};
 
 /** Unified idea type returned by all modes. */
 export interface GeneratedIdea {
@@ -67,8 +281,15 @@ export interface GeneratedIdea {
 
   // Grounding metadata (attached post-parse for Trend-Jacker)
   sources?: Array<{ title: string; url: string }>;
+  sourceAttribution?: {
+    totalSources: number;
+    domains: string[];
+  };
   searchQueries?: string[];
   groundedAt?: string;
+  confidenceReason?: string;
+  uniqueReason?: string;
+  qualityChecks?: IdeaQualityChecks;
 
   // Post Generation integration seed
   postSeed?: PostGenerationInput;
@@ -112,6 +333,8 @@ export interface GeneratedIdea {
       }
     >
   >;
+  platformTemplate?: IdeaPlatformTemplate;
+  draftFieldRequirements?: IdeaDraftFieldRequirements;
 }
 
 /** API response shape. */
@@ -128,6 +351,8 @@ export interface IdeaFinderRequest {
   topic?: string;
   platform: IdeaPlatform;
   audience?: string;
+  coreMessage?: string;
+  importPersona?: boolean;
   vibe?: string;
   count?: number;
   accountId: string;

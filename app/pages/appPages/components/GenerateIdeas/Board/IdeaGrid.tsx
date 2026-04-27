@@ -13,7 +13,6 @@ interface IdeaGridProps {
   generationStep?: string;
   onIdeaClick: (idea: GeneratedIdea) => void;
   onSave?: (idea: GeneratedIdea) => void;
-  onFeedback?: (idea: GeneratedIdea, feedback: "positive" | "negative") => void;
   onGenerateMore?: () => void;
 }
 
@@ -40,7 +39,6 @@ export default function IdeaGrid({
   generationStep,
   onIdeaClick,
   onSave,
-  onFeedback,
   onGenerateMore,
 }: IdeaGridProps) {
   const currentModeStr = mode ? MODE_LABELS[mode] : "Voice-Match";
@@ -126,7 +124,6 @@ export default function IdeaGrid({
               mode={mode}
               onClick={onIdeaClick}
               onSave={onSave}
-              onFeedback={onFeedback}
             />
           </motion.div>
         ))}

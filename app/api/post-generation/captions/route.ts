@@ -8,9 +8,17 @@ import { parseAIJson } from "@/lib/parseAIJson";
 import { AI_MODELS } from "@/lib/aiConfig";
 import { getWritingStyleById } from "@/lib/models/adminStyles";
 import { getCaptionTemplateById } from "@/lib/models/captionTemplates";
+import {
+  getBuiltInCaptionTemplate,
+  isBuiltInCaptionTemplateId,
+  resolveCaptionTemplateId,
+} from "@/lib/postGeneration/captionTemplates";
+import { resolveCreativeProfile } from "@/lib/postGeneration/creativeDirector";
+import { POSTGEN_PLATFORM_WRITING_STYLE_MAP } from "@/lib/postGeneration/featureFlags";
 import type { WritingStyleDocument } from "@/lib/models/adminStyles";
 import type { CaptionTemplateDocument } from "@/lib/models/captionTemplates";
 import type {
+  CaptionStylePreference,
   CaptionGeneratorOutput,
   ContentStrategyOutput,
   PostGenerationInput,
@@ -146,6 +154,15 @@ function normalisePlatforms(platforms: string[]): string[] {
   return platforms.map((p) => PLATFORM_ALIAS_MAP[p.toLowerCase()] ?? p);
 }
 
+function resolvePlatformMappedId(
+  input: PostGenerationInput,
+  platform: PostPlatform,
+  key: "platformWritingStyleIds" | "platformTemplateIds",
+): string | undefined {
+  const value = input[key]?.[platform];
+  return typeof value === "string" && value.trim().length > 0 ? value : undefined;
+}
+
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
@@ -181,7 +198,10 @@ export async function POST(req: NextRequest) {
       body.input.platforms = normalisePlatforms(body.input.platforms) as typeof body.input.platforms;
     }
 
-    // Fetch writing style if provided
+    const writingStyleByPlatform: Partial<Record<PostPlatform, WritingStyleDocument>> = {};
+    const templateByPlatform: Partial<Record<PostPlatform, CaptionTemplateDocument>> = {};
+
+    // Fetch writing style fallback (global) if provided
     let writingStyle: WritingStyleDocument | undefined;
     if (body.input.writingStyleId) {
       try {
@@ -192,7 +212,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Fetch DB caption template if provided
+    // Fetch DB caption template fallback (global) if provided
     let dbTemplate: CaptionTemplateDocument | undefined;
     if (body.input.selectedTemplateId) {
       try {
@@ -203,12 +223,60 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Fetch platform-specific style/template mappings
+    if (POSTGEN_PLATFORM_WRITING_STYLE_MAP) {
+      for (const platform of body.input.platforms) {
+        const styleId = resolvePlatformMappedId(body.input, platform, "platformWritingStyleIds");
+        if (styleId) {
+          try {
+            const fetched = await getWritingStyleById(styleId);
+            if (fetched) writingStyleByPlatform[platform] = fetched;
+          } catch {
+            // Non-fatal — continue with fallback style
+          }
+        }
+
+        const templateId = resolvePlatformMappedId(body.input, platform, "platformTemplateIds");
+        if (templateId) {
+          try {
+            const fetched = await getCaptionTemplateById(templateId);
+            if (fetched) templateByPlatform[platform] = fetched;
+          } catch {
+            // Non-fatal — continue with fallback template
+          }
+        }
+      }
+    }
+
+    const primaryPlatform = body.input.platforms?.[0] ?? "instagram_post";
+    const primaryPlatformStyle = writingStyleByPlatform[primaryPlatform];
+    const primaryPlatformTemplate = templateByPlatform[primaryPlatform];
+    const primaryPlatformTemplateId = POSTGEN_PLATFORM_WRITING_STYLE_MAP
+      ? resolvePlatformMappedId(body.input, primaryPlatform, "platformTemplateIds")
+      : undefined;
+    const resolvedCaptionStyle: CaptionStylePreference =
+      body.input.captionStyle ?? resolveCreativeProfile(body.input).captionStyle;
+    const resolvedBuiltInTemplateId = resolveCaptionTemplateId(
+      resolvedCaptionStyle,
+      primaryPlatform,
+      body.input.objective,
+      body.input.niche,
+      primaryPlatformTemplateId ?? body.input.selectedTemplateId,
+    );
+    const resolvedBuiltInTemplate = getBuiltInCaptionTemplate(resolvedBuiltInTemplateId);
+    const forcedBuiltInSelected = isBuiltInCaptionTemplateId(
+      primaryPlatformTemplateId ?? body.input.selectedTemplateId,
+    );
+    const templateAutoSelected = !primaryPlatformTemplate && !dbTemplate && !forcedBuiltInSelected;
+
     const prompt = buildCaptionGeneratorPrompt(
       body.input,
       body.strategy,
       personaContext,
       writingStyle,
       dbTemplate,
+      POSTGEN_PLATFORM_WRITING_STYLE_MAP ? writingStyleByPlatform : undefined,
+      POSTGEN_PLATFORM_WRITING_STYLE_MAP ? templateByPlatform : undefined,
     );
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -247,9 +315,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       captions: normalized,
-      usedTemplateId: dbTemplate?._id?.toString(),
-      usedTemplateName: dbTemplate?.name,
-      templateAutoSelected: false,
+      usedTemplateId: primaryPlatformTemplate?._id?.toString() ?? dbTemplate?._id?.toString() ?? resolvedBuiltInTemplateId,
+      usedTemplateName: primaryPlatformTemplate?.name ?? dbTemplate?.name ?? resolvedBuiltInTemplate?.name,
+      templateAutoSelected,
       templateAICurated: false,
     });
   } catch (error) {

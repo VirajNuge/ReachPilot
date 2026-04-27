@@ -28,7 +28,11 @@ import {
 } from "../types/postGeneration";
 
 import { resolveCreativeProfile, NICHE_KEYWORDS } from "./postGeneration/creativeDirector";
-import { buildCaptionTemplateInstructions } from "./postGeneration/captionTemplates";
+import {
+  buildCaptionTemplateInstructions,
+  resolveCaptionTemplateId,
+  getBuiltInCaptionTemplate,
+} from "./postGeneration/captionTemplates";
 
 // ── LinkedIn Style Profile Personas ──────────────────────────────────────────
 
@@ -71,6 +75,84 @@ const LINKEDIN_STYLE_PERSONAS: Record<string, string> = {
 - Vulnerability builds trust
 - Structure: Honest moment → The real lesson → What I'm doing about it`,
 };
+
+function buildStructureOnlyTemplateBlock(
+  captionStyle: PostGenerationInput["captionStyle"],
+  platform: PostPlatform,
+  objective: PostGenerationInput["objective"],
+  niche?: PostGenerationInput["niche"],
+  forcedTemplateId?: string,
+): string {
+  const templateId = resolveCaptionTemplateId(
+    captionStyle ?? "auto",
+    platform,
+    objective,
+    niche,
+    forcedTemplateId,
+  );
+  const template = getBuiltInCaptionTemplate(templateId);
+  if (!template) return "";
+
+  const platformVariation = template.platformVariations[platform] ?? "";
+  const structureOnly = template.structure
+    .split("\n")
+    .filter((line) => line.trim().length > 0)
+    .slice(0, 18)
+    .join("\n");
+
+  const lines = [
+    `## ${platform.toUpperCase()} TEMPLATE STRUCTURE`,
+    `Template: ${template.name}`,
+    `Structure:`,
+    structureOnly,
+  ];
+
+  if (platformVariation) {
+    const conciseVariation = platformVariation
+      .replace(/\s+/g, " ")
+      .trim();
+    lines.push(`Platform note: ${conciseVariation}`);
+  }
+
+  lines.push(`Keep the response concise. Do not include do/don't lists or long explanations.`);
+  return lines.join("\n");
+}
+
+function buildWritingStyleBlock(
+  writingStyle: WritingStyleDocument,
+  heading: string,
+  applyInstruction: string,
+): string {
+  const tp = writingStyle.toneProfile;
+  const toneParts: string[] = [];
+  if (tp.formalCasual > 60) toneParts.push("casual and conversational");
+  else if (tp.formalCasual < 40) toneParts.push("formal and professional");
+  else toneParts.push("balanced register");
+  if (tp.seriousPlayful > 60) toneParts.push("playful and fun");
+  else if (tp.seriousPlayful < 40) toneParts.push("serious and focused");
+  if (tp.inspiringInformative > 60) toneParts.push("informative and data-driven");
+  else if (tp.inspiringInformative < 40) toneParts.push("inspiring and emotional");
+  if (tp.dataDriven > 60) toneParts.push("data-driven with stats and proof");
+  const toneDesc = toneParts.filter(Boolean).join(", ");
+
+  const styleLines: string[] = [
+    heading,
+    writingStyle.description,
+    ``,
+    `Tone Profile: ${toneDesc || "balanced"}`,
+    `Sentence Length: ${writingStyle.sentenceLength.join(", ")} sentences`,
+    `Emoji Usage: ${writingStyle.emojiUsage}`,
+    `Hashtag Intensity: ${writingStyle.hashtagIntensity}`,
+  ];
+  if (writingStyle.ctas?.length) {
+    styleLines.push(`Preferred CTAs: ${writingStyle.ctas.join(", ")}`);
+  }
+  if (writingStyle.examplePost) {
+    styleLines.push(``, `Example post in this style:`, `"""`, writingStyle.examplePost, `"""`);
+  }
+  styleLines.push(``, applyInstruction);
+  return styleLines.join("\n");
+}
 
 /**
  * Stage 1 — Content Strategist Prompt
@@ -156,6 +238,8 @@ export function buildCaptionGeneratorPrompt(
   personaContext?: string,
   writingStyle?: WritingStyleDocument,
   dbTemplate?: CaptionTemplateDocument,
+  platformWritingStyles?: Partial<Record<PostPlatform, WritingStyleDocument>>,
+  platformTemplates?: Partial<Record<PostPlatform, CaptionTemplateDocument>>,
 ): string {
   const sections: string[] = [];
 
@@ -179,61 +263,74 @@ ${strategy.talkingPoints.map((p) => `  • ${p}`).join("\n")}`);
 - Emoji Level: ${input.emojiLevel}
 - Hashtag Intensity: ${input.hashtagIntensity}`);
 
-  // Inject writing style from DB if provided
+  // Inject global writing style fallback
   if (writingStyle) {
-    const tp = writingStyle.toneProfile;
-    const toneParts: string[] = [];
-    if (tp.formalCasual > 60) toneParts.push("casual and conversational");
-    else if (tp.formalCasual < 40) toneParts.push("formal and professional");
-    else toneParts.push("balanced register");
-    if (tp.seriousPlayful > 60) toneParts.push("playful and fun");
-    else if (tp.seriousPlayful < 40) toneParts.push("serious and focused");
-    if (tp.inspiringInformative > 60) toneParts.push("informative and data-driven");
-    else if (tp.inspiringInformative < 40) toneParts.push("inspiring and emotional");
-    if (tp.dataDriven > 60) toneParts.push("data-driven with stats and proof");
-    const toneDesc = toneParts.filter(Boolean).join(", ");
-
-    const styleLines: string[] = [
-      `## WRITING STYLE: ${writingStyle.name.toUpperCase()}`,
-      writingStyle.description,
-      ``,
-      `Tone Profile: ${toneDesc || "balanced"}`,
-      `Sentence Length: ${writingStyle.sentenceLength.join(", ")} sentences`,
-      `Emoji Usage: ${writingStyle.emojiUsage}`,
-      `Hashtag Intensity: ${writingStyle.hashtagIntensity}`,
-    ];
-    if (writingStyle.ctas?.length) {
-      styleLines.push(`Preferred CTAs: ${writingStyle.ctas.join(", ")}`);
-    }
-    if (writingStyle.examplePost) {
-      styleLines.push(``, `Example post in this style:`, `"""`, writingStyle.examplePost, `"""`);
-    }
-    styleLines.push(``, `IMPORTANT: Apply this writing style to ALL platform captions. Override generic tone guidance with the style above.`);
-    sections.push(styleLines.join("\n"));
+    sections.push(
+      buildWritingStyleBlock(
+        writingStyle,
+        `## WRITING STYLE: ${writingStyle.name.toUpperCase()}`,
+        `IMPORTANT: Apply this writing style to ALL platform captions unless a platform-specific style override is provided below.`,
+      ),
+    );
   }
 
-  // Inject caption template — DB template takes priority over in-code templates
-  if (dbTemplate) {
-    const primaryPlatform = input.platforms[0] ?? "instagram_post";
-    const variant =
-      dbTemplate.platformVariants.find((v) => v.platform === primaryPlatform) ??
-      dbTemplate.platformVariants[0];
-    if (variant) {
-      sections.push(`## CAPTION TEMPLATE: ${dbTemplate.name.toUpperCase()}\n\n${variant.structure}`);
-    }
-  } else {
-    // Fall back to in-code templates
-    const creativeProfile = resolveCreativeProfile(input);
-    const primaryPlatform = input.platforms[0] ?? "instagram_post";
-    const captionTemplateBlock = buildCaptionTemplateInstructions(
-      creativeProfile.captionStyle,
-      primaryPlatform,
-      input.objective,
-      input.niche,
-    );
-    if (captionTemplateBlock) {
-      sections.push(captionTemplateBlock);
-    }
+  // Inject per-platform writing style overrides
+  const perPlatformStyleBlocks = input.platforms
+    .map((platform) => {
+      const platformStyle = platformWritingStyles?.[platform];
+      if (!platformStyle) return "";
+      return buildWritingStyleBlock(
+        platformStyle,
+        `## ${platform.toUpperCase()} WRITING STYLE OVERRIDE: ${platformStyle.name.toUpperCase()}`,
+        `IMPORTANT: Apply this style ONLY for ${platform}. It overrides global writing style for this platform.`,
+      );
+    })
+    .filter(Boolean);
+  if (perPlatformStyleBlocks.length > 0) {
+    sections.push(perPlatformStyleBlocks.join("\n\n"));
+  }
+
+  // Inject caption template blocks per platform
+  const creativeProfile = resolveCreativeProfile(input);
+  const templateBlocks = input.platforms
+    .map((platform) => {
+      const platformTemplate = platformTemplates?.[platform] ?? dbTemplate;
+      if (platformTemplate) {
+        const variant =
+            platformTemplate.platformVariants.find((v) => v.platform === platform) ??
+            platformTemplate.platformVariants[0];
+        if (!variant) return "";
+
+        const structureOnly = variant.structure
+          .split("\n")
+          .filter((line) => line.trim().length > 0)
+          .slice(0, 16)
+          .join("\n");
+
+        return [
+          `## ${platform.toUpperCase()} CAPTION STRUCTURE`,
+          `Template: ${platformTemplate.name}`,
+          structureOnly,
+          `Keep it concise and return only the structure plan for ${platform}.`,
+        ].join("\n");
+      }
+
+      const forcedTemplateId =
+        input.platformTemplateIds?.[platform] ?? input.selectedTemplateId;
+      return (
+        buildStructureOnlyTemplateBlock(
+          creativeProfile.captionStyle,
+          platform,
+          input.objective,
+          input.niche,
+          forcedTemplateId,
+        )
+      );
+    })
+    .filter(Boolean);
+
+  if (templateBlocks.length) {
+    sections.push(templateBlocks.join("\n\n"));
   }
 
   // Build platform-specific instructions
@@ -255,6 +352,10 @@ ${strategy.talkingPoints.map((p) => `  • ${p}`).join("\n")}`);
 
     if (p === "facebook") {
       return buildFacebookCaptionInstructions(input);
+    }
+
+    if (p === "pinterest") {
+      return buildPinterestCaptionInstructions(input);
     }
 
     return `### ${intel.name}
@@ -314,6 +415,9 @@ Blend location into topic-relevant hashtags where natural.`);
   sections.push(`## YOUR TASK
 You are a Caption Generator AI. Write platform-specific captions following the strategy and rules above.
 
+Important: if multiple platforms are selected, return captions for every selected platform. Do not omit any platform.
+Use the matching structure block for each platform and keep each platform caption aligned to its own structure.
+
 Respond in EXACTLY this JSON format:
 {
   "captions": {
@@ -327,7 +431,7 @@ ${captionFields}
 }
 
 Rules:
-- Generate EXACTLY 3 distinct caption options per platform
+- Generate EXACTLY 3 distinct caption options per selected platform
 - Each caption MUST follow its platform's specific rules (length, tone, structure)
 - Hashtags MUST be relevant to the post topic, niche, and audience — never generic
 - High reach hashtags = broad audience appeal (100K+ posts), derived from primary niche terms
@@ -1308,6 +1412,33 @@ ${input.imageConcept}
 - The mandatory discussion question at the end should be easy to answer in 1-3 words or a short sentence`);
 
   return lines.join("\n");
+}
+
+/**
+ * Pinterest-specific caption instruction block
+ * Called from buildCaptionGeneratorPrompt when Pinterest is in platforms
+ */
+function buildPinterestCaptionInstructions(_input: PostGenerationInput): string {
+  return `### Pinterest — SEARCH-FIRST + SAVE-FIRST REQUIRED
+
+**CORE OBJECTIVE:**
+- Write Pinterest descriptions that rank for search and drive saves/clicks.
+
+**STRUCTURE RULES (MANDATORY):**
+1. Open with a keyword-led value promise.
+2. Include practical takeaway steps or outcomes.
+3. Keep the language evergreen and actionable.
+4. End with a save/click CTA.
+
+**LENGTH + HASHTAGS:**
+- Target description length: 250-500 characters
+- Hashtags: 3-6 relevant tags only
+- Prioritize niche and intent-based hashtags over broad vanity tags
+
+**STYLE RULES:**
+- Clear, helpful, and direct wording.
+- Avoid vague hype copy or abstract motivational filler.
+- Make the description useful enough that the reader wants to save the pin.`;
 }
 
 /**

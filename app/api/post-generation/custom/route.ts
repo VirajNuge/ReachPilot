@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/withAuth";
 import { connectToDatabase } from "@/lib/mongodb";
-import type { PostGenerationDocument, PostPlatform } from "@/lib/types/postGeneration";
+import type { PostGenerationDocument, PostPlatform, PostGenerationInput } from "@/lib/types/postGeneration";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,6 +30,27 @@ export async function POST(req: NextRequest) {
     }
 
     const firstCaption = Object.values(finalCaptions)[0] || "";
+    const sanitizedPlatforms = (platforms as unknown[])
+      .filter((p): p is PostPlatform => typeof p === "string")
+      .map((p) => p as PostPlatform);
+
+    const defaultInput: PostGenerationInput = {
+      objective: "engagement",
+      targetAudiences: ["general_audience"],
+      coreMessage: firstCaption || "Custom post",
+      platforms: sanitizedPlatforms,
+      brandType: "personal_brand",
+      visualStyles: ["minimal"],
+      imageGenType: "upload_image",
+      brandAssets: {
+        colorPalette: ["#0052FF"],
+        watermark: false,
+      },
+      tones: ["friendly"],
+      ctas: ["none"],
+      emojiLevel: "low",
+      hashtagIntensity: "low",
+    };
 
     const newDraft: Omit<PostGenerationDocument, "_id"> = {
       userId: auth.userId,
@@ -52,7 +73,7 @@ export async function POST(req: NextRequest) {
         designStyle: "minimal",
       },
       input: {
-        platforms,
+        ...defaultInput,
       },
     };
 

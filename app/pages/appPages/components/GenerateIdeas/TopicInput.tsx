@@ -1,13 +1,18 @@
 "use client";
 
 import React from "react";
-import { UserCircle2, AlignLeft, Users } from "lucide-react";
+import { AlignLeft, Users, ToggleLeft, ToggleRight, MessageSquareText } from "lucide-react";
 
 interface TopicInputProps {
   topic: string;
   setTopic: (val: string) => void;
   audience: string;
   setAudience: (val: string) => void;
+  coreMessage: string;
+  setCoreMessage: (val: string) => void;
+  importPersona: boolean;
+  setImportPersona: (val: boolean) => void;
+  personaAvailable: boolean;
 }
 
 export default function TopicInput({
@@ -15,27 +20,44 @@ export default function TopicInput({
   setTopic,
   audience,
   setAudience,
+  coreMessage,
+  setCoreMessage,
+  importPersona,
+  setImportPersona,
+  personaAvailable,
 }: TopicInputProps) {
   return (
     <div className="space-y-5">
-      {/* 1. Persona Context Card */}
-      <div className="bg-yellow-50/80 rounded-xl p-4 border border-yellow-100 flex items-start gap-3 transition-colors hover:border-yellow-200 hover:bg-yellow-50">
-        <div className="p-2 bg-white rounded-full shadow-sm text-yellow-600 ring-1 ring-yellow-50">
-          <UserCircle2 size={20} />
-        </div>
-        <div>
-          <span className="text-[10px] font-bold text-yellow-600 uppercase tracking-wider block mb-0.5">
-            Active Persona
-          </span>
-          <h4 className="text-sm font-bold text-gray-900 leading-tight">
-            Senior Content Strategist
-          </h4>
-          <p className="text-xs text-yellow-700/80 mt-1 leading-snug">
-            Optimizing for:{" "}
-            <span className="font-medium">
-              High Retention, Authority Building
+      {/* 1. Persona Import Toggle */}
+      <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">
+              Persona Import
             </span>
-          </p>
+            <p className="text-xs text-slate-600 leading-snug">
+              {personaAvailable
+                ? "Use saved persona context to shape ideas."
+                : "No persona available for this account yet."}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (personaAvailable) setImportPersona(!importPersona);
+            }}
+            disabled={!personaAvailable}
+            className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold border transition-all ${
+              personaAvailable
+                ? importPersona
+                  ? "bg-[#0052FF]/10 text-[#0052FF] border-[#0052FF]/30"
+                  : "bg-white text-slate-600 border-slate-300"
+                : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+            }`}
+          >
+            {importPersona ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
+            {importPersona ? "Enabled" : "Disabled"}
+          </button>
         </div>
       </div>
 
@@ -67,6 +89,24 @@ export default function TopicInput({
           placeholder="e.g. 'Early-stage Founders' or 'Fitness Beginners'"
           className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none transition-all shadow-sm"
         />
+      </div>
+
+      {/* 4. Core Message */}
+      <div>
+        <label className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
+          <MessageSquareText size={16} className="text-gray-400" />
+          Core Message
+        </label>
+        <textarea
+          value={coreMessage}
+          onChange={(e) => setCoreMessage(e.target.value)}
+          rows={4}
+          placeholder="What should every generated idea ultimately communicate?"
+          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none transition-all shadow-sm resize-none"
+        />
+        <p className="text-[11px] text-gray-500 mt-1.5 font-medium">
+          Tip: add context, promise, or transformation you want the audience to remember.
+        </p>
       </div>
     </div>
   );

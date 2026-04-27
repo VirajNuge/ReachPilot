@@ -42,6 +42,7 @@ import type {
   ContentStrategyOutput,
   CaptionGeneratorOutput,
   PosterPromptOutput,
+  ImageCreativeDirectorOutput,
   ImageVariation,
   PostPackage,
   ContentScore,
@@ -83,11 +84,18 @@ import {
   CAPTION_STYLE_LABELS,
 } from "@/lib/types/postGeneration";
 
-import { GenerationPipeline, PipelineStage } from "./Pipeline/GenerationPipeline";
+import type { PipelineStage } from "./Pipeline/GenerationPipeline";
+import GenerationExperience from "./Pipeline/GenerationExperience";
 import { OutputDashboard } from "./Output/OutputDashboard";
 import StylePickerModal from "./Modals/StylePickerModal";
 import WritingStyleModal from "./Modals/WritingStyleModal";
 import { PLATFORM_BRANDS, PlatformLogo } from "./platformBranding";
+import { normalizeGroupedHashtags } from "@/lib/postGeneration/hashtags";
+import { aggregatePlatformScores } from "@/lib/postGeneration/scoreAggregator";
+import {
+  POSTGEN_AUTO_ANALYTICS,
+  POSTGEN_CREATIVE_DIRECTOR_STAGE,
+} from "@/lib/postGeneration/featureFlags";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -114,6 +122,7 @@ type HistoryPostRecord = Omit<PostGenerationDocument, "_id" | "createdAt" | "upd
 const POST_GENERATOR_PREVIEW_KEY = "reachpilot_post_generator_preview_snapshot";
 const POST_GENERATOR_SEED_INPUT_KEY = "reachpilot_post_generator_seed_input";
 const CAPTION_OPTION_LIMIT = 3;
+const STARTER_BRAND_COLORS = ["#F97316", "#22C55E", "#EAB308", "#EF4444", "#14B8A6"];
 
 function isDataUrl(value: string | undefined): boolean {
   return typeof value === "string" && value.startsWith("data:");
@@ -187,6 +196,7 @@ function normalizeCaptionOptionsMap(
 
 function normalizePostPackage(postPackage: PostPackage): PostPackage {
   const normalizedCaptionOptions = normalizeCaptionOptionsMap(postPackage.captionOptions, postPackage.captions);
+  const normalizedHashtags = normalizeGroupedHashtags(postPackage.hashtags);
 
   return {
     ...postPackage,
@@ -195,6 +205,7 @@ function normalizePostPackage(postPackage: PostPackage): PostPackage {
     subtext: postPackage.subtext || "",
     cta: postPackage.cta || "",
     captionOptions: normalizedCaptionOptions,
+    hashtags: normalizedHashtags,
   };
 }
 
@@ -236,7 +247,7 @@ const DUMMY_PREVIEW_SNAPSHOT: OutputPreviewSnapshot = {
     textBlocks: [],
     referenceImages: [],
     brandAssets: {
-      colorPalette: ["#0052FF", "#0F172A", "#A5E338"],
+      colorPalette: ["#F97316", "#22C55E", "#EAB308"],
       watermark: false,
       fontFamily: "Inter",
     },
@@ -270,14 +281,14 @@ const DUMMY_PREVIEW_SNAPSHOT: OutputPreviewSnapshot = {
   imageGenError: null,
   postPackage: {
     imagePrompt:
-      "Clean modern SaaS campaign visual, dashboard UI in perspective, content tiles flowing into LinkedIn/X/Instagram/Facebook/Threads icons, cool blue gradient, subtle neon green accents, minimalist, high contrast, premium product launch style",
+      "Clean modern SaaS campaign visual, dashboard UI in perspective, content tiles flowing into LinkedIn/X/Instagram/Facebook/Threads icons, warm amber glow, citrus-green accents, minimalist, high contrast, premium product launch style",
     imageUrl:
-      "https://image.pollinations.ai/prompt/Minimal%20SaaS%20launch%20dashboard%20poster%20blue%20and%20lime?width=1080&height=1080&nologo=true&enhance=true",
+      "https://image.pollinations.ai/prompt/Minimal%20SaaS%20launch%20dashboard%20poster%20amber%20and%20green?width=1080&height=1080&nologo=true&enhance=true",
     imageVariations: [
       {
         id: 1,
         imageUrl:
-          "https://image.pollinations.ai/prompt/Minimal%20SaaS%20launch%20dashboard%20poster%20blue%20and%20lime?width=1080&height=1080&nologo=true&enhance=true",
+          "https://image.pollinations.ai/prompt/Minimal%20SaaS%20launch%20dashboard%20poster%20amber%20and%20green?width=1080&height=1080&nologo=true&enhance=true",
         model: "gemini-2.5-flash-image",
         aspectRatio: "1:1",
       },
@@ -398,6 +409,13 @@ const INITIAL_STAGES: PipelineStage[] = [
     description: "Designing visual concepts for your post",
     status: "pending",
   },
+  ...(POSTGEN_CREATIVE_DIRECTOR_STAGE
+    ? [{
+        name: "Creative Director",
+        description: "Upgrading your visual brief with advanced art direction",
+        status: "pending" as const,
+      }]
+    : []),
   {
     name: "Image Render",
     description: "Generating your social media image with AI",
@@ -427,6 +445,9 @@ function buildPipelineStages(platforms: PostPlatform[], shouldGenerateImage: boo
   }
   if (shouldGenerateImage) {
     stages.push({ name: "Image Prompt Generator", description: "Designing visual concepts for your post", status: "pending" });
+    if (POSTGEN_CREATIVE_DIRECTOR_STAGE) {
+      stages.push({ name: "Creative Director", description: "Upgrading your visual brief with advanced art direction", status: "pending" });
+    }
     stages.push({ name: "Image Render", description: "Generating your social media image with AI", status: "pending" });
   }
   return stages;
@@ -442,7 +463,7 @@ const DEFAULT_INPUT: PostGenerationInput = {
   brandType: "personal_brand",
   visualStyles: ["minimal"],
   imageGenType: "ai_background",
-  brandAssets: { colorPalette: ["#0052FF", "#1A1D23"], watermark: false },
+  brandAssets: { colorPalette: [], watermark: false },
   tones: ["professional"],
   ctas: ["none"],
   emojiLevel: "medium",
@@ -731,7 +752,6 @@ export function PostGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
   const [imageGenError, setImageGenError] = useState<string | null>(null);
   const [isRemixing, setIsRemixing] = useState(false);
-  const [isScoring, setIsScoring] = useState(false);
   const [isSavingToQueue, setIsSavingToQueue] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   const [isPublishingNow, setIsPublishingNow] = useState(false);
@@ -991,7 +1011,16 @@ export function PostGeneratorPage() {
   const handlePlatformToggle = (platform: PostPlatform) => {
     const current = formInput.platforms;
     if (current.includes(platform)) {
-      updateInput({ platforms: current.filter((p) => p !== platform) });
+      const nextPlatforms = current.filter((p) => p !== platform);
+      const nextStyleMap = { ...(formInput.platformWritingStyleIds ?? {}) };
+      const nextTemplateMap = { ...(formInput.platformTemplateIds ?? {}) };
+      delete nextStyleMap[platform];
+      delete nextTemplateMap[platform];
+      updateInput({
+        platforms: nextPlatforms,
+        platformWritingStyleIds: nextStyleMap,
+        platformTemplateIds: nextTemplateMap,
+      });
     } else {
       updateInput({ platforms: [...current, platform] });
     }
@@ -1001,10 +1030,14 @@ export function PostGeneratorPage() {
 
   const handleAddColor = () => {
     if (formInput.brandAssets.colorPalette.length < 5) {
+      const nextDefault =
+        STARTER_BRAND_COLORS.find((color) => !formInput.brandAssets.colorPalette.includes(color)) ??
+        STARTER_BRAND_COLORS[formInput.brandAssets.colorPalette.length % STARTER_BRAND_COLORS.length];
+
       updateInput({
         brandAssets: {
           ...formInput.brandAssets,
-          colorPalette: [...formInput.brandAssets.colorPalette, "#000000"],
+          colorPalette: [...formInput.brandAssets.colorPalette, nextDefault],
         },
       });
     }
@@ -1157,6 +1190,7 @@ export function PostGeneratorPage() {
       facebookOptimizer: hasFacebook ? offset++ : -1,
       threadsOptimizer: hasThreads ? offset++ : -1,
       imagePrompt: shouldGenerateImage ? offset++ : -1,
+      creativeDirector: shouldGenerateImage && POSTGEN_CREATIVE_DIRECTOR_STAGE ? offset++ : -1,
       imageRender: shouldGenerateImage ? offset : -1,
     };
 
@@ -1375,6 +1409,7 @@ export function PostGeneratorPage() {
         compositionNotes: "Caption-first post without generated image.",
       };
       let generatedVariations: ImageVariation[] = [];
+      let creativeDirectorOutput: ImageCreativeDirectorOutput | undefined;
 
       if (shouldGenerateImage) {
         updateStageStatus(stageIdx.imagePrompt, "active");
@@ -1395,6 +1430,39 @@ export function PostGeneratorPage() {
         setImagePrompt(imagePromptData);
 
         updateStageStatus(stageIdx.imagePrompt, "completed");
+        if (stageIdx.creativeDirector >= 0) {
+          updateStageStatus(stageIdx.creativeDirector, "active");
+
+          try {
+            const creativeDirectorRes = await fetch("/api/post-generation/image-creative-director", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                input: wizardInput,
+                strategy: strategyData,
+                imagePrompt: imagePromptData,
+              }),
+              signal,
+            });
+
+            if (creativeDirectorRes.ok) {
+              const creativeDirectorJson = await creativeDirectorRes.json();
+              creativeDirectorOutput = creativeDirectorJson.creativeDirector;
+            } else {
+              const errBody = await creativeDirectorRes.json().catch(() => ({}));
+              console.warn(
+                "Creative director stage failed (non-fatal):",
+                (errBody as { error?: string }).error || `creative director failed (${creativeDirectorRes.status})`
+              );
+            }
+          } catch (creativeError) {
+            if ((creativeError as Error)?.name !== "AbortError") {
+              console.warn("Creative director stage error (non-fatal):", creativeError);
+            }
+          }
+
+          updateStageStatus(stageIdx.creativeDirector, "completed");
+        }
         updateStageStatus(stageIdx.imageRender, "active");
 
         try {
@@ -1403,6 +1471,7 @@ export function PostGeneratorPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               posterOutput: imagePromptData,
+              creativeDirector: creativeDirectorOutput,
               input: wizardInput,
               imageModel: wizardInput.imageModel,
               accountId: effectiveAccountId,
@@ -1440,7 +1509,7 @@ export function PostGeneratorPage() {
         ])
       );
 
-      const newPostPackage: PostPackage = normalizePostPackage({
+      let newPostPackage: PostPackage = normalizePostPackage({
         imagePrompt: imagePromptData.posterPrompt,
         imageUrl: generatedVariations[0]?.imageUrl,
         imageVariations: generatedVariations,
@@ -1461,13 +1530,30 @@ export function PostGeneratorPage() {
         facebookRefined: facebookRefinedData,
       });
 
+      let autoContentScore: ContentScore | null = null;
+      if (POSTGEN_AUTO_ANALYTICS) {
+        try {
+          autoContentScore = await runAutoAnalytics(captionsRecord, imagePromptData.headline);
+        } catch (scoreError) {
+          console.warn("Auto analytics failed (non-fatal):", scoreError);
+        }
+      }
+
+      if (autoContentScore) {
+        newPostPackage = normalizePostPackage({
+          ...newPostPackage,
+          contentScore: autoContentScore,
+        });
+      }
+
       setPostPackage(newPostPackage);
+      setContentScore(autoContentScore);
       savePreviewSnapshot({
         postPackage: newPostPackage,
         input: wizardInput,
         strategy: strategyData,
         hooks: null,
-        contentScore: null,
+        contentScore: autoContentScore,
         usedTemplateName: captionsJson.usedTemplateName,
         templateAICurated: captionsJson.templateAICurated === true,
         imageGenError,
@@ -1500,7 +1586,7 @@ export function PostGeneratorPage() {
             input: wizardInput,
             strategy: strategyData,
             hooks: data.hooks ?? null,
-            contentScore: null,
+            contentScore: autoContentScore,
             usedTemplateName: captionsJson.usedTemplateName,
             templateAICurated: captionsJson.templateAICurated === true,
             imageGenError,
@@ -1624,34 +1710,41 @@ export function PostGeneratorPage() {
     }
   };
 
-  const handleScoreRequest = async (platform: string) => {
-    if (!postPackage) return;
-    setIsScoring(true);
-    try {
-      const caption = postPackage.captions[platform];
-      const res = await fetch("/api/post-generation/score", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ caption, platform, headline: postPackage.headline }),
-      });
-      if (!res.ok) throw new Error("Failed to score content");
-      const scoreJson = await res.json();
-      const data: ContentScore = scoreJson.score;
-      setContentScore(data);
-      const updatedPackage: PostPackage = normalizePostPackage({ ...postPackage, contentScore: data });
-      setPostPackage(updatedPackage);
-      if (lastInput) {
-        try {
-          await saveGenerationToDb(lastInput, strategy, updatedPackage, "draft");
-        } catch (saveErr) {
-          console.error("Failed to persist content score:", saveErr);
-        }
-      }
-    } catch (err) {
-      console.error("Score error:", err);
-    } finally {
-      setIsScoring(false);
-    }
+  const requestContentScore = async (
+    caption: string,
+    platform: string,
+    headline: string,
+  ): Promise<ContentScore | null> => {
+    const res = await fetch("/api/post-generation/score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ caption, platform, headline }),
+    });
+    if (!res.ok) return null;
+    const scoreJson = await res.json();
+    return (scoreJson.score as ContentScore) ?? null;
+  };
+
+  const runAutoAnalytics = async (
+    captions: Record<string, string>,
+    headline: string,
+  ): Promise<ContentScore | null> => {
+    if (!POSTGEN_AUTO_ANALYTICS) return null;
+
+    const scoredEntries = await Promise.all(
+      Object.entries(captions).map(async ([platform, caption]) => {
+        if (!caption) return null;
+        const score = await requestContentScore(caption, platform, headline);
+        if (!score) return null;
+        return [platform as PostPlatform, score] as const;
+      }),
+    );
+
+    const map = Object.fromEntries(
+      scoredEntries.filter((entry): entry is readonly [PostPlatform, ContentScore] => entry !== null),
+    ) as Partial<Record<PostPlatform, ContentScore>>;
+
+    return aggregatePlatformScores(map);
   };
 
   const handleRetry = () => {
@@ -1660,6 +1753,14 @@ export function PostGeneratorPage() {
     } else {
       setView("idle");
     }
+  };
+
+  const handleCancelGeneration = () => {
+    generationAbortRef.current?.abort();
+    generationAbortRef.current = null;
+    setView("idle");
+    setPipelineStages(INITIAL_STAGES);
+    setImageGenError(null);
   };
 
   const loadHistoryItem = async (id: string) => {
@@ -2026,75 +2127,14 @@ export function PostGeneratorPage() {
 
   return (
     <div className="min-h-screen bg-[#EEF3F8]">
-      {view !== "output" ? (
+      {view === "generating" ? (
+        <GenerationExperience
+          stages={pipelineStages}
+          currentStage={getCurrentStageIndex()}
+          onCancel={handleCancelGeneration}
+        />
+      ) : view !== "output" ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <div className="max-w-5xl mx-auto mb-6 rounded-[36px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,250,252,0.74))] p-6 shadow-[0_30px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-8">
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#64748B]">ReachPilot Studio</p>
-                <h1 className="mt-3 max-w-2xl text-[34px] font-black leading-[1.05] text-[#0F172A] sm:text-[44px]">
-                  Turn one sharp idea into a polished multi-platform campaign.
-                </h1>
-                <p className="mt-4 max-w-2xl text-[15px] leading-7 text-[#475569]">
-                  Shape the brief, tune the voice, decide whether the visual matters, and let the generator assemble something that already feels publishable.
-                </p>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {steps.map((step) => {
-                    const active = currentStep === step.id;
-                    const done = currentStep > step.id;
-                    return (
-                      <div
-                        key={`hero-step-${step.id}`}
-                        className={`rounded-full px-3 py-2 text-[12px] font-bold transition-colors ${
-                          active
-                            ? "bg-[linear-gradient(135deg,#0F172A,#1D4ED8)] text-white shadow-[0_10px_24px_rgba(29,78,216,0.18)]"
-                            : done
-                              ? "bg-[#E8F0FF] text-[#0052FF]"
-                              : "bg-white text-[#64748B] border border-[#E2E8F0]"
-                        }`}
-                      >
-                        {step.id}. {step.title}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-                <div className="rounded-[28px] border border-white/80 bg-white/80 p-4 shadow-[0_12px_35px_rgba(15,23,42,0.06)]">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#94A3B8]">Platforms</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {(formInput.platforms.length > 0 ? formInput.platforms : ALL_PLATFORMS.slice(0, 1)).map((platform) => {
-                      const brand = PLATFORM_BRANDS[platform];
-                      return (
-                        <span
-                          key={`hero-platform-${platform}`}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#F8FAFC]"
-                          style={{ color: brand.color }}
-                          title={brand.label}
-                        >
-                          <PlatformLogo platform={platform} className="h-4 w-4" />
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className="rounded-[28px] border border-white/80 bg-white/80 p-4 shadow-[0_12px_35px_rgba(15,23,42,0.06)]">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#94A3B8]">Mode</p>
-                  <p className="mt-3 text-sm font-bold text-[#0F172A]">
-                    {formInput.generateImage !== false ? "Caption + visual" : "Caption-only run"}
-                  </p>
-                </div>
-                <div className="rounded-[28px] border border-white/80 bg-[#111827] p-4 text-white shadow-[0_12px_35px_rgba(15,23,42,0.12)]">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/55">Core brief</p>
-                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-white/90">
-                    {formInput.coreMessage.trim() || "Your central message will appear here as you shape the brief."}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div className="max-w-2xl mx-auto mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <button
@@ -2724,11 +2764,6 @@ export function PostGeneratorPage() {
             </motion.div>
             </AnimatePresence>
 
-          {view === "generating" && (
-            <div className="max-w-3xl mx-auto mt-6 rounded-[32px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,253,0.88))] p-6 shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
-              <GenerationPipeline currentStage={getCurrentStageIndex()} stages={pipelineStages} />
-            </div>
-          )}
         </div>
       ) : (
         <div className="relative max-w-7xl mx-auto px-6 py-8">
@@ -2874,7 +2909,6 @@ export function PostGeneratorPage() {
               strategy={strategy ?? undefined}
               accountId={effectiveAccountId ?? undefined}
               onRemix={handleRemix}
-              onScoreRequest={handleScoreRequest}
               onSaveToQueue={handleSaveToQueue}
               isSavingToQueue={isSavingToQueue}
               onSchedulePost={handleSchedulePost}
@@ -2883,7 +2917,6 @@ export function PostGeneratorPage() {
               isPublishingNow={isPublishingNow}
               suggestedScheduleIso={suggestedScheduleIso}
               isRemixing={isRemixing}
-              isScoring={isScoring}
               onSelectImageVariation={handleSelectImageVariation}
             />
           )}

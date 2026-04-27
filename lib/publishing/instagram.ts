@@ -10,6 +10,22 @@ import type { PublishPayload, PublishResult } from "./types";
 
 const GRAPH_API = "https://graph.facebook.com/v19.0";
 
+type MetaErrorShape = {
+  message?: string;
+  code?: number;
+  error_subcode?: number;
+  type?: string;
+};
+
+function formatMetaError(error?: MetaErrorShape, fallback?: string): string {
+  if (!error) return fallback ?? "Instagram API error";
+  const parts = [error.message ?? fallback ?? "Instagram API error"];
+  if (typeof error.code === "number") parts.push(`code=${error.code}`);
+  if (typeof error.error_subcode === "number") parts.push(`subcode=${error.error_subcode}`);
+  if (error.type) parts.push(`type=${error.type}`);
+  return parts.join(" | ");
+}
+
 /** Poll for container readiness (max 10 retries × 3 s) */
 async function waitForContainer(
   containerId: string,
@@ -54,11 +70,11 @@ export async function publishToInstagram(
       }
     );
 
-    const containerData = await containerRes.json() as { id?: string; error?: { message: string } };
+    const containerData = await containerRes.json() as { id?: string; error?: MetaErrorShape };
     if (!containerRes.ok || containerData.error) {
       return {
         success: false,
-        error: containerData.error?.message || `IG container creation failed (${containerRes.status})`,
+        error: formatMetaError(containerData.error, `IG container creation failed (${containerRes.status})`),
       };
     }
 
@@ -85,11 +101,11 @@ export async function publishToInstagram(
       }
     );
 
-    const publishData = await publishRes.json() as { id?: string; error?: { message: string } };
+    const publishData = await publishRes.json() as { id?: string; error?: MetaErrorShape };
     if (!publishRes.ok || publishData.error) {
       return {
         success: false,
-        error: publishData.error?.message || `IG publish failed (${publishRes.status})`,
+        error: formatMetaError(publishData.error, `IG publish failed (${publishRes.status})`),
       };
     }
 

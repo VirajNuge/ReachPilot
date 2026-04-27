@@ -32,14 +32,12 @@ interface PlatformTabProps {
   strategy?: ContentStrategyOutput;
   accountId?: string;
   onRemix: (style: RemixStyle) => void;
-  onScoreRequest: () => void;
   onRefinedCaption?: (newCaption: string, newScore: number, newFlags: string[]) => void;
   onXRefined?: (newCaption: string, newScore: number, newFlags: string[]) => void;
   onInstagramRefined?: (newCaption: string, newScore: number, newFlags: string[], newPostType?: InstagramPostType) => void;
   onFacebookRefined?: (newCaption: string, newScore: number, newFlags: string[]) => void;
   onCaptionChange?: (newCaption: string) => void;
   isRemixing?: boolean;
-  isScoring?: boolean;
 }
 
 export const PlatformTab: React.FC<PlatformTabProps> = ({
@@ -58,14 +56,12 @@ export const PlatformTab: React.FC<PlatformTabProps> = ({
   strategy,
   accountId,
   onRemix: _onRemix,
-  onScoreRequest,
   onRefinedCaption,
   onXRefined,
   onInstagramRefined,
   onFacebookRefined,
   onCaptionChange,
   isRemixing: _isRemixing = false,
-  isScoring = false,
 }) => {
   return (
     <div className="flex flex-col gap-5">
@@ -78,25 +74,6 @@ export const PlatformTab: React.FC<PlatformTabProps> = ({
         onSelectOption={onSelectCaptionIndex}
         onCopy={() => navigator.clipboard.writeText(caption)}
       />
-
-      {/* Score action (fallback when no global score tile data is available) */}
-      {!contentScore && (
-        <button
-          type="button"
-          onClick={onScoreRequest}
-          disabled={isScoring}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#0052FF] text-white rounded-xl font-bold text-[13px] hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isScoring ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Scoring...
-            </>
-          ) : (
-            <>Score this platform</>
-          )}
-        </button>
-      )}
 
       {/* LinkedIn Performance (LinkedIn tab only) */}
       {platform === "linkedin" && linkedInRefined && strategy && (

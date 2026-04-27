@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Sidebar from "../pages/appPages/components/Sidebar/Sidebar";
 import TopMenu from "../pages/appPages/components/topMenu/topMenu";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function DashboardLayout({
@@ -12,6 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const getTitle = (path: string | null): string => {
     if (!path) return "Dashboard";
@@ -22,13 +23,19 @@ export default function DashboardLayout({
     if (path.includes("/publishing")) return "Scheduling & Publishing";
     if (path.includes("/analytics")) return "Analytics";
     if (path.includes("/generateIdeas")) return "Find Post Ideas";
-    if (path.includes("/explorePostIdeas")) return "Explore Trending";
+    if (path.includes("/explorePostsIdeas")) return "Explore Trending";
     if (path.includes("/questionMine")) return "Question Mine";
     return "Dashboard";
   };
 
   const title = getTitle(pathname);
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [loading, user, router]);
 
   if (loading) {
     return (
@@ -42,9 +49,6 @@ export default function DashboardLayout({
   }
 
   if (!user) {
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
-    }
     return null;
   }
 

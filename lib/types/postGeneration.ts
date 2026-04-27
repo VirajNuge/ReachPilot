@@ -12,6 +12,7 @@ export type PostPlatform =
   | "linkedin"
   | "x"
   | "facebook"
+  | "pinterest"
   | "threads";
 
 export interface PlatformImageSize {
@@ -108,6 +109,25 @@ export const PLATFORM_INTELLIGENCE: Record<PostPlatform, PlatformIntelligence> =
         "Clear CTA",
         "Question to spark comments",
         "Shareable value",
+      ],
+    },
+  },
+  pinterest: {
+    id: "pinterest",
+    name: "Pinterest",
+    imageSizes: [
+      { label: "Standard Pin", width: 1000, height: 1500 },
+      { label: "Square", width: 1000, height: 1000 },
+    ],
+    captionRules: {
+      maxLength: 500,
+      hashtagRange: [3, 6],
+      toneGuidelines: ["Search-friendly", "Visual-first", "Evergreen"],
+      structureRules: [
+        "Keyword-led first line",
+        "Value-forward concise description",
+        "Save and click intent CTA",
+        "Use practical search terms",
       ],
     },
   },
@@ -465,6 +485,8 @@ export interface PostGenerationInput {
   // Writing Style & Template Selection
   writingStyleId?: string;
   selectedTemplateId?: string;
+  platformWritingStyleIds?: Partial<Record<PostPlatform, string>>;
+  platformTemplateIds?: Partial<Record<PostPlatform, string>>;
 
   // Visual Style Preset Selection
   visualStylePresetId?: string;
@@ -508,6 +530,25 @@ export interface ImagePromptOutput {
   prompt: string;
   headline: string;
   subtext: string;
+  pinterest: {
+    id: "pinterest",
+    name: "Pinterest",
+    imageSizes: [
+      { label: "Standard Pin", width: 1000, height: 1500 },
+      { label: "Square", width: 1000, height: 1000 },
+    ],
+    captionRules: {
+      maxLength: 500,
+      hashtagRange: [3, 6],
+      toneGuidelines: ["Visual-first", "Helpful", "Search-friendly"],
+      structureRules: [
+        "Strong keyword-led title",
+        "Useful, saveable description",
+        "Clear visual direction",
+        "Light CTA for click-through",
+      ],
+    },
+  },
   suggestedLayout: string;
 }
 
@@ -603,6 +644,14 @@ export interface PosterPromptOutput {
   compositionNotes: string;   // Supporting composition/mood notes for reference
 }
 
+export interface ImageCreativeDirectorOutput {
+  creativeDirectionSummary: string;
+  renderPrompt: string;
+  copyPlacementPlan: string;
+  visualConstraints: string[];
+  riskWarnings: string[];
+}
+
 export interface ImageVariation {
   id: number;           // 1, 2, or 3
   imageUrl: string;     // base64 data URL
@@ -641,6 +690,7 @@ export interface PostVariation {
 export interface PostPackage {
   imagePrompt: string;
   imageUrl?: string;
+  platformImages?: Record<string, string>;
   captions: Record<string, string>;  // platform -> caption
   captionOptions?: Record<string, string[]>;
   hashtags: {
@@ -1000,6 +1050,7 @@ export const PLATFORM_DISPLAY: Record<PostPlatform, { label: string; color: stri
   linkedin: { label: "LinkedIn", color: "#0A66C2", shortLabel: "LI" },
   x: { label: "X (Twitter)", color: "#000000", shortLabel: "X" },
   facebook: { label: "Facebook", color: "#1877F2", shortLabel: "FB" },
+  pinterest: { label: "Pinterest", color: "#E60023", shortLabel: "PIN" },
   threads: { label: "Threads", color: "#111827", shortLabel: "TH" },
 };
 

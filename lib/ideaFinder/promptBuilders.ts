@@ -14,6 +14,20 @@ IMPORTANT RULES:
 - Return the exact shape shown in OUTPUT FORMAT.
 `;
 
+const PLATFORM_REASONING_EXTRAS = `"platformTemplate": {
+        "templateId": "problem_solution | hook_value_cta | story_format | authority_format | listicle_format | engagement_question",
+        "templateName": "human-readable template label",
+        "hookAngle": "why this hook style fits the platform",
+        "captionTone": ["tone 1", "tone 2"],
+        "ctaPattern": "platform-native CTA pattern",
+        "formatRecommendation": "why this format fits this platform",
+        "visualRecommendation": "specific visual direction for this platform",
+        "imageRatio": "recommended ratio such as 1:1, 4:5, 2:3",
+        "hashtagGuidance": "platform hashtag guidance",
+        "lengthGuidance": "recommended character/section guidance",
+        "confidenceReason": "why this template and angle are a high-fit match"
+      }`;
+
 function ideaJsonShape(extras: string = ""): string {
   return `{
   "ideas": [
@@ -21,12 +35,13 @@ function ideaJsonShape(extras: string = ""): string {
       "title": "short idea title (5-8 words)",
       "hook": "the opening hook written in their voice",
       "angle": "the strategic angle (educational/controversial/story/etc)",
-      "format": "post | carousel | thread | reel | story | video",
+      "format": "post",
       "platform": "<target platform>",
       "whyItFits": "1 sentence on why this matches their brand",
       "suggestedCTA": "call to action suggestion",
-      "visualDirection": "brief visual/image suggestion",
-      "confidenceScore": 0-100${extras ? ",\n      " + extras : ""}
+      "visualDirection": "single-post visual direction with clear layout detail; never mention carousels/slides",
+      "confidenceScore": 0-100,
+      ${PLATFORM_REASONING_EXTRAS}${extras ? ",\n      " + extras : ""}
     }
   ]
 }`;
@@ -63,6 +78,53 @@ function platformLine(ctx: IdeaFinderContext): string {
   return `Target platform: ${ctx.platform.target}`;
 }
 
+function coreMessageBlock(coreMessage: string): string {
+  const trimmed = coreMessage.trim();
+  if (!trimmed) return "";
+  return `## USER CORE MESSAGE (HIGHEST PRIORITY)\n${trimmed}\n\nTreat this as a strict intent anchor when generating hooks, angles, and CTA framing.`;
+}
+
+function recentPostsAvoidanceBlock(ctx: IdeaFinderContext): string {
+  if (!ctx.postHistory.recentPosts.length) return "";
+
+  const recent = ctx.postHistory.recentPosts
+    .slice(0, 6)
+    .map((post, index) => {
+      const caption = post.caption.replace(/\s+/g, " ").trim().slice(0, 120);
+      return `${index + 1}. [${post.platform}] ${caption}`;
+    })
+    .join("\n");
+
+  return `## RECENT OUTPUTS (AVOID REPETITION)\n${recent}\n\nDo NOT repeat the same hook framing or angle used above. Generate a meaningfully different angle.`;
+}
+
+function modeQualityChecklist(mode: IdeaMode): string {
+  const shared = [
+    "Every idea must include a confidenceReason inside platformTemplate.",
+    "Hook must be specific and scroll-stopping, not generic.",
+    "Visual direction must include concrete production detail for one single post.",
+    "Never mention carousel, slides, multi-frame, swipe, or thread cards.",
+  ];
+
+  if (mode === "trend-jacker") {
+    return `## QUALITY CHECKLIST\n- ${shared.join("\n- ")}\n- Include trendTopic and trendContext that clearly explain timeliness.`;
+  }
+
+  if (mode === "repurpose") {
+    return `## QUALITY CHECKLIST\n- ${shared.join("\n- ")}\n- Include originalContentRef and remixStrategy that clearly identify the source and transformation.`;
+  }
+
+  if (mode === "gap-filler") {
+    return `## QUALITY CHECKLIST\n- ${shared.join("\n- ")}\n- Include gapTopic and audienceDemandSignal with explicit evidence language.`;
+  }
+
+  if (mode === "prism") {
+    return `## QUALITY CHECKLIST\n- ${shared.join("\n- ")}\n- Each angleFramework must be distinct and non-overlapping.`;
+  }
+
+  return `## QUALITY CHECKLIST\n- ${shared.join("\n- ")}`;
+}
+
 // ---- Mode Builders ----
 
 function buildVoiceMatchPrompt(
@@ -70,7 +132,8 @@ function buildVoiceMatchPrompt(
   topic: string,
   audience: string,
   vibe: string,
-  count: number
+  count: number,
+  coreMessage: string
 ): string {
   const sections: string[] = [];
 
@@ -79,6 +142,8 @@ function buildVoiceMatchPrompt(
   );
 
   sections.push(personaBlock(ctx));
+  const userCoreMessage = coreMessageBlock(coreMessage);
+  if (userCoreMessage) sections.push(userCoreMessage);
 
   // Voice analysis
   const voiceLines: string[] = [];
@@ -119,10 +184,16 @@ function buildVoiceMatchPrompt(
     `## YOUR TASK
 Generate ${count} social media post ideas for ${ctx.platform.target}${topicStr}${audienceStr}.${vibeStr}
 Each idea MUST sound like it was written by this exact person — match their hook style, sentence patterns, emoji usage, and signature phrases.
+For each idea, include platform-specific template reasoning in platformTemplate.
+Visual direction must be concrete enough to hand off directly to image generation.
 
 ${doNotTalkBlock(ctx)}
 ${platformLine(ctx)}`
   );
+
+  const recentPostsBlock = recentPostsAvoidanceBlock(ctx);
+  if (recentPostsBlock) sections.push(recentPostsBlock);
+  sections.push(modeQualityChecklist("voice-match"));
 
   sections.push(`## OUTPUT FORMAT\n${JSON_ENFORCEMENT}\n${ideaJsonShape()}`);
 
@@ -134,7 +205,8 @@ function buildTrendJackerPrompt(
   topic: string,
   audience: string,
   vibe: string,
-  count: number
+  count: number,
+  coreMessage: string
 ): string {
   const sections: string[] = [];
 
@@ -143,6 +215,8 @@ function buildTrendJackerPrompt(
   );
 
   sections.push(compactPersonaBlock(ctx));
+  const userCoreMessage = coreMessageBlock(coreMessage);
+  if (userCoreMessage) sections.push(userCoreMessage);
 
   // Viral recipe context (what works for this brand)
   if (ctx.analysis.viralRecipe.length) {
@@ -166,12 +240,19 @@ function buildTrendJackerPrompt(
 5. Prioritize trends with high virality potential for ${ctx.platform.target}
 ${audienceStr}${vibeStr}
 
+For each idea, include platformTemplate with a template recommendation and confidence reason.
+Write stronger visualDirection details for image execution (composition, focal subject, and content framing).
+
 DO NOT suggest trends outside this brand's expertise areas.
 DO NOT suggest generic ideas that any brand could post.
 ${ctx.persona.uniquePOV ? `Each idea MUST connect the trend to this brand's unique POV: "${ctx.persona.uniquePOV}"` : ""}
 
 ${doNotTalkBlock(ctx)}`
   );
+
+  const recentPostsBlock = recentPostsAvoidanceBlock(ctx);
+  if (recentPostsBlock) sections.push(recentPostsBlock);
+  sections.push(modeQualityChecklist("trend-jacker"));
 
   const extras = `"trendTopic": "the trending topic being leveraged",
       "trendContext": "why this topic is trending right now (1 sentence)",
@@ -189,7 +270,8 @@ function buildRepurposePrompt(
   _topic: string,
   _audience: string,
   _vibe: string,
-  count: number
+  count: number,
+  coreMessage: string
 ): string {
   const sections: string[] = [];
 
@@ -199,6 +281,8 @@ function buildRepurposePrompt(
 
   // Compact persona
   sections.push(compactPersonaBlock(ctx));
+  const userCoreMessage = coreMessageBlock(coreMessage);
+  if (userCoreMessage) sections.push(userCoreMessage);
 
   // Post history
   if (ctx.postHistory.recentPosts.length) {
@@ -233,9 +317,16 @@ Analyze the EXISTING CONTENT LIBRARY above and suggest ${count} repurpose ideas:
 4. Suggest "sequel" ideas (follow-up content to high performers)
 5. Suggest "compilation" ideas (combine multiple related posts)
 
+For each idea, include platformTemplate with template choice and rationale.
+visualDirection must explain what should be visible in the first frame/asset.
+
 ${doNotTalkBlock(ctx)}
 ${platformLine(ctx)}`
   );
+
+  const recentPostsBlock = recentPostsAvoidanceBlock(ctx);
+  if (recentPostsBlock) sections.push(recentPostsBlock);
+  sections.push(modeQualityChecklist("repurpose"));
 
   const extras = `"originalContentRef": "brief reference to the original content being remixed",
       "remixStrategy": "how to remix (format change / platform change / sequel / compilation)"`;
@@ -250,7 +341,8 @@ function buildGapFillerPrompt(
   topic: string,
   _audience: string,
   _vibe: string,
-  count: number
+  count: number,
+  coreMessage: string
 ): string {
   const sections: string[] = [];
 
@@ -259,6 +351,8 @@ function buildGapFillerPrompt(
   );
 
   sections.push(compactPersonaBlock(ctx));
+  const userCoreMessage = coreMessageBlock(coreMessage);
+  if (userCoreMessage) sections.push(userCoreMessage);
 
   // Content pillar analysis
   if (ctx.analysis.contentPillars.length) {
@@ -298,9 +392,16 @@ function buildGapFillerPrompt(
 Identify ${count} content gaps — topics this brand's audience needs but the brand hasn't covered.
 Prioritize by: audience demand (question weight) x brand relevance (pillar alignment).${topicStr}
 
+For each idea, include platformTemplate with a concrete platform-fit rationale and do/don't rules.
+visualDirection must include practical production guidance rather than generic style words.
+
 ${doNotTalkBlock(ctx)}
 ${platformLine(ctx)}`
   );
+
+  const recentPostsBlock = recentPostsAvoidanceBlock(ctx);
+  if (recentPostsBlock) sections.push(recentPostsBlock);
+  sections.push(modeQualityChecklist("gap-filler"));
 
   const extras = `"gapTopic": "the topic gap identified",
       "audienceDemandSignal": "evidence of audience demand for this topic"`;
@@ -315,7 +416,8 @@ function buildPrismPrompt(
   topic: string,
   audience: string,
   vibe: string,
-  count: number
+  count: number,
+  coreMessage: string
 ): string {
   const sections: string[] = [];
 
@@ -324,6 +426,8 @@ function buildPrismPrompt(
   );
 
   sections.push(personaBlock(ctx));
+  const userCoreMessage = coreMessageBlock(coreMessage);
+  if (userCoreMessage) sections.push(userCoreMessage);
 
   // Voice analysis (lighter)
   const vs = ctx.analysis.voiceSpectrum;
@@ -360,9 +464,15 @@ Available frameworks (use at least ${Math.min(count, frameworks.length)} differe
 ${frameworks.map((f) => `- ${f}`).join("\n")}
 
 Each idea must be distinct in angle while staying true to the brand voice.
+For each idea, include platformTemplate with recommended template, confidenceReason, and do/don't guidance.
+visualDirection should be concrete and platform-appropriate.
 ${doNotTalkBlock(ctx)}
 ${platformLine(ctx)}`
   );
+
+  const recentPostsBlock = recentPostsAvoidanceBlock(ctx);
+  if (recentPostsBlock) sections.push(recentPostsBlock);
+  sections.push(modeQualityChecklist("prism"));
 
   const extras = `"angleFramework": "which framework was used (e.g. 'Controversial/hot take', 'Educational breakdown')"`;
 
@@ -378,6 +488,7 @@ export interface PromptBuilderInput {
   mode: IdeaMode;
   topic: string;
   audience: string;
+  coreMessage: string;
   vibe: string;
   count: number;
 }
@@ -387,19 +498,19 @@ export interface PromptBuilderInput {
  * Returns the prompt string ready for Gemini.
  */
 export function buildIdeaFinderPrompt(input: PromptBuilderInput): string {
-  const { context, mode, topic, audience, vibe, count } = input;
+  const { context, mode, topic, audience, coreMessage, vibe, count } = input;
 
   switch (mode) {
     case "voice-match":
-      return buildVoiceMatchPrompt(context, topic, audience, vibe, count);
+      return buildVoiceMatchPrompt(context, topic, audience, vibe, count, coreMessage);
     case "trend-jacker":
-      return buildTrendJackerPrompt(context, topic, audience, vibe, count);
+      return buildTrendJackerPrompt(context, topic, audience, vibe, count, coreMessage);
     case "repurpose":
-      return buildRepurposePrompt(context, topic, audience, vibe, count);
+      return buildRepurposePrompt(context, topic, audience, vibe, count, coreMessage);
     case "gap-filler":
-      return buildGapFillerPrompt(context, topic, audience, vibe, count);
+      return buildGapFillerPrompt(context, topic, audience, vibe, count, coreMessage);
     case "prism":
-      return buildPrismPrompt(context, topic, audience, vibe, count);
+      return buildPrismPrompt(context, topic, audience, vibe, count, coreMessage);
     default: {
       const _exhaustive: never = mode;
       throw new Error(`Unknown idea mode: ${_exhaustive}`);

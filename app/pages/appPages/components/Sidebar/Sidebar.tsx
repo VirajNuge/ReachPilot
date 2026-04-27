@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname, useParams, useRouter } from "next/navigation";
 import {
   FaFlask,
   FaLightbulb,
@@ -28,7 +28,9 @@ import { useAuth } from "../../../../contexts/AuthContext";
 const Sidebar = () => {
   const pathname = usePathname();
   const params = useParams();
-  const accountId = params?.id ?? "1";
+  const router = useRouter();
+  const rawAccountId = params?.id;
+  const accountId = Array.isArray(rawAccountId) ? rawAccountId[0] : rawAccountId ?? "1";
   const { user, logout } = useAuth();
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
@@ -54,6 +56,24 @@ const Sidebar = () => {
   const subLinkBase =
     "block ml-4 px-4 py-2.5 text-[12px] font-bold rounded-xl transition-all duration-200";
 
+  useEffect(() => {
+    if (!accountId) return;
+
+    const frequentRoutes = [
+      `/${accountId}/profileAnalyzer`,
+      `/${accountId}/accountPersona`,
+      `/${accountId}/postAnalyzer`,
+      `/${accountId}/postGenerator`,
+      `/${accountId}/generateIdeas`,
+      `/${accountId}/publishing`,
+      `/${accountId}/analytics`,
+      `/${accountId}/questionMine`,
+      `/${accountId}/explorePostsIdeas`,
+    ];
+
+    frequentRoutes.forEach((route) => router.prefetch(route));
+  }, [accountId, router]);
+
   return (
     <aside className="w-[260px] h-screen shrink-0 bg-[#E8ECF2] flex flex-col z-50 border-none font-sans antialiased">
       {/* 1. BRAND IDENTITY SECTION */}
@@ -78,9 +98,9 @@ const Sidebar = () => {
         </p>
 
         <Link
-          href="/dashboard"
+          href={`/${accountId}/profileAnalyzer`}
           className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none no-underline outline-none ${
-            isActive("/dashboard") ? activeMainLink : inactiveMainLink
+            isActive("/dashboard") || isActive("profileAnalyzer") ? activeMainLink : inactiveMainLink
           }`}
         >
           <FaTachometerAlt

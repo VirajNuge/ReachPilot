@@ -224,10 +224,6 @@ export function ScheduleCalendar({
     return "bg-[#DBEAFE]/30 hover:bg-[#DBEAFE]/50";
   };
 
-  const hasOptimalSlot = (dayOfWeek: number, hour?: number) => {
-    return optimalSlots.some(s => s.day === dayOfWeek && (hour === undefined || s.hour === hour));
-  };
-
   /* ── Render ─────────────────────────────────────────────────────────── */
 
   return (
@@ -431,8 +427,6 @@ export function ScheduleCalendar({
                 const isOpt = score > 0;
 
                 // Header bg: apply light tint of the score color for the column
-                const hdrBg = isT ? "bg-[#EEF3FF]" : isOpt ? `opacity-${Math.round(score * 20)}` : "";
-
                 return (
                   <div key={i} className={`flex-1 text-center py-2 border-r border-slate-100 ${isT ? "bg-[#EEF3FF]" : ""}`}>
                     <p className={`text-[10px] font-bold uppercase tracking-widest ${isT ? "text-[#0052FF]" : isOpt ? "text-[#0052FF]" : "text-slate-400"}`}>
@@ -473,8 +467,6 @@ export function ScheduleCalendar({
                       {HOURS.map(h => {
                         const score = hourScore(dayIdx, h);
                         const posts = draftsForHour(date.getDate(), date.getMonth(), date.getFullYear(), h);
-                        const slot  = optimalSlots.find(s => s.day === dayIdx && s.hour === h);
-
                         return (
                           <div
                             key={`cell-${dayIdx}-${h}`}

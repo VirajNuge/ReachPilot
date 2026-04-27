@@ -10,6 +10,13 @@ import {
   Search,
   Globe,
 } from "lucide-react";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaPinterest,
+  FaXTwitter,
+} from "react-icons/fa6";
 
 // --- Sub-Components ---
 import TopicInput from "./TopicInput";
@@ -21,12 +28,15 @@ interface BriefingFormProps {
     mode: IdeaMode;
     topic: string;
     audience: string;
+    coreMessage: string;
+    importPersona: boolean;
     goal: string;
     vibe: string;
     platform: IdeaPlatform;
     count: number;
   }) => void;
   isGenerating: boolean;
+  personaAvailable: boolean;
 }
 
 const MODE_CONFIG: Array<{
@@ -87,27 +97,41 @@ const MODE_CONFIG: Array<{
 
 const PLATFORMS: Array<{ id: IdeaPlatform; label: string; icon: React.ReactNode }> = [
   { id: "all", label: "All", icon: <Globe size={14} /> },
-  { id: "instagram", label: "Instagram", icon: <span className="text-xs">📸</span> },
-  { id: "linkedin", label: "LinkedIn", icon: <span className="text-xs">💼</span> },
-  { id: "x", label: "X", icon: <span className="text-xs">𝕏</span> },
-  { id: "facebook", label: "Facebook", icon: <span className="text-xs">📘</span> },
+  { id: "instagram", label: "Instagram", icon: <FaInstagram size={14} /> },
+  { id: "linkedin", label: "LinkedIn", icon: <FaLinkedin size={14} /> },
+  { id: "x", label: "X", icon: <FaXTwitter size={14} /> },
+  { id: "facebook", label: "Facebook", icon: <FaFacebook size={14} /> },
+  { id: "pinterest", label: "Pinterest", icon: <FaPinterest size={14} /> },
 ];
 
 export default function BriefingForm({
   onGenerate,
   isGenerating,
+  personaAvailable,
 }: BriefingFormProps) {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [mode, setMode] = useState<IdeaMode>("voice-match");
   const [platform, setPlatform] = useState<IdeaPlatform>("all");
   const [topic, setTopic] = useState("");
   const [audience, setAudience] = useState("");
+  const [coreMessage, setCoreMessage] = useState("");
+  const [importPersona, setImportPersona] = useState(true);
   const [goal, setGoal] = useState("viral");
   const [vibe, setVibe] = useState("Educational");
 
   const handleSubmit = () => {
     if (!topic && mode !== "gap-filler" && mode !== "repurpose") return;
-    onGenerate({ mode, topic, audience, goal, vibe, platform, count: 8 });
+    onGenerate({
+      mode,
+      topic,
+      audience,
+      coreMessage,
+      importPersona: personaAvailable ? importPersona : false,
+      goal,
+      vibe,
+      platform,
+      count: 1,
+    });
   };
 
   const activeConfig = MODE_CONFIG.find((m) => m.id === mode)!;
@@ -272,6 +296,11 @@ export default function BriefingForm({
             setTopic={setTopic}
             audience={audience}
             setAudience={setAudience}
+            coreMessage={coreMessage}
+            setCoreMessage={setCoreMessage}
+            importPersona={importPersona}
+            setImportPersona={setImportPersona}
+            personaAvailable={personaAvailable}
           />
         </section>
       )}
@@ -295,6 +324,8 @@ export default function BriefingForm({
             <p className="text-xs font-semibold text-slate-700">Mode: {activeConfig.label}</p>
             <p className="text-xs font-semibold text-slate-700">Platform: {PLATFORMS.find((p) => p.id === platform)?.label ?? "All"}</p>
             <p className="text-xs font-semibold text-slate-700 truncate">Topic: {topic || "Auto from context"}</p>
+            <p className="text-xs font-semibold text-slate-700 truncate">Core Message: {coreMessage || "Not specified"}</p>
+            <p className="text-xs font-semibold text-slate-700">Persona Import: {personaAvailable ? (importPersona ? "Enabled" : "Disabled") : "Unavailable"}</p>
           </div>
         </>
       )}

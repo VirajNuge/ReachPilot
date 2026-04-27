@@ -174,13 +174,15 @@ export async function assembleIdeaFinderContext(
   userId: string,
   accountId: string,
   mode: IdeaMode,
-  platform: IdeaPlatform
+  platform: IdeaPlatform,
+  options?: { importPersona?: boolean }
 ): Promise<IdeaFinderContext> {
   const { db } = await connectToDatabase();
+  const shouldImportPersona = options?.importPersona ?? true;
 
   // Parallel data fetch
   const [persona, analysisSession, postDocs] = await Promise.all([
-    getPersonaByUserAndAccount(userId, accountId),
+    shouldImportPersona ? getPersonaByUserAndAccount(userId, accountId) : Promise.resolve(null),
     db
       .collection("analysis_sessions")
       .findOne(

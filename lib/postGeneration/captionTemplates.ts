@@ -25,6 +25,14 @@ export interface CaptionTemplate {
   bestFor: CaptionStylePreference[];
 }
 
+export type BuiltInCaptionTemplateId =
+  | "problem_solution"
+  | "hook_value_cta"
+  | "story_format"
+  | "authority_format"
+  | "listicle_format"
+  | "engagement_question";
+
 // ── Template Library ─────────────────────────────────────────
 
 export const CAPTION_TEMPLATES: Record<string, CaptionTemplate> = {
@@ -57,6 +65,7 @@ Follow this exact structure:
       x: `X variation: Compress to hook (problem) + punchline (solution) format. Max 250 chars. No hashtags.`,
       instagram_post: `Instagram variation: Hook in first line (before "more"). Use emojis to mark sections. Save-worthy formatting with tips.`,
       facebook: `Facebook variation: Start conversational — "Anyone else dealing with...?" Make it relatable. End with discussion question.`,
+      pinterest: `Pinterest variation: Lead with a keyword-driven hook, then practical value steps. Optimize for save intent and evergreen usefulness.`,
     },
     bestFor: ["promotional", "educational", "authority"],
   },
@@ -93,6 +102,7 @@ Follow this exact structure:
       x: `X variation: Compress hook + 1 key value point + question CTA. Under 250 chars.`,
       instagram_post: `Instagram variation: Use "Save this for later 📌" as CTA. Value section formatted for carousel-friendly reading.`,
       facebook: `Facebook variation: Value delivered as a mini-story or analogy. CTA is a community question.`,
+      pinterest: `Pinterest variation: Use a keyword-led title line, then concise actionable value bullets. End with save/click CTA.`,
     },
     bestFor: ["educational", "authority", "promotional"],
   },
@@ -133,6 +143,7 @@ Follow this exact narrative arc:
       x: `X variation: Micro-story format — situation in 1 line, punchline lesson in 1 line. Max 250 chars.`,
       instagram_post: `Instagram variation: Story in caption drives saves. Include a "moral of the story" that's screenshot-worthy.`,
       facebook: `Facebook variation: Stories drive shares on Facebook. Make it feel like talking to a friend.`,
+      pinterest: `Pinterest variation: Story should teach a repeatable method readers can save and revisit later.`,
     },
     bestFor: ["storytelling", "motivational", "conversational"],
   },
@@ -172,6 +183,7 @@ Follow this exact structure:
       x: `X variation: Lead with the contrarian insight as the hook. Framework in thread if needed. Under 250 chars for main post.`,
       instagram_post: `Instagram variation: Perfect for carousel posts. Each framework step = 1 slide. Caption teases the framework.`,
       facebook: `Facebook variation: Position as helpful advice from an expert friend, not a lecture. Use relatable examples.`,
+      pinterest: `Pinterest variation: Convert framework into saveable checklist language with keyword-rich phrasing.`,
     },
     bestFor: ["authority", "educational", "promotional"],
   },
@@ -210,6 +222,7 @@ Follow this exact structure:
       x: `X variation: Pick the strongest 3 items. Hook + mini-list format. Under 250 chars.`,
       instagram_post: `Instagram variation: Perfect for saves. "Save this for later 📌" CTA. Each item on its own line with emoji markers.`,
       facebook: `Facebook variation: Keep to 3-5 items. Make each one conversational. End with "Which one resonates most?"`,
+      pinterest: `Pinterest variation: Best-fit Pinterest structure. Use numbered list with search keywords and explicit save CTA.`,
     },
     bestFor: ["educational", "authority", "conversational"],
   },
@@ -247,6 +260,7 @@ Follow this exact structure:
       x: `X variation: Just the question + optional personal take. Max 250 chars. Questions drive replies on X.`,
       instagram_post: `Instagram variation: Use this/that format or "Would you rather..." Encourage comments for algorithm boost.`,
       facebook: `Facebook variation: Conversational, community-focused. "Quick poll for my friends:" or "Curious what you all think:"`,
+      pinterest: `Pinterest variation: Use engagement prompts sparingly; keep emphasis on practical saveable value.`,
     },
     bestFor: ["conversational", "storytelling", "motivational"],
   },
@@ -265,9 +279,9 @@ export function selectCaptionTemplate(
   platform: PostPlatform,
   objective: PostObjective,
   _niche?: NicheCategory,
-): string {
+): BuiltInCaptionTemplateId {
   // Direct style → template mapping
-  const styleToTemplate: Record<CaptionStylePreference, string> = {
+  const styleToTemplate: Record<CaptionStylePreference, BuiltInCaptionTemplateId | ""> = {
     educational: "hook_value_cta",
     storytelling: "story_format",
     motivational: "story_format",
@@ -286,7 +300,7 @@ export function selectCaptionTemplate(
   }
 
   // For "auto" — resolve based on objective + platform
-  const objectiveToTemplate: Partial<Record<PostObjective, string>> = {
+  const objectiveToTemplate: Partial<Record<PostObjective, BuiltInCaptionTemplateId>> = {
     educational: "hook_value_cta",
     promotional: "problem_solution",
     thought_leadership: "authority_format",
@@ -305,15 +319,41 @@ export function selectCaptionTemplate(
   }
 
   // Platform-based fallback
-  const platformFallback: Record<PostPlatform, string> = {
+  const platformFallback: Record<PostPlatform, BuiltInCaptionTemplateId> = {
     linkedin: "authority_format",
     x: "hook_value_cta",
     instagram_post: "hook_value_cta",
     facebook: "story_format",
+    pinterest: "listicle_format",
     threads: "hook_value_cta",
   };
 
   return platformFallback[platform] ?? "hook_value_cta";
+}
+
+export function isBuiltInCaptionTemplateId(value: string | undefined): value is BuiltInCaptionTemplateId {
+  if (!value) return false;
+  return Object.prototype.hasOwnProperty.call(CAPTION_TEMPLATES, value);
+}
+
+export function getBuiltInCaptionTemplate(
+  templateId: BuiltInCaptionTemplateId,
+): CaptionTemplate | undefined {
+  return CAPTION_TEMPLATES[templateId];
+}
+
+export function resolveCaptionTemplateId(
+  captionStyle: CaptionStylePreference,
+  platform: PostPlatform,
+  objective: PostObjective,
+  niche?: NicheCategory,
+  forcedTemplateId?: string,
+): BuiltInCaptionTemplateId {
+  if (isBuiltInCaptionTemplateId(forcedTemplateId)) {
+    return forcedTemplateId;
+  }
+
+  return selectCaptionTemplate(captionStyle, platform, objective, niche);
 }
 
 /**
@@ -325,8 +365,15 @@ export function buildCaptionTemplateInstructions(
   platform: PostPlatform,
   objective: PostObjective,
   niche?: NicheCategory,
+  forcedTemplateId?: string,
 ): string {
-  const templateId = selectCaptionTemplate(captionStyle, platform, objective, niche);
+  const templateId = resolveCaptionTemplateId(
+    captionStyle,
+    platform,
+    objective,
+    niche,
+    forcedTemplateId,
+  );
   const template = CAPTION_TEMPLATES[templateId];
 
   if (!template) return "";

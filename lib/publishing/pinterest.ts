@@ -12,7 +12,15 @@ async function getFirstBoardId(accessToken: string): Promise<string | null> {
     const res = await fetch(`${PINTEREST_API}/boards?page_size=1`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    const data = await res.json() as { items?: Array<{ id: string }> };
+    const data = await res.json() as { items?: Array<{ id: string }>; code?: number; message?: string };
+    if (!res.ok || data.code) {
+      console.error("Pinterest board fetch failed", {
+        status: res.status,
+        code: data.code,
+        message: data.message,
+      });
+      return null;
+    }
     return data?.items?.[0]?.id ?? null;
   } catch {
     return null;
@@ -55,7 +63,9 @@ export async function publishToPinterest(
     const data = await res.json() as { id?: string; code?: number; message?: string };
 
     if (!res.ok || data.code) {
-      return { success: false, error: data.message || `Pinterest API error ${res.status}` };
+      const base = data.message || `Pinterest API error ${res.status}`;
+      const enriched = typeof data.code === "number" ? `${base} | code=${data.code}` : base;
+      return { success: false, error: enriched };
     }
 
     return { success: true, platformPostId: data.id };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Lightbulb } from "lucide-react";
 import { motion } from "framer-motion";
@@ -27,10 +27,14 @@ export default function GenerateIdeasPage() {
   const [generationStep, setGenerationStep] = useState<string>("");
   const [ideas, setIdeas] = useState<GeneratedIdea[]>([]);
   const [currentMode, setCurrentMode] = useState<IdeaMode>("voice-match");
+  const [savedIdeaIds, setSavedIdeaIds] = useState<Record<string, string>>({});
+  const [personaAvailable, setPersonaAvailable] = useState(false);
   const [lastFormData, setLastFormData] = useState<{
     mode: IdeaMode;
     topic: string;
     audience: string;
+    coreMessage: string;
+    importPersona: boolean;
     goal: string;
     vibe: string;
     platform: IdeaPlatform;
@@ -42,10 +46,36 @@ export default function GenerateIdeasPage() {
   const [selectedIdea, setSelectedIdea] = useState<GeneratedIdea | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  useEffect(() => {
+    let mounted = true;
+
+    const loadPersonaAvailability = async () => {
+      try {
+        const res = await fetch(`/api/idea-finder/persona-availability?accountId=${accountId}`);
+        const json = await res.json();
+        if (!mounted) return;
+        setPersonaAvailable(Boolean(json?.data?.available));
+      } catch {
+        if (!mounted) return;
+        setPersonaAvailable(false);
+      }
+    };
+
+    if (accountId) {
+      loadPersonaAvailability();
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [accountId]);
+
   const handleGenerate = async (data: {
     mode: IdeaMode;
     topic: string;
     audience: string;
+    coreMessage: string;
+    importPersona: boolean;
     goal: string;
     vibe: string;
     platform: IdeaPlatform;
@@ -68,8 +98,10 @@ export default function GenerateIdeasPage() {
           topic: data.topic,
           platform: data.platform,
           audience: data.audience,
+          coreMessage: data.coreMessage,
+          importPersona: data.importPersona,
           vibe: data.vibe,
-          count: data.count,
+          count: 1,
           accountId,
         }),
       });
@@ -99,7 +131,9 @@ export default function GenerateIdeasPage() {
 
   const handleSave = async (idea: GeneratedIdea) => {
     try {
-      await fetch("/api/idea-finder/save", {
+      if (savedIdeaIds[idea.id]) return;
+
+      const res = await fetch("/api/idea-finder/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -108,24 +142,11 @@ export default function GenerateIdeasPage() {
           accountId,
         }),
       });
-    } catch {
-      // Fire-and-forget
-    }
-  };
 
-  const handleFeedback = async (
-    idea: GeneratedIdea,
-    feedback: "positive" | "negative"
-  ) => {
-    try {
-      await fetch("/api/idea-finder/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ideaId: idea.id,
-          feedback,
-        }),
-      });
+      const json = await res.json();
+      if (res.ok && json?.success && json?.id) {
+        setSavedIdeaIds((prev) => ({ ...prev, [idea.id]: json.id }));
+      }
     } catch {
       // Fire-and-forget
     }
@@ -230,6 +251,7 @@ export default function GenerateIdeasPage() {
               <BriefingForm
                 onGenerate={handleGenerate}
                 isGenerating={isGenerating}
+                personaAvailable={personaAvailable}
               />
             </div>
           </motion.div>
@@ -249,7 +271,6 @@ export default function GenerateIdeasPage() {
               generationStep={generationStep}
               onIdeaClick={handleIdeaClick}
               onSave={handleSave}
-              onFeedback={handleFeedback}
               onGenerateMore={undefined}
             />
           </motion.div>
@@ -283,7 +304,6 @@ export default function GenerateIdeasPage() {
               generationStep={undefined}
               onIdeaClick={handleIdeaClick}
               onSave={handleSave}
-              onFeedback={handleFeedback}
               onGenerateMore={handleGenerateMore}
             />
           </motion.div>
@@ -295,6 +315,7 @@ export default function GenerateIdeasPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         idea={selectedIdea}
+        mode={currentMode}
         onGenerateDraft={handleGenerateDraft}
       />
     </div>

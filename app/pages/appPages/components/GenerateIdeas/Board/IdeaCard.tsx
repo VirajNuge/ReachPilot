@@ -4,13 +4,15 @@ import React from "react";
 import {
   ArrowRight,
   Bookmark,
-  ThumbsUp,
-  ThumbsDown,
-  Copy,
-  ExternalLink,
-  TrendingUp,
   Sparkles,
 } from "lucide-react";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaPinterest,
+  FaXTwitter,
+} from "react-icons/fa6";
 import type { GeneratedIdea, IdeaMode } from "@/lib/ideaFinder/types";
 
 // Re-export for backwards compat
@@ -21,7 +23,6 @@ interface IdeaCardProps {
   mode?: IdeaMode;
   onClick: (idea: GeneratedIdea) => void;
   onSave?: (idea: GeneratedIdea) => void;
-  onFeedback?: (idea: GeneratedIdea, feedback: "positive" | "negative") => void;
 }
 
 const MODE_BADGE: Record<string, { label: string; color: string; accent: string; bg: string }> = {
@@ -32,15 +33,16 @@ const MODE_BADGE: Record<string, { label: string; color: string; accent: string;
   prism: { label: "Prism", color: "text-indigo-600", accent: "bg-indigo-500", bg: "bg-indigo-50" },
 };
 
-function getPlatformLabel(platform: string): string {
-  const map: Record<string, string> = {
-    instagram: "Instagram",
-    linkedin: "LinkedIn",
-    x: "X",
-    facebook: "Facebook",
-    all: "All Platforms",
+function getPlatformMeta(platform: string): { label: string; icon: React.ReactNode } {
+  const map: Record<string, { label: string; icon: React.ReactNode }> = {
+    instagram: { label: "Instagram", icon: <FaInstagram size={12} /> },
+    linkedin: { label: "LinkedIn", icon: <FaLinkedin size={12} /> },
+    x: { label: "X", icon: <FaXTwitter size={12} /> },
+    facebook: { label: "Facebook", icon: <FaFacebook size={12} /> },
+    pinterest: { label: "Pinterest", icon: <FaPinterest size={12} /> },
+    all: { label: "All Platforms", icon: <Sparkles size={12} /> },
   };
-  return map[platform] || platform;
+  return map[platform] || { label: platform, icon: <Sparkles size={12} /> };
 }
 
 function getConfidenceStyles(score: number): { text: string; bg: string; border: string; ring: string } {
@@ -54,24 +56,14 @@ export default function IdeaCard({
   mode,
   onClick,
   onSave,
-  onFeedback,
 }: IdeaCardProps) {
   const confStyles = getConfidenceStyles(idea.confidenceScore);
   const modeBadge = mode ? MODE_BADGE[mode] : MODE_BADGE["voice-match"];
-
-  const handleCopyHook = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(idea.hook);
-  };
+  const platformMeta = getPlatformMeta(idea.platform);
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
     onSave?.(idea);
-  };
-
-  const handleFeedback = (e: React.MouseEvent, fb: "positive" | "negative") => {
-    e.stopPropagation();
-    onFeedback?.(idea, fb);
   };
 
   // SVG Ring for confidence
@@ -163,8 +155,9 @@ export default function IdeaCard({
           )}
 
           {/* Platform in footer now */}
-          <span className="px-2 py-1 rounded-md bg-slate-50 border border-slate-100 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-            {getPlatformLabel(idea.platform)}
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-slate-50 border border-slate-100 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+            <span className="text-slate-400">{platformMeta.icon}</span>
+            {platformMeta.label}
           </span>
 
           <span className="px-2 py-1 rounded-md bg-slate-50 border border-slate-100 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
@@ -182,13 +175,6 @@ export default function IdeaCard({
       {/* Action Footer */}
       <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <button
-            onClick={handleCopyHook}
-            className="p-2 rounded-xl text-slate-400 hover:bg-white hover:text-slate-800 hover:shadow-sm transition-all border border-transparent hover:border-slate-200"
-            title="Copy hook"
-          >
-            <Copy size={16} />
-          </button>
           {onSave && (
             <button
               onClick={handleSave}
@@ -197,24 +183,6 @@ export default function IdeaCard({
             >
               <Bookmark size={16} />
             </button>
-          )}
-          {onFeedback && (
-            <>
-              <button
-                onClick={(e) => handleFeedback(e, "positive")}
-                className="p-2 rounded-xl text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 hover:shadow-sm transition-all border border-transparent hover:border-emerald-200 ml-2"
-                title="Good idea"
-              >
-                <ThumbsUp size={16} />
-              </button>
-              <button
-                onClick={(e) => handleFeedback(e, "negative")}
-                className="p-2 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 hover:shadow-sm transition-all border border-transparent hover:border-rose-200"
-                title="Not useful"
-              >
-                <ThumbsDown size={16} />
-              </button>
-            </>
           )}
         </div>
 

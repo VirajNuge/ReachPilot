@@ -2,7 +2,7 @@
 
 import React from "react";
 import type { PostPlatform } from "@/lib/types/postGeneration";
-import { SiFacebook, SiInstagram, SiLinkedin, SiThreads, SiX } from "react-icons/si";
+import { SiFacebook, SiInstagram, SiLinkedin, SiPinterest, SiThreads, SiX } from "react-icons/si";
 
 type PlatformBrand = {
   label: string;
@@ -35,6 +35,12 @@ export const PLATFORM_BRANDS: Record<PostPlatform, PlatformBrand> = {
     shortLabel: "FB",
     color: "#1877F2",
     Icon: SiFacebook,
+  },
+  pinterest: {
+    label: "Pinterest",
+    shortLabel: "PIN",
+    color: "#E60023",
+    Icon: SiPinterest,
   },
   threads: {
     label: "Threads",

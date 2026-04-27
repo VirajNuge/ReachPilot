@@ -6,7 +6,6 @@ import {
   X,
   Copy,
   Image as ImageIcon,
-  Hash,
   Target,
   TrendingUp,
   CheckCircle2,
@@ -16,19 +15,22 @@ import {
   Link2,
   SlidersHorizontal,
   Eye,
+  Layers,
 } from "lucide-react";
 import type { GeneratedIdea } from "@/lib/ideaFinder/types";
-import type { PostGenerationInput } from "@/lib/types/postGeneration";
+import { PLATFORM_INTELLIGENCE, type PostGenerationInput } from "@/lib/types/postGeneration";
 import { mapIdeaToPostSeed } from "@/lib/ideaFinder/ideaToPostSeed";
 import { validatePostSeed } from "@/lib/ideaFinder/postSeedValidation";
 import PostSeedPanel from "./PostSeedPanel";
+import type { IdeaMode } from "@/lib/ideaFinder/types";
 
-type ModalTab = "preview" | "inputs";
+type ModalTab = "preview" | "templates" | "inputs";
 
 interface BlueprintModalProps {
   isOpen: boolean;
   onClose: () => void;
   idea: GeneratedIdea | null;
+  mode: IdeaMode;
   onGenerateDraft?: (idea: GeneratedIdea, editedSeed?: PostGenerationInput) => void;
 }
 
@@ -36,6 +38,7 @@ export default function BlueprintModal({
   isOpen,
   onClose,
   idea,
+  mode,
   onGenerateDraft,
 }: BlueprintModalProps) {
   const [copied, setCopied] = useState(false);
@@ -47,9 +50,9 @@ export default function BlueprintModal({
     if (!idea) return null;
     if (idea.postSeed) return idea.postSeed;
     // Fallback: regenerate deterministically
-    const { postSeed } = mapIdeaToPostSeed(idea, "voice-match");
+    const { postSeed } = mapIdeaToPostSeed(idea, mode);
     return postSeed;
-  }, [idea]);
+  }, [idea, mode]);
 
   // Reset state when modal opens with new idea
   useEffect(() => {
@@ -60,10 +63,51 @@ export default function BlueprintModal({
     }
   }, [isOpen, idea, defaultSeed]);
 
-  if (!isOpen || !idea) return null;
-
   const currentSeed = editedSeed ?? defaultSeed;
   const validation = currentSeed ? validatePostSeed(currentSeed) : { valid: false, errors: [] };
+
+  const outlinePoints = useMemo(() => {
+    if (!idea) return [];
+
+    const shorten = (text: string, max = 180) => {
+      const trimmed = text.replace(/\s+/g, " ").trim();
+      if (trimmed.length <= max) return trimmed;
+      return `${trimmed.slice(0, max - 1).trim()}…`;
+    };
+
+    const fromTextBlocks = (currentSeed?.textBlocks || [])
+      .filter((block) => typeof block.text === "string" && block.text.trim().length > 0)
+      .map((block) => {
+        const label = block.label?.trim() || "Point";
+        const text = shorten(block.text);
+        return `${label}: ${text}`;
+      });
+
+    const dedupedTextBlocks = Array.from(new Set(fromTextBlocks))
+      .filter((point) => point.trim().length > 0)
+      .slice(0, 5);
+
+    if (dedupedTextBlocks.length > 0) {
+      return dedupedTextBlocks;
+    }
+
+    const angleParts = idea.angle
+      .split(/[.!?]\s+|;\s+|\n+/)
+      .map((part) => shorten(part, 140))
+      .filter((part) => part.length > 0)
+      .slice(0, 3);
+
+    const fallback = [
+      idea.hook ? `Hook: ${shorten(idea.hook, 140)}` : "",
+      angleParts[0] ? `Core value: ${angleParts[0]}` : `Core value: ${shorten(idea.angle, 140)}`,
+      angleParts[1] ? `Support point: ${angleParts[1]}` : "",
+      idea.suggestedCTA ? `Close with CTA: ${shorten(idea.suggestedCTA, 140)}` : "Close with CTA aligned to the audience action.",
+    ].filter(Boolean);
+
+    return fallback.slice(0, 5);
+  }, [currentSeed, idea]);
+
+  if (!isOpen || !idea) return null;
 
   const handleCopy = () => {
     const text = `${idea.hook}\n\n${idea.angle}\n\n${idea.suggestedCTA}`;
@@ -89,6 +133,38 @@ export default function BlueprintModal({
   };
 
   const confColors = getConfidenceColor(idea.confidenceScore);
+  const platformTemplate = idea.platformTemplate;
+  const getPlatformLabel = (platform: string) => {
+    if (platform === "instagram_post") return "Instagram";
+    if (platform === "x") return "X";
+    if (platform === "linkedin") return "LinkedIn";
+    if (platform === "facebook") return "Facebook";
+    if (platform === "pinterest") return "Pinterest";
+    if (platform === "threads") return "Threads";
+    return platform;
+  };
+
+  const templatePlatforms = currentSeed?.platforms?.length
+    ? currentSeed.platforms
+    : platformTemplate?.platform
+      ? [platformTemplate.platform]
+      : [];
+
+  const primaryStructureTemplate = platformTemplate?.templateName || "Single Post Structure";
+
+  const getPlatformTemplateLabel = (platform: string) => {
+    if (platform === "linkedin") return "Authority Insight Structure";
+    if (platform === "instagram_post") return "Hook-Value-CTA Feed Structure";
+    if (platform === "x") return "Compact Punchy Structure";
+    if (platform === "facebook") return "Community Conversation Structure";
+    if (platform === "pinterest") return "Search-Save Pin Structure";
+    if (platform === "threads") return "Hot-Take Conversation Structure";
+    return primaryStructureTemplate;
+  };
+  const confidenceRationale =
+    platformTemplate?.confidenceReason ||
+    idea.whyItFits ||
+    "Confidence is based on platform fit, strategic angle strength, and mode context.";
 
   return (
     <AnimatePresence>
@@ -148,6 +224,9 @@ export default function BlueprintModal({
                       className={`h-full rounded-full ${confColors.bar}`}
                     />
                   </div>
+                  <p className="text-[12px] text-slate-500 leading-relaxed font-medium">
+                    {confidenceRationale}
+                  </p>
                 </div>
               </div>
 
@@ -223,6 +302,27 @@ export default function BlueprintModal({
                       Sources
                     </h4>
                   </div>
+                  {(idea.searchQueries?.length || idea.groundedAt) && (
+                    <div className="mb-3 space-y-2">
+                      {idea.searchQueries?.length ? (
+                        <div className="flex flex-wrap gap-1.5">
+                          {idea.searchQueries.map((query) => (
+                            <span
+                              key={query}
+                              className="text-[10px] font-bold text-[#0052FF] bg-[#0052FF]/5 border border-[#0052FF]/15 px-2 py-1 rounded-md"
+                            >
+                              {query}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                      {idea.groundedAt ? (
+                        <p className="text-[11px] text-slate-500 font-medium">
+                          Grounded at: {new Date(idea.groundedAt).toLocaleString()}
+                        </p>
+                      ) : null}
+                    </div>
+                  )}
                   <div className="space-y-2">
                     {idea.sources.map((src, idx) => (
                       <a
@@ -243,6 +343,50 @@ export default function BlueprintModal({
                   </div>
                 </div>
               )}
+
+              {/* Draft handoff field contract */}
+              {idea.draftFieldRequirements && (
+                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle2 size={16} className="text-[#000100]" strokeWidth={2.5} />
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      Draft Handoff Fields
+                    </h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">
+                        Mandatory
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {idea.draftFieldRequirements.mandatory.map((field) => (
+                          <span
+                            key={field}
+                            className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-md"
+                          >
+                            {field}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">
+                        Inferred
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {idea.draftFieldRequirements.inferred.map((field) => (
+                          <span
+                            key={field}
+                            className="text-[10px] font-bold text-slate-600 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md"
+                          >
+                            {field}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -260,7 +404,11 @@ export default function BlueprintModal({
                       Idea Blueprint
                     </span>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      {activeTab === "preview" ? "Draft Preview" : "Post Generation Inputs"}
+                      {activeTab === "preview"
+                        ? "Draft Preview"
+                        : activeTab === "templates"
+                          ? "Platform Templates"
+                          : "Post Generation Inputs"}
                     </span>
                   </div>
                 </div>
@@ -281,6 +429,10 @@ export default function BlueprintModal({
                   className={`px-4 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all border-b-2 flex items-center gap-2 ${activeTab === "inputs" ? "border-[#0052FF] text-[#0052FF]" : "border-transparent text-slate-400 hover:text-slate-600"}`}>
                   <SlidersHorizontal size={14} /> Inputs
                   {!validation.valid && <span className="w-2 h-2 rounded-full bg-amber-400" />}
+                </button>
+                <button type="button" onClick={() => setActiveTab("templates")}
+                  className={`px-4 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all border-b-2 flex items-center gap-2 ${activeTab === "templates" ? "border-[#0052FF] text-[#0052FF]" : "border-transparent text-slate-400 hover:text-slate-600"}`}>
+                  <Layers size={14} /> Templates
                 </button>
               </div>
             </div>
@@ -339,12 +491,17 @@ export default function BlueprintModal({
                       <span className="w-1.5 h-6 bg-slate-200 rounded-full" />
                       <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">Outline</h3>
                     </div>
-                    <div className="pl-4 space-y-4">
-                      <div className="w-full h-4 bg-slate-100 rounded-md" />
-                      <div className="w-5/6 h-4 bg-slate-100 rounded-md" />
-                      <div className="w-4/6 h-4 bg-slate-100 rounded-md" />
-                      <p className="text-[13px] text-slate-400 font-medium pt-2">
-                        (Body content will be generated from the strategic angle)
+                    <div className="pl-4 space-y-3">
+                      <ul className="space-y-2">
+                        {outlinePoints.map((point, index) => (
+                          <li key={`${idea.id}-outline-${index}`} className="flex items-start gap-2.5">
+                            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0" />
+                            <span className="text-[14px] text-slate-700 leading-relaxed font-medium">{point}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="text-[12px] text-slate-400 font-medium pt-1">
+                        Body copy will be expanded from this outline when you generate the draft.
                       </p>
                     </div>
                   </div>
@@ -392,6 +549,80 @@ export default function BlueprintModal({
                         </p>
                       )}
                     </div>
+                  )}
+                </div>
+              ) : activeTab === "templates" ? (
+                /* ── Templates Tab ── */
+                <div className="max-w-2xl mx-auto space-y-4">
+                  {templatePlatforms.length === 0 ? (
+                    <div className="p-5 rounded-2xl border border-slate-100 bg-slate-50">
+                      <p className="text-[13px] text-slate-600 font-medium">
+                        No platform templates available for this idea yet.
+                      </p>
+                    </div>
+                  ) : (
+                    templatePlatforms.map((platform) => {
+                      const style = idea.platformStyles?.[platform];
+                      const label = getPlatformLabel(platform);
+                      const intelligence = PLATFORM_INTELLIGENCE[platform];
+                      const structureRules = intelligence?.captionRules?.structureRules?.slice(0, 4) || [
+                        "Lead with a clear hook.",
+                        "Deliver one focused value body.",
+                        "Close with a clear CTA.",
+                        "Keep layout optimized for one single post.",
+                      ];
+                      const lengthGuidance = style
+                        ? `${style.lengthPolicy.recommendedMin}-${style.lengthPolicy.recommendedMax} chars`
+                        : platformTemplate?.lengthGuidance || "Platform native length";
+
+                      return (
+                        <div key={platform} className="p-5 rounded-2xl border border-slate-100 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.02)] space-y-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                              <span className="px-2 py-1 rounded-md bg-slate-50 border border-slate-100 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                {label}
+                              </span>
+                              <span className="px-2 py-1 rounded-md bg-[#0052FF]/5 border border-[#0052FF]/15 text-[10px] font-black text-[#0052FF] uppercase tracking-widest">
+                                {getPlatformTemplateLabel(platform)}
+                              </span>
+                            </div>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                              Structure Only
+                            </span>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="p-3 rounded-xl border border-slate-100 bg-slate-50">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">1. Hook</p>
+                              <p className="text-[12px] text-slate-700 font-medium leading-relaxed">{idea.hook}</p>
+                            </div>
+                            <div className="p-3 rounded-xl border border-slate-100 bg-slate-50">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">2. Core Value Body</p>
+                              <p className="text-[12px] text-slate-700 font-medium leading-relaxed">{idea.angle}</p>
+                            </div>
+                            <div className="p-3 rounded-xl border border-slate-100 bg-slate-50">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">3. CTA Close</p>
+                              <p className="text-[12px] text-slate-700 font-medium leading-relaxed">{idea.suggestedCTA || "End with a clear audience action."}</p>
+                            </div>
+                          </div>
+
+                          <div className="p-3 rounded-xl border border-slate-100 bg-slate-50">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Platform Structure Rules</p>
+                            <div className="space-y-1">
+                              {structureRules.map((rule, index) => (
+                                <p key={`${platform}-rule-${index}`} className="text-[12px] text-slate-700 font-medium leading-relaxed">
+                                  {index + 1}. {rule}
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+
+                          <p className="text-[11px] text-slate-500 font-medium">
+                            Recommended length: {lengthGuidance}
+                          </p>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               ) : (

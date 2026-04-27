@@ -12,9 +12,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/withAuth";
 import { getPostGenerationById, updatePostGeneration } from "@/lib/models/postGeneration";
 import { getConnections } from "@/lib/models/connection";
-import { publishToPlatform } from "@/lib/publishing";
+import { normalizeConnectionPlatform, publishToPlatform, resolvePublishImageUrl } from "@/lib/publishing";
 import type { PublishPayload } from "@/lib/publishing";
 import type { PublishPlatformResult } from "@/lib/types/postGeneration";
+import { flattenGroupedHashtags } from "@/lib/postGeneration/hashtags";
 
 export async function POST(
   _req: NextRequest,
@@ -54,17 +55,25 @@ export async function POST(
     }
 
     // 4. Build publish payload
-    const hashtags = [
-      ...(post.output.hashtags?.highReach ?? []),
-      ...(post.output.hashtags?.niche ?? []),
-      ...(post.output.hashtags?.branded ?? []),
-    ];
+    const hashtags = flattenGroupedHashtags(post.output.hashtags);
+    const hostedImageCache = new Map<string, string | undefined>();
+
+    const getHostedImageUrl = async (candidateUrl?: string) => {
+      if (!candidateUrl) return undefined;
+      const cachedUrl = hostedImageCache.get(candidateUrl);
+      if (cachedUrl !== undefined) return cachedUrl;
+
+      const hostedUrl = await resolvePublishImageUrl(candidateUrl);
+      hostedImageCache.set(candidateUrl, hostedUrl);
+      return hostedUrl;
+    };
 
     // 5. Publish to each platform
     const results: PublishPlatformResult[] = [];
 
     for (const platform of platforms) {
-      const connection = connectionMap[platform];
+      const connectionPlatform = normalizeConnectionPlatform(platform);
+      const connection = connectionMap[connectionPlatform];
 
       if (!connection) {
         results.push({
@@ -78,17 +87,21 @@ export async function POST(
       // Use platform-specific caption, fall back to first available
       const caption =
         post.output.captions?.[platform] ??
+        post.output.captions?.[connectionPlatform] ??
         Object.values(post.output.captions ?? {})[0] ??
         "";
         
       // Use platform-specific image, fall back to global image
       const imageUrl = 
         post.output.platformImages?.[platform] ?? 
+        post.output.platformImages?.[connectionPlatform] ??
         post.output.imageUrl;
+
+      const hostedImageUrl = await getHostedImageUrl(imageUrl);
 
       const payload: PublishPayload = {
         caption,
-        imageUrl,
+        imageUrl: hostedImageUrl,
         hashtags,
       };
 

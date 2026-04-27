@@ -37,7 +37,6 @@ interface OutputDashboardProps {
   accountId?: string;
   onRemix: (caption: string, platform: string, style: RemixStyle) => void;
   onSelectHook?: (hook: HookOption) => void;
-  onScoreRequest: (platform: string) => void;
   onRefinedCaption?: (platform: string, newCaption: string, newScore: number, newFlags: string[]) => void;
   onSaveToQueue?: (updatedPackage: PostPackage) => void;
   isSavingToQueue?: boolean;
@@ -47,7 +46,6 @@ interface OutputDashboardProps {
   isPublishingNow?: boolean;
   suggestedScheduleIso?: string | null;
   isRemixing?: boolean;
-  isScoring?: boolean;
   onSelectImageVariation?: (variationId: number) => void;
 }
 
@@ -65,7 +63,6 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
   accountId,
   onRemix,
   onSelectHook,
-  onScoreRequest,
   onRefinedCaption,
   onSaveToQueue,
   isSavingToQueue = false,
@@ -75,7 +72,6 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
   isPublishingNow = false,
   suggestedScheduleIso,
   isRemixing = false,
-  isScoring = false,
   onSelectImageVariation,
 }) => {
   const platforms = useMemo(() => Object.keys(postPackage.captions) as PostPlatform[], [postPackage.captions]);
@@ -267,7 +263,6 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
                       strategy={strategy}
                       accountId={accountId}
                       onRemix={(style) => onRemix(activeCaption, platform, style)}
-                      onScoreRequest={() => onScoreRequest(platform)}
                       onRefinedCaption={handleRefinedCaption}
                       onXRefined={handleXRefined}
                       onInstagramRefined={handleInstagramRefined}
@@ -276,7 +271,6 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
                         setLocalCaptions((prev) => ({ ...prev, [platform]: newCaption }))
                       }
                       isRemixing={isRemixing}
-                      isScoring={isScoring}
                     />
                   ) : null
                 )}
@@ -361,30 +355,13 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
                 <ContentScoreCard score={postPackage.contentScore} />
               ) : (
                 <section className="relative overflow-hidden rounded-[24px] bg-white p-5 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100">
-                  <div className="absolute top-0 left-0 p-24 bg-amber-500/5 blur-3xl rounded-full -ml-12 -mt-12 pointer-events-none"></div>
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-600">Analytics</p>
-                        </div>
-                        <h3 className="text-[15px] font-semibold text-gray-900 leading-tight">Run AI Scoring</h3>
-                      </div>
-                      <div className="rounded-full bg-amber-50 p-2 text-amber-500">
-                        <Sparkles className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="button"
-                      onClick={() => onScoreRequest(activeTab)}
-                      disabled={isScoring}
-                      className="mt-4 group flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-amber-200 hover:bg-amber-50/50 hover:text-amber-700 disabled:opacity-50"
-                    >
-                      {isScoring ? "Scoring..." : "Score active platform"}
-                    </motion.button>
-                  </div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#64748B]">Analytics</p>
+                  <h3 className="mt-1 text-[15px] font-semibold text-gray-900 leading-tight">
+                    Analytics unavailable
+                  </h3>
+                  <p className="mt-2 text-xs text-[#64748B]">
+                    Auto analytics could not be generated for this run.
+                  </p>
                 </section>
               )}
 

@@ -7,6 +7,22 @@ import type { PublishPayload, PublishResult } from "./types";
 
 const GRAPH_API = "https://graph.facebook.com/v19.0";
 
+type MetaErrorShape = {
+  message?: string;
+  code?: number;
+  error_subcode?: number;
+  type?: string;
+};
+
+function formatMetaError(error?: MetaErrorShape, fallback?: string): string {
+  if (!error) return fallback ?? "Facebook API error";
+  const parts = [error.message ?? fallback ?? "Facebook API error"];
+  if (typeof error.code === "number") parts.push(`code=${error.code}`);
+  if (typeof error.error_subcode === "number") parts.push(`subcode=${error.error_subcode}`);
+  if (error.type) parts.push(`type=${error.type}`);
+  return parts.join(" | ");
+}
+
 export async function publishToFacebook(
   pageAccessToken: string,
   pageId: string,
@@ -41,10 +57,9 @@ export async function publishToFacebook(
 
     const data = await res.json();
 
-    if (!res.ok || (data as { error?: { message: string } }).error) {
-      const errMsg =
-        (data as { error?: { message: string } }).error?.message ||
-        `Facebook API error ${res.status}`;
+    const metaError = (data as { error?: MetaErrorShape }).error;
+    if (!res.ok || metaError) {
+      const errMsg = formatMetaError(metaError, `Facebook API error ${res.status}`);
       return { success: false, error: errMsg };
     }
 

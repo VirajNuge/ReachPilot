@@ -5,6 +5,7 @@ import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import type {
   CreativeHandoffV2,
   GeminiImageModel,
+  ImageCreativeDirectorOutput,
   PostGenerationInput,
   PosterPromptOutput,
   ImageVariation,
@@ -12,6 +13,7 @@ import type {
 } from "@/lib/types/postGeneration";
 import { POST_IMAGE_SIZES } from "@/lib/types/postGeneration";
 import { buildPosterPrompt, PLATFORM_ASPECT_RATIO } from "@/lib/postGeneration/posterPromptBuilder";
+import { POSTGEN_CREATIVE_DIRECTOR_STAGE } from "@/lib/postGeneration/featureFlags";
 
 // Imagen models use generateImages(); Gemini models use generateContent()
 const IMAGEN_MODELS = new Set([
@@ -140,6 +142,7 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as {
       posterOutput: PosterPromptOutput;
       creativeHandoff?: CreativeHandoffV2;
+      creativeDirector?: ImageCreativeDirectorOutput;
       input: PostGenerationInput;
       imageModel?: GeminiImageModel;
       accountId?: string;
@@ -198,7 +201,13 @@ export async function POST(req: NextRequest) {
       : undefined;
 
     // Build the complete poster prompt
-    const posterPrompt = buildPosterPrompt(body.input, body.posterOutput, body.creativeHandoff, aspectRatio);
+    const posterPrompt = buildPosterPrompt(
+      body.input,
+      body.posterOutput,
+      body.creativeHandoff,
+      POSTGEN_CREATIVE_DIRECTOR_STAGE ? body.creativeDirector : undefined,
+      aspectRatio
+    );
 
     // Append reference image labels to the prompt text for Imagen (which can't take inline images)
     const referenceImages = body.input.referenceImages ?? [];

@@ -67,7 +67,7 @@ export default function PlatformFilter({
   ];
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 px-3 py-2 rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <div className="bg-[#f4f8fb] rounded-2xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       {platforms.map((p) => {
         const isActive = selected === p.id;
         return (

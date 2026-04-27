@@ -20,7 +20,7 @@ import {
   FaPinterest,
 } from "react-icons/fa";
 import type { PostDraft, Platform, ReachScore } from "./types";
-import { PLATFORM_META } from "./types";
+import { ALL_PLATFORMS, PLATFORM_META } from "./types";
 import { PublishToast } from "./PublishToast";
 import type { PlatformPublishResult } from "./PublishToast";
 
@@ -177,6 +177,19 @@ export function PostEditor({
 
   const handleCaptionChange = (value: string) => {
     onChange({ ...post, captions: { ...post.captions, [platform]: value } });
+  };
+
+  const handlePlatformToggle = (target: Platform) => {
+    const selected = post.platforms.includes(target);
+    let nextPlatforms: Platform[];
+    if (selected) {
+      if (post.platforms.length === 1) return;
+      nextPlatforms = post.platforms.filter((p) => p !== target);
+    } else {
+      nextPlatforms = [...post.platforms, target];
+    }
+
+    onChange({ ...post, platforms: nextPlatforms });
   };
 
   const handleCopyCaption = () => {
@@ -543,18 +556,26 @@ export function PostEditor({
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0">
             Publish to
           </p>
-          {post.platforms.map((p) => {
+          {ALL_PLATFORMS.map((p) => {
             const currentMeta = PLATFORM_META[p];
             const Icon = PLATFORM_ICONS[p];
+            const selected = post.platforms.includes(p);
             return (
-              <span
+              <button
+                type="button"
+                onClick={() => handlePlatformToggle(p)}
                 key={p}
-                className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg"
-                style={{ backgroundColor: `${currentMeta.color}18`, color: currentMeta.color }}
+                className={[
+                  "flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors",
+                  selected
+                    ? "text-white border-transparent"
+                    : "text-slate-500 bg-white border-slate-200 hover:border-slate-300",
+                ].join(" ")}
+                style={selected ? { backgroundColor: currentMeta.color } : undefined}
               >
                 <Icon size={10} />
                 {currentMeta.shortLabel}
-              </span>
+              </button>
             );
           })}
         </div>

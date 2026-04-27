@@ -9,6 +9,7 @@
 
 import type {
   CreativeHandoffV2,
+  ImageCreativeDirectorOutput,
   PostGenerationInput,
   ContentStrategyOutput,
   PosterPromptOutput,
@@ -17,6 +18,7 @@ import type {
 import {
   orchestrateImagePrompt,
   buildFinalImagePrompt,
+  applyCreativeDirectorEnhancements,
   PLATFORM_ASPECT_RATIO,
 } from "./promptOrchestrator";
 
@@ -69,6 +71,7 @@ export function buildPosterPrompt(
   input: PostGenerationInput,
   posterOutput: PosterPromptOutput,
   creativeHandoff?: CreativeHandoffV2,
+  creativeDirector?: ImageCreativeDirectorOutput,
   _aspectRatio?: string
 ): string {
   // Strategy is not available at this stage, but buildFinalImagePrompt
@@ -87,5 +90,6 @@ export function buildPosterPrompt(
     strategy: minimalStrategy,
   };
 
-  return buildFinalImagePrompt(config, posterOutput, creativeHandoff);
+  const basePrompt = buildFinalImagePrompt(config, posterOutput, creativeHandoff);
+  return applyCreativeDirectorEnhancements(basePrompt, input, creativeDirector);
 }

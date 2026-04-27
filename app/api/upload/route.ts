@@ -5,8 +5,19 @@ import { v2 as cloudinary } from "cloudinary";
 // cloudinary.config(true); is not strictly necessary if CLOUDINARY_URL is present, but it ensures it's loaded.
 cloudinary.config(true);
 
+function isCloudinaryConfigured(): boolean {
+  return Boolean(process.env.CLOUDINARY_URL?.trim());
+}
+
 export async function POST(req: NextRequest) {
   try {
+    if (!isCloudinaryConfigured()) {
+      return NextResponse.json(
+        { error: "CLOUDINARY_URL is not configured" },
+        { status: 500 }
+      );
+    }
+
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
 

@@ -14,7 +14,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { getConnections } from "@/lib/models/connection";
-import { publishToPlatform } from "@/lib/publishing";
+import { normalizeConnectionPlatform, publishToPlatform, resolvePublishImageUrl } from "@/lib/publishing";
 import type { PublishPayload } from "@/lib/publishing";
 import type { PostGenerationDocument, PublishPlatformResult } from "@/lib/types/postGeneration";
 import { ObjectId } from "mongodb";
@@ -69,11 +69,23 @@ export async function GET(req: NextRequest) {
         ...(post.output.hashtags?.niche ?? []),
         ...(post.output.hashtags?.branded ?? []),
       ];
+      const hostedImageCache = new Map<string, string | undefined>();
+
+      const getHostedImageUrl = async (candidateUrl?: string) => {
+        if (!candidateUrl) return undefined;
+        const cachedUrl = hostedImageCache.get(candidateUrl);
+        if (cachedUrl !== undefined) return cachedUrl;
+
+        const hostedUrl = await resolvePublishImageUrl(candidateUrl);
+        hostedImageCache.set(candidateUrl, hostedUrl);
+        return hostedUrl;
+      };
 
       const results: PublishPlatformResult[] = [];
 
       for (const platform of platforms) {
-        const connection = connectionMap[platform];
+        const connectionPlatform = normalizeConnectionPlatform(platform);
+        const connection = connectionMap[connectionPlatform];
         if (!connection) {
           results.push({ platform, success: false, error: `Not connected to ${platform}` });
           continue;
@@ -81,12 +93,20 @@ export async function GET(req: NextRequest) {
 
         const caption =
           post.output.captions?.[platform] ??
+          post.output.captions?.[connectionPlatform] ??
           Object.values(post.output.captions ?? {})[0] ??
           "";
 
+        const imageUrl =
+          post.output.platformImages?.[platform] ??
+          post.output.platformImages?.[connectionPlatform] ??
+          post.output.imageUrl;
+
+        const hostedImageUrl = await getHostedImageUrl(imageUrl);
+
         const payload: PublishPayload = {
           caption,
-          imageUrl: post.output.imageUrl,
+          imageUrl: hostedImageUrl,
           hashtags,
         };
 

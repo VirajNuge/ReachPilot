@@ -234,6 +234,9 @@ export default function PublishingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           status: post.status,
+          input: {
+            platforms: post.platforms,
+          },
           output: { captions: captionsRecord },
         }),
       });

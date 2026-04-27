@@ -8,8 +8,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", process.env.NEXTAUTH_URL || req.url));
   }
 
-  const accountId = req.cookies.get("rp_oauth_account")?.value;
+  const accountId =
+    req.cookies.get("rp_oauth_account")?.value ||
+    req.nextUrl.searchParams.get("state")?.trim() ||
+    "";
   if (!accountId) {
+    console.error("Pinterest OAuth callback missing accountId", {
+      hasCookieAccount: Boolean(req.cookies.get("rp_oauth_account")?.value),
+      hasStateParam: Boolean(req.nextUrl.searchParams.get("state")),
+      hasCodeParam: Boolean(req.nextUrl.searchParams.get("code")),
+      errorParam: req.nextUrl.searchParams.get("error") ?? null,
+    });
     return NextResponse.json({ error: "Missing accountId from OAuth state" }, { status: 400 });
   }
 
@@ -42,7 +51,19 @@ export async function GET(req: NextRequest) {
 
     const tokenData = await tokenResponse.json();
     if (!tokenResponse.ok || tokenData.error) {
+      console.error("Pinterest OAuth token exchange failed", {
+        status: tokenResponse.status,
+        tokenData,
+      });
       throw new Error(tokenData.error_description || tokenData.error || "Token exchange failed");
+    }
+
+    const scopeValue = typeof tokenData.scope === "string" ? tokenData.scope : "";
+    const grantedScopes = scopeValue.split(/[,\s]+/).filter(Boolean);
+    const requiredScopes = ["boards:read", "pins:write"];
+    const missingScopes = requiredScopes.filter((scope) => !grantedScopes.includes(scope));
+    if (missingScopes.length > 0) {
+      throw new Error(`Pinterest token missing required scopes: ${missingScopes.join(", ")}`);
     }
 
     // 2. Fetch user profile
@@ -50,6 +71,13 @@ export async function GET(req: NextRequest) {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
     const userData = await userResponse.json();
+    if (!userResponse.ok || userData?.code || userData?.message) {
+      console.error("Pinterest OAuth user profile fetch failed", {
+        status: userResponse.status,
+        userData,
+      });
+      throw new Error(userData?.message || "Failed to fetch Pinterest profile");
+    }
 
     const tokenExpiresAt = tokenData.expires_in
       ? new Date(Date.now() + tokenData.expires_in * 1000)
@@ -69,8 +97,13 @@ export async function GET(req: NextRequest) {
     response.cookies.delete("rp_oauth_account");
     return response;
   } catch (error) {
-    console.error("Pinterest OAuth error:", error);
-    const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?error=auth_failed`, process.env.NEXTAUTH_URL || req.url));
+    console.error("Pinterest OAuth callback failed", {
+      accountId,
+      hasCodeParam: Boolean(code),
+      errorParam: error ?? null,
+    });
+    const message = error instanceof Error ? encodeURIComponent(error.message) : "OAuth failed";
+    const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?error=auth_failed&platform=pinterest&reason=${message}`, process.env.NEXTAUTH_URL || req.url));
     response.cookies.delete("rp_oauth_account");
     return response;
   }

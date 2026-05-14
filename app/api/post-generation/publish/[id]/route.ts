@@ -11,18 +11,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/withAuth";
 import { getPostGenerationById, updatePostGeneration } from "@/lib/models/postGeneration";
-import { getConnections } from "@/lib/models/connection";
+import { getConnections, getConnectionsByUser, type ConnectionDocument } from "@/lib/models/connection";
 import { normalizeConnectionPlatform, publishToPlatform, resolvePublishImageUrl } from "@/lib/publishing";
 import type { PublishPayload } from "@/lib/publishing";
 import type { PublishPlatformResult } from "@/lib/types/postGeneration";
 import { flattenGroupedHashtags } from "@/lib/postGeneration/hashtags";
 
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await requireAuth();
+    const authResult = await requireAuth(req);
     if (authResult instanceof NextResponse) return authResult;
     const auth = authResult;
 
@@ -43,10 +43,23 @@ export async function POST(
 
     // 2. Load social connections for this account
     const accountId = post.accountId ?? "";
-    const connections = await getConnections(auth.userId, accountId);
+    const connections = accountId
+      ? await getConnections(auth.userId, accountId)
+      : [];
     const connectionMap = Object.fromEntries(
       connections.map((c) => [c.platform, c])
     );
+    let userConnectionCache: ConnectionDocument[] | null = null;
+
+    const findFallbackConnection = async (platformKey: string): Promise<ConnectionDocument | null> => {
+      if (!userConnectionCache) {
+        userConnectionCache = await getConnectionsByUser(auth.userId);
+      }
+
+      const candidates = userConnectionCache.filter((conn) => conn.platform === platformKey);
+      if (candidates.length === 1) return candidates[0];
+      return null;
+    };
 
     // 3. Determine target platforms from input
     const platforms = (post.input?.platforms as string[] | undefined) ?? Object.keys(post.output.captions || {});
@@ -73,13 +86,18 @@ export async function POST(
 
     for (const platform of platforms) {
       const connectionPlatform = normalizeConnectionPlatform(platform);
-      const connection = connectionMap[connectionPlatform];
+      const connection =
+        connectionMap[connectionPlatform] ??
+        (await findFallbackConnection(connectionPlatform));
 
       if (!connection) {
+        const accountHint = accountId
+          ? `for account ${accountId}`
+          : "for this draft";
         results.push({
           platform,
           success: false,
-          error: `Not connected to ${platform}. Go to Account Settings to connect.`,
+          error: `Not connected to ${platform} ${accountHint}. Reconnect on the same account and try again.`,
         });
         continue;
       }

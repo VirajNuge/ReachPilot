@@ -37,8 +37,26 @@ export const HashtagPanel: React.FC<HashtagPanelProps> = ({ hashtags }) => {
     window.setTimeout(() => setCopiedKey((prev) => (prev === key ? null : prev)), 1800);
   };
 
+  const getGroupColors = (key: GroupKey) => {
+    switch (key) {
+      case "highReach":
+        return "bg-blue-50 text-blue-700 hover:bg-blue-100 ring-blue-600/20";
+      case "niche":
+        return "bg-purple-50 text-purple-700 hover:bg-purple-100 ring-purple-600/20";
+      case "branded":
+        return "bg-slate-50 text-slate-700 hover:bg-slate-100 ring-slate-600/20";
+    }
+  };
+
+  const handleCopyTag = async (tag: string) => {
+    const formattedTag = tag.startsWith("#") ? tag : `#${tag}`;
+    await navigator.clipboard.writeText(formattedTag);
+    setCopiedKey(tag);
+    window.setTimeout(() => setCopiedKey((prev) => (prev === tag ? null : prev)), 1500);
+  };
+
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]">Hashtags</p>
@@ -47,39 +65,60 @@ export const HashtagPanel: React.FC<HashtagPanelProps> = ({ hashtags }) => {
         <button
           type="button"
           onClick={() => handleCopy("all")}
-          className="inline-flex items-center gap-2 rounded-full border border-[#D1D5DB] px-3 py-1.5 text-xs font-semibold text-[#374151] transition-colors hover:border-[#9CA3AF]"
+          className="inline-flex items-center gap-2 rounded-full border border-[#D1D5DB] bg-white px-3 py-1.5 text-xs font-semibold text-[#374151] transition-colors hover:border-[#9CA3AF] shadow-sm"
         >
           {copiedKey === "all" ? <Check className="h-3.5 w-3.5 text-[#15803D]" /> : <Copy className="h-3.5 w-3.5" />}
-          {copiedKey === "all" ? "Copied all" : "Copy all grouped"}
+          {copiedKey === "all" ? "Copied all" : "Copy all"}
         </button>
       </div>
 
       <div className="space-y-3">
-        {(Object.keys(GROUP_META) as GroupKey[]).map((key) => (
-          <div key={key} className="rounded-[22px] border border-[#E5E7EB] bg-white p-4">
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <div>
-                <p className="text-sm font-semibold text-[#111827]">{GROUP_META[key].label}</p>
-                <p className="text-[11px] text-[#6B7280]">{GROUP_META[key].hint}</p>
+        {(Object.keys(GROUP_META) as GroupKey[]).map((key) => {
+          const tags = grouped[key];
+          if (tags.length === 0) return null;
+
+          return (
+            <div key={key} className="rounded-[24px] border border-[#E5E7EB] bg-[#FCFCFD] p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold text-[#111827]">{GROUP_META[key].label}</p>
+                  <p className="text-[11px] text-[#6B7280]">{GROUP_META[key].hint}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCopy(key)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#374151] transition-colors hover:border-gray-300 shadow-sm"
+                >
+                  {copiedKey === key ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copiedKey === key ? "Copied" : "Copy group"}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => handleCopy(key)}
-                disabled={grouped[key].length === 0}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#D1D5DB] px-2.5 py-1 text-[11px] font-semibold text-[#374151] transition-colors hover:border-[#9CA3AF] disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {copiedKey === key ? <Check className="h-3.5 w-3.5 text-[#15803D]" /> : <Copy className="h-3.5 w-3.5" />}
-                {copiedKey === key ? "Copied" : "Copy"}
-              </button>
+              
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => {
+                  const displayTag = tag.startsWith("#") ? tag : `#${tag}`;
+                  const isCopied = copiedKey === tag;
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => handleCopyTag(tag)}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset transition-all duration-200 ${
+                        isCopied 
+                          ? "bg-green-50 text-green-700 ring-green-600/20" 
+                          : getGroupColors(key)
+                      }`}
+                      title="Click to copy"
+                    >
+                      {isCopied ? <Check className="h-3 w-3" /> : null}
+                      {displayTag}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="flex items-start gap-3">
-              <Hash className="mt-0.5 h-4 w-4 shrink-0 text-[#6B7280]" />
-              <p className="text-sm leading-7 text-[#374151]">
-                {grouped[key].join(" ") || "No hashtags in this group."}
-              </p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

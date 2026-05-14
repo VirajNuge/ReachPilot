@@ -1,89 +1,113 @@
 import { SignJWT, jwtVerify } from "jose";
-import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
-import { SafeUser } from "./models/user";
+import { cookies } from "next/headers";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "fallback_secret_change_me"
-);
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
+const AUTH_COOKIE_NAME = "rp_token";
 
-const COOKIE_NAME = "rp_token";
+type SafeUserToken = {
+  id: string;
+  username: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  createdAt?: string;
+};
 
-export async function signToken(user: SafeUser): Promise<string> {
-  return new SignJWT({
+function getKey() {
+  // jose expects a Uint8Array key for HMAC algorithms
+  return new TextEncoder().encode(JWT_SECRET);
+}
+
+export async function signToken(user: SafeUserToken) {
+  return await new SignJWT({
     userId: user.id,
     username: user.username,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
+    createdAt: user.createdAt,
   })
     .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(JWT_SECRET);
+    .sign(getKey());
 }
 
-export async function verifyToken(
-  token: string
-): Promise<{
-  userId: string;
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-} | null> {
+export async function verifyToken(token: string) {
+  const { payload } = await jwtVerify(token, getKey());
+  return payload;
+}
+
+export async function getAuthFromRequest(request: NextRequest) {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as {
-      userId: string;
-      username: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-    };
+    let token = request.cookies.get(AUTH_COOKIE_NAME)?.value || null;
+    
+    if (!token) {
+      const authHeader = request.headers.get("authorization");
+      if (authHeader?.startsWith("Bearer ")) {
+        token = authHeader.substring(7);
+      }
+    }
+    
+    if (!token) return null;
+    const payload = await verifyToken(token);
+    return payload as any;
   } catch {
     return null;
   }
 }
 
+// For route handlers that rely on Next.js cookies() helper
+export async function getAuthFromCookies() {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(AUTH_COOKIE_NAME)?.value || null;
+    if (!token) return null;
+    const payload = await verifyToken(token);
+    return payload as any;
+  } catch {
+    return null;
+  }
+}
+
+// Utility used in some API routes to read raw token
+export function getTokenFromRequest(request: NextRequest) {
+  let token = request.cookies.get(AUTH_COOKIE_NAME)?.value || null;
+  if (!token) {
+    const authHeader = request.headers.get("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      token = authHeader.substring(7);
+    }
+  }
+  return token;
+}
+
 export function setAuthCookie(token: string) {
-  // Returns cookie options for the response
+  // Return object suitable for NextResponse.cookies.set(name, value) or .set(cookieObject)
   return {
-    name: COOKIE_NAME,
+    name: AUTH_COOKIE_NAME,
     value: token,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
     path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  };
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7,
+  } as const;
+}
+
+export async function signResetToken(payload: any) {
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("1h")
+    .sign(getKey());
 }
 
 export function clearAuthCookie() {
   return {
-    name: COOKIE_NAME,
+    name: AUTH_COOKIE_NAME,
     value: "",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
     path: "/",
+    httpOnly: true,
+    sameSite: "lax",
     maxAge: 0,
-  };
-}
-
-export async function getAuthFromCookies(): Promise<{
-  userId: string;
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-} | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (!token) return null;
-  return verifyToken(token);
-}
-
-export function getTokenFromRequest(request: NextRequest): string | null {
-  return request.cookies.get(COOKIE_NAME)?.value || null;
+  } as const;
 }

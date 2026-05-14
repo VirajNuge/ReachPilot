@@ -6,7 +6,7 @@ import type { IdeaStatus } from "@/lib/models/savedIdea";
 const VALID_STATUSES: IdeaStatus[] = ["idea-bank", "drafting", "published"];
 
 export async function GET(req: NextRequest) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

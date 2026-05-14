@@ -78,7 +78,17 @@ export async function GET(req: NextRequest) {
       tokenExpiresAt,
       platformUserId: profileData.id || userId,
       platformUsername: profileData.username || profileData.name || "Threads User",
-      scope: "threads_basic,threads_content_publish",
+      scope: [
+        "threads_basic",
+        "threads_content_publish",
+        "threads_manage_insights",
+        "threads_manage_replies",
+        "threads_read_replies",
+        "threads_manage_mentions",
+        "threads_keyword_search",
+        "threads_delete",
+        "threads_location_tagging",
+      ].join(","),
     });
 
     const response = NextResponse.redirect(

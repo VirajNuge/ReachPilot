@@ -15,6 +15,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { url } = body;
+    const callbackUrl = new URL(
+      "/api/auth/x/callback",
+      process.env.NEXTAUTH_URL || request.url,
+    ).toString();
 
     if (!url) {
       return NextResponse.json(
@@ -47,8 +51,7 @@ export async function POST(request: NextRequest) {
             step3: "Go to Settings > User authentication settings",
             step4: "Enable OAuth 2.0 with 'Read' permissions",
             step5: "Set Type: Web App, Confidential Client",
-            step6:
-              "Add callback URL: http://localhost:3000/api/auth/x/callback",
+            step6: `Add callback URL: ${callbackUrl}`,
             step7: "Copy Client ID and Client Secret to .env.local",
           },
         } as ScanResult);

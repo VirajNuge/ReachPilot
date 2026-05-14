@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type {
   PostPlatform,
   PostPackage,
@@ -63,80 +64,112 @@ export const PlatformTab: React.FC<PlatformTabProps> = ({
   onCaptionChange,
   isRemixing: _isRemixing = false,
 }) => {
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: 0.08 },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
+  };
+
   return (
-    <div className="flex flex-col gap-5">
-      {/* Caption Card */}
-      <CaptionCard
-        platform={platform}
-        caption={caption}
-        options={captionOptions}
-        selectedOptionIndex={selectedCaptionIndex}
-        onSelectOption={onSelectCaptionIndex}
-        onCopy={() => navigator.clipboard.writeText(caption)}
-      />
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={platform}
+        className="flex flex-col gap-5"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        exit={{ opacity: 0, y: -8, transition: { duration: 0.2 } }}
+      >
+        {/* Caption Card */}
+        <motion.div variants={cardVariants}>
+          <CaptionCard
+            platform={platform}
+            caption={caption}
+            options={captionOptions}
+            selectedOptionIndex={selectedCaptionIndex}
+            onSelectOption={onSelectCaptionIndex}
+            onCopy={() => navigator.clipboard.writeText(caption)}
+            onCaptionChange={onCaptionChange}
+          />
+        </motion.div>
 
-      {/* LinkedIn Performance (LinkedIn tab only) */}
-      {platform === "linkedin" && linkedInRefined && strategy && (
-        <LinkedInOutput
-          viralityScore={linkedInRefined.viralityScore}
-          qualityFlags={linkedInRefined.qualityFlags}
-          styleProfile={linkedInRefined.styleProfile}
-          postType={linkedInRefined.postType}
-          caption={caption}
-          input={input}
-          strategy={strategy}
-          accountId={accountId}
-          onRefinedCaption={(newCaption, newScore, newFlags) => {
-            onRefinedCaption?.(newCaption, newScore, newFlags);
-            onCaptionChange?.(newCaption);
-          }}
-        />
-      )}
+        {/* LinkedIn Performance (LinkedIn tab only) */}
+        {platform === "linkedin" && linkedInRefined && strategy && (
+          <motion.div variants={cardVariants}>
+            <LinkedInOutput
+              viralityScore={linkedInRefined.viralityScore}
+              qualityFlags={linkedInRefined.qualityFlags}
+              styleProfile={linkedInRefined.styleProfile}
+              postType={linkedInRefined.postType}
+              caption={caption}
+              input={input}
+              strategy={strategy}
+              accountId={accountId}
+              onRefinedCaption={(newCaption, newScore, newFlags) => {
+                onRefinedCaption?.(newCaption, newScore, newFlags);
+                onCaptionChange?.(newCaption);
+              }}
+            />
+          </motion.div>
+        )}
 
-      {/* X Engagement Score (X tab only) */}
-      {platform === "x" && xRefined && strategy && (
-        <XOutput
-          xRefined={xRefined}
-          caption={caption}
-          input={input}
-          strategy={strategy}
-          accountId={accountId}
-          onRefined={(newCaption, newScore, newFlags) => {
-            onXRefined?.(newCaption, newScore, newFlags);
-            onCaptionChange?.(newCaption);
-          }}
-        />
-      )}
+        {/* X Performance (X tab only) */}
+        {platform === "x" && xRefined && strategy && (
+          <motion.div variants={cardVariants}>
+            <XOutput
+              xRefined={xRefined}
+              caption={caption}
+              input={input}
+              strategy={strategy}
+              accountId={accountId}
+              onRefined={(newCaption, newScore, newFlags) => {
+                onXRefined?.(newCaption, newScore, newFlags);
+                onCaptionChange?.(newCaption);
+              }}
+            />
+          </motion.div>
+        )}
 
-      {/* Instagram Engagement Score (Instagram tab only) */}
-      {platform === "instagram_post" && instagramRefined && strategy && (
-        <InstagramOutput
-          instagramRefined={instagramRefined}
-          caption={caption}
-          input={input}
-          strategy={strategy}
-          accountId={accountId}
-          onRefined={(newCaption, newScore, newFlags, newPostType) => {
-            onInstagramRefined?.(newCaption, newScore, newFlags, newPostType);
-            onCaptionChange?.(newCaption);
-          }}
-        />
-      )}
+        {/* Instagram Performance (Instagram tab only) */}
+        {platform === "instagram_post" && instagramRefined && strategy && (
+          <motion.div variants={cardVariants}>
+            <InstagramOutput
+              instagramRefined={instagramRefined}
+              caption={caption}
+              input={input}
+              strategy={strategy}
+              accountId={accountId}
+              onRefined={(newCaption, newScore, newFlags, newPostType) => {
+                onInstagramRefined?.(newCaption, newScore, newFlags, newPostType);
+                onCaptionChange?.(newCaption);
+              }}
+            />
+          </motion.div>
+        )}
 
-      {/* Facebook Engagement Score (Facebook tab only) */}
-      {platform === "facebook" && facebookRefined && strategy && (
-        <FacebookOutput
-          facebookRefined={facebookRefined}
-          caption={caption}
-          input={input}
-          strategy={strategy}
-          accountId={accountId}
-          onRefined={(newCaption, newScore, newFlags) => {
-            onFacebookRefined?.(newCaption, newScore, newFlags);
-            onCaptionChange?.(newCaption);
-          }}
-        />
-      )}
-    </div>
+        {/* Facebook Performance (Facebook tab only) */}
+        {platform === "facebook" && facebookRefined && strategy && (
+          <motion.div variants={cardVariants}>
+            <FacebookOutput
+              facebookRefined={facebookRefined}
+              caption={caption}
+              input={input}
+              strategy={strategy}
+              accountId={accountId}
+              onRefined={(newCaption, newScore, newFlags) => {
+                onFacebookRefined?.(newCaption, newScore, newFlags);
+                onCaptionChange?.(newCaption);
+              }}
+            />
+          </motion.div>
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
 };

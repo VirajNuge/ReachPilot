@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { FaChrome, FaArrowRight, FaSearch } from "react-icons/fa";
-import MotionBackground from "../../components/Shared/MotionBackground";
 import AnalyzedAccountPage from "./analyzed-account/page";
 
 export default function UnifiedAnalyzerPage() {
@@ -14,11 +13,33 @@ export default function UnifiedAnalyzerPage() {
   // Auto-show dashboard when coming from extension, otherwise use toggle
   const [hasAnalysis, setHasAnalysis] = useState(isFromExtension);
 
-  return (
-    <div className="relative min-h-screen bg-[#f4f8fb] font-sans text-[#000100] overflow-x-hidden">
-      <MotionBackground />
+  const formAreaRef = useRef<HTMLDivElement>(null);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!formAreaRef.current) return;
+    const rect = formAreaRef.current.getBoundingClientRect();
+    formAreaRef.current.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    formAreaRef.current.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  };
 
-      <div className="relative z-10 px-6 max-w-7xl mx-auto pb-24">
+  return (
+    <div 
+      ref={formAreaRef}
+      onMouseMove={handleMouseMove}
+      className="min-h-screen bg-gradient-to-br from-[#E2EFFF] to-[#C7DEFF] pt-12 md:pt-20 pb-16 px-4 sm:px-6 lg:px-8 flex items-start justify-center font-sans text-[#1A1D23] relative overflow-hidden group/page"
+    >
+      {/* Interactive Background Plus Pattern on the whole page */}
+      <div 
+        className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500 opacity-50 group-hover/page:opacity-100"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 14V0h2v14h14v2H16v14h-2V16H0v-2h14z' fill='%230052FF' fill-opacity='0.12' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+          backgroundSize: '30px 30px',
+          maskImage: 'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%)',
+        }}
+      />
+
+      {/* Main White Container */}
+      <div className={`bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,10,50,0.05)] border border-white/50 flex flex-col relative z-10 p-8 md:p-12 ${hasAnalysis ? 'w-full max-w-7xl min-h-[750px]' : 'w-full max-w-[1000px] h-fit'}`}>
         {/* Header Section */}
 
         {!hasAnalysis ? (
@@ -27,7 +48,7 @@ export default function UnifiedAnalyzerPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-12"
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 items-center"
           >
             {/* Left: Value Prop & CTA */}
             <div className="space-y-8">

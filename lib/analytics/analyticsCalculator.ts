@@ -24,6 +24,8 @@ export interface VelocityMetrics {
   previousImpressions: number;
   impressionVelocity: number;
   impressionVelocityPercentage: number;
+  currentComments: number;
+  currentShares: number;
 }
 
 /**
@@ -31,6 +33,7 @@ export interface VelocityMetrics {
  */
 export interface GrowthMetrics {
   date: Date;
+  platform?: Platform;
   followers: number;
   impressions: number;
   engagements: number;
@@ -43,10 +46,13 @@ export interface GrowthMetrics {
 export interface PlatformComparisonMetrics {
   platform: Platform;
   followers: number;
+  engagements: number;
   engagementRate: number;
   impressions: number;
   posting: number; // posts per day
   growth: number; // follower growth rate
+  comments?: number;
+  shares?: number;
 }
 
 /**
@@ -114,10 +120,11 @@ export interface PlatformComparison {
  */
 export async function calculateVelocityMetrics(
   userId: string,
-  accountId: string
+  accountId: string,
+  platform?: Platform
 ): Promise<VelocityMetrics> {
-  const summary = await getAnalyticsSummary(userId, accountId, 30);
-  const previousSummary = await getAnalyticsSummary(userId, accountId, 60);
+  const summary = await getAnalyticsSummary(userId, accountId, 30, platform);
+  const previousSummary = await getAnalyticsSummary(userId, accountId, 60, platform);
 
   const currentFollowers = summary.aggregate.totalFollowers;
   const previousFollowers = previousSummary.aggregate.totalFollowers;
@@ -141,6 +148,10 @@ export async function calculateVelocityMetrics(
       ? (impressionVelocity / previousImpressions) * 100
       : 0;
 
+  // Get comments and shares from aggregate
+  const currentComments = (summary.aggregate as any).totalComments || 0;
+  const currentShares = (summary.aggregate as any).totalShares || 0;
+
   return {
     currentFollowers,
     previousFollowers,
@@ -156,6 +167,8 @@ export async function calculateVelocityMetrics(
     previousImpressions,
     impressionVelocity,
     impressionVelocityPercentage: Math.round(impressionVelocityPercentage * 100) / 100,
+    currentComments,
+    currentShares,
   };
 }
 
@@ -171,6 +184,7 @@ export async function calculateGrowthMetrics(
 
   return summary.trends.map((trend) => ({
     date: trend.date,
+    platform: trend.platform as Platform,
     followers: trend.followers,
     impressions: trend.impressions,
     engagements: trend.engagements,
@@ -190,10 +204,13 @@ export async function calculatePlatformComparison(
   return summary.platformComparison.map((p) => ({
     platform: p.platform as Platform,
     followers: p.followers,
+    engagements: p.engagements,
     engagementRate: p.engagementRate,
     impressions: p.impressions,
     posting: p.posts > 0 ? (p.posts / 30) : 0, // posts per day in 30 days
     growth: p.followerGrowthRate,
+    comments: p.comments || 0,
+    shares: p.shares || 0,
   }));
 }
 
@@ -203,9 +220,10 @@ export async function calculatePlatformComparison(
 export async function getTopPostsMetrics(
   userId: string,
   accountId: string,
-  limit: number = 10
+  limit: number = 10,
+  platform?: Platform
 ): Promise<TopPostMetrics[]> {
-  const summary = await getAnalyticsSummary(userId, accountId);
+  const summary = await getAnalyticsSummary(userId, accountId, 30, platform);
 
   return summary.topPosts.slice(0, limit).map((post) => ({
     id: post.id,
@@ -339,17 +357,18 @@ export function calculateAnomalyScore(
  */
 export async function getAllAnalyticsMetrics(
   userId: string,
-  accountId: string
+  accountId: string,
+  platform?: Platform
 ) {
   const [velocity, growth, platformComp, topPosts, formats, audience, comparison] =
     await Promise.all([
-      calculateVelocityMetrics(userId, accountId),
-      calculateGrowthMetrics(userId, accountId),
-      calculatePlatformComparison(userId, accountId),
-      getTopPostsMetrics(userId, accountId),
-      getFormatPerformanceMetrics(userId, accountId),
-      getAudienceInsights(userId, accountId),
-      getPlatformComparisonMetrics(userId, accountId),
+      calculateVelocityMetrics(userId, accountId, platform), // Only filter velocity for vitals card
+      calculateGrowthMetrics(userId, accountId, 30), // Never filter - show all platforms
+      calculatePlatformComparison(userId, accountId), // Never filter - show all platforms
+      getTopPostsMetrics(userId, accountId, 10, platform), // Only filter for top posts card
+      getFormatPerformanceMetrics(userId, accountId), // Never filter - global analysis
+      getAudienceInsights(userId, accountId), // Never filter - global analysis
+      getPlatformComparisonMetrics(userId, accountId), // Never filter - radar needs all
     ]);
 
   return {

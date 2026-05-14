@@ -3,7 +3,7 @@ import { requireAuth } from "@/lib/withAuth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 
 export async function GET(req: NextRequest) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
 
   const { userId } = authResult;

@@ -3,11 +3,9 @@
 import React from "react";
 import { LayoutGrid } from "lucide-react";
 import {
-  FaLinkedin,
   FaTwitter,
   FaInstagram,
   FaFacebook,
-  FaPinterest,
   FaAt,
 } from "react-icons/fa";
 import type { PlatformKey } from "@/lib/analytics/platforms";
@@ -27,12 +25,6 @@ export default function PlatformFilter({
       label: "Overview",
       icon: <LayoutGrid size={14} />,
       color: "text-gray-600",
-    },
-    {
-      id: "linkedin",
-      label: "LinkedIn",
-      icon: <FaLinkedin size={14} />,
-      color: "text-[#0077B5]",
     },
     {
       id: "twitter",
@@ -57,12 +49,6 @@ export default function PlatformFilter({
       label: "Threads",
       icon: <FaAt size={14} />,
       color: "text-black",
-    },
-    {
-      id: "pinterest",
-      label: "Pinterest",
-      icon: <FaPinterest size={14} />,
-      color: "text-[#E60023]",
     },
   ];
 

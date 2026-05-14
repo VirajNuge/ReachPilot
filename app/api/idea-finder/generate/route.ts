@@ -37,7 +37,7 @@ const VALID_PLATFORMS: IdeaPlatform[] = [
   "all",
 ];
 
-function isValidRequest(body: unknown): body is IdeaFinderRequest {
+export function isValidRequest(body: unknown): body is IdeaFinderRequest {
   if (typeof body !== "object" || body === null) return false;
   const b = body as Record<string, unknown>;
   const hasValidCoreMessage =
@@ -54,6 +54,47 @@ function isValidRequest(body: unknown): body is IdeaFinderRequest {
     hasValidCoreMessage &&
     hasValidPersonaToggle
   );
+}
+
+export function buildEmptyIdeaFinderContext(platform: IdeaPlatform) {
+  return {
+    persona: {
+      summary: "",
+      audience: "",
+      voice: "",
+      writingSamples: [],
+      doNotTalk: [],
+      contentThemes: [],
+      contentPillars: [],
+      uniquePOV: "",
+    },
+    analysis: {
+      ideaBank: [],
+      contentPillars: [],
+      viralRecipe: [],
+      questionCloud: [],
+      postDNA: [],
+      voiceSpectrum: { signatureWords: [], avoidWords: [] },
+    },
+    postHistory: {
+      recentPosts: [],
+    },
+    platform: {
+      target: platform === "all" ? "all platforms" : platform,
+    },
+  };
+}
+
+export function joinCandidateText(
+  candidate: { content?: { parts?: Array<{ text?: string | null }> } } | undefined,
+): string {
+  const parts = candidate?.content?.parts;
+  if (!parts?.length) return "";
+
+  return parts
+    .map((part) => (typeof part?.text === "string" ? part.text : ""))
+    .join("")
+    .trim();
 }
 
 // ---- Trend-Jacker: uses @google/genai with Google Search grounding ----
@@ -73,7 +114,9 @@ async function generateWithGrounding(
   });
 
   const candidate = response.candidates?.[0];
-  const text = candidate?.content?.parts?.[0]?.text || "";
+  const text =
+    joinCandidateText(candidate) ||
+    (typeof response.text === "string" ? response.text.trim() : "");
   const groundingMetadata = candidate?.groundingMetadata;
 
   const sources =
@@ -305,11 +348,12 @@ function postProcessIdeas(
   sources?: Array<{ title: string; url: string }>,
   searchQueries?: string[],
   recentPosts: Array<{ caption: string; hooks: string[]; contentScore: number; platform: string }> = [],
+  count: number = 6,
 ): GeneratedIdea[] {
   if (typeof raw !== "object" || raw === null) return [];
 
   const obj = raw as Record<string, unknown>;
-  const ideasArr = Array.isArray(obj.ideas) ? obj.ideas.slice(0, 1) : [];
+  const ideasArr = Array.isArray(obj.ideas) ? obj.ideas.slice(0, count) : [];
 
   return ideasArr.map((idea: unknown) => {
     const i = (typeof idea === "object" && idea !== null ? idea : {}) as Record<
@@ -442,7 +486,7 @@ function postProcessIdeas(
 // ---- Route Handler ----
 
 export async function POST(req: NextRequest) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
@@ -475,16 +519,33 @@ export async function POST(req: NextRequest) {
       count = 8,
     } = body;
 
-    const clampedCount = 1;
+    const requestedCount = Number(count);
+    const clampedCount = Number.isFinite(requestedCount)
+      ? Math.min(Math.max(Math.trunc(requestedCount), 1), 6)
+      : 6;
 
     // 1. Assemble context
-    const context = await assembleIdeaFinderContext(
-      userId,
-      accountId,
-      mode,
-      platform,
-      { importPersona }
-    );
+    let context;
+    let contextDegraded = false;
+    try {
+      context = await assembleIdeaFinderContext(
+        userId,
+        accountId,
+        mode,
+        platform,
+        { importPersona }
+      );
+    } catch (error) {
+      contextDegraded = true;
+      console.warn("[idea-finder] context assembly failed, falling back to empty context", {
+        userId,
+        accountId,
+        mode,
+        platform,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      context = buildEmptyIdeaFinderContext(platform);
+    }
 
     // 2. Build prompt
     const prompt = buildIdeaFinderPrompt({
@@ -532,6 +593,7 @@ export async function POST(req: NextRequest) {
       groundingSources,
       groundingQueries,
       context.postHistory.recentPosts,
+      clampedCount,
     );
 
     if (!ideas.length) {
@@ -548,7 +610,13 @@ export async function POST(req: NextRequest) {
       groundingAvailable: mode === "trend-jacker" && groundingSources.length > 0,
     };
 
-    return NextResponse.json({ success: true, data: response });
+    return NextResponse.json({
+      success: true,
+      data: response,
+      meta: {
+        contextDegraded,
+      },
+    });
   } catch (error) {
     console.error("[idea-finder/generate] Error:", error);
     return NextResponse.json(

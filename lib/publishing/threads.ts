@@ -8,11 +8,11 @@ import type { PublishPayload, PublishResult } from "./types";
 
 const THREADS_API = "https://graph.threads.net/v1.0";
 
-/** Poll for container readiness (max 10 retries × 3 s) */
+/** Poll for container readiness (max 20 retries × 3 s) */
 async function waitForContainer(
   containerId: string,
   accessToken: string,
-  maxRetries = 10
+  maxRetries = 20
 ): Promise<boolean> {
   for (let i = 0; i < maxRetries; i++) {
     await new Promise((r) => setTimeout(r, 3000));
@@ -32,44 +32,95 @@ export async function publishToThreads(
   payload: PublishPayload
 ): Promise<PublishResult> {
   try {
-    // Step 1: Create container
-    const containerParams: Record<string, string> = {
-      access_token: accessToken,
-    };
+    const mediaUrls = payload.mediaUrls || (payload.imageUrl ? [payload.imageUrl] : []);
+    const isCarousel = payload.mediaType === "carousel" || mediaUrls.length > 1;
+    const isVideo = payload.mediaType === "video" || (mediaUrls.length > 0 && mediaUrls[0].toLowerCase().match(/\.(mp4|mov)$/));
 
-    if (payload.imageUrl) {
-      containerParams.media_type = "IMAGE";
-      containerParams.image_url = payload.imageUrl;
-      containerParams.text = payload.caption;
-    } else {
-      containerParams.media_type = "TEXT";
-      containerParams.text = payload.caption;
-    }
+    let containerId: string;
 
-    const containerRes = await fetch(
-      `${THREADS_API}/${platformUserId}/threads`,
-      {
+    if (isCarousel) {
+      // 1. Create individual containers for carousel items
+      const childIds: string[] = [];
+      for (const url of mediaUrls.slice(0, 20)) {
+        const itemParams = new URLSearchParams({
+          is_carousel_item: "true",
+          access_token: accessToken,
+        });
+
+        const isChildVideo = url.toLowerCase().match(/\.(mp4|mov)$/);
+        if (isChildVideo) {
+          itemParams.set("media_type", "VIDEO");
+          itemParams.set("video_url", url);
+        } else {
+          itemParams.set("media_type", "IMAGE");
+          itemParams.set("image_url", url);
+        }
+
+        const itemRes = await fetch(`${THREADS_API}/${platformUserId}/threads`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: itemParams.toString(),
+        });
+
+        const itemData = await itemRes.json() as { id?: string; error?: { message: string } };
+        if (!itemRes.ok || !itemData.id) {
+          throw new Error(itemData.error?.message || `Threads carousel item creation failed (${itemRes.status})`);
+        }
+        childIds.push(itemData.id);
+      }
+
+      // 2. Create carousel container
+      const carouselRes = await fetch(`${THREADS_API}/${platformUserId}/threads`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(containerParams).toString(),
-      }
-    );
+        body: new URLSearchParams({
+          media_type: "CAROUSEL",
+          children: childIds.join(","),
+          text: payload.caption || "",
+          access_token: accessToken,
+        }).toString(),
+      });
 
-    const containerData = await containerRes.json() as { id?: string; error?: { message: string } };
-    if (!containerRes.ok || containerData.error) {
-      return {
-        success: false,
-        error: containerData.error?.message || `Threads container creation failed (${containerRes.status})`,
-      };
+      const carouselData = await carouselRes.json() as { id?: string; error?: { message: string } };
+      if (!carouselRes.ok || !carouselData.id) {
+        throw new Error(carouselData.error?.message || `Threads carousel creation failed (${carouselRes.status})`);
+      }
+      containerId = carouselData.id;
+    } else {
+      // Single Image, Video, or Text
+      const params = new URLSearchParams({
+        access_token: accessToken,
+        text: payload.caption || "",
+      });
+
+      if (isVideo) {
+        params.set("media_type", "VIDEO");
+        params.set("video_url", mediaUrls[0]);
+      } else if (mediaUrls.length > 0) {
+        params.set("media_type", "IMAGE");
+        params.set("image_url", mediaUrls[0]);
+      } else {
+        params.set("media_type", "TEXT");
+      }
+
+      const res = await fetch(`${THREADS_API}/${platformUserId}/threads`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+      });
+
+      const data = await res.json() as { id?: string; error?: { message: string } };
+      if (!res.ok || !data.id) {
+        throw new Error(data.error?.message || `Threads container creation failed (${res.status})`);
+      }
+      containerId = data.id;
     }
 
-    const containerId = containerData.id!;
-
-    // Step 2: Wait for readiness (required for media, instant for text)
-    if (payload.imageUrl) {
+    // Step 2: Wait for readiness (required for media)
+    if (isCarousel || isVideo || mediaUrls.length > 0) {
       const ready = await waitForContainer(containerId, accessToken);
       if (!ready) {
-        return { success: false, error: "Threads media container timed out" };
+        return { success: false, error: "Threads media container timed out or failed processing" };
       }
     }
 
@@ -99,3 +150,4 @@ export async function publishToThreads(
     return { success: false, error: err instanceof Error ? err.message : "Threads publish failed" };
   }
 }
+

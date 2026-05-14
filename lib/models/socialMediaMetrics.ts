@@ -23,6 +23,7 @@ export interface SocialMediaMetricsDocument {
     totalEngagements: number;
     totalClicks: number;
     totalShares: number;
+    totalComments?: number;
     totalSaves?: number;
     averageEngagementRate: number;
     averageCommentRate: number;
@@ -52,6 +53,10 @@ export interface SocialMediaMetricsDocument {
 }
 
 const COLLECTION = "social_media_metrics";
+
+function normalizeMetricDate(date: Date): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+}
 
 async function getCollection() {
   const { db } = await connectToDatabase();
@@ -101,9 +106,11 @@ export async function createMetrics(
 ): Promise<SocialMediaMetricsDocument> {
   const col = await getCollection();
   const now = new Date();
+  const normalizedDate = normalizeMetricDate(data.date);
 
   const doc: SocialMediaMetricsDocument = {
     ...data,
+    date: normalizedDate,
     createdAt: now,
     updatedAt: now,
   };
@@ -120,18 +127,20 @@ export async function upsertMetrics(
 ): Promise<SocialMediaMetricsDocument> {
   const col = await getCollection();
   const now = new Date();
+  const normalizedDate = normalizeMetricDate(data.date);
 
   const result = await col.findOneAndUpdate(
     {
       userId: data.userId,
       accountId: data.accountId,
       platform: data.platform,
-      date: data.date,
+      date: normalizedDate,
       granularity: data.granularity,
     },
     {
       $set: {
         ...data,
+        date: normalizedDate,
         updatedAt: now,
       },
       $setOnInsert: {

@@ -30,7 +30,41 @@ import {
   type AggregateMetrics,
 } from "./dataNormalizer";
 
-import type { Platform } from "@/lib/models/persistedTypes";
+import type { Platform, SocialMediaMetricsDocument } from "@/lib/models/persistedTypes";
+
+const ANALYTICS_FEATURE_PLATFORMS: Platform[] = ["facebook", "instagram", "x", "threads"];
+
+function toDateKey(date: Date): string {
+  return new Date(date).toISOString().split("T")[0];
+}
+
+function collapseMetricsByPlatformDay(metrics: SocialMediaMetricsDocument[]): SocialMediaMetricsDocument[] {
+  const byKey = new Map<string, SocialMediaMetricsDocument>();
+
+  for (const metric of [...metrics].sort((a, b) => a.date.getTime() - b.date.getTime())) {
+    const key = `${metric.platform}:${toDateKey(metric.date)}`;
+    const existing = byKey.get(key);
+
+    if (!existing || metric.updatedAt.getTime() >= existing.updatedAt.getTime()) {
+      byKey.set(key, metric);
+    }
+  }
+
+  return Array.from(byKey.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
+}
+
+function latestMetricsPerPlatform(metrics: SocialMediaMetricsDocument[]): SocialMediaMetricsDocument[] {
+  const latest = new Map<Platform, SocialMediaMetricsDocument>();
+
+  for (const metric of [...metrics].sort((a, b) => a.date.getTime() - b.date.getTime())) {
+    const existing = latest.get(metric.platform);
+    if (!existing || metric.date.getTime() >= existing.date.getTime()) {
+      latest.set(metric.platform, metric);
+    }
+  }
+
+  return Array.from(latest.values());
+}
 
 /**
  * Analytics summary for dashboard
@@ -103,7 +137,8 @@ export interface AccountHealth {
 export async function getAnalyticsSummary(
   userId: string,
   accountId: string,
-  days: number = 30
+  days: number = 30,
+  platformFilter?: Platform
 ): Promise<AnalyticsSummary> {
   const endDate = new Date();
   const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
@@ -115,12 +150,20 @@ export async function getAnalyticsSummary(
     getPostCountByFormat(userId, accountId),
   ]);
 
+  // Filter by platform if requested
+  const filteredPosts = platformFilter
+    ? posts.filter((p) => p.platform === platformFilter)
+    : posts.filter((p) => ANALYTICS_FEATURE_PLATFORMS.includes(p.platform));
+  const filteredMetrics = platformFilter
+    ? metrics.filter((m) => m.platform === platformFilter)
+    : metrics.filter((m) => ANALYTICS_FEATURE_PLATFORMS.includes(m.platform));
+  const dedupedMetrics = collapseMetricsByPlatformDay(filteredMetrics);
+  const latestMetrics = latestMetricsPerPlatform(dedupedMetrics);
+
   // Normalize data
-  const normalizedPosts = posts.map(normalizePost);
-  const normalizedMetrics = metrics.map(normalizeMetrics);
-  const metricsByPlatform = normalizeCrossPlatformMetrics(
-    metrics.filter((m) => m.date >= startDate && m.date <= endDate)
-  );
+  const normalizedPosts = filteredPosts.map(normalizePost);
+  const normalizedMetrics = dedupedMetrics.map(normalizeMetrics);
+  const metricsByPlatform = normalizeCrossPlatformMetrics(latestMetrics);
 
   // Calculate aggregates
   const aggregate = calculateAggregateMetrics(metricsByPlatform);
@@ -129,25 +172,17 @@ export async function getAnalyticsSummary(
   const topPosts = await getTopPostsByEngagement(
     userId,
     accountId,
-    5,
+    25,
     startDate,
-    endDate
+    endDate,
+    platformFilter && ANALYTICS_FEATURE_PLATFORMS.includes(platformFilter) ? platformFilter : undefined
   );
 
   // Get top posts per platform
   const topPostsByPlatform: Record<Platform, NormalizedPost[]> = {} as any;
-  for (const platform of [
-    "linkedin",
-    "facebook",
-    "instagram",
-    "x",
-    "pinterest",
-    "threads",
-  ] as Platform[]) {
-    const platformPosts = await getTopPostsByEngagement(userId, accountId, 3);
-    topPostsByPlatform[platform] = platformPosts
-      .filter((p) => p.platform === platform)
-      .map(normalizePost);
+  for (const platform of ANALYTICS_FEATURE_PLATFORMS) {
+    const platformPosts = await getTopPostsByEngagement(userId, accountId, 3, startDate, endDate, platform);
+    topPostsByPlatform[platform] = platformPosts.map(normalizePost);
   }
 
   // Format analysis
@@ -208,7 +243,10 @@ export async function getAnalyticsSummary(
   return {
     dateRange: { start: startDate, end: endDate },
     aggregate,
-    topPosts: topPosts.slice(0, 5).map(normalizePost),
+    topPosts: topPosts
+      .filter((post) => ANALYTICS_FEATURE_PLATFORMS.includes(post.platform))
+      .slice(0, 5)
+      .map(normalizePost),
     topPostsByPlatform,
     formatAnalysis,
     platformComparison,

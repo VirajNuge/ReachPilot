@@ -6,6 +6,23 @@ import { jwtVerify } from "jose";
 
 const JWT_SECRET = process.env.JWT_SECRET || "reachpilot-secret-key";
 
+function toTrimmedString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function toStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === "string" ? item.trim() : ""))
+      .filter(Boolean);
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed ? [trimmed] : [];
+  }
+  return [];
+}
+
 async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
   try {
      const cookieStore = await cookies();
@@ -67,53 +84,55 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await upsertPersona(userId, accountId, {
-      personaName: persona.personaName || "",
-      userRole: persona.userRole || "",
-      industry: persona.industry || "",
-      tagline: persona.tagline || "",
-      websiteUrl: persona.websiteUrl || "",
-      businessStage: persona.businessStage || "",
-      scrapedWebsiteData: persona.scrapedWebsiteData || "",
-      audienceSegments: persona.audienceSegments || [],
-      ageRange: persona.ageRange || "",
-      region: persona.region || "",
-      education: persona.education || "",
-      painPoints: persona.painPoints || "",
-      audienceGoals: persona.audienceGoals || [],
-      primaryObjective: persona.primaryObjective || [],
-      conversionTargets: persona.conversionTargets || [],
-      contentMix: persona.contentMix || [],
+      personaName: toTrimmedString(persona.personaName),
+      userRole: toStringArray(persona.userRole),
+      industry: toStringArray(persona.industry),
+      tagline: toTrimmedString(persona.tagline),
+      websiteUrl: toTrimmedString(persona.websiteUrl),
+      businessStage: toStringArray(persona.businessStage),
+      scrapedWebsiteData: toTrimmedString(persona.scrapedWebsiteData),
+      audienceSegments: toStringArray(persona.audienceSegments),
+      ageRange: toTrimmedString(persona.ageRange),
+      region: toTrimmedString(persona.region),
+      education: toTrimmedString(persona.education),
+      painPoints: toStringArray(persona.painPoints),
+      audienceGoals: toStringArray(persona.audienceGoals),
+      primaryObjective: toStringArray(persona.primaryObjective),
+      conversionTargets: toStringArray(persona.conversionTargets).length > 0
+        ? toStringArray(persona.conversionTargets)
+        : toStringArray(persona.conversionGoal),
+      contentMix: toStringArray(persona.contentMix),
       toneSliders: persona.toneSliders || {
         formalCasual: 50,
         seriousPlayful: 50,
         inspiringInformative: 50,
         dataDriven: 50,
       },
-      writingStyle: persona.writingStyle || "",
-      sentenceLength: persona.sentenceLength || [],
-      brandArchetype: persona.brandArchetype || "",
-      coreValues: persona.coreValues || [],
-      brandColorHex: persona.brandColorHex || "",
-      favoriteInfluencer: persona.favoriteInfluencer || "",
-      contentThemes: persona.contentThemes || [],
-      postingFrequency: persona.postingFrequency || "",
-      contentDepth: persona.contentDepth || "",
-      doNotTalk: persona.doNotTalk || "",
-      commentReplyStyle: persona.commentReplyStyle || [],
-      emojiUsage: persona.emojiUsage || "",
-       dmStrategy: persona.dmStrategy || "",
-       connections: persona.connections || [],
-       uniquePOV: persona.uniquePOV || "",
-       productsServices: persona.productsServices || "",
-       credibilitySignals: persona.credibilitySignals || "",
-       writingSamples: persona.writingSamples || "",
-       audienceDesiredOutcome: persona.audienceDesiredOutcome || "",
-       audienceRole: persona.audienceRole || "",
-       conversionGoal: persona.conversionGoal || "",
-       influencerStyle: persona.influencerStyle || "",
-       logoUrl: persona.logoUrl || "",
+      writingStyle: toStringArray(persona.writingStyle),
+      sentenceLength: toStringArray(persona.sentenceLength),
+      brandArchetype: toStringArray(persona.brandArchetype),
+      coreValues: toStringArray(persona.coreValues),
+      brandColorHex: toTrimmedString(persona.brandColorHex),
+      favoriteInfluencer: toTrimmedString(persona.favoriteInfluencer),
+      contentThemes: toStringArray(persona.contentThemes),
+      postingFrequency: toStringArray(persona.postingFrequency),
+      contentDepth: toTrimmedString(persona.contentDepth),
+      doNotTalk: toStringArray(persona.doNotTalk),
+      commentReplyStyle: toStringArray(persona.commentReplyStyle),
+      emojiUsage: toStringArray(persona.emojiUsage),
+       dmStrategy: toTrimmedString(persona.dmStrategy),
+       connections: toStringArray(persona.connections),
+       uniquePOV: toStringArray(persona.uniquePOV),
+       productsServices: toStringArray(persona.productsServices),
+       credibilitySignals: toStringArray(persona.credibilitySignals),
+       writingSamples: toTrimmedString(persona.writingSamples),
+       audienceDesiredOutcome: toStringArray(persona.audienceDesiredOutcome),
+       audienceRole: toStringArray(persona.audienceRole),
+      conversionGoal: toStringArray(persona.conversionGoal),
+       influencerStyle: toStringArray(persona.influencerStyle),
+       logoUrl: toTrimmedString(persona.logoUrl),
        colorPalette: Array.isArray(persona.colorPalette) ? persona.colorPalette : [],
-       fontFamily: persona.fontFamily || "",
+       fontFamily: toTrimmedString(persona.fontFamily),
      });
 
     return NextResponse.json({

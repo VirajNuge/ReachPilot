@@ -24,7 +24,7 @@ export interface ConnectionDocument {
 
 const COLLECTION = "social_connections";
 
-async function getCollection() {
+export async function getCollection() {
   const { db } = await connectToDatabase();
   return db.collection<ConnectionDocument>(COLLECTION);
 }
@@ -84,6 +84,18 @@ export async function getConnections(
 
   const connections = await col
     .find({ userId, accountId })
+    .toArray();
+
+  return connections;
+}
+
+export async function getConnectionsByUser(
+  userId: string
+): Promise<ConnectionDocument[]> {
+  const col = await getCollection();
+
+  const connections = await col
+    .find({ userId })
     .toArray();
 
   return connections;

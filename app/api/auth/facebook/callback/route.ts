@@ -24,19 +24,28 @@ export async function GET(req: NextRequest) {
 
   const code = req.nextUrl.searchParams.get("code");
   const error = req.nextUrl.searchParams.get("error");
+  const redirectUri =
+    req.cookies.get("rp_oauth_facebook_redirect_uri")?.value?.trim() ||
+    process.env.FACEBOOK_REDIRECT_URI?.trim() ||
+    new URL("/api/auth/facebook/callback", req.nextUrl.origin).toString();
 
   if (error || !code) {
     const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?error=auth_denied`, process.env.NEXTAUTH_URL || req.url));
     response.cookies.delete("rp_oauth_account");
+    response.cookies.delete("rp_oauth_facebook_redirect_uri");
     return response;
   }
 
   try {
+    if (!process.env.FACEBOOK_APP_ID || !process.env.FACEBOOK_APP_SECRET) {
+      throw new Error("Missing Facebook OAuth app credentials");
+    }
+
     // 1. Exchange code for short-lived user token
     const tokenUrl = new URL("https://graph.facebook.com/v19.0/oauth/access_token");
     tokenUrl.searchParams.set("client_id", process.env.FACEBOOK_APP_ID!);
     tokenUrl.searchParams.set("client_secret", process.env.FACEBOOK_APP_SECRET!);
-    tokenUrl.searchParams.set("redirect_uri", process.env.FACEBOOK_REDIRECT_URI!);
+    tokenUrl.searchParams.set("redirect_uri", redirectUri);
     tokenUrl.searchParams.set("code", code);
 
     const tokenResponse = await fetch(tokenUrl.toString());
@@ -116,6 +125,23 @@ export async function GET(req: NextRequest) {
         const pages = (data?.data ?? []) as FacebookPage[];
         if (pages.length > 0) return pages;
       }
+
+      // Some accounts expose managed pages more reliably via nested accounts edge.
+      const nestedRes = await fetch(
+        `https://graph.facebook.com/v19.0/me?fields=accounts{id,name,access_token,tasks}&access_token=${token}`
+      );
+      const nestedData = await nestedRes.json();
+      if (!nestedRes.ok || nestedData?.error) {
+        console.error("Facebook OAuth nested accounts fetch failed", {
+          tokenKind,
+          status: nestedRes.status,
+          data: nestedData,
+        });
+      } else {
+        const nestedPages = (nestedData?.accounts?.data ?? []) as FacebookPage[];
+        if (nestedPages.length > 0) return nestedPages;
+      }
+
       return [];
     };
 
@@ -304,13 +330,14 @@ export async function GET(req: NextRequest) {
       accessToken: userToken,
       platformUserId: userData.id,
       platformUsername,
-      scope: "pages_manage_posts,pages_read_engagement,pages_show_list,read_insights,public_profile,business_management",
+      scope: "pages_manage_posts,pages_manage_metadata,pages_read_engagement,pages_show_list,read_insights,public_profile,business_management",
       pageId,
       pageAccessToken,
     });
 
     const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?connected=facebook`, process.env.NEXTAUTH_URL || req.url));
     response.cookies.delete("rp_oauth_account");
+    response.cookies.delete("rp_oauth_facebook_redirect_uri");
     return response;
   } catch (error) {
     console.error("Facebook OAuth callback failed", {
@@ -321,6 +348,7 @@ export async function GET(req: NextRequest) {
     const message = error instanceof Error ? encodeURIComponent(error.message) : "OAuth failed";
     const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?error=auth_failed&platform=facebook&reason=${message}`, process.env.NEXTAUTH_URL || req.url));
     response.cookies.delete("rp_oauth_account");
+    response.cookies.delete("rp_oauth_facebook_redirect_uri");
     return response;
   }
 }

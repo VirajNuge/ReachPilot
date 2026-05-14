@@ -36,7 +36,7 @@ const PLATFORM_LABELS: Record<PostPlatform, string> = {
 };
 
 function withoutKey<T extends string>(record: Partial<Record<T, string>> | undefined, key: T) {
-  const next = { ...(record ?? {}) };
+  const next = { ...(record ?? {}) } as Partial<Record<T, string>>;
   delete next[key];
   return next;
 }
@@ -54,9 +54,9 @@ export default function WritingStyleModal({
   const [loading, setLoading] = useState(false);
 
   const selectedPlatforms = useMemo<PostPlatform[]>(() => {
-    const base = formInput.platforms.length > 0 ? formInput.platforms : ["linkedin"];
-    if (!POSTGEN_PLATFORM_WRITING_STYLE_MAP) return [base[0]];
-    return base;
+    const base = formInput.platforms.length > 0 ? formInput.platforms : (["linkedin"] as PostPlatform[]);
+    if (!POSTGEN_PLATFORM_WRITING_STYLE_MAP) return [(base[0] || "linkedin") as PostPlatform];
+    return base as PostPlatform[];
   }, [formInput.platforms]);
 
   useEffect(() => {

@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
 
     const scopeValue = typeof tokenData.scope === "string" ? tokenData.scope : "";
     const grantedScopes = scopeValue.split(/[,\s]+/).filter(Boolean);
-    const requiredScopes = ["boards:read", "pins:write"];
+    const requiredScopes = ["boards:read", "boards:write", "pins:write"];
     const missingScopes = requiredScopes.filter((scope) => !grantedScopes.includes(scope));
     if (missingScopes.length > 0) {
       throw new Error(`Pinterest token missing required scopes: ${missingScopes.join(", ")}`);

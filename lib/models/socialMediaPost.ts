@@ -183,11 +183,15 @@ export async function getTopPostsByEngagement(
   accountId: string,
   limit: number = 10,
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
+  platform?: Platform
 ): Promise<SocialMediaPostDocument[]> {
   const col = await getCollection();
 
   const query: any = { userId, accountId };
+  if (platform) {
+    query.platform = platform;
+  }
   if (startDate || endDate) {
     query.postedAt = {};
     if (startDate) query.postedAt.$gte = startDate;

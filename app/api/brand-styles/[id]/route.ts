@@ -7,10 +7,10 @@ import { deleteBrandStyle } from "@/lib/models/postGeneration";
  * Deletes a brand style preset. Only the owner can delete their own styles.
  */
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

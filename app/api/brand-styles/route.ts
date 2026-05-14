@@ -10,8 +10,8 @@ import type { SavedBrandStyle, BrandType, VisualStyle } from "@/lib/types/postGe
  * GET /api/brand-styles
  * Returns all saved brand styles for the authenticated user.
  */
-export async function GET() {
-  const authResult = await requireAuth();
+export async function GET(req: NextRequest) {
+  const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
@@ -29,7 +29,7 @@ export async function GET() {
  * Saves a new brand style preset for the authenticated user.
  */
 export async function POST(req: NextRequest) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

@@ -2,8 +2,13 @@ import { MongoClient, Db } from "mongodb";
 
 const MONGO_URI = process.env.MONGO_URI;
 
-if (!MONGO_URI) {
+// Allow tests to run without a real MongoDB connection by skipping the
+// hard fail when NODE_ENV === 'test'. Production and dev still require MONGO_URI.
+if (!MONGO_URI && process.env.NODE_ENV !== "test") {
   throw new Error("Please define the MONGO_URI environment variable in .env.local");
+} else if (!MONGO_URI && process.env.NODE_ENV === "test") {
+  // eslint-disable-next-line no-console
+  console.warn("MONGO_URI not defined; running in test mode without a MongoDB connection.");
 }
 
 interface MongoCache {

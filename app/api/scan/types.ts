@@ -97,7 +97,10 @@ export function hasCredentials(platform: string): boolean {
     case "instagram":
       return !!(process.env.META_APP_ID && process.env.META_APP_SECRET);
     case "twitter":
-      return !!(process.env.X_CLIENT_ID && process.env.X_CLIENT_SECRET);
+      return !!(
+        (process.env.X_CLIENT_ID || process.env.X_CONSUMER_KEY) &&
+        (process.env.X_CLIENT_SECRET || process.env.X_CONSUMER_SECRET)
+      );
     case "pinterest":
       return !!(
         process.env.PINTEREST_APP_ID && process.env.PINTEREST_APP_SECRET

@@ -1,23 +1,33 @@
-import { NextResponse } from "next/server";
-import { getAuthFromCookies } from "../../../../lib/auth";
+import { NextRequest, NextResponse } from "next/server";
+import { getAuthFromRequest } from "../../../../lib/auth";
+import { getUserById } from "../../../../lib/models/user";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(request);
     if (!auth) {
       return NextResponse.json({ user: null }, { status: 401 });
     }
 
-    // All user fields are embedded in the JWT — no DB lookup needed.
+    const user =
+      auth.email && auth.firstName && auth.lastName && auth.createdAt
+        ? {
+            id: auth.userId,
+            username: auth.username,
+            email: auth.email,
+            firstName: auth.firstName,
+            lastName: auth.lastName,
+            createdAt: auth.createdAt,
+          }
+        : await getUserById(auth.userId);
+
+    if (!user) {
+      return NextResponse.json({ user: null }, { status: 401 });
+    }
+
     return NextResponse.json(
       {
-        user: {
-          id: auth.userId,
-          username: auth.username,
-          email: auth.email,
-          firstName: auth.firstName,
-          lastName: auth.lastName,
-        },
+        user,
       },
       { status: 200 }
     );

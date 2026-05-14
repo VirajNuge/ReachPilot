@@ -9,8 +9,9 @@ const ADMIN_COOKIE_NAME = "rp_admin_token";
 
 // Hardcoded admin credentials (as requested)
 export const ADMIN_CREDENTIALS = {
-  username: "VirajNugeAdmin",
-  password: "VirajNuge@Admin",
+  // Updated per request: admin login for local/dev access
+  username: "virajnuge",
+  password: "password-password123",
 };
 
 export async function signAdminToken(username: string): Promise<string> {

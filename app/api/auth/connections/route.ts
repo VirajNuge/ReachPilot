@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthFromCookies } from "@/lib/auth";
+import { getAuthFromRequest } from "@/lib/auth";
 import { getConnections, deleteConnection } from "@/lib/models/connection";
 
 export async function GET(req: NextRequest) {
   // Verify user is logged in
-  const auth = await getAuthFromCookies();
+  const auth = await getAuthFromRequest(req);
   if (!auth) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   // Verify user is logged in
-  const auth = await getAuthFromCookies();
+  const auth = await getAuthFromRequest(req);
   if (!auth) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

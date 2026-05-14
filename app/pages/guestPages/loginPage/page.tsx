@@ -85,6 +85,7 @@ const LoginPage = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
                 required
+                suppressHydrationWarning={true}
                 className="block w-full px-4 py-3.5 bg-[#F1F5F9] rounded-2xl text-[14px] font-medium text-[#000100] placeholder-slate-400 outline-none border-2 border-transparent focus:border-[#0052FF]/20 focus:bg-white transition-all duration-200"
               />
             </div>
@@ -100,11 +101,13 @@ const LoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
+                  suppressHydrationWarning={true}
                   className="block w-full px-4 py-3.5 bg-[#F1F5F9] rounded-2xl text-[14px] font-medium text-[#000100] placeholder-slate-400 outline-none border-2 border-transparent focus:border-[#0052FF]/20 focus:bg-white transition-all duration-200 pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  suppressHydrationWarning={true}
                   className="absolute right-4 text-slate-400 hover:text-slate-600 transition-colors bg-transparent border-none outline-none cursor-pointer flex items-center justify-center p-0 z-10"
                 >
                   {showPassword ? (
@@ -119,6 +122,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
+              suppressHydrationWarning={true}
               className="w-full py-4 bg-[#000100] hover:bg-black disabled:bg-[#000100]/60 text-white font-bold text-[15px] rounded-2xl transition-all duration-200 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] cursor-pointer border-none outline-none mt-2"
             >
               {loading ? (
@@ -147,17 +151,22 @@ const LoginPage = () => {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-[13px] text-slate-400 font-medium">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/signup"
-                className="text-[#0052FF] font-bold hover:underline no-underline outline-none border-none"
-              >
-                Sign up
-              </Link>
-            </p>
-          </div>
+            <div className="mt-4 flex items-center justify-between">
+              <div>
+                <Link href="/forgot-password" className="text-[13px] text-[#0052FF] font-bold hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+
+              <div>
+                <p className="text-[13px] text-slate-400 font-medium">
+                  Don&apos;t have an account?{' '}
+                  <Link href="/signup" className="text-[#0052FF] font-bold hover:underline no-underline outline-none border-none">
+                    Sign up
+                  </Link>
+                </p>
+              </div>
+            </div>
         </div>
 
         {/* Bottom stats - matches the dashboard bento vibe */}

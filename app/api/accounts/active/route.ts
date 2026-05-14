@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { getAuthFromCookies } from '@/lib/auth';
+import { getAuthFromRequest } from '@/lib/auth';
 import { getAccountById } from '@/lib/models/account';
 
 const ACTIVE_ACCOUNT_COOKIE = 'rp_active_account';
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

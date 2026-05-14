@@ -60,14 +60,14 @@ export const PLATFORMS: PlatformConfig[] = [
     placeholder: "https://instagram.com/username",
     urlPattern: /instagram\.com\/[\w._]+/i,
   },
-  {
-    id: "pinterest",
-    name: "Pinterest",
-    icon: BsPinterest,
-    color: "#E60023",
-    placeholder: "https://pinterest.com/username",
-    urlPattern: /pinterest\.com\/[\w]+/i,
-  },
+  // {
+  //   id: "pinterest",
+  //   name: "Pinterest",
+  //   icon: BsPinterest,
+  //   color: "#E60023",
+  //   placeholder: "https://pinterest.com/username",
+  //   urlPattern: /pinterest\.com\/[\w]+/i,
+  // },
 ];
 
 interface PlatformSelectorProps {

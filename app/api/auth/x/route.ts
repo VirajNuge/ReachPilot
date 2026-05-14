@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromCookies } from "@/lib/auth";
 import crypto from "crypto";
 
+function getXClientId(): string | undefined {
+  return process.env.X_CLIENT_ID?.trim() || process.env.X_CONSUMER_KEY?.trim();
+}
+
+function getXRedirectUri(req: NextRequest): string | undefined {
+  return (
+    process.env.X_REDIRECT_URI?.trim() ||
+    new URL("/api/auth/x/callback", process.env.NEXTAUTH_URL || req.url).toString()
+  );
+}
+
 export async function GET(req: NextRequest) {
   // 1. Verify user is logged in
   const auth = await getAuthFromCookies();
@@ -27,12 +38,22 @@ export async function GET(req: NextRequest) {
     .update(codeVerifier)
     .digest("base64url");
 
+  const clientId = getXClientId();
+  const redirectUri = getXRedirectUri(req);
+
+  if (!clientId || !redirectUri) {
+    return NextResponse.json(
+      { error: "Missing X OAuth environment variables" },
+      { status: 500 }
+    );
+  }
+
   // 4. Build X OAuth authorization URL
   const params = new URLSearchParams({
     response_type: "code",
-    client_id: process.env.X_CLIENT_ID!,
-    redirect_uri: process.env.X_REDIRECT_URI!,
-    scope: "tweet.read tweet.write users.read offline.access",
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    scope: "tweet.read tweet.write users.read media.write offline.access",
     state: accountId,
     code_challenge: codeChallenge,
     code_challenge_method: "S256",

@@ -55,6 +55,8 @@ export interface NormalizedMetrics {
   engagementGrowth: number;
   engagementGrowthRate: number;
   clicks: number;
+  comments: number;
+  shares: number;
   avgPostPerformance: number;
 }
 
@@ -113,6 +115,8 @@ export function normalizeMetrics(
     engagementGrowth: metrics.growth?.engagementGrowth || 0,
     engagementGrowthRate: metrics.growth?.engagementGrowthRate || 0,
     clicks: metrics.metrics.totalClicks,
+    comments: metrics.metrics.totalComments || 0,
+    shares: metrics.metrics.totalShares || 0,
     avgPostPerformance: calculateAveragePostPerformance(metrics),
   };
 }
@@ -164,14 +168,42 @@ export function calculateAveragePostPerformance(
 
 /**
  * Normalize platform metrics across all platforms
+ * Aggregates metrics over the provided period.
  */
 export function normalizeCrossPlatformMetrics(
   metricsArray: SocialMediaMetricsDocument[]
 ): Map<string, NormalizedMetrics> {
   const normalized = new Map<string, NormalizedMetrics>();
 
-  for (const m of metricsArray) {
-    normalized.set(m.platform, normalizeMetrics(m));
+  // Sort by date so we can easily find the latest followers count
+  const sorted = [...metricsArray].sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  for (const m of sorted) {
+    const existing = normalized.get(m.platform);
+    const current = normalizeMetrics(m);
+
+    if (existing) {
+      // Sum metrics that should be cumulative over the period
+      existing.impressions += current.impressions;
+      existing.engagements += current.engagements;
+      existing.clicks += current.clicks;
+      existing.comments += current.comments;
+      existing.shares += current.shares;
+      existing.posts += current.posts;
+      
+      // For followers, we want the latest snapshot
+      existing.followers = current.followers;
+      existing.followerGrowth += current.followerGrowth;
+      existing.impressionGrowth += current.impressionGrowth;
+      existing.engagementGrowth += current.engagementGrowth;
+      
+      // Re-calculate engagement rate for the aggregate period
+      existing.engagementRate = existing.impressions > 0 
+        ? (existing.engagements / existing.impressions) * 100 
+        : 0;
+    } else {
+      normalized.set(m.platform, { ...current });
+    }
   }
 
   return normalized;
@@ -186,6 +218,8 @@ export interface AggregateMetrics {
   totalImpressions: number;
   totalEngagements: number;
   totalClicks: number;
+  totalComments: number;
+  totalShares: number;
   overallEngagementRate: number;
   platformCount: number;
   topPerformingPlatform: string;
@@ -200,6 +234,8 @@ export function calculateAggregateMetrics(
   let totalImpressions = 0;
   let totalEngagements = 0;
   let totalClicks = 0;
+  let totalComments = 0;
+  let totalShares = 0;
   let topPerformingPlatform = "";
   let topPerformingScore = 0;
 
@@ -209,6 +245,8 @@ export function calculateAggregateMetrics(
     totalImpressions += metrics.impressions;
     totalEngagements += metrics.engagements;
     totalClicks += metrics.clicks;
+    totalComments += metrics.comments || 0;
+    totalShares += metrics.shares || 0;
 
     if (metrics.engagementRate > topPerformingScore) {
       topPerformingScore = metrics.engagementRate;
@@ -227,6 +265,8 @@ export function calculateAggregateMetrics(
     totalImpressions,
     totalEngagements,
     totalClicks,
+    totalComments,
+    totalShares,
     overallEngagementRate: Math.round(overallEngagementRate * 100) / 100,
     platformCount: normalizedMetrics.size,
     topPerformingPlatform,

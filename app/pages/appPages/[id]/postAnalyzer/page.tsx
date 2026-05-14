@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   FaChrome,
@@ -12,7 +12,6 @@ import {
   FaChevronRight,
   FaSpinner,
 } from "react-icons/fa";
-import MotionBackground from "../../components/Shared/MotionBackground";
 import HookCTAScorecard from "../../components/PostAnalyzer/HookCTAScorecard";
 import CommentGapDiscovery from "../../components/PostAnalyzer/CommentGapDiscovery";
 import LeadPersonaID from "../../components/PostAnalyzer/LeadPersonaID";
@@ -24,18 +23,21 @@ import RetentionHook from "../../components/PostAnalyzer/RetentionHook";
 
 export default function PostAnalyzerPage() {
   const params = useParams();
-  const id = params?.id as string;
+  const accountId = params?.id as string;
+  const searchParams = useSearchParams();
+  const analysisId = searchParams.get("analysisId");
 
   const [analysisData, setAnalysisData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!!analysisId);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!analysisId) return;
 
     const fetchAnalysis = async () => {
       try {
-        const res = await fetch(`/api/analyze-post/${id}`);
+        setIsLoading(true);
+        const res = await fetch(`/api/analyze-post/${analysisId}`);
         if (!res.ok) throw new Error("Failed to load analysis");
         const json = await res.json();
         if (json.success && json.data) {
@@ -51,13 +53,38 @@ export default function PostAnalyzerPage() {
     };
 
     fetchAnalysis();
-  }, [id]);
+  }, [analysisId]);
+
+  const formAreaRef = useRef<HTMLDivElement>(null);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!formAreaRef.current) return;
+    const rect = formAreaRef.current.getBoundingClientRect();
+    formAreaRef.current.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    formAreaRef.current.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  };
+
+  const hasAnalysis = !!analysisData;
+  const isDashboard = !isLoading && !error && hasAnalysis;
 
   return (
-    <div className="relative min-h-screen bg-[#F4F7FA] font-sans text-gray-900 overflow-x-hidden">
-      <MotionBackground />
+    <div 
+      ref={formAreaRef}
+      onMouseMove={handleMouseMove}
+      className="min-h-screen bg-gradient-to-br from-[#E2EFFF] to-[#C7DEFF] pt-12 md:pt-20 pb-16 px-4 sm:px-6 lg:px-8 flex items-start justify-center font-sans text-[#1A1D23] relative overflow-hidden group/page"
+    >
+      {/* Interactive Background Plus Pattern on the whole page */}
+      <div 
+        className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500 opacity-50 group-hover/page:opacity-100"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 14V0h2v14h14v2H16v14h-2V16H0v-2h14z' fill='%230052FF' fill-opacity='0.12' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+          backgroundSize: '30px 30px',
+          maskImage: 'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%)',
+        }}
+      />
 
-      <div className="relative z-10 px-4 py-8 md:px-8 max-w-[1600px] mx-auto pb-24">
+      {/* Main White Container */}
+      <div className={`bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,10,50,0.05)] border border-white/50 flex flex-col relative z-10 p-8 md:p-12 ${isDashboard ? 'w-full max-w-[1600px] min-h-[750px]' : 'w-full max-w-[1000px] h-fit'}`}>
         {/* ─── Loading ─── */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -89,17 +116,17 @@ export default function PostAnalyzerPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-12 max-w-7xl mx-auto"
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 items-center"
           >
             {/* Left: Value Prop & CTA */}
             <div className="space-y-8">
               <h2 className="text-4xl md:text-5xl font-black text-[#000100] leading-[1.1]">
-                Analyze any post <br />
-                <span className="text-[#074ed5]">in one click.</span>
+                Audit any profile <br />
+                <span className="text-[#074ed5]">in seconds.</span>
               </h2>
               <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-md">
-                Stop guessing why your posts aren&apos;t going viral. Get a
-                deep-dive audit of hooks, visuals, and retention.
+                Stop guessing why you're not growing. Get a
+                deep-dive audit of your content strategy, audience, and revenue funnels.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -127,7 +154,7 @@ export default function PostAnalyzerPage() {
                   ))}
                 </div>
                 <p className="text-sm font-bold text-slate-500">
-                  Join <span className="text-[#000100]">5,000+ creators</span>{" "}
+                  Join <span className="text-[#000100]">5,000+ marketers</span>{" "}
                   using ReachPilot.
                 </p>
               </div>
@@ -150,18 +177,18 @@ export default function PostAnalyzerPage() {
                     },
                     {
                       step: "02",
-                      title: "Visit Post",
-                      desc: "Go to any LinkedIn or X post you want to reverse-engineer.",
+                      title: "Visit Profile",
+                      desc: "Go to any LinkedIn or Twitter profile you want to audit.",
                     },
                     {
                       step: "03",
-                      title: "One-Click Scan",
-                      desc: "Open the extension and click 'Analyze Post'.",
+                      title: "One-Click Audit",
+                      desc: "Open the extension and click 'Run Deep Scan'.",
                     },
                     {
                       step: "04",
-                      title: "Viral Breakdown",
-                      desc: "Get a forensic breakdown of the hook, structure, and quality.",
+                      title: "Growth Blueprint",
+                      desc: "Get a complete breakdown of their pillars, funnel, and strategy.",
                     },
                   ].map((item, i) => (
                     <div key={i} className="flex gap-4 group">

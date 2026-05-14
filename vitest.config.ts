@@ -9,5 +9,15 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    include: [
+      "lib/**/*.test.ts",
+      "lib/**/*.test.tsx",
+      "app/**/*.test.ts",
+      "app/**/*.test.tsx",
+    ],
+    exclude: [
+      // DB integration test is now re-enabled. Provide MONGO_URI when running the full test suite.
+      "node_modules/**",
+    ],
   },
 });

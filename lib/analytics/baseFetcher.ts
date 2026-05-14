@@ -59,6 +59,7 @@ export interface RawPlatformMetrics {
   engagements: number;
   clicks: number;
   shares: number;
+  comments?: number;
   saves?: number;
   topPostId?: string;
   topPostEngagement?: number;

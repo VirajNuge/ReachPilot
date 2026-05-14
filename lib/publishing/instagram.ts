@@ -8,7 +8,7 @@
  */
 import type { PublishPayload, PublishResult } from "./types";
 
-const GRAPH_API = "https://graph.facebook.com/v19.0";
+const GRAPH_API = "https://graph.facebook.com/v21.0";
 
 type MetaErrorShape = {
   message?: string;
@@ -26,11 +26,11 @@ function formatMetaError(error?: MetaErrorShape, fallback?: string): string {
   return parts.join(" | ");
 }
 
-/** Poll for container readiness (max 10 retries × 3 s) */
+/** Poll for container readiness (max 20 retries × 3 s) */
 async function waitForContainer(
   containerId: string,
   accessToken: string,
-  maxRetries = 10
+  maxRetries = 20
 ): Promise<boolean> {
   for (let i = 0; i < maxRetries; i++) {
     await new Promise((r) => setTimeout(r, 3000));
@@ -50,40 +50,93 @@ export async function publishToInstagram(
   payload: PublishPayload
 ): Promise<PublishResult> {
   try {
-    if (!payload.imageUrl) {
-      return { success: false, error: "Instagram requires an image to publish" };
+    const mediaUrls = payload.mediaUrls || (payload.imageUrl ? [payload.imageUrl] : []);
+    if (mediaUrls.length === 0) {
+      return { success: false, error: "Instagram requires at least one media URL to publish" };
     }
 
-    // Step 1: Create media container
-    const containerParams = new URLSearchParams({
-      image_url: payload.imageUrl,
-      caption: payload.caption,
-      access_token: pageAccessToken,
-    });
+    const isCarousel = payload.mediaType === "carousel" || mediaUrls.length > 1;
+    const isVideo = payload.mediaType === "video" || mediaUrls[0].toLowerCase().match(/\.(mp4|mov)$/);
 
-    const containerRes = await fetch(
-      `${GRAPH_API}/${igBusinessId}/media`,
-      {
+    let containerId: string;
+
+    if (isCarousel) {
+      // 1. Create item containers for each media
+      const childIds: string[] = [];
+      for (const url of mediaUrls.slice(0, 10)) {
+        const itemParams = new URLSearchParams({
+          is_carousel_item: "true",
+          access_token: pageAccessToken,
+        });
+        
+        const isChildVideo = url.toLowerCase().match(/\.(mp4|mov)$/);
+        if (isChildVideo) {
+          itemParams.set("media_type", "VIDEO");
+          itemParams.set("video_url", url);
+        } else {
+          itemParams.set("image_url", url);
+        }
+
+        const itemRes = await fetch(`${GRAPH_API}/${igBusinessId}/media`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: itemParams.toString(),
+        });
+        const itemData = await itemRes.json() as { id?: string; error?: MetaErrorShape };
+        if (!itemRes.ok || !itemData.id) {
+          throw new Error(formatMetaError(itemData.error, `Carousel item creation failed (${itemRes.status})`));
+        }
+        childIds.push(itemData.id);
+      }
+
+      // 2. Create the carousel container
+      const carouselParams = new URLSearchParams({
+        media_type: "CAROUSEL",
+        caption: payload.caption || "",
+        children: childIds.join(","),
+        access_token: pageAccessToken,
+      });
+
+      const carouselRes = await fetch(`${GRAPH_API}/${igBusinessId}/media`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: containerParams.toString(),
+        body: carouselParams.toString(),
+      });
+      const carouselData = await carouselRes.json() as { id?: string; error?: MetaErrorShape };
+      if (!carouselRes.ok || !carouselData.id) {
+        throw new Error(formatMetaError(carouselData.error, `Carousel creation failed (${carouselRes.status})`));
       }
-    );
+      containerId = carouselData.id;
+    } else {
+      // Single Image or Video/Reel
+      const params = new URLSearchParams({
+        caption: payload.caption || "",
+        access_token: pageAccessToken,
+      });
 
-    const containerData = await containerRes.json() as { id?: string; error?: MetaErrorShape };
-    if (!containerRes.ok || containerData.error) {
-      return {
-        success: false,
-        error: formatMetaError(containerData.error, `IG container creation failed (${containerRes.status})`),
-      };
+      if (isVideo) {
+        params.set("media_type", "REELS");
+        params.set("video_url", mediaUrls[0]);
+      } else {
+        params.set("image_url", mediaUrls[0]);
+      }
+
+      const res = await fetch(`${GRAPH_API}/${igBusinessId}/media`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+      });
+      const data = await res.json() as { id?: string; error?: MetaErrorShape };
+      if (!res.ok || !data.id) {
+        throw new Error(formatMetaError(data.error, `Media container creation failed (${res.status})`));
+      }
+      containerId = data.id;
     }
-
-    const containerId = containerData.id!;
 
     // Step 2: Wait for container to be ready
     const ready = await waitForContainer(containerId, pageAccessToken);
     if (!ready) {
-      return { success: false, error: "Instagram media container timed out or failed processing" };
+      return { success: false, error: "Instagram media container timed out or failed processing. Check media format/size." };
     }
 
     // Step 3: Publish container
@@ -114,3 +167,4 @@ export async function publishToInstagram(
     return { success: false, error: err instanceof Error ? err.message : "Instagram publish failed" };
   }
 }
+

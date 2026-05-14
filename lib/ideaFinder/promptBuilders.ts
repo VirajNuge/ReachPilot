@@ -69,6 +69,57 @@ function compactPersonaBlock(ctx: IdeaFinderContext): string {
   return lines.length ? `## BRAND CONTEXT (abbreviated)\n${lines.join("\n")}` : "";
 }
 
+/**
+ * Full voice + persona block used in all non-voice-match modes.
+ * Injects brand context, audience, voice profile, and writing samples
+ * so every mode generates persona-aware, on-brand content.
+ */
+function voiceEnhancedBlock(ctx: IdeaFinderContext): string {
+  const p = ctx.persona;
+  const sections: string[] = [];
+
+  // Full persona summary (includes role, industry, mission, etc.)
+  if (p.summary) {
+    sections.push(`## BRAND PERSONA\n${p.summary}`);
+  } else {
+    // Fallback compact block
+    const compact = compactPersonaBlock(ctx);
+    if (compact) sections.push(compact);
+  }
+
+  // Voice profile lines
+  const voiceLines: string[] = [];
+  if (p.voice) voiceLines.push(p.voice);
+  const vs = ctx.analysis.voiceSpectrum;
+  if (vs.signatureWords.length)
+    voiceLines.push(`Signature words/phrases: ${vs.signatureWords.join(", ")}`);
+  if (vs.avoidWords.length)
+    voiceLines.push(`Avoid these words: ${vs.avoidWords.join(", ")}`);
+  const topHookTypes = ctx.analysis.postDNA
+    .slice(0, 4)
+    .map((d) => d.hookType)
+    .filter(Boolean);
+  if (topHookTypes.length)
+    voiceLines.push(`Preferred hook styles: ${topHookTypes.join(", ")}`);
+  if (p.uniquePOV)
+    voiceLines.push(`Unique POV to weave in: ${p.uniquePOV}`);
+  if (voiceLines.length)
+    sections.push(`## VOICE & TONE PROFILE\n${voiceLines.join("\n")}`);
+
+  // Writing samples for style calibration
+  if (p.writingSamples.length) {
+    const samples = p.writingSamples
+      .slice(0, 2)
+      .map((s, i) => `Sample ${i + 1}: "${s}"`)
+      .join("\n");
+    sections.push(
+      `## WRITING SAMPLES (calibrate hooks and angles to this exact voice)\n${samples}`
+    );
+  }
+
+  return sections.filter(Boolean).join("\n\n");
+}
+
 function doNotTalkBlock(ctx: IdeaFinderContext): string {
   if (!ctx.persona.doNotTalk.length) return "";
   return `DO NOT generate ideas about: ${ctx.persona.doNotTalk.join(", ")}`;
@@ -211,10 +262,13 @@ function buildTrendJackerPrompt(
   const sections: string[] = [];
 
   sections.push(
-    "You are a trend-spotting social media strategist. You identify trending topics and craft brand-relevant angles. You MUST use real-time data from Google Search."
+    "You are a trend-spotting social media strategist. You identify trending topics and craft brand-relevant angles that authentically fit the brand's voice and audience. You MUST use real-time data from Google Search."
   );
 
-  sections.push(compactPersonaBlock(ctx));
+  // Full persona + voice context for on-brand trend angles
+  const voiceBlock = voiceEnhancedBlock(ctx);
+  if (voiceBlock) sections.push(voiceBlock);
+
   const userCoreMessage = coreMessageBlock(coreMessage);
   if (userCoreMessage) sections.push(userCoreMessage);
 
@@ -276,11 +330,13 @@ function buildRepurposePrompt(
   const sections: string[] = [];
 
   sections.push(
-    "You are a content repurposing expert. You analyze existing high-performing content and suggest creative ways to remix it into new formats and platforms."
+    "You are a content repurposing expert. You analyze existing high-performing content and suggest creative ways to remix it into new formats and platforms — always preserving the brand's authentic voice and style."
   );
 
-  // Compact persona
-  sections.push(compactPersonaBlock(ctx));
+  // Full persona + voice so remixed ideas stay on-brand
+  const voiceBlock = voiceEnhancedBlock(ctx);
+  if (voiceBlock) sections.push(voiceBlock);
+
   const userCoreMessage = coreMessageBlock(coreMessage);
   if (userCoreMessage) sections.push(userCoreMessage);
 
@@ -347,10 +403,13 @@ function buildGapFillerPrompt(
   const sections: string[] = [];
 
   sections.push(
-    "You are a content gap analyst. You identify topics a brand should be covering but hasn't, based on audience demand and competitive analysis."
+    "You are a content gap analyst. You identify topics a brand should be covering but hasn't — ensuring every gap idea is shaped to match the brand's authentic voice, audience, and strategic positioning."
   );
 
-  sections.push(compactPersonaBlock(ctx));
+  // Full persona + voice so gap ideas match brand context
+  const voiceBlock = voiceEnhancedBlock(ctx);
+  if (voiceBlock) sections.push(voiceBlock);
+
   const userCoreMessage = coreMessageBlock(coreMessage);
   if (userCoreMessage) sections.push(userCoreMessage);
 
@@ -422,19 +481,23 @@ function buildPrismPrompt(
   const sections: string[] = [];
 
   sections.push(
-    "You are a creative content strategist specializing in multi-angle content explosions. Given a single topic, you generate diverse ideas across different strategic frameworks."
+    "You are a creative content strategist specializing in multi-angle content explosions. Given a single topic, you generate diverse ideas across different strategic frameworks — every angle must sound like it came from this specific brand, not a generic creator."
   );
 
-  sections.push(personaBlock(ctx));
+  // Full voice + persona for all prism angles
+  const voiceBlock = voiceEnhancedBlock(ctx);
+  if (voiceBlock) sections.push(voiceBlock);
+
   const userCoreMessage = coreMessageBlock(coreMessage);
   if (userCoreMessage) sections.push(userCoreMessage);
 
-  // Voice analysis (lighter)
-  const vs = ctx.analysis.voiceSpectrum;
-  if (vs.signatureWords.length) {
-    sections.push(
-      `## VOICE NOTES\nSignature words: ${vs.signatureWords.join(", ")}`
-    );
+  // Supplement with viral recipe for angle inspiration
+  if (ctx.analysis.viralRecipe.length) {
+    const recipes = ctx.analysis.viralRecipe
+      .slice(0, 3)
+      .map((r) => `- ${r.hookType}: ${r.whyItWorked}`)
+      .join("\n");
+    sections.push(`## WHAT WORKS FOR THIS BRAND\n${recipes}`);
   }
 
   const topicStr = topic || "their core niche";

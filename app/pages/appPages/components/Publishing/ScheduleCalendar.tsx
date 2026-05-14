@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import { CalendarCheck, Lightbulb, ChevronLeft, ChevronRight, LayoutGrid, List } from "lucide-react";
 import type { PostDraft } from "./types";
 import { PLATFORM_META } from "./types";
-import { OptimalTimesPanel, type OptimalSlot } from "./OptimalTimesPanel";
+import { OptimalTimesPanel } from "./OptimalTimesPanel";
+import type { OptimalSlot } from "@/lib/publishing/types";
 
 interface ScheduleCalendarProps {
   selectedDate:     Date | null;
@@ -15,9 +16,9 @@ interface ScheduleCalendarProps {
   viewMode:         "month" | "week";
   setViewMode:      (mode: "month" | "week") => void;
   optimalSlots:     OptimalSlot[];
-  onApplyOptimalSlots: (slots: OptimalSlot[]) => void;
+  onCalculateOptimalTimes: () => void;
+  hasPersona: boolean;
   isOptimalTimesLoading: boolean;
-  setIsOptimalTimesLoading: (v: boolean) => void;
 }
 
 const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -75,9 +76,9 @@ export function ScheduleCalendar({
   viewMode,
   setViewMode,
   optimalSlots,
-  onApplyOptimalSlots,
+  onCalculateOptimalTimes,
+  hasPersona,
   isOptimalTimesLoading,
-  setIsOptimalTimesLoading
 }: ScheduleCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [hoverDay,     setHoverDay]     = useState<number | null>(null);
@@ -498,12 +499,12 @@ export function ScheduleCalendar({
       </div>
 
       {/* Optimal Times Panel at the bottom */}
-      <div className="mt-auto border-t border-slate-100 p-2.5 bg-slate-50/30">
+      <div className="mt-auto border-t border-slate-100 px-2 py-2 bg-slate-50/30">
         <OptimalTimesPanel 
-          onApply={onApplyOptimalSlots}
+          onCalculate={onCalculateOptimalTimes}
           isLoading={isOptimalTimesLoading}
-          setIsLoading={setIsOptimalTimesLoading}
           savedSlots={optimalSlots.length > 0 ? optimalSlots : null}
+          hasPersona={hasPersona}
           isEmbedded={true}
         />
       </div>

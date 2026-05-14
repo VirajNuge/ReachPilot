@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     response_type: "code",
     client_id: process.env.PINTEREST_APP_ID!,
     redirect_uri: process.env.PINTEREST_REDIRECT_URI!,
-    scope: "boards:read,pins:read,pins:write,user_accounts:read",
+    scope: "boards:read,boards:write,pins:read,pins:write,user_accounts:read",
     state: accountId,
   });
 

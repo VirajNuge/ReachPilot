@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthFromCookies } from '@/lib/auth';
+import { getAuthFromRequest } from '@/lib/auth';
 import { getAccountById, updateAccount, deleteAccount, getAccountsByUserId } from '@/lib/models/account';
 
 export async function GET(
@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ accountId: string }> }
 ) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -31,7 +31,7 @@ export async function PATCH(
   { params }: { params: Promise<{ accountId: string }> }
 ) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -62,7 +62,7 @@ export async function DELETE(
   { params }: { params: Promise<{ accountId: string }> }
 ) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

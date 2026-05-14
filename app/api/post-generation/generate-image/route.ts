@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI, Modality } from "@google/genai";
-import { getAuthFromCookies } from "@/lib/auth";
+import { getAuthFromRequest } from "@/lib/auth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import type {
   CreativeHandoffV2,
@@ -129,7 +129,7 @@ async function callImagenGenerateImages(
 
 export async function POST(req: NextRequest) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(req);
     if (!auth?.userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

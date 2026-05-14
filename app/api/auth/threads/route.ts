@@ -25,7 +25,17 @@ export async function GET(req: NextRequest) {
   const params = new URLSearchParams({
     client_id: process.env.THREADS_APP_ID,
     redirect_uri: process.env.THREADS_REDIRECT_URI,
-    scope: "threads_basic,threads_content_publish,threads_manage_insights",
+    scope: [
+      "threads_basic",
+      "threads_content_publish",
+      "threads_manage_insights",
+      "threads_manage_replies",
+      "threads_read_replies",
+      "threads_manage_mentions",
+      "threads_keyword_search",
+      "threads_delete",
+      "threads_location_tagging",
+    ].join(","),
     response_type: "code",
     state: accountId,
   });

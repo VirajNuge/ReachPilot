@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromCookies } from "@/lib/auth";
+import { getAuthFromRequest } from "@/lib/auth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 
 /**
@@ -9,7 +10,7 @@ import { getPersonaByUserAndAccount } from "@/lib/models/persona";
  */
 export async function GET(req: NextRequest) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(req);
     if (!auth?.userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -30,17 +31,24 @@ export async function GET(req: NextRequest) {
         personaName: persona.personaName,
         userRole: persona.userRole,
         industry: persona.industry,
+        businessStage: persona.businessStage,
         tagline: persona.tagline,
         websiteUrl: persona.websiteUrl,
         // Audience (Step 2)
         audienceRole: persona.audienceRole ?? [],
         audienceSegments: persona.audienceSegments ?? [],
+        region: persona.region,
+        education: persona.education,
         painPoints: persona.painPoints,
         audienceGoals: persona.audienceGoals ?? [],
         audienceDesiredOutcome: persona.audienceDesiredOutcome,
         // Objectives (Step 3)
         primaryObjective: persona.primaryObjective ?? [],
+        conversionTargets: persona.conversionTargets?.length
+          ? persona.conversionTargets
+          : persona.conversionGoal ?? [],
         contentMix: persona.contentMix ?? [],
+        contentThemes: persona.contentThemes ?? [],
         conversionGoal: persona.conversionGoal,
         // Tone & Voice (Step 4)
         toneSliders: persona.toneSliders,

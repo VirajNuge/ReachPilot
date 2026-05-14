@@ -12,14 +12,38 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "accountId is required" }, { status: 400 });
   }
 
-  if (!process.env.FACEBOOK_APP_ID || !process.env.FACEBOOK_REDIRECT_URI) {
+  if (!process.env.FACEBOOK_APP_ID) {
     return NextResponse.json({ error: "Missing Facebook OAuth environment variables" }, { status: 500 });
   }
 
+  const redirectUri =
+    process.env.FACEBOOK_REDIRECT_URI?.trim() ||
+    new URL("/api/auth/facebook/callback", req.nextUrl.origin).toString();
+
   const params = new URLSearchParams({
     client_id: process.env.FACEBOOK_APP_ID,
-    redirect_uri: process.env.FACEBOOK_REDIRECT_URI,
-    scope: "pages_manage_posts,pages_read_engagement,pages_show_list,read_insights,public_profile,business_management",
+    redirect_uri: redirectUri,
+    scope: [
+      // Identity
+      "public_profile",
+      "email",
+      // Page management
+      "pages_show_list",
+      "pages_read_engagement",
+      "pages_read_user_content",
+      "pages_manage_posts",
+      "pages_manage_metadata",
+      "pages_manage_engagement",
+      // Instagram management
+      "instagram_basic",
+      "instagram_manage_insights",
+      "instagram_manage_comments",
+      "instagram_content_publish",
+      // Insights & analytics
+      "read_insights",
+      // Business
+      "business_management",
+    ].join(","),
     response_type: "code",
     auth_type: "rerequest",
     state: accountId,
@@ -29,6 +53,13 @@ export async function GET(req: NextRequest) {
 
   const response = NextResponse.redirect(authUrl);
   response.cookies.set("rp_oauth_account", accountId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 600,
+  });
+  response.cookies.set("rp_oauth_facebook_redirect_uri", redirectUri, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

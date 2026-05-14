@@ -22,11 +22,11 @@ export function buildMockAnalyticsDataset(platform: PlatformKey): AnalyticsDatas
       ? undefined
       : {
           platformA: platform,
-          platformB: "linkedin" as PlatformKey,
+          platformB: "twitter" as PlatformKey,
           series: HISTORY_DATA.map((point) => ({
             date: point.date as string,
             platformA: typeof point[platform] === "number" ? (point[platform] as number) : 0,
-            platformB: typeof point.linkedin === "number" ? point.linkedin : 0,
+            platformB: typeof point.twitter === "number" ? point.twitter : 0,
           })),
         };
   return normalizeAnalyticsPayload({

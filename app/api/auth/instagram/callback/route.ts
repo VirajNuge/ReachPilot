@@ -24,19 +24,28 @@ export async function GET(req: NextRequest) {
 
   const code = req.nextUrl.searchParams.get("code");
   const error = req.nextUrl.searchParams.get("error");
+  const redirectUri =
+    req.cookies.get("rp_oauth_instagram_redirect_uri")?.value?.trim() ||
+    process.env.INSTAGRAM_REDIRECT_URI?.trim() ||
+    new URL("/api/auth/instagram/callback", req.nextUrl.origin).toString();
 
   if (error || !code) {
     const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?error=auth_denied`, process.env.NEXTAUTH_URL || req.url));
     response.cookies.delete("rp_oauth_account");
+    response.cookies.delete("rp_oauth_instagram_redirect_uri");
     return response;
   }
 
   try {
+    if (!process.env.FACEBOOK_APP_ID || !process.env.FACEBOOK_APP_SECRET) {
+      throw new Error("Missing Meta OAuth app credentials");
+    }
+
     // 1. Exchange code for short-lived user token
     const tokenUrl = new URL("https://graph.facebook.com/v19.0/oauth/access_token");
     tokenUrl.searchParams.set("client_id", process.env.FACEBOOK_APP_ID!);
     tokenUrl.searchParams.set("client_secret", process.env.FACEBOOK_APP_SECRET!);
-    tokenUrl.searchParams.set("redirect_uri", process.env.INSTAGRAM_REDIRECT_URI!);
+    tokenUrl.searchParams.set("redirect_uri", redirectUri);
     tokenUrl.searchParams.set("code", code);
 
     const tokenResponse = await fetch(tokenUrl.toString());
@@ -298,13 +307,14 @@ export async function GET(req: NextRequest) {
       accessToken: userToken,
       platformUserId: userData.id,
       platformUsername,
-      scope: "instagram_basic,instagram_content_publish,instagram_manage_insights,pages_show_list,pages_read_engagement,business_management",
+      scope: "instagram_basic,instagram_content_publish,instagram_manage_insights,pages_show_list,pages_read_engagement,pages_manage_metadata,business_management",
       pageId: igBusinessId,         // IG Business Account ID (used in /media endpoints)
       pageAccessToken,              // Page-scoped token required by Graph API
     });
 
     const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?connected=instagram`, process.env.NEXTAUTH_URL || req.url));
     response.cookies.delete("rp_oauth_account");
+    response.cookies.delete("rp_oauth_instagram_redirect_uri");
     return response;
   } catch (error) {
     console.error("Instagram OAuth callback failed", {
@@ -315,6 +325,7 @@ export async function GET(req: NextRequest) {
     const message = error instanceof Error ? encodeURIComponent(error.message) : "OAuth failed";
     const response = NextResponse.redirect(new URL(`/${accountId}/accountPersona?error=auth_failed&platform=instagram&reason=${message}`, process.env.NEXTAUTH_URL || req.url));
     response.cookies.delete("rp_oauth_account");
+    response.cookies.delete("rp_oauth_instagram_redirect_uri");
     return response;
   }
 }

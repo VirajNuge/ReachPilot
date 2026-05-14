@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import type { ContentScore } from "@/lib/types/postGeneration";
 
 interface ContentScoreCardProps {
@@ -9,40 +10,76 @@ interface ContentScoreCardProps {
 
 export const ContentScoreCard: React.FC<ContentScoreCardProps> = ({ score }) => {
   const metrics = [
-    { label: "Hook", value: score.hookStrength },
-    { label: "Clarity", value: score.clarity },
-    { label: "Virality", value: score.virality },
-    { label: "Engagement", value: score.engagementPotential },
+    { label: "Hook", value: score.hookStrength, color: "bg-purple-500" },
+    { label: "Clarity", value: score.clarity, color: "bg-blue-500" },
+    { label: "Virality", value: score.virality, color: "bg-green-500" },
+    { label: "Engagement", value: score.engagementPotential, color: "bg-orange-500" },
   ];
 
+  const getScoreColor = (value: number) => {
+    if (value >= 80) return "text-green-500";
+    if (value >= 50) return "text-amber-500";
+    return "text-red-500";
+  };
+
+  const strokeDasharray = 2 * Math.PI * 36;
+  const strokeDashoffset = strokeDasharray - (score.overall / 100) * strokeDasharray;
+
   return (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]">Score</p>
-          <h3 className="mt-1 text-sm font-semibold text-[#111827]">AI content read</h3>
-        </div>
-        <span className="rounded-full border border-[#D1D5DB] px-3 py-1 text-sm font-semibold text-[#111827]">
-          {score.overall}/100
-        </span>
-      </div>
-
-      <div className="grid gap-2 rounded-[22px] border border-[#E5E7EB] bg-white p-4">
-        {metrics.map((metric) => (
-          <div key={metric.label} className="grid grid-cols-[72px_1fr_40px] items-center gap-3">
-            <span className="text-xs font-medium text-[#6B7280]">{metric.label}</span>
-            <div className="h-2 rounded-full bg-[#F3F4F6]">
-              <div
-                className="h-2 rounded-full bg-[#111827]"
-                style={{ width: `${Math.max(6, metric.value)}%` }}
+    <motion.section
+      className="space-y-4"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-sm">
+        <div className="flex items-center gap-5">
+          <div className="relative flex h-24 w-24 shrink-0 items-center justify-center">
+            <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="36" fill="transparent" stroke="#F3F4F6" strokeWidth="6" />
+              <motion.circle
+                cx="40"
+                cy="40"
+                r="36"
+                fill="transparent"
+                stroke="currentColor"
+                strokeWidth="6"
+                strokeLinecap="round"
+                className={getScoreColor(score.overall)}
+                initial={{ strokeDashoffset: strokeDasharray, strokeDasharray }}
+                animate={{ strokeDashoffset, strokeDasharray }}
+                transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
               />
+            </svg>
+            <div className="absolute flex flex-col items-center justify-center text-center">
+              <span className={`text-2xl font-bold tracking-tight ${getScoreColor(score.overall)}`}>
+                {score.overall}
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#6B7280]">Score</span>
             </div>
-            <span className="text-right text-xs font-semibold text-[#111827]">{metric.value}</span>
           </div>
-        ))}
+
+          <div className="flex-1 space-y-3">
+            {metrics.map((metric, i) => (
+              <div key={metric.label} className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-[#4B5563]">{metric.label}</span>
+                  <span className="text-[11px] font-bold text-[#111827]">{metric.value}</span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-[#F3F4F6]">
+                  <motion.div
+                    className={`h-full rounded-full ${metric.color}`}
+                    initial={{ width: "0%" }}
+                    animate={{ width: `${Math.max(4, metric.value)}%` }}
+                    transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 + i * 0.08 }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <p className="text-sm leading-6 text-[#4B5563]">{score.feedback}</p>
-    </section>
+    </motion.section>
   );
 };

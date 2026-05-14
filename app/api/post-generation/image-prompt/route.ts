@@ -270,7 +270,7 @@ function normalizePosterPromptOutput(
 }
 
 export async function POST(req: NextRequest) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 

@@ -5,11 +5,8 @@ import { motion } from "framer-motion";
 import {
   CalendarDays,
   ChevronRight,
-  PanelRightClose,
-  PanelRightOpen,
   Save,
   Send,
-  Sparkles,
 } from "lucide-react";
 import type { PlatformPublishResult } from "../../Publishing/PublishToast";
 import { PublishToast } from "../../Publishing/PublishToast";
@@ -78,7 +75,6 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
   const [activeTab, setActiveTab] = useState<PostPlatform>(platforms[0] ?? "linkedin");
   const [selectedCaptionIndices, setSelectedCaptionIndices] = useState<Record<string, number>>({});
   const [selectedHookId, setSelectedHookId] = useState<string | undefined>(undefined);
-  const [utilityOpen, setUtilityOpen] = useState(true);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [scheduleValue, setScheduleValue] = useState(
     suggestedScheduleIso ? toLocalInputValue(suggestedScheduleIso) : ""
@@ -189,60 +185,111 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
 
   return (
     <>
-      <div className="w-full max-w-[1320px] mx-auto">
-        <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
-          <section className="min-w-0 space-y-6">
-            <div className="overflow-hidden rounded-[34px] border border-white/80 bg-[linear-gradient(135deg,rgba(17,24,39,0.96),rgba(0,82,255,0.90))] px-5 py-5 text-white shadow-[0_30px_80px_rgba(15,23,42,0.18)] sm:px-6">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Generated post</p>
-                  <h2 className="mt-1 text-2xl font-semibold text-white">Review, remix, publish</h2>
-                  <p className="mt-2 max-w-xl text-sm leading-6 text-white/75">
-                    Move through each platform version, keep the best hook, and push the finished draft into your calendar.
-                  </p>
+      <div className="w-full max-w-[1320px] mx-auto space-y-6">
+        {/* ── Sticky Action Bar (actions only) ── */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          className="sticky top-4 z-40 flex items-center justify-between gap-3 rounded-3xl border border-white/80 bg-white/90 px-4 py-2.5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-xl"
+        >
+          <p className="text-sm font-semibold text-gray-700 hidden sm:block">Post ready</p>
+          <div className="flex flex-wrap items-center gap-2 ml-auto">
+            <button
+              type="button"
+              onClick={() => onSaveToQueue?.(getCurrentPackage())}
+              disabled={isSavingToQueue}
+              className="group flex items-center gap-2 rounded-full bg-gray-50/80 px-4 py-2 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50"
+            >
+              <Save className="h-4 w-4 text-gray-400 transition-colors group-hover:text-gray-600" />
+              <span className="hidden sm:inline">{isSavingToQueue ? "Saving..." : "Save Draft"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setScheduleOpen(true)}
+              disabled={!onSchedulePost}
+              className="group flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50/30 hover:text-blue-700 disabled:opacity-50"
+            >
+              <CalendarDays className="h-4 w-4 text-gray-400 transition-colors group-hover:text-blue-500" />
+              <span className="hidden sm:inline">Schedule</span>
+            </button>
+            {onPublishNow && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                disabled={isPublishingNow}
+                onClick={async () => {
+                  const results = await onPublishNow(getCurrentPackage());
+                  setPublishResults(results);
+                }}
+                className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-[linear-gradient(110deg,#1e293b,45%,#0f172a,55%,#1e293b)] bg-[length:200%_100%] px-5 py-2 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(15,23,42,0.18)] transition-all hover:shadow-[0_8px_28px_rgba(15,23,42,0.28)] hover:bg-[position:-100%_0] disabled:opacity-50"
+              >
+                <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <span>{isPublishingNow ? "Publishing..." : "Publish Now"}</span>
+              </motion.button>
+            )}
+          </div>
+        </motion.div>
+
+        {/* ── 2-Column Layout: Content | Sidebar ── */}
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+
+          {/* ── Left: Image ↓ Caption ── */}
+          <div className="min-w-0 space-y-6">
+
+            {/* Image Preview — full width above caption */}
+            {hasImage && input?.generateImage !== false && (
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45 }}
+              >
+                <ImagePreview
+                  imagePrompt={postPackage.imagePrompt}
+                  headline={postPackage.headline}
+                  subtext={postPackage.subtext}
+                  cta={postPackage.cta}
+                  imageUrl={postPackage.imageUrl}
+                  imageVariations={postPackage.imageVariations}
+                  selectedImageVariationId={postPackage.selectedImageVariationId}
+                  onSelectVariation={onSelectImageVariation}
+                />
+              </motion.div>
+            )}
+
+            {/* Caption Card — platform tabs live here */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: hasImage && input?.generateImage !== false ? 0.1 : 0 }}
+              className="overflow-hidden rounded-[34px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(252,252,253,0.90))] shadow-[0_20px_60px_rgba(15,23,42,0.07)]"
+            >
+              {/* Caption header: platform tabs + remix on same row */}
+              <div className="flex flex-col gap-3 border-b border-[#E5E7EB] px-5 pt-5 pb-4 sm:px-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9CA3AF]">Caption</p>
+                    <h3 className="mt-0.5 text-base font-semibold text-[#111827]">Platform-ready copy</h3>
+                  </div>
+                  <RemixPanel
+                    onRemix={(style) => onRemix(activeCaption, activeTab, style)}
+                    isRemixing={isRemixing}
+                  />
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                {/* Platform selector tabs — inline in the caption card */}
+                <div className="-mx-1">
                   <PlatformNav
                     platforms={platforms}
                     activePlatform={activeTab}
                     onChange={setActiveTab}
                     variant="horizontal"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setUtilityOpen((value) => !value)}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/15"
-                  >
-                    {utilityOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
-                    Utilities
-                  </button>
                 </div>
               </div>
-            </div>
 
-            {hasImage && input?.generateImage !== false && (
-              <ImagePreview
-                imagePrompt={postPackage.imagePrompt}
-                headline={postPackage.headline}
-                subtext={postPackage.subtext}
-                cta={postPackage.cta}
-                imageUrl={postPackage.imageUrl}
-                imageVariations={postPackage.imageVariations}
-                selectedImageVariationId={postPackage.selectedImageVariationId}
-                onSelectVariation={onSelectImageVariation}
-              />
-            )}
-
-            <div className="overflow-hidden rounded-[34px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(252,252,253,0.88))] shadow-[0_28px_70px_rgba(15,23,42,0.08)]">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E5E7EB] px-6 py-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B7280]">Caption</p>
-                  <h3 className="mt-1 text-lg font-semibold text-[#111827]">Platform-ready copy</h3>
-                </div>
-                <RemixPanel onRemix={(style) => onRemix(activeCaption, activeTab, style)} isRemixing={isRemixing} />
-              </div>
-
+              {/* Tab content */}
               <div className="px-2 py-2 sm:px-3 sm:py-3">
                 {platforms.map((platform) =>
                   platform === activeTab ? (
@@ -275,107 +322,50 @@ export const OutputDashboard: React.FC<OutputDashboardProps> = ({
                   ) : null
                 )}
               </div>
-            </div>
-          </section>
+            </motion.div>
+          </div>
 
-          {utilityOpen && (
-            <motion.aside
-              initial={{ opacity: 0, x: 12 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-6 border-l border-white/70 pl-0 xl:pl-8"
-            >
-              <section className="relative overflow-hidden rounded-[30px] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-                <div className="absolute top-0 right-0 p-32 bg-blue-500/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
-                <div className="flex flex-col gap-4 relative z-10">
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-                      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600">Distribution</p>
-                    </div>
-                    <h3 className="text-[15px] font-semibold text-gray-900 leading-tight">Publishing Actions</h3>
-                  </div>
-
-                  <div className="flex flex-col gap-3">
-                    {onPublishNow && (
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        type="button"
-                        disabled={isPublishingNow}
-                        onClick={async () => {
-                          const results = await onPublishNow(getCurrentPackage());
-                          setPublishResults(results);
-                        }}
-                        className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-[linear-gradient(110deg,#1e293b,45%,#0f172a,55%,#1e293b)] bg-[length:200%_100%] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(15,23,42,0.15)] transition-all hover:shadow-[0_10px_30px_rgba(15,23,42,0.25)] hover:bg-[position:-100%_0] disabled:opacity-50"
-                      >
-                        <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        <span>{isPublishingNow ? "Publishing..." : "Publish Now"}</span>
-                      </motion.button>
-                    )}
-
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="button"
-                      onClick={() => setScheduleOpen(true)}
-                      disabled={!onSchedulePost}
-                      className="group flex w-full flex-col items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50/30 hover:text-blue-700 disabled:opacity-50"
-                    >
-                      <div className="flex items-center gap-2">
-                        <CalendarDays className="h-4 w-4 text-gray-400 transition-colors group-hover:text-blue-500" />
-                        <span>Schedule Post</span>
-                      </div>
-                    </motion.button>
-
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="button"
-                      onClick={() => onSaveToQueue?.(getCurrentPackage())}
-                      disabled={isSavingToQueue}
-                      className="group flex w-full items-center justify-center gap-2 rounded-full bg-gray-50/80 px-5 py-3 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50"
-                    >
-                      <Save className="h-4 w-4 text-gray-400 transition-colors group-hover:text-gray-600" />
-                      <span>{isSavingToQueue ? "Saving..." : "Save to Queue"}</span>
-                    </motion.button>
-                  </div>
-
-                  {suggestedScheduleIso && (
-                    <div className="mt-1 flex items-center justify-center rounded-2xl bg-indigo-50/50 py-2.5 px-3 border border-indigo-100/50">
-                      <p className="text-[11px] text-indigo-800 font-medium">
-                        <span className="opacity-70 mr-1">Smart slot:</span>
-                        <span className="font-bold">{new Date(suggestedScheduleIso).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
-                      </p>
-                    </div>
-                  )}
-                </div>
+          {/* ── Right: Sidebar ── */}
+          <motion.aside
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.45, delay: 0.15 }}
+            className="space-y-6"
+          >
+            {suggestedScheduleIso && (
+              <section className="relative overflow-hidden rounded-[24px] bg-indigo-50/50 p-4 border border-indigo-100/50 flex flex-col items-center text-center">
+                <CalendarDays className="h-5 w-5 text-indigo-500 mb-2" />
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-600">Smart Slot</p>
+                <p className="mt-1 text-[13px] font-bold text-indigo-900">
+                  {new Date(suggestedScheduleIso).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                </p>
               </section>
+            )}
 
-              {postPackage.contentScore ? (
-                <ContentScoreCard score={postPackage.contentScore} />
-              ) : (
-                <section className="relative overflow-hidden rounded-[24px] bg-white p-5 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#64748B]">Analytics</p>
-                  <h3 className="mt-1 text-[15px] font-semibold text-gray-900 leading-tight">
-                    Analytics unavailable
-                  </h3>
-                  <p className="mt-2 text-xs text-[#64748B]">
-                    Auto analytics could not be generated for this run.
-                  </p>
-                </section>
-              )}
+            {postPackage.contentScore ? (
+              <ContentScoreCard score={postPackage.contentScore} />
+            ) : (
+              <section className="relative overflow-hidden rounded-[24px] bg-white p-5 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100">
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#64748B]">Analytics</p>
+                <h3 className="mt-1 text-[15px] font-semibold text-gray-900 leading-tight">
+                  Analytics unavailable
+                </h3>
+                <p className="mt-2 text-xs text-[#64748B]">
+                  Auto analytics could not be generated for this run.
+                </p>
+              </section>
+            )}
 
-              <HashtagPanel hashtags={postPackage.hashtags} />
+            <HashtagPanel hashtags={postPackage.hashtags} />
 
-              {postPackage.hooks && postPackage.hooks.length > 0 && (
-                <HookSelector
-                  hooks={postPackage.hooks}
-                  onSelect={handleSelectHook}
-                  selectedHookId={selectedHookId}
-                />
-              )}
-            </motion.aside>
-          )}
+            {postPackage.hooks && postPackage.hooks.length > 0 && (
+              <HookSelector
+                hooks={postPackage.hooks}
+                onSelect={handleSelectHook}
+                selectedHookId={selectedHookId}
+              />
+            )}
+          </motion.aside>
         </div>
       </div>
 

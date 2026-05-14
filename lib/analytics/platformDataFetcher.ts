@@ -19,10 +19,8 @@ import {
 } from "@/lib/models/persistedTypes";
 
 import { BasePlatformFetcher, type FetchResult } from "./baseFetcher";
-import { LinkedInFetcher } from "./linkedInFetcher";
 import { FacebookFetcher, InstagramFetcher } from "./facebookInstagramFetcher";
 import { TwitterFetcher } from "./twitterFetcher";
-import { PinterestFetcher } from "./pinterestFetcher";
 import { ThreadsFetcher } from "./threadsFetcher";
 
 import type { ConnectionDocument } from "@/lib/models/connection";
@@ -48,16 +46,12 @@ export interface SyncStats {
  */
 function createFetcher(connection: ConnectionDocument): BasePlatformFetcher {
   switch (connection.platform) {
-    case "linkedin":
-      return new LinkedInFetcher(connection);
     case "facebook":
       return new FacebookFetcher(connection);
     case "instagram":
       return new InstagramFetcher(connection);
     case "x":
       return new TwitterFetcher(connection);
-    case "pinterest":
-      return new PinterestFetcher(connection);
     case "threads":
       return new ThreadsFetcher(connection);
     default:
@@ -89,20 +83,48 @@ async function syncPlatform(
   };
 
   try {
+    // Verify the fetcher's token is valid before attempting API calls
+    try {
+      const valid = await fetcher.isTokenValid();
+      if (!valid) {
+        result.error = "Access token is invalid or expired";
+        return result;
+      }
+    } catch (e) {
+      // If token check fails unexpectedly, abort and report
+      result.error = `Token validation failed: ${String(e)}`;
+      return result;
+    }
     // Fetch posts
     const rawPosts = await fetcher.fetchPosts(100);
+    let postLikes = 0;
+    let postComments = 0;
+    let postShares = 0;
+    let postViews = 0;
+
     if (rawPosts.length > 0) {
       const normalizedPosts = fetcher.normalizePosts(rawPosts);
 
+      // Aggregate post-level metrics as a fallback for insights
+      for (const raw of rawPosts) {
+        postLikes += raw.metrics?.likes || 0;
+        postComments += raw.metrics?.comments || 0;
+        postShares += raw.metrics?.shares || 0;
+        postViews += raw.metrics?.views || 0;
+      }
+
       for (const post of normalizedPosts) {
         try {
-          await upsertPost(post);
-          result.postsAdded++;
-        } catch (error: any) {
-          // If it's a duplicate key error, it's an update not an insert
-          if (error.code === 11000) {
+          const upserted = await upsertPost(post);
+          // If updatedAt and createdAt are within 1 second, it's likely a new insert
+          const isNew = Math.abs(upserted.createdAt.getTime() - upserted.updatedAt.getTime()) < 1000;
+          if (isNew) {
+            result.postsAdded++;
+          } else {
             result.postsUpdated++;
           }
+        } catch (error: any) {
+          console.error(`[Analytics] Error upserting post ${post.platformPostId}:`, error);
         }
       }
     }
@@ -110,6 +132,18 @@ async function syncPlatform(
     // Fetch metrics
     const rawMetrics = await fetcher.fetchMetrics();
     if (rawMetrics) {
+      // If insights API returned 0 engagements or impressions but posts have data, use post totals
+      if (rawMetrics.engagements === 0 && (postLikes + postComments + postShares) > 0) {
+        rawMetrics.engagements = postLikes + postComments + postShares;
+      }
+      if (rawMetrics.impressions === 0 && postViews > 0) {
+        rawMetrics.impressions = postViews;
+      }
+      if (rawMetrics.shares === 0 && postShares > 0) {
+        rawMetrics.shares = postShares;
+      }
+      console.log(`[Analytics] Enriched metrics from post data: engagements=${rawMetrics.engagements}, impressions=${rawMetrics.impressions}, shares=${rawMetrics.shares}`);
+
       const normalizedMetrics = fetcher.normalizeMetrics(rawMetrics);
       if (normalizedMetrics) {
         try {
@@ -154,7 +188,12 @@ export async function syncAllPlatforms(
 
   try {
     // Get all connected platforms for this account
-    const connections = await getConnections(userId, accountId);
+    const connections = (await getConnections(userId, accountId)).filter((connection) =>
+      connection.platform === "facebook" ||
+      connection.platform === "instagram" ||
+      connection.platform === "threads" ||
+      connection.platform === "x"
+    );
 
     if (connections.length === 0) {
       console.log("[Analytics] No connected platforms for account", accountId);

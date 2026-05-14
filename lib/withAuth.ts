@@ -1,5 +1,5 @@
-import { getAuthFromCookies } from "./auth";
-import { NextResponse } from "next/server";
+import { getAuthFromCookies, getAuthFromRequest } from "./auth";
+import { NextRequest, NextResponse } from "next/server";
 
 export interface AuthContext {
   userId: string;
@@ -17,8 +17,11 @@ export interface AuthContext {
  *   if (authResult instanceof NextResponse) return authResult;
  *   const { userId } = authResult;
  */
-export async function requireAuth(): Promise<AuthContext | NextResponse> {
-  const auth = await getAuthFromCookies();
+export async function requireAuth(request?: NextRequest): Promise<AuthContext | NextResponse> {
+  const auth = request
+    ? await getAuthFromRequest(request)
+    : await getAuthFromCookies();
+
   if (!auth?.userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

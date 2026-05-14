@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
-import MotionBackground from "../../components/Shared/MotionBackground";
+
 import BriefingForm from "../../components/GenerateIdeas/BriefingForm";
 import IdeaGrid from "../../components/GenerateIdeas/Board/IdeaGrid";
 import BlueprintModal from "../../components/GenerateIdeas/BlueprintModal";
@@ -17,6 +17,27 @@ import type {
 import type { PostGenerationInput } from "@/lib/types/postGeneration";
 import { mapIdeaToPostSeed } from "@/lib/ideaFinder/ideaToPostSeed";
 import { validatePostSeed } from "@/lib/ideaFinder/postSeedValidation";
+
+async function readErrorMessage(res: Response): Promise<string> {
+  try {
+    const json = await res.json();
+    if (typeof json?.error === "string" && json.error.trim()) {
+      return json.error;
+    }
+    if (typeof json?.message === "string" && json.message.trim()) {
+      return json.message;
+    }
+  } catch {
+    // Fall through to text parsing.
+  }
+
+  try {
+    const text = await res.text();
+    return text.trim() || `Request failed with status ${res.status}`;
+  } catch {
+    return `Request failed with status ${res.status}`;
+  }
+}
 
 export default function GenerateIdeasPage() {
   const params = useParams();
@@ -41,6 +62,15 @@ export default function GenerateIdeasPage() {
     count: number;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Interactive background
+  const pageRef = useRef<HTMLDivElement>(null);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!pageRef.current) return;
+    const rect = pageRef.current.getBoundingClientRect();
+    pageRef.current.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+    pageRef.current.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+  };
 
   // Modal state
   const [selectedIdea, setSelectedIdea] = useState<GeneratedIdea | null>(null);
@@ -88,6 +118,13 @@ export default function GenerateIdeasPage() {
     setCurrentMode(data.mode);
     setLastFormData(data);
 
+    if (!accountId || !accountId.trim()) {
+      setError("Missing account context for Idea Finder. Please reopen the page from a valid account.");
+      setIsGenerating(false);
+      setGenerationStep("");
+      return;
+    }
+
     try {
       setGenerationStep("Generating high-quality idea blueprints...");
       const res = await fetch("/api/idea-finder/generate", {
@@ -101,15 +138,21 @@ export default function GenerateIdeasPage() {
           coreMessage: data.coreMessage,
           importPersona: data.importPersona,
           vibe: data.vibe,
-          count: 1,
+          count: 6,
           accountId,
         }),
       });
 
-      const json = await res.json();
+      let json: any = null;
+      try {
+        json = await res.json();
+      } catch {
+        json = null;
+      }
 
-      if (!res.ok || !json.success) {
-        setError(json.error || "Generation failed");
+      if (!res.ok || !json?.success) {
+        const message = json?.error || json?.message || (await readErrorMessage(res));
+        setError(message || "Generation failed");
         return;
       }
 
@@ -211,8 +254,23 @@ export default function GenerateIdeasPage() {
   const showOutput = !isGenerating && ideas.length > 0;
 
   return (
-    <div className="relative h-screen bg-[#f4f8fb] flex flex-col font-sans overflow-hidden">
-      <MotionBackground />
+    <div
+      ref={pageRef}
+      onMouseMove={handleMouseMove}
+      className="relative h-screen bg-gradient-to-br from-[#E2EFFF] to-[#C7DEFF] flex flex-col font-sans overflow-hidden group/page"
+    >
+      {/* Interactive mouse-reactive grid overlay */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500 opacity-40 group-hover/page:opacity-100"
+        style={{
+          backgroundImage: 'url("data:image/svg+xml;charset=utf-8,%3Csvg width=%2730%27 height=%2730%27 viewBox=%270 0 30 30%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M14 14V0h2v14h14v2H16v14h-2V16H0v-2h14z%27 fill=%27%2523005FFF%27 fill-opacity=%270.10%27 fill-rule=%27evenodd%27/%3E%3C/svg%3E")',
+          backgroundSize: "30px 30px",
+          maskImage:
+            "radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%)",
+          WebkitMaskImage:
+            "radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%)",
+        }}
+      />
 
       <div className="relative z-10 flex-1 overflow-y-auto p-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {error && (
@@ -271,6 +329,7 @@ export default function GenerateIdeasPage() {
               generationStep={generationStep}
               onIdeaClick={handleIdeaClick}
               onSave={handleSave}
+              savedIdeaIds={savedIdeaIds}
               onGenerateMore={undefined}
             />
           </motion.div>
@@ -286,15 +345,29 @@ export default function GenerateIdeasPage() {
             <div className="mb-5 flex items-center justify-between bg-white/70 backdrop-blur-sm border border-slate-100 rounded-2xl px-5 py-3">
               <div>
                 <h3 className="text-sm font-black text-[#000100] uppercase tracking-widest">Idea Output</h3>
-                <p className="text-xs text-slate-500 font-medium">Your generated blueprints are ready.</p>
+                <p className="text-xs text-slate-500 font-medium">
+                  {ideas.length} blueprints generated — bookmark to save, or generate more.
+                </p>
               </div>
-              <button
-                type="button"
-                onClick={handleStartOver}
-                className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold uppercase tracking-widest text-slate-600 hover:border-[#0052FF]/40 hover:text-[#0052FF] transition-all"
-              >
-                New Brief
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Phase 5: Generate Variations moved here — always above the fold */}
+                <button
+                  type="button"
+                  onClick={handleGenerateMore}
+                  disabled={isGenerating}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#0052FF]/30 bg-[#EEF3FF] text-xs font-bold uppercase tracking-widest text-[#0052FF] hover:bg-[#0052FF] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Sparkles size={13} />
+                  Generate More
+                </button>
+                <button
+                  type="button"
+                  onClick={handleStartOver}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold uppercase tracking-widest text-slate-600 hover:border-[#0052FF]/40 hover:text-[#0052FF] transition-all"
+                >
+                  New Brief
+                </button>
+              </div>
             </div>
 
             <IdeaGrid
@@ -304,7 +377,8 @@ export default function GenerateIdeasPage() {
               generationStep={undefined}
               onIdeaClick={handleIdeaClick}
               onSave={handleSave}
-              onGenerateMore={handleGenerateMore}
+              savedIdeaIds={savedIdeaIds}
+              onGenerateMore={undefined}
             />
           </motion.div>
         )}

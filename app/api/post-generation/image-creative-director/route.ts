@@ -15,7 +15,7 @@ import {
 } from "@/lib/postGeneration/imageCreativeDirectorContract";
 
 export async function POST(req: NextRequest) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
 
   try {

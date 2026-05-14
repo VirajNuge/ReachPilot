@@ -824,6 +824,9 @@ export interface PostGenerationDocument {
   /** True if created manually via the Publishing page, bypassing the AI generator */
   isCustom?: boolean;
 
+  /** Identifies whether the post originated from the web or mobile app */
+  source?: "web" | "mobile";
+
   input?: PostGenerationInput;
 
   design?: {

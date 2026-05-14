@@ -101,7 +101,7 @@ export async function publishToPlatform(
       return publishToLinkedIn(connection.accessToken, connection.platformUserId, payload);
 
     case "x":
-      return publishToX(connection.accessToken, payload);
+      return publishToX(connection, payload);
 
     case "facebook":
       if (!connection.pageId || !connection.pageAccessToken) {
@@ -129,7 +129,7 @@ export async function publishToPlatform(
       return publishToThreads(connection.accessToken, connection.platformUserId, payload);
 
     case "pinterest":
-      return publishToPinterest(connection.accessToken, payload);
+      return publishToPinterest(connection, payload);
 
     default:
       return { success: false, error: `Unknown platform: ${platform}` };

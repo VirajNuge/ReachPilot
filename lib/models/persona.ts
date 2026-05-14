@@ -10,17 +10,17 @@ export interface PersonaDocument {
 
   // Step 1 — Identity
   personaName: string;
-  userRole: string;
-  industry: string;
+  userRole: string | string[];
+  industry: string | string[];
   tagline: string;
   websiteUrl: string;
-  businessStage: string;
+  businessStage: string | string[];
   scrapedWebsiteData: string;
 
   // New AI-impactful fields — Core Identity
-  uniquePOV?: string; // Contrarian/unique take on their industry
-  productsServices?: string; // What they sell or offer
-  credibilitySignals?: string; // Proof points, awards, follower counts, years of experience
+  uniquePOV?: string | string[]; // Contrarian/unique take on their industry
+  productsServices?: string | string[]; // What they sell or offer
+  credibilitySignals?: string | string[]; // Proof points, awards, follower counts, years of experience
   writingSamples?: string; // 1-3 examples of their actual posts (up to 3000 chars)
 
   // Step 2 — Target Audience
@@ -28,13 +28,13 @@ export interface PersonaDocument {
   ageRange: string;
   region: string;
   education: string;
-  painPoints: string;
+  painPoints: string | string[];
   audienceGoals: string[];
 
   // New AI-impactful fields — Audience & Goals
-  audienceDesiredOutcome?: string; // What the audience wants to achieve
-  audienceRole?: string; // Job title / role of target audience
-  conversionGoal?: string; // What action they want audience to take
+  audienceDesiredOutcome?: string | string[]; // What the audience wants to achieve
+  audienceRole?: string | string[]; // Job title / role of target audience
+  conversionGoal?: string | string[]; // What action they want audience to take
 
   // Step 3 — Brand Objectives
   primaryObjective: string[];
@@ -48,11 +48,11 @@ export interface PersonaDocument {
     inspiringInformative: number;
     dataDriven: number;
   };
-  writingStyle: string;
+  writingStyle: string | string[];
   sentenceLength: string[];
 
   // Step 5 — Brand Personality
-  brandArchetype: string;
+  brandArchetype: string | string[];
   coreValues: string[];
   brandColorHex: string;
 
@@ -63,15 +63,15 @@ export interface PersonaDocument {
 
   // Step 6 — Content Inspiration
   favoriteInfluencer: string;
-  influencerStyle?: string; // Name of influencer whose style they want to emulate
+  influencerStyle?: string | string[]; // Name of influencer whose style they want to emulate
   contentThemes: string[];
-  postingFrequency: string;
+  postingFrequency: string | string[];
   contentDepth: string;
-  doNotTalk: string;
+  doNotTalk: string | string[];
 
   // Step 7 — Engagement Style
   commentReplyStyle: string[];
-  emojiUsage: string;
+  emojiUsage: string | string[];
   dmStrategy: string;
 
   // Step 8 — Connections
@@ -133,8 +133,12 @@ export async function getPersonaByUserAndAccount(
   accountId?: string
 ): Promise<PersonaDocument | null> {
   const col = await getCollection();
-  const query = accountId ? { userId, accountId } : { userId };
-  return col.findOne(query) as Promise<PersonaDocument | null>;
+  if (accountId) {
+    const accountPersona = await col.findOne({ userId, accountId });
+    if (accountPersona) return accountPersona as PersonaDocument;
+  }
+
+  return col.findOne({ userId }) as Promise<PersonaDocument | null>;
 }
 
 /**

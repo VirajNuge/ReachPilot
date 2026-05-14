@@ -423,7 +423,7 @@ export async function warmCache(userIds: string[], accountIds: string[]): Promis
 
   for (const userId of userIds) {
     for (const accountId of accountIds) {
-      for (const platform of ["all", "linkedin", "facebook", "instagram", "x", "pinterest", "threads"]) {
+      for (const platform of ["all", "facebook", "instagram", "x", "threads"]) {
         for (const range of ["7D", "30D", "90D"]) {
           for (const plan of ["core", "pro"]) {
             const key = buildCacheKey(userId, accountId, platform, range, plan);

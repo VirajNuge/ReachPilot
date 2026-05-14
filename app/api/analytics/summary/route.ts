@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthFromCookies } from "@/lib/auth";
+import { getAuthFromRequest } from "@/lib/auth";
 import { PLATFORM_KEYS, type PlatformKey } from "@/lib/analytics/platforms";
 import type { AnalyticsSummaryResponse, DateRangeKey } from "@/lib/analytics/types";
-import { buildMockAnalyticsSummary } from "@/lib/analytics/mockDataAdapter";
 import { buildRealAnalyticsSummary } from "@/lib/analytics/realDataAdapter";
 import {
   initializeCache,
@@ -11,7 +10,6 @@ import {
   setCachedAnalytics,
   getCacheStats,
 } from "@/lib/analytics/cacheLayer";
-import { queueFullAccountSync } from "@/lib/analytics/backgroundSyncService";
 import { productionMetrics, errorTracker } from "@/lib/analytics/productionMonitoring";
 
 // Initialize cache on module load
@@ -65,7 +63,7 @@ function withRangeLimits(
 }
 
 export async function GET(request: NextRequest) {
-  const auth = await getAuthFromCookies();
+  const auth = await getAuthFromRequest(request);
   if (!auth) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -80,12 +78,11 @@ export async function GET(request: NextRequest) {
   const effectiveRange = plan === "core" ? "7D" : requestedRange;
   const cacheKey = buildCacheKey(auth.userId, accountId, platform, effectiveRange, plan);
 
-  // Check multi-level cache
-  let cached = getCachedAnalytics(cacheKey);
+  const cached = getCachedAnalytics(cacheKey);
   if (cached) {
     const duration = performance.now() - startTime;
     productionMetrics.recordRequest(request.url, duration, 200, true);
-    
+
     const response = NextResponse.json(cached);
     response.headers.set("X-Cache", "HIT");
     return response;
@@ -94,7 +91,6 @@ export async function GET(request: NextRequest) {
   let summary: AnalyticsSummaryResponse;
 
   try {
-    // Try to fetch real data first
     summary = await buildRealAnalyticsSummary(
       auth.userId,
       accountId,
@@ -102,48 +98,24 @@ export async function GET(request: NextRequest) {
       effectiveRange,
       plan
     );
-
-    // Queue background sync for next refresh
-    if (accountId) {
-      try {
-        queueFullAccountSync(auth.userId, accountId);
-      } catch (e) {
-        // Silently fail if queuing fails
-      }
-    }
   } catch (error) {
-    // Fallback to mock data if real data fetch fails
     errorTracker.trackError("analytics-summary", String(error), "medium");
-    console.warn(
-      "Real analytics data fetch failed, falling back to mock data:",
-      error
-    );
-    summary = buildMockAnalyticsSummary(platform, effectiveRange, plan);
+    console.error("Real analytics data fetch failed:", error);
+    return NextResponse.json({ error: "Failed to generate analytics summary" }, { status: 500 });
   }
 
-  summary = withRangeLimits(summary, effectiveRange);
-
-  if (plan === "core") {
-    summary = {
-      ...summary,
-      platformData: null,
-    };
-  }
-
-  // Cache with 1-hour TTL
-  setCachedAnalytics(cacheKey, summary, 1000 * 60 * 60);
+  const rangedSummary = withRangeLimits(summary, effectiveRange);
+  setCachedAnalytics(cacheKey, rangedSummary);
 
   const duration = performance.now() - startTime;
   productionMetrics.recordRequest(request.url, duration, 200, false);
 
-  const response = NextResponse.json(summary);
+  const response = NextResponse.json(rangedSummary);
   response.headers.set("X-Cache", "MISS");
-  response.headers.set("X-Response-Time", `${duration.toFixed(2)}ms`);
   return response;
 }
 
 /**
- * Optional: Cache statistics endpoint
  * GET /api/analytics/cache-stats
  */
 export async function OPTIONS(request: NextRequest) {

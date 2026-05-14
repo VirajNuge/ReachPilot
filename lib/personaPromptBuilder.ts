@@ -7,10 +7,22 @@ function cleanText(value: unknown): string {
 }
 
 function cleanList(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  return value
-    .map((item) => (typeof item === "string" ? item.trim() : ""))
-    .filter(Boolean);
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === "string" ? item.trim() : ""))
+      .filter(Boolean);
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed ? [trimmed] : [];
+  }
+  return [];
+}
+
+function cleanTextOrList(value: unknown): string {
+  const single = cleanText(value);
+  if (single) return single;
+  return cleanList(value).join(", ");
 }
 
 function toneBucket(value: number, leftLabel: string, rightLabel: string): string {
@@ -47,7 +59,7 @@ function buildToneDescription(persona: Partial<PersonaDocument>): string {
 
 function hasRequiredIdentity(persona: PartialPersona): persona is Partial<PersonaDocument> {
   if (!persona) return false;
-  return Boolean(cleanText(persona.personaName) && cleanText(persona.userRole));
+  return Boolean(cleanText(persona.personaName) && cleanTextOrList(persona.userRole));
 }
 
 function section(title: string, lines: string[]): string {
@@ -59,8 +71,8 @@ export function buildContentGenerationContext(persona: Partial<PersonaDocument>)
   if (!hasRequiredIdentity(persona)) return "";
 
   const personaName = cleanText(persona.personaName);
-  const userRole = cleanText(persona.userRole);
-  const industry = cleanText(persona.industry);
+  const userRole = cleanTextOrList(persona.userRole);
+  const industry = cleanTextOrList(persona.industry);
 
   const firstLine = industry
     ? `You are creating content for ${personaName}, ${userRole} in ${industry}.`
@@ -69,7 +81,7 @@ export function buildContentGenerationContext(persona: Partial<PersonaDocument>)
   const whoTheyAre: string[] = [];
   whoTheyAre.push(`- Role: ${userRole}`);
   if (industry) whoTheyAre.push(`- Industry: ${industry}`);
-  const businessStage = cleanText(persona.businessStage);
+  const businessStage = cleanTextOrList(persona.businessStage);
   if (businessStage) whoTheyAre.push(`- Business Stage: ${businessStage}`);
   const tagline = cleanText(persona.tagline);
   if (tagline) whoTheyAre.push(`- Tagline: ${tagline}`);
@@ -77,18 +89,18 @@ export function buildContentGenerationContext(persona: Partial<PersonaDocument>)
   if (scrapedWebsiteData) whoTheyAre.push(`- Brand context: ${scrapedWebsiteData}`);
 
   const productsAndPov: string[] = [];
-  const productsServices = cleanText(persona.productsServices);
-  const uniquePOV = cleanText(persona.uniquePOV);
-  const credibilitySignals = cleanText(persona.credibilitySignals);
+  const productsServices = cleanTextOrList(persona.productsServices);
+  const uniquePOV = cleanTextOrList(persona.uniquePOV);
+  const credibilitySignals = cleanTextOrList(persona.credibilitySignals);
   if (productsServices) productsAndPov.push(`- What they offer: ${productsServices}`);
   if (uniquePOV) productsAndPov.push(`- Their unique take: ${uniquePOV}`);
   if (credibilitySignals) productsAndPov.push(`- Why they're credible: ${credibilitySignals}`);
 
   const audience: string[] = [];
-  const audienceRole = cleanText(persona.audienceRole);
+  const audienceRole = cleanTextOrList(persona.audienceRole);
   const audienceSegments = cleanList(persona.audienceSegments);
-  const painPoints = cleanText(persona.painPoints);
-  const audienceDesiredOutcome = cleanText(persona.audienceDesiredOutcome);
+  const painPoints = cleanTextOrList(persona.painPoints);
+  const audienceDesiredOutcome = cleanTextOrList(persona.audienceDesiredOutcome);
   const audienceGoals = cleanList(persona.audienceGoals);
   if (audienceRole) audience.push(`- Reader role: ${audienceRole}`);
   if (audienceSegments.length) audience.push(`- Audience segments: ${audienceSegments.join(", ")}`);
@@ -98,7 +110,7 @@ export function buildContentGenerationContext(persona: Partial<PersonaDocument>)
 
   const contentGoals: string[] = [];
   const primaryObjective = cleanList(persona.primaryObjective);
-  const conversionGoal = cleanText(persona.conversionGoal);
+  const conversionGoal = cleanTextOrList(persona.conversionGoal);
   const contentMix = cleanList(persona.contentMix);
   if (primaryObjective.length) contentGoals.push(`- Primary goals: ${primaryObjective.join(", ")}`);
   if (conversionGoal) contentGoals.push(`- Conversion goal: ${conversionGoal}`);
@@ -107,18 +119,18 @@ export function buildContentGenerationContext(persona: Partial<PersonaDocument>)
   const voiceAndTone: string[] = [];
   const toneDescription = buildToneDescription(persona);
   if (toneDescription) voiceAndTone.push(`- Tone: ${toneDescription}`);
-  const writingStyle = cleanText(persona.writingStyle);
+  const writingStyle = cleanTextOrList(persona.writingStyle);
   if (writingStyle) voiceAndTone.push(`- Writing style: ${writingStyle}`);
-  const emojiUsage = cleanText(persona.emojiUsage);
+  const emojiUsage = cleanTextOrList(persona.emojiUsage);
   if (emojiUsage) voiceAndTone.push(`- Emoji usage: ${emojiUsage}`);
-  const influencerStyle = cleanText(persona.influencerStyle);
+  const influencerStyle = cleanTextOrList(persona.influencerStyle);
   if (influencerStyle) voiceAndTone.push(`- Voice to emulate: ${influencerStyle}`);
 
   const contentTopics: string[] = [];
   const contentThemes = cleanList(persona.contentThemes);
   const coreValues = cleanList(persona.coreValues);
-  const postingFrequency = cleanText(persona.postingFrequency);
-  const doNotTalk = cleanText(persona.doNotTalk);
+  const postingFrequency = cleanTextOrList(persona.postingFrequency);
+  const doNotTalk = cleanTextOrList(persona.doNotTalk);
   if (contentThemes.length) contentTopics.push(`- Themes: ${contentThemes.join(", ")}`);
   if (coreValues.length) contentTopics.push(`- Values: ${coreValues.join(", ")}`);
   if (postingFrequency) contentTopics.push(`- Posts: ${postingFrequency}`);
@@ -146,8 +158,8 @@ export function buildChatbotContext(persona: Partial<PersonaDocument>): string {
   if (!hasRequiredIdentity(persona)) return "";
 
   const personaName = cleanText(persona.personaName);
-  const userRole = cleanText(persona.userRole);
-  const industry = cleanText(persona.industry);
+  const userRole = cleanTextOrList(persona.userRole);
+  const industry = cleanTextOrList(persona.industry);
 
   const sentences: string[] = [];
   sentences.push(
@@ -156,15 +168,15 @@ export function buildChatbotContext(persona: Partial<PersonaDocument>): string {
       : `You are assisting ${personaName}, a ${userRole}.`
   );
 
-  const uniqueAngle = cleanText(persona.uniquePOV) || cleanText(persona.tagline);
+  const uniqueAngle = cleanTextOrList(persona.uniquePOV) || cleanText(persona.tagline);
   if (uniqueAngle) {
     sentences.push(`Their unique angle is ${uniqueAngle}.`);
   }
 
-  const audienceRole = cleanText(persona.audienceRole);
+  const audienceRole = cleanTextOrList(persona.audienceRole);
   const audienceSegments = cleanList(persona.audienceSegments);
   const audienceDescriptor = audienceRole || audienceSegments.join(", ");
-  const painPoints = cleanText(persona.painPoints);
+  const painPoints = cleanTextOrList(persona.painPoints);
   if (audienceDescriptor && painPoints) {
     sentences.push(`They write for ${audienceDescriptor}, who struggle with ${painPoints}.`);
   } else if (audienceDescriptor) {
@@ -176,7 +188,7 @@ export function buildChatbotContext(persona: Partial<PersonaDocument>): string {
     sentences.push(`Their tone is ${toneDescription}.`);
   }
 
-  const styleParts = [cleanText(persona.writingStyle), cleanText(persona.emojiUsage)].filter(Boolean);
+  const styleParts = [cleanTextOrList(persona.writingStyle), cleanTextOrList(persona.emojiUsage)].filter(Boolean);
   if (styleParts.length) {
     sentences.push(`Always match their writing style: ${styleParts.join(", ")}.`);
   }

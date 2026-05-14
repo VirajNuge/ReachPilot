@@ -1,71 +1,157 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { requireAuth } from "@/lib/withAuth";
-import { parseAIJson } from "@/lib/parseAIJson";
-import { AI_MODELS } from "@/lib/aiConfig";
+import { getPersonaByUserAndAccount } from "@/lib/models/persona";
+import {
+  ensurePublishingOptimalTimesIndexes,
+  getPublishingOptimalTimesForAccount,
+  upsertPublishingOptimalTimes,
+} from "@/lib/models/publishingOptimalTimes";
+import {
+  buildFallbackOptimalSlots,
+  buildMonthlyOptimalSlots,
+} from "@/lib/publishing/optimalTimes";
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
-  return "Unknown AI provider error";
+  return "Unknown publishing timing error";
+}
+
+function resolveMonthAndYear(req: NextRequest): { month: number; year: number } {
+  const now = new Date();
+  const monthParam = req.nextUrl.searchParams.get("month");
+  const yearParam = req.nextUrl.searchParams.get("year");
+  const monthValue = Number(monthParam);
+  const yearValue = Number(yearParam);
+
+  return {
+    month: Number.isFinite(monthValue) ? monthValue : now.getMonth(),
+    year: Number.isFinite(yearValue) ? yearValue : now.getFullYear(),
+  };
+}
+
+async function loadAndMaybeCreateSlots(req: NextRequest, saveIfMissing: boolean) {
+  const authResult = await requireAuth(req);
+  if (authResult instanceof NextResponse) return authResult;
+
+  const accountId = req.nextUrl.searchParams.get("accountId")?.trim() || "";
+  if (!accountId) {
+    return NextResponse.json({ error: "accountId is required" }, { status: 400 });
+  }
+
+  const { month, year } = resolveMonthAndYear(req);
+  const persona = await getPersonaByUserAndAccount(authResult.userId, accountId);
+  const personaId = persona?._id?.toString() || "default";
+
+  await ensurePublishingOptimalTimesIndexes();
+
+  const saved = await getPublishingOptimalTimesForAccount(
+    authResult.userId,
+    accountId,
+    month,
+    year,
+    personaId
+  );
+
+  if (saved) {
+    return NextResponse.json({
+      slots: saved.slots,
+      month,
+      year,
+      personaId: saved.personaId,
+      updatedAt: saved.updatedAt,
+      personaMissing: !persona,
+    });
+  }
+
+  if (!saveIfMissing) {
+    return NextResponse.json({
+      slots: persona
+        ? buildMonthlyOptimalSlots(persona, { month, year })
+        : buildFallbackOptimalSlots({ month, year }),
+      month,
+      year,
+      personaMissing: !persona,
+    });
+  }
+
+  const slots = persona
+    ? buildMonthlyOptimalSlots(persona, { month, year })
+    : buildFallbackOptimalSlots({ month, year });
+
+  const savedDoc = await upsertPublishingOptimalTimes(
+    authResult.userId,
+    accountId,
+    personaId,
+    month,
+    year,
+    slots
+  );
+
+  return NextResponse.json({
+    slots: savedDoc.slots,
+    month,
+    year,
+    personaId: savedDoc.personaId,
+    updatedAt: savedDoc.updatedAt,
+    personaMissing: !persona,
+  });
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    return await loadAndMaybeCreateSlots(req, false);
+  } catch (error) {
+    console.error("Optimal times API GET error:", error);
+    return NextResponse.json(
+      { error: "Failed to load optimal times", details: getErrorMessage(error) },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const authResult = await requireAuth();
+    const authResult = await requireAuth(req);
     if (authResult instanceof NextResponse) return authResult;
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "GEMINI_API_KEY is not set" }, { status: 500 });
+    const body = await req.json();
+    const accountId = typeof body.accountId === "string" ? body.accountId.trim() : "";
+    if (!accountId) {
+      return NextResponse.json({ error: "accountId is required" }, { status: 400 });
     }
 
-    const { country, niche, targetAudience } = await req.json();
+    const now = new Date();
+    const monthValue = Number(body.month);
+    const yearValue = Number(body.year);
+    const month = Number.isFinite(monthValue) ? monthValue : now.getMonth();
+    const year = Number.isFinite(yearValue) ? yearValue : now.getFullYear();
 
-    if (!country || !niche || !targetAudience) {
-      return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
-    }
+    const persona = await getPersonaByUserAndAccount(authResult.userId, accountId);
+    const personaId = persona?._id?.toString() || "default";
+    const slots = persona
+      ? buildMonthlyOptimalSlots(persona, { month, year })
+      : buildFallbackOptimalSlots({ month, year });
 
-    const prompt = `You are an expert social media strategist.
-Based on the following profile, suggest the 5 best optimal posting times for maximum engagement.
+    await ensurePublishingOptimalTimesIndexes();
+    const savedDoc = await upsertPublishingOptimalTimes(
+      authResult.userId,
+      accountId,
+      personaId,
+      month,
+      year,
+      slots
+    );
 
-Country: ${country}
-Niche/Industry: ${niche}
-Target Audience: ${targetAudience}
-
-Return ONLY a JSON array of objects with this EXACT format:
-[
-  {
-    "day": 1, // 0 = Sunday, 1 = Monday, etc.
-    "hour": 9, // 24-hour format (0-23)
-    "minute": 30, // 0-59
-    "label": "Morning commute",
-    "reason": "Brief explanation of why this works"
-  }
-]
-`;
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
-    
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-    
-    let parsed: unknown;
-    try {
-      parsed = parseAIJson(responseText);
-    } catch (e) {
-      console.error("JSON parse error:", responseText);
-      throw new Error("Failed to parse AI response");
-    }
-
-    if (!Array.isArray(parsed)) {
-      throw new Error("AI returned invalid structure");
-    }
-
-    return NextResponse.json({ slots: parsed });
-
+    return NextResponse.json({
+      slots: savedDoc.slots,
+      month,
+      year,
+      personaId: savedDoc.personaId,
+      updatedAt: savedDoc.updatedAt,
+      personaMissing: !persona,
+    });
   } catch (error) {
-    console.error("Optimal times API error:", error);
+    console.error("Optimal times API POST error:", error);
     return NextResponse.json(
       { error: "Failed to generate optimal times", details: getErrorMessage(error) },
       { status: 500 }

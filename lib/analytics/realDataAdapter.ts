@@ -21,11 +21,29 @@ import type {
 } from "./types";
 import type { PlatformKey } from "./platforms";
 import { getAllAnalyticsMetrics } from "./analyticsCalculator";
+import { getPostsByDateRange } from "@/lib/models/persistedTypes";
+import { normalizePost } from "./dataNormalizer";
+import type { Platform } from "@/lib/models/persistedTypes";
+
+function toPersistedPlatform(platform: PlatformKey): Platform | null {
+  switch (platform) {
+    case "facebook":
+      return "facebook";
+    case "instagram":
+      return "instagram";
+    case "twitter":
+      return "x";
+    case "threads":
+      return "threads";
+    default:
+      return null;
+  }
+}
 
 /**
  * Convert velocity metrics to VelocityMetric format
  */
-function convertVelocityMetrics(velocity: any): AnalyticsVitals {
+function convertVelocityMetrics(velocity: any, platformComparison?: any[]): AnalyticsVitals {
   const formatTrend = (value: number): "up" | "down" | "neutral" => {
     if (value > 5) return "up";
     if (value < -5) return "down";
@@ -44,11 +62,32 @@ function convertVelocityMetrics(velocity: any): AnalyticsVitals {
     return num.toString();
   };
 
+  // When a single-platform view, pull numbers from platformComparison rather than
+  // aggregate velocity so that the vitals card shows platform-specific figures.
+  let followers = velocity.currentFollowers;
+  let impressions = velocity.currentImpressions;
+  let engagements = velocity.currentEngagement;
+  let clicks = 0;
+  let comments = velocity.currentComments || 0;
+  let shares = velocity.currentShares || 0;
+  let activePlatform = "all";
+
+  if (platformComparison && platformComparison.length === 1) {
+    const p = platformComparison[0]; // only one platform in filtered view
+    followers    = p.followers    ?? followers;
+    impressions  = p.impressions  ?? impressions;
+    engagements  = p.engagements  ?? engagements;
+    clicks       = p.clicks       ?? 0;
+    comments     = p.comments     ?? 0;
+    shares       = p.shares       ?? 0;
+    activePlatform = p.platform   || "all";
+  }
+
   return {
     audience: {
       id: "followers",
       label: "Total Followers",
-      value: formatValue(velocity.currentFollowers),
+      value: formatValue(followers),
       change: velocity.followerVelocity,
       trend: formatTrend(velocity.followerVelocityPercentage),
       velocity: formatVelocity(velocity.followerVelocityPercentage),
@@ -56,7 +95,7 @@ function convertVelocityMetrics(velocity: any): AnalyticsVitals {
     reach: {
       id: "impressions",
       label: "Total Impressions",
-      value: formatValue(velocity.currentImpressions),
+      value: formatValue(impressions),
       change: velocity.impressionVelocity,
       trend: formatTrend(velocity.impressionVelocityPercentage),
       velocity: formatVelocity(velocity.impressionVelocityPercentage),
@@ -64,7 +103,7 @@ function convertVelocityMetrics(velocity: any): AnalyticsVitals {
     engagement: {
       id: "engagement",
       label: "Total Engagements",
-      value: formatValue(velocity.currentEngagement),
+      value: formatValue(engagements),
       change: velocity.engagementVelocity,
       trend: formatTrend(velocity.engagementVelocityPercentage),
       velocity: formatVelocity(velocity.engagementVelocityPercentage),
@@ -72,14 +111,31 @@ function convertVelocityMetrics(velocity: any): AnalyticsVitals {
     clicks: {
       id: "clicks",
       label: "Total Clicks",
-      value: "0",
+      value: formatValue(clicks),
       change: 0,
       trend: "neutral",
       velocity: "low",
     },
-    topDriver: "audience", // Most important metric
+    comments: {
+      id: "comments",
+      label: "Total Comments",
+      value: formatValue(comments),
+      change: 0,
+      trend: comments > 0 ? "up" : "neutral",
+      velocity: comments > 10 ? "high" : comments > 0 ? "medium" : "low",
+    },
+    shares: {
+      id: "shares",
+      label: activePlatform === "instagram" ? "Total Saves" : (activePlatform === "threads" ? "Total Reposts" : "Total Shares"),
+      value: formatValue(shares),
+      change: 0,
+      trend: shares > 0 ? "up" : "neutral",
+      velocity: shares > 10 ? "high" : shares > 0 ? "medium" : "low",
+    },
+    topDriver: "audience",
   };
 }
+
 
 /**
  * Convert growth metrics to history and prediction points
@@ -89,26 +145,63 @@ function convertGrowthMetrics(growth: any[]): { history: HistoryPoint[]; predict
     return { history: [], prediction: [] };
   }
 
-  const history: HistoryPoint[] = growth.map((point) => ({
-    date: point.date ? new Date(point.date).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
-    all: point.engagementRate || 0,
-    linkedin: point.engagementRate || 0,
-    facebook: point.engagementRate || 0,
-    instagram: point.engagementRate || 0,
-    twitter: point.engagementRate || 0,
-    pinterest: point.engagementRate || 0,
-    threads: point.engagementRate || 0,
-  }));
+  const entries = new Map<string, HistoryPoint>();
+  const platformMap: Record<string, PlatformKey> = {
+    facebook: "facebook",
+    instagram: "instagram",
+    x: "twitter",
+    twitter: "twitter",
+    threads: "threads",
+  };
+
+  for (const point of growth) {
+    const date = point.date
+      ? new Date(point.date).toISOString().split("T")[0]
+      : new Date().toISOString().split("T")[0];
+    if (!entries.has(date)) {
+      entries.set(date, {
+        date,
+        all: 0,
+        facebook: 0,
+        instagram: 0,
+        twitter: 0,
+        threads: 0,
+      });
+    }
+
+    const target = entries.get(date)!;
+    // Use followers count (integer) as the primary chart value, not engagementRate (float fraction)
+    const value = Math.round(Number(point.followers || 0));
+    const platformKey = platformMap[String(point.platform || "")];
+
+    if (platformKey) {
+      target[platformKey] = value;
+    } else {
+      target.facebook = value;
+      target.instagram = value;
+      target.twitter = value;
+      target.threads = value;
+    }
+  }
+
+  const history: HistoryPoint[] = Array.from(entries.values())
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)))
+    .map((point) => ({
+      ...point,
+      all:
+        Number(point.facebook || 0) +
+        Number(point.instagram || 0) +
+        Number(point.twitter || 0) +
+        Number(point.threads || 0),
+    }));
 
   // Generate simple predictions based on trend
   const prediction: PredictionPoint[] = history.slice(-7).map((point, index) => ({
     date: point.date,
     all: Math.round((point.all as number) * (1 + (index * 0.02))),
-    linkedin: Math.round((point.linkedin as number) * (1 + (index * 0.02))),
     facebook: Math.round((point.facebook as number) * (1 + (index * 0.02))),
     instagram: Math.round((point.instagram as number) * (1 + (index * 0.02))),
     twitter: Math.round((point.twitter as number) * (1 + (index * 0.02))),
-    pinterest: Math.round((point.pinterest as number) * (1 + (index * 0.02))),
     threads: Math.round((point.threads as number) * (1 + (index * 0.02))),
   }));
 
@@ -243,11 +336,16 @@ function formatNumber(num: number): string {
  */
 function buildRealAnalyticsDataset(
   metrics: any,
+  filteredPlatformComparison?: any[]
 ): AnalyticsDataset {
   const { history, prediction } = convertGrowthMetrics(metrics.growth || []);
 
+  // When rendering a single-platform view, override velocity vitals using
+  // that platform's own metrics from platformComparison.
+  const compForVitals = filteredPlatformComparison ?? metrics.platformComparison;
+
   return {
-    vitals: convertVelocityMetrics(metrics.velocity),
+    vitals: convertVelocityMetrics(metrics.velocity, compForVitals),
     history,
     prediction,
     radar: convertPlatformComparison(metrics.platformComparison || []),
@@ -255,6 +353,46 @@ function buildRealAnalyticsDataset(
     demographics: convertAudience(metrics.audience),
     anomalies: generateAnomalyPoints(metrics.growth || []),
     topPosts: convertTopPosts(metrics.topPosts || []),
+  };
+}
+
+function filterMetricsForPlatform(metrics: any, platform: PlatformKey): any {
+  if (platform === "all") return metrics;
+  const persistedPlatform = toPersistedPlatform(platform);
+  if (!persistedPlatform) return metrics;
+
+  const filteredGrowth = Array.isArray(metrics.growth)
+    ? metrics.growth.filter((point: any) => {
+        const pointPlatform = String(point?.platform || "").toLowerCase();
+        return pointPlatform === persistedPlatform;
+      })
+    : [];
+
+  const filteredTopPosts = Array.isArray(metrics.topPosts)
+    ? metrics.topPosts.filter((post: any) => String(post?.platform || "").toLowerCase() === persistedPlatform)
+    : [];
+
+  const filteredPlatformComparison = Array.isArray(metrics.platformComparison)
+    ? metrics.platformComparison.filter(
+        (item: any) => String(item?.platform || "").toLowerCase() === persistedPlatform
+      )
+    : [];
+
+  const filteredAudienceBreakdown = Array.isArray(metrics.audience?.platformBreakdown)
+    ? metrics.audience.platformBreakdown.filter(
+        (item: any) => String(item?.platform || "").toLowerCase() === persistedPlatform
+      )
+    : [];
+
+  return {
+    ...metrics,
+    growth: filteredGrowth,
+    topPosts: filteredTopPosts,
+    platformComparison: filteredPlatformComparison,
+    audience: {
+      ...metrics.audience,
+      platformBreakdown: filteredAudienceBreakdown,
+    },
   };
 }
 
@@ -274,16 +412,92 @@ export async function buildRealAnalyticsSummary(
     const days = daysMap[dateRange] || 30;
 
     // Fetch real metrics from the analytics calculator
-    const metrics = await getAllAnalyticsMetrics(userId, accountId);
+    // 1. Fetch Global (Aggregate) Metrics
+    const globalMetrics = await getAllAnalyticsMetrics(userId, accountId);
 
     // Validate that we have data
-    if (!metrics || Object.keys(metrics).length === 0) {
-      throw new Error("No analytics data available for account");
+    if (!globalMetrics || Object.keys(globalMetrics).length === 0) {
+      return {
+        platform,
+        dateRange,
+        plan,
+        generatedAt: new Date().toISOString(),
+        globalData: {
+          vitals: {
+            audience: { id: "followers", label: "Total Followers", value: "0", change: 0, trend: "neutral", velocity: "low" },
+            reach: { id: "impressions", label: "Total Impressions", value: "0", change: 0, trend: "neutral", velocity: "low" },
+            engagement: { id: "engagement", label: "Total Engagements", value: "0", change: 0, trend: "neutral", velocity: "low" },
+            clicks: { id: "clicks", label: "Total Clicks", value: "0", change: 0, trend: "neutral", velocity: "low" },
+            comments: { id: "comments", label: "Total Comments", value: "0", change: 0, trend: "neutral", velocity: "low" },
+            shares: { id: "shares", label: "Total Shares", value: "0", change: 0, trend: "neutral", velocity: "low" },
+            topDriver: "audience"
+          },
+          history: [],
+          prediction: [],
+          radar: [],
+          contentInsights: [],
+          demographics: { jobs: [], locations: [], seniority: "" },
+          anomalies: [],
+          topPosts: []
+        },
+        platformData: null
+      };
     }
 
     // Build the analytics dataset
-    const globalData = buildRealAnalyticsDataset(metrics);
-    const platformData = platform === "all" ? null : buildRealAnalyticsDataset(metrics);
+    const globalData = buildRealAnalyticsDataset(globalMetrics);
+
+    // Attach post events and best posts for the overview chart and list
+    try {
+      const endDate = new Date();
+      const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+      const rawPosts = await getPostsByDateRange(userId, accountId, startDate, endDate, 500);
+      const normalizedPosts = rawPosts.map(normalizePost);
+
+      const postEvents = normalizedPosts.map((p) => ({
+        postId: p.id,
+        platform: p.platform,
+        postedAt: p.postedAt instanceof Date ? p.postedAt.toISOString() : String(p.postedAt),
+        thumbnail: (rawPosts.find(r => String(r._id) === p.id)?.mediaUrls?.[0]) || null,
+        metrics: {
+          likes: p.metrics.likes,
+          comments: p.metrics.comments,
+          shares: p.metrics.shares,
+          views: p.metrics.views,
+        },
+      }));
+
+      const bestPosts30d = normalizedPosts
+        .slice()
+        .sort((a, b) => (b.performanceScore || 0) - (a.performanceScore || 0))
+        .slice(0, 10)
+        .map((p) => ({
+          postId: p.id,
+          platform: p.platform,
+          postedAt: p.postedAt instanceof Date ? p.postedAt.toISOString() : String(p.postedAt),
+          thumbnail: (rawPosts.find(r => String(r._id) === p.id)?.mediaUrls?.[0]) || null,
+          caption: p.caption?.slice(0, 220) || "",
+          metricValue: Math.round((p.engagement?.rate || 0) * 100) / 100,
+        }));
+
+      globalData.postEvents = postEvents;
+      globalData.bestPosts30d = bestPosts30d;
+    } catch (err) {
+      // Non-fatal; add empty lists if post enrichment fails
+      globalData.postEvents = [];
+      globalData.bestPosts30d = [];
+    }
+
+    let platformData: AnalyticsDataset | null = null;
+    if (platform !== "all") {
+      const persistedPlatform = toPersistedPlatform(platform);
+      if (persistedPlatform) {
+        // 2. Fetch Platform-Specific Metrics for isolated velocity
+        const platformMetrics = await getAllAnalyticsMetrics(userId, accountId, persistedPlatform);
+        const filteredMetrics = filterMetricsForPlatform(platformMetrics, platform);
+        platformData = buildRealAnalyticsDataset(filteredMetrics, filteredMetrics.platformComparison);
+      }
+    }
 
     return {
       platform,

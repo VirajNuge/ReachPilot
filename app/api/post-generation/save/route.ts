@@ -48,7 +48,7 @@ function isSavePostBody(value: unknown): value is SavePostBody {
 
 export async function POST(req: NextRequest) {
   try {
-    const authResult = await requireAuth();
+    const authResult = await requireAuth(req);
     if (authResult instanceof NextResponse) return authResult;
     const auth = authResult;
 
@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
       userId: auth.userId,
       ...(body.personaId ? { personaId: body.personaId } : {}),
       ...(body.accountId ? { accountId: body.accountId } : {}),
+      ...((body as any).source ? { source: (body as any).source } : {}),
       input: body.input,
       design: body.design,
       ...(body.strategy ? { strategy: body.strategy } : {}),
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const authResult = await requireAuth();
+    const authResult = await requireAuth(req);
     if (authResult instanceof NextResponse) return authResult;
     const auth = authResult;
 

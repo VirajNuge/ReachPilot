@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthFromCookies } from '@/lib/auth';
+import { getAuthFromRequest } from '@/lib/auth';
 import { getAccountsByUserId, createAccount } from '@/lib/models/account';
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

@@ -80,6 +80,28 @@ export interface TopPost {
   whyItWorked: string;
 }
 
+export interface PostEvent {
+  postId: string;
+  platform: string;
+  postedAt: string; // ISO date
+  thumbnail?: string | null;
+  metrics?: {
+    likes?: number;
+    comments?: number;
+    shares?: number;
+    views?: number;
+  };
+}
+
+export interface BestPost {
+  postId: string;
+  platform: string;
+  postedAt: string;
+  thumbnail?: string | null;
+  caption?: string;
+  metricValue: number;
+}
+
 export interface CorrelationSeriesPoint {
   date: string;
   platformA: number;
@@ -97,6 +119,8 @@ export interface AnalyticsVitals {
   reach: VelocityMetric;
   engagement: VelocityMetric;
   clicks: VelocityMetric;
+  comments?: VelocityMetric;
+  shares?: VelocityMetric;
   topDriver?: string;
 }
 
@@ -110,6 +134,8 @@ export interface AnalyticsDataset {
   anomalies: AnomalyPoint[];
   topPosts: TopPost[];
   correlation?: CorrelationSeries;
+  postEvents?: PostEvent[];
+  bestPosts30d?: BestPost[];
 }
 
 export interface AnalyticsSummaryResponse {

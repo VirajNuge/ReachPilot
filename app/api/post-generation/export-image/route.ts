@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 
-import { getAuthFromCookies } from "@/lib/auth";
+import { getAuthFromRequest } from "@/lib/auth";
 import { resolveSelectedVariation, validateComposedPostPackage } from "@/lib/postGeneration/compositionValidation";
 import { buildFallbackCreativeHandoff } from "@/lib/postGeneration/creativeHandoffValidation";
 import { POST_IMAGE_SIZES } from "@/lib/types/postGeneration";
@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
   let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
 
   try {
-    const auth = await getAuthFromCookies();
+    const auth = await getAuthFromRequest(req);
     if (!auth?.userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

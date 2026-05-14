@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set(cookieOpts);
     return response;
   } catch {
+    console.error('[admin/login] Unexpected error:', arguments.length ? arguments[0] : 'unknown');
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

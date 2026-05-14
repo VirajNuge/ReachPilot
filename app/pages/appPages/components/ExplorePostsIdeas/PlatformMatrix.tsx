@@ -53,13 +53,13 @@ export default function PlatformMatrix() {
       activeColor: "bg-[#1877F2] text-white border-[#1877F2]",
       inactiveColor: "text-gray-600 bg-gray-100",
     },
-    {
-      id: "pinterest",
-      name: "Pinterest",
-      icon: <Hash size={18} />,
-      activeColor: "bg-[#E60023] text-white border-[#E60023]",
-      inactiveColor: "text-gray-600 bg-gray-100",
-    },
+    // {
+    //   id: "pinterest",
+    //   name: "Pinterest",
+    //   icon: <Hash size={18} />,
+    //   activeColor: "bg-[#E60023] text-white border-[#E60023]",
+    //   inactiveColor: "text-gray-600 bg-gray-100",
+    // },
   ];
 
   return (

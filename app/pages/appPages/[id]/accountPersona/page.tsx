@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import {
   BsChevronLeft,
   BsCheckCircleFill,
@@ -22,8 +22,6 @@ import {
 import { useAuth } from "../../../../contexts/AuthContext";
 import {
   FormInput,
-  FormSelect,
-  TagGroup,
   ToneSlider,
   WebsiteScraper,
   MultiSelectDropdown,
@@ -35,11 +33,11 @@ import {
 interface PersonaData {
   // Step 1 — YOU
   personaName: string;
-  userRole: string;
-  industry: string;
+  userRole: string[];
+  industry: string[];
   tagline: string;
   websiteUrl: string;
-  businessStage: string;
+  businessStage: string[];
   scrapedWebsiteData: string;
   // Step 2 — AUDIENCE
   audienceSegments: string[];
@@ -56,14 +54,14 @@ interface PersonaData {
   brandArchetype: string[];
   // Step 4 — VOICE
   toneSliders: { formalCasual: number; seriousPlayful: number; inspiringInformative: number; dataDriven: number; };
-  writingStyle: string;
-  emojiUsage: string;
-  influencerStyle: string;
+  writingStyle: string[];
+  emojiUsage: string[];
+  influencerStyle: string[];
   writingSamples: string;
   // Step 5 — CONTENT
   contentThemes: string[];
   contentMix: string[];
-  postingFrequency: string;
+  postingFrequency: string[];
   doNotTalk: string[];
   coreValues: string[];
   // Step 6 — BRAND STYLE
@@ -74,13 +72,13 @@ interface PersonaData {
 }
 
 const defaultPersona: PersonaData = {
-  personaName: "", userRole: "", industry: "", tagline: "", websiteUrl: "",
-  businessStage: "", scrapedWebsiteData: "",
+  personaName: "", userRole: [], industry: [], tagline: "", websiteUrl: "",
+  businessStage: [], scrapedWebsiteData: "",
   audienceSegments: [], audienceRole: [], painPoints: [], audienceGoals: [], audienceDesiredOutcome: [],
   productsServices: [], uniquePOV: [], credibilitySignals: [], conversionGoal: [], primaryObjective: [], brandArchetype: [],
   toneSliders: { formalCasual: 50, seriousPlayful: 50, inspiringInformative: 50, dataDriven: 50 },
-  writingStyle: "First Person (I/Me)", emojiUsage: "", influencerStyle: "", writingSamples: "",
-  contentThemes: [], contentMix: [], postingFrequency: "", doNotTalk: [], coreValues: [],
+  writingStyle: ["First Person (I/Me)"], emojiUsage: [], influencerStyle: [], writingSamples: "",
+  contentThemes: [], contentMix: [], postingFrequency: [], doNotTalk: [], coreValues: [],
   logoUrl: "", colorPalette: [], fontFamily: "Inter", brandColorHex: "",
 };
 
@@ -103,6 +101,7 @@ const personaSteps = [
 export default function AccountPersona() {
   const { user } = useAuth();
   const params = useParams();
+  const searchParams = useSearchParams();
   const accountId = params?.id as string;
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -122,8 +121,74 @@ export default function AccountPersona() {
   const [connectionsLoading, setConnectionsLoading] = useState(false);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
 
+  const formAreaRef = useRef<HTMLDivElement>(null);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!formAreaRef.current) return;
+    const rect = formAreaRef.current.getBoundingClientRect();
+    formAreaRef.current.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    formAreaRef.current.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  };
+
   const totalSteps = personaSteps.length;
   const activeStepData = personaSteps.find((s) => s.id === currentStep)!;
+
+  const oauthConnected = searchParams.get("connected");
+  const oauthError = searchParams.get("error");
+  const oauthPlatform = searchParams.get("platform") || oauthConnected || "";
+  const oauthReasonRaw = searchParams.get("reason") || "";
+
+  const decodeOAuthReason = (value: string) => {
+    if (!value) return "";
+    try {
+      return decodeURIComponent(value.replace(/\+/g, "%20"));
+    } catch {
+      return value;
+    }
+  };
+
+  const oauthReason = decodeOAuthReason(oauthReasonRaw);
+  const oauthPlatformLabel = oauthPlatform
+    ? oauthPlatform.charAt(0).toUpperCase() + oauthPlatform.slice(1)
+    : "Account";
+
+  const oauthMessage = (() => {
+    if (oauthConnected) {
+      return {
+        tone: "success" as const,
+        text: `${oauthPlatformLabel} connected successfully. You can now publish from Persona Builder.`,
+      };
+    }
+
+    if (!oauthError) return null;
+
+    if (oauthError === "auth_denied") {
+      return {
+        tone: "warning" as const,
+        text: `${oauthPlatformLabel} connection was canceled. Please approve all requested permissions and try again.`,
+      };
+    }
+
+    if (oauthError === "auth_failed") {
+      if (oauthReason.includes("No publishable Facebook Page found")) {
+        return {
+          tone: "error" as const,
+          text: "Facebook connected, but no publishable Page was found. Make sure the same Facebook user has a Page and granted pages_show_list, pages_manage_posts, and pages_manage_metadata.",
+        };
+      }
+
+      return {
+        tone: "error" as const,
+        text: oauthReason
+          ? `${oauthPlatformLabel} connection failed: ${oauthReason}`
+          : `${oauthPlatformLabel} connection failed. Please retry and approve all requested permissions.`,
+      };
+    }
+
+    return {
+      tone: "error" as const,
+      text: `${oauthPlatformLabel} connection failed. Please try again.`,
+    };
+  })();
 
   // Pre-load on mount
   useEffect(() => {
@@ -139,9 +204,11 @@ export default function AccountPersona() {
           }
           // Back-compat: coerce old string fields to string[] for MultiSelectDropdown
           const arrayFields = [
+            "userRole", "industry", "businessStage",
             "audienceRole", "painPoints", "audienceDesiredOutcome",
             "productsServices", "uniquePOV", "credibilitySignals",
             "conversionGoal", "doNotTalk", "brandArchetype",
+            "writingStyle", "emojiUsage", "influencerStyle", "postingFrequency",
           ] as const;
           for (const field of arrayFields) {
             if (typeof loaded[field] === "string") {
@@ -253,25 +320,57 @@ export default function AccountPersona() {
           <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
             <FormInput label="Persona Name" placeholder="e.g., The Bold Founder" value={persona.personaName} onChange={(v) => update("personaName", v)} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormSelect
+              <MultiSelectDropdown
                 label="User Role"
-                options={["Founder", "Marketer", "Creator", "Sales Rep", "Consultant", "Executive", "Coach", "Freelancer"]}
-                value={persona.userRole}
+                options={[
+                  { value: "Founder", description: "Builds and leads the company vision and growth" },
+                  { value: "Marketer", description: "Drives awareness, demand, and positioning" },
+                  { value: "Creator", description: "Publishes audience-focused educational or entertainment content" },
+                  { value: "Sales Rep", description: "Converts leads through outreach and relationships" },
+                  { value: "Consultant", description: "Offers strategic expertise and implementation guidance" },
+                  { value: "Executive", description: "Leads teams and strategic company decisions" },
+                  { value: "Coach", description: "Helps clients through guided transformation" },
+                  { value: "Freelancer", description: "Delivers specialized services independently" },
+                ]}
+                selected={persona.userRole}
                 onChange={(v) => update("userRole", v)}
+                placeholder="Select or type roles..."
+                hint="Choose all roles you actively show up as in content."
               />
-              <FormSelect
+              <MultiSelectDropdown
                 label="Industry / Niche"
-                options={["SaaS", "E-commerce", "Health & Wellness", "Fintech", "EdTech", "Agency", "Creator Economy", "B2B Services", "Retail", "Real Estate", "Coaching & Consulting"]}
-                value={persona.industry}
+                options={[
+                  { value: "SaaS", description: "Software products sold as subscriptions" },
+                  { value: "E-commerce", description: "Online selling and digital storefront growth" },
+                  { value: "Health & Wellness", description: "Fitness, health, and wellbeing outcomes" },
+                  { value: "Fintech", description: "Technology for finance, payments, and money systems" },
+                  { value: "EdTech", description: "Education-focused technology and learning products" },
+                  { value: "Agency", description: "Client services and done-for-you execution" },
+                  { value: "Creator Economy", description: "Audience-led business and digital products" },
+                  { value: "B2B Services", description: "Services sold to other businesses" },
+                  { value: "Retail", description: "Product-led consumer and storefront business" },
+                  { value: "Real Estate", description: "Property investment, brokerage, and development" },
+                  { value: "Coaching & Consulting", description: "Advisory and coaching-led client outcomes" },
+                ]}
+                selected={persona.industry}
                 onChange={(v) => update("industry", v)}
+                placeholder="Select or type industries..."
+                hint="Add every industry you want the AI to speak with authority about."
               />
             </div>
             <FormInput label="Tagline / One-liner" placeholder="Helping startups scale with AI..." value={persona.tagline} onChange={(v) => update("tagline", v)} />
-            <FormSelect
+            <MultiSelectDropdown
               label="Business Stage"
-              options={["Idea / Pre-revenue", "MVP / Early Stage", "Growth Phase", "Scale / Enterprise"]}
-              value={persona.businessStage}
+              options={[
+                { value: "Idea / Pre-revenue", description: "Validating concept before reliable sales" },
+                { value: "MVP / Early Stage", description: "Early product with first users and feedback" },
+                { value: "Growth Phase", description: "Consistent traction with active scaling" },
+                { value: "Scale / Enterprise", description: "Mature operations with larger team and systems" },
+              ]}
+              selected={persona.businessStage}
               onChange={(v) => update("businessStage", v)}
+              placeholder="Select or type stages..."
+              hint="Include current and near-term stage if your content serves both."
             />
             <WebsiteScraper
               url={persona.websiteUrl}
@@ -286,7 +385,20 @@ export default function AccountPersona() {
             )}
             <MultiSelectDropdown
               label="Brand Archetype"
-              options={["Hero", "Sage", "Rebel", "Magician", "Caregiver", "Everyman", "Creator", "Ruler", "Jester", "Lover", "Explorer", "Outlaw"]}
+              options={[
+                { value: "Hero", description: "Ambitious, courageous, helps people overcome challenges" },
+                { value: "Sage", description: "Insightful teacher focused on truth and clarity" },
+                { value: "Rebel", description: "Challenges norms and breaks stale industry rules" },
+                { value: "Magician", description: "Transforms complex problems into meaningful breakthroughs" },
+                { value: "Caregiver", description: "Supportive, empathetic, protects and nurtures others" },
+                { value: "Everyman", description: "Relatable, practical, approachable and down-to-earth" },
+                { value: "Creator", description: "Innovative builder driven by originality and expression" },
+                { value: "Ruler", description: "Authoritative leader who values structure and excellence" },
+                { value: "Jester", description: "Playful communicator using humor and lightness" },
+                { value: "Lover", description: "Warm, emotional, relationship-driven storytelling" },
+                { value: "Explorer", description: "Curious pioneer seeking freedom, growth, and discovery" },
+                { value: "Outlaw", description: "Disruptive outsider challenging traditional systems" },
+              ]}
               selected={persona.brandArchetype}
               onChange={(v) => update("brandArchetype", v)}
               placeholder="Select archetypes..."
@@ -391,25 +503,56 @@ export default function AccountPersona() {
               <ToneSlider leftLabel="Inspiring" rightLabel="Informative" value={persona.toneSliders.inspiringInformative} onChange={(v) => update("toneSliders", { ...persona.toneSliders, inspiringInformative: v })} />
               <ToneSlider leftLabel="Data-Driven" rightLabel="Storytelling" value={persona.toneSliders.dataDriven} onChange={(v) => update("toneSliders", { ...persona.toneSliders, dataDriven: v })} />
             </div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Writing Style</p>
-            <div className="flex gap-3 mb-6">
-              {["First Person (I/Me)", "Third Person (They/Their)", "Brand Voice (We/Our)"].map((style) => (
-                <button
-                  key={style}
-                  type="button"
-                  onClick={() => update("writingStyle", style)}
-                  className={`flex-1 py-3 rounded-2xl font-bold text-[12px] transition-all border ${
-                    persona.writingStyle === style
-                      ? "bg-[#0052FF] text-white border-[#0052FF] shadow-md shadow-blue-200"
-                      : "bg-white text-slate-500 border-slate-200 hover:border-[#0052FF]/30"
-                  }`}
-                >
-                  {style}
-                </button>
-              ))}
-            </div>
-            <FormSelect label="Emoji Usage" options={["None (Strict)", "Minimal (1–2 per post)", "Moderate (3–5 per post)", "Heavy Emoji User"]} value={persona.emojiUsage} onChange={(v) => update("emojiUsage", v)} />
-            <FormSelect label="Influencer Style" options={["Gary Vee", "Alex Hormozi", "Brené Brown", "Simon Sinek", "Naval Ravikant", "MrBeast", "Sahil Bloom", "Justin Welsh", "Lenny Rachitsky", "Codie Sanchez", "Mark Manson", "Tim Ferriss", "James Clear", "Ann Handley", "Seth Godin"]} value={persona.influencerStyle} onChange={(v) => update("influencerStyle", v)} />
+            <MultiSelectDropdown
+              label="Writing Style"
+              options={[
+                { value: "First Person (I/Me)", description: "Personal, direct, and experience-driven" },
+                { value: "Third Person (They/Their)", description: "Observer tone with objective distance" },
+                { value: "Brand Voice (We/Our)", description: "Company perspective and team-led voice" },
+                { value: "Story-led", description: "Narrative flow with emotional momentum" },
+                { value: "Framework-led", description: "Structured systems, steps, and models" },
+                { value: "Data-backed", description: "Evidence-led writing with metrics and proof" },
+              ]}
+              selected={persona.writingStyle}
+              onChange={(v) => update("writingStyle", v)}
+              placeholder="Select or type writing styles..."
+              hint="Combine multiple styles if your content voice shifts by topic."
+            />
+            <MultiSelectDropdown
+              label="Emoji Usage"
+              options={[
+                { value: "None (Strict)", description: "No emojis for formal or executive voice" },
+                { value: "Minimal (1–2 per post)", description: "Light emphasis without visual clutter" },
+                { value: "Moderate (3–5 per post)", description: "Balanced expressiveness" },
+                { value: "Heavy Emoji User", description: "High energy and strong visual tone" },
+              ]}
+              selected={persona.emojiUsage}
+              onChange={(v) => update("emojiUsage", v)}
+              placeholder="Select or type emoji styles..."
+            />
+            <MultiSelectDropdown
+              label="Influencer Style"
+              options={[
+                { value: "Gary Vee", description: "Direct, energetic, hustle-focused" },
+                { value: "Alex Hormozi", description: "No-fluff, tactical, value-heavy" },
+                { value: "Brené Brown", description: "Vulnerable, empathetic, trust-centered" },
+                { value: "Simon Sinek", description: "Purpose-led, inspirational leadership" },
+                { value: "Naval Ravikant", description: "Philosophical, concise, high-signal" },
+                { value: "MrBeast", description: "Attention hooks and high engagement pacing" },
+                { value: "Sahil Bloom", description: "Clear frameworks and growth lessons" },
+                { value: "Justin Welsh", description: "Creator-business clarity and consistency" },
+                { value: "Lenny Rachitsky", description: "Product-led strategy and research tone" },
+                { value: "Codie Sanchez", description: "Contrarian business and wealth angle" },
+                { value: "Mark Manson", description: "Blunt, thought-provoking narrative" },
+                { value: "Tim Ferriss", description: "Experimentation and tactical optimization" },
+                { value: "James Clear", description: "Behavioral insight and practical clarity" },
+                { value: "Ann Handley", description: "Human-first writing craft and clarity" },
+                { value: "Seth Godin", description: "Conceptual, minimalist, strategic depth" },
+              ]}
+              selected={persona.influencerStyle}
+              onChange={(v) => update("influencerStyle", v)}
+              placeholder="Select or type voices to emulate..."
+            />
             
             <div className="mb-5">
               <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">
@@ -457,7 +600,20 @@ export default function AccountPersona() {
               onChange={(v) => update("contentMix", v)}
               placeholder="Select content types..."
             />
-            <FormSelect label="Posting Frequency" options={["Daily", "3× per week", "Weekly", "Bi-weekly", "Ad-hoc"]} value={persona.postingFrequency} onChange={(v) => update("postingFrequency", v)} />
+            <MultiSelectDropdown
+              label="Posting Frequency"
+              options={[
+                { value: "Daily", description: "Maximum cadence for audience momentum" },
+                { value: "5× per week", description: "Weekday consistency with recovery room" },
+                { value: "3× per week", description: "Balanced consistency and quality" },
+                { value: "Weekly", description: "Deep value posts with lower volume" },
+                { value: "Bi-weekly", description: "Long-form or campaign-based output" },
+                { value: "Ad-hoc", description: "Flexible cadence based on workload" },
+              ]}
+              selected={persona.postingFrequency}
+              onChange={(v) => update("postingFrequency", v)}
+              placeholder="Select or type posting frequencies..."
+            />
             <MultiSelectDropdown
               label="Core Values"
               options={["Innovation", "Transparency", "Growth", "Trust", "Impact", "Excellence", "Fun", "Authenticity", "Sustainability", "Diversity", "Community", "Education", "Integrity", "Creativity", "Simplicity"]}
@@ -742,7 +898,7 @@ export default function AccountPersona() {
           { key: "threads",           name: "Threads",            subtitle: "Text-based conversations", color: "#000000", emoji: "🧵", canDisconnect: true  },
           { key: "linkedin",          name: "LinkedIn",           subtitle: "Professional network",  color: "#0A66C2", emoji: "💼", canDisconnect: true  },
           { key: "x",                 name: "X (Twitter)",        subtitle: "Real-time social",      color: "#000000", emoji: "🐦", canDisconnect: true  },
-          { key: "pinterest",         name: "Pinterest",          subtitle: "Visual discovery",      color: "#E60023", emoji: "📌", canDisconnect: true  },
+          // { key: "pinterest",         name: "Pinterest",          subtitle: "Visual discovery",      color: "#E60023", emoji: "📌", canDisconnect: true  },
         ];
 
         const handleDisconnect = async (platformKey: string) => {
@@ -850,126 +1006,156 @@ export default function AccountPersona() {
   // RENDER
   // ─────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#E8ECF2] pb-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <div 
+      ref={formAreaRef}
+      onMouseMove={handleMouseMove}
+      className="min-h-screen bg-gradient-to-br from-[#E2EFFF] to-[#C7DEFF] py-16 px-4 sm:px-6 lg:px-8 flex justify-center font-sans text-[#1A1D23] relative overflow-hidden group/page"
+    >
+      {/* Interactive Background Plus Pattern on the whole page */}
+      <div 
+        className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500 opacity-50 group-hover/page:opacity-100"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 14V0h2v14h14v2H16v14h-2V16H0v-2h14z' fill='%230052FF' fill-opacity='0.12' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+          backgroundSize: '30px 30px',
+          maskImage: 'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%)',
+        }}
+      />
 
-        {/* ── LEFT COLUMN ── */}
-        <div>
+      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,10,50,0.05)] border border-white/50 flex flex-col md:flex-row overflow-hidden min-h-[750px] relative z-10">
+        
+        {/* ── LEFT SIDEBAR (Stepper) ── */}
+        <div className="w-full md:w-[320px] bg-[#FAFAFA] border-r border-slate-100 p-10 flex flex-col shrink-0">
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 text-[13px] font-semibold text-slate-500 hover:text-[#1A1D23] transition-colors mb-12 bg-transparent border-none p-0 cursor-pointer"
+          >
+            <BsChevronLeft size={12} strokeWidth={1} /> Back to dashboard
+          </button>
 
-          {/* Step Progress Bar */}
-          <div className="hidden md:flex items-center mb-6 bg-white rounded-full px-8 py-5 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border-none overflow-hidden gap-2">
+          <div className="flex flex-col relative pl-2">
+            {/* The vertical line connecting steps */}
+            <div className="absolute left-[13px] top-3 bottom-8 w-px bg-slate-200 z-0"></div>
+            
             {personaSteps.map((step, idx) => {
-              const isDone = currentStep > step.id;
+              const isCompletedForm = (() => {
+                switch (step.id) {
+                  case 1: return !!persona.personaName && (persona.userRole.length > 0 || persona.industry.length > 0);
+                  case 2: return persona.audienceRole.length > 0 || persona.audienceSegments.length > 0 || persona.painPoints.length > 0;
+                  case 3: return persona.productsServices.length > 0 || persona.primaryObjective.length > 0;
+                  case 4: return !!persona.writingSamples || persona.writingStyle.length > 0;
+                  case 5: return persona.contentThemes.length > 0 || persona.contentMix.length > 0;
+                  case 6: return !!persona.logoUrl || persona.colorPalette.length > 0;
+                  case 7: return connections.length > 0;
+                  default: return false;
+                }
+              })();
+              const isDone = isCompletedForm;
               const isActive = currentStep === step.id;
+              
               return (
-                <React.Fragment key={step.id}>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentStep(step.id)}
-                    className={`flex flex-col items-center gap-1.5 px-3 py-1.5 rounded-2xl transition-all shrink-0 border-none ${
-                      isActive ? "bg-[#0052FF]/5 shadow-[0_4px_20px_rgba(0,82,255,0.05)]" : "hover:bg-[#F8FAFC] hover:shadow-sm"
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-none text-[12px] font-black transition-all ${
-                      isDone
-                        ? "bg-[#0052FF] text-white shadow-[0_4px_16px_rgba(0,82,255,0.3)]"
-                        : isActive
-                        ? "bg-[#0052FF]/10 text-[#0052FF] ring-4 ring-[#0052FF]/5"
-                        : "text-slate-400 bg-[#F8FAFC]"
-                    }`}>
-                      {isDone ? <BsCheckCircleFill size={14} /> : step.id}
-                    </div>
-                    <span className={`text-[10px] font-black uppercase tracking-widest hidden lg:block ${
-                      isActive ? "text-[#0052FF]" : isDone ? "text-slate-500" : "text-slate-400"
-                    }`}>
-                      {step.label}
-                    </span>
-                  </button>
-                  {idx < personaSteps.length - 1 && (
-                    <div className={`h-1.5 flex-1 mx-2 min-w-[20px] rounded-full transition-all ${
-                      currentStep > step.id ? "bg-[#0052FF]" : "bg-[#F8FAFC]"
-                    }`} />
-                  )}
-                </React.Fragment>
+                <button
+                  key={step.id}
+                  type="button"
+                  onClick={() => setCurrentStep(step.id)}
+                  className="flex items-center gap-4 py-3.5 relative z-10 group text-left bg-transparent border-none p-0 cursor-pointer"
+                >
+                  <div className={`w-[26px] h-[26px] rounded-full flex items-center justify-center shrink-0 transition-all shadow-sm ${
+                    isDone && !isActive
+                      ? "bg-white border-2 border-[#0052FF]"
+                      : isActive
+                      ? "bg-[#0052FF] border-2 border-[#0052FF]"
+                      : "bg-white border-2 border-slate-200 group-hover:border-slate-300"
+                  }`}>
+                    {step.id === 7 ? (
+                      <span className={`text-[12px] font-bold ${isActive ? "text-white" : isDone ? "text-[#0052FF]" : "text-slate-300"}`}>
+                        {connections.length}
+                      </span>
+                    ) : isDone && !isActive ? (
+                      <CheckCircle size={14} className="text-[#0052FF]" strokeWidth={3} />
+                    ) : isActive ? (
+                      <CheckCircle size={14} className="text-white" strokeWidth={3} />
+                    ) : (
+                      <CheckCircle size={14} className="text-slate-200 group-hover:text-slate-300" strokeWidth={3} />
+                    )}
+                  </div>
+                  <span className={`text-[14px] font-medium transition-colors ${
+                    isActive ? "text-[#1A1D23]" : isDone ? "text-slate-600" : "text-slate-400 group-hover:text-slate-500"
+                  }`}>
+                    {step.title}
+                  </span>
+                </button>
               );
             })}
           </div>
-
-          {/* Form Card */}
-          <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.02)]">
-            {/* Step Header */}
-            <div className="mb-10">
-              <span className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#0052FF] bg-[#0052FF]/10 px-4 py-2 rounded-full mb-4">
-                <Sparkles size={12} strokeWidth={3} />
-                Step {currentStep} / {totalSteps}
-              </span>
-              <h2 className="text-3xl font-black text-[#1A1D23] tracking-tight mb-2">{activeStepData.title}</h2>
-              <p className="text-slate-500 text-[15px] font-medium">{activeStepData.description}</p>
-            </div>
-
-            {/* Step Form */}
-            <div className="min-h-[380px]">{renderStepContent()}</div>
-
-            {/* Navigation */}
-            <div className="flex items-center justify-between mt-12 pt-8 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={handlePrev}
-                disabled={currentStep === 1}
-                className={`flex items-center gap-2 px-6 py-3.5 rounded-full font-bold text-[14px] transition-all border-none ${
-                  currentStep === 1
-                    ? "text-slate-400 bg-transparent cursor-not-allowed"
-                    : "text-slate-500 bg-[#F8FAFC] hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:text-[#1A1D23]"
-                }`}
-              >
-                <BsChevronLeft size={12} strokeWidth={1.5} /> Back
-              </button>
-
-              <div className="flex items-center gap-4">
-                {saveError && (
-                  <span className="text-[12px] font-bold text-red-500 bg-red-50 px-4 py-2 rounded-full">{saveError}</span>
-                )}
-                {saved && (
-                  <span className="flex items-center gap-2 text-[12px] font-bold text-green-700 bg-green-50 px-4 py-2 rounded-full">
-                    <CheckCircle size={14} /> Persona saved!
-                  </span>
-                )}
-                
-                {/* Save Progress Button (Secondary) */}
-                {currentStep < totalSteps && (
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-[13px] text-[#0052FF] bg-[#0052FF]/10 hover:bg-[#0052FF]/20 transition-all disabled:opacity-70 border-none"
-                  >
-                    {saving ? <><Loader2 size={14} className="animate-spin" /> Saving...</> : "Save Progress"}
-                  </button>
-                )}
-
-                {currentStep === totalSteps ? (
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="flex items-center gap-2.5 px-8 py-3.5 rounded-full font-black text-[14px] text-white bg-[#0052FF] hover:bg-blue-600 shadow-[0_8px_30px_rgba(0,82,255,0.4)] transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:hover:translate-y-0 border-none"
-                  >
-                    {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><BsStarFill size={14} /> Finish & Save Persona</>}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="flex items-center gap-2.5 px-8 py-3.5 rounded-full font-black text-[14px] text-white bg-[#0052FF] hover:bg-blue-600 shadow-[0_8px_30px_rgba(0,82,255,0.4)] transition-all hover:-translate-y-0.5 active:translate-y-0 border-none"
-                  >
-                    Continue <ArrowRight size={16} strokeWidth={2.5} />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
 
+        {/* ── RIGHT MAIN CONTENT ── */}
+        <div className="flex-1 p-8 md:p-14 flex flex-col bg-white">
+          {oauthMessage && (
+            <div
+              className={`mb-8 rounded-xl px-4 py-3 text-[13px] font-medium border ${
+                oauthMessage.tone === "success"
+                  ? "bg-green-50 text-green-700 border-green-200"
+                  : oauthMessage.tone === "warning"
+                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                  : "bg-red-50 text-red-700 border-red-200"
+              }`}
+            >
+              {oauthMessage.text}
+            </div>
+          )}
+
+          {/* Step Header */}
+          <div className="mb-10">
+            <h2 className="text-[22px] font-semibold text-[#1A1D23] mb-1">{activeStepData.title}</h2>
+          </div>
+
+          {/* Step Form */}
+          <div className="flex-1 max-w-2xl">
+             {renderStepContent()}
+          </div>
+
+          {/* Navigation */}
+          <div className="mt-12 pt-8 flex flex-col items-center border-t border-slate-100">
+             {saveError && (
+                <div className="mb-4 text-[13px] font-medium text-red-500">{saveError}</div>
+             )}
+             {saved && (
+                <div className="mb-4 text-[13px] font-medium text-green-600">Persona saved!</div>
+             )}
+             
+             {currentStep === totalSteps ? (
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="w-full max-w-[280px] flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium text-[14px] text-white bg-[#0052FF] hover:bg-blue-600 transition-colors disabled:opacity-70 border-none cursor-pointer"
+                >
+                  {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : "Finish & Save Persona"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="w-full max-w-[280px] flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium text-[14px] text-white bg-[#0052FF] hover:bg-blue-600 transition-colors border-none cursor-pointer"
+                >
+                  Continue <ArrowRight size={16} strokeWidth={2} />
+                </button>
+              )}
+              
+              {currentStep < totalSteps && (
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="mt-4 text-[13px] font-medium text-[#0052FF] hover:text-blue-700 bg-transparent border-none transition-colors cursor-pointer p-0"
+                  >
+                    {saving ? "Saving..." : "Save Progress"}
+                  </button>
+              )}
+          </div>
+        </div>
       </div>
     </div>
   );

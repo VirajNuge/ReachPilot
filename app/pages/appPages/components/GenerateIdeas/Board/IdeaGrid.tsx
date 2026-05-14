@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import IdeaCard from "./IdeaCard";
 import type { GeneratedIdea, IdeaMode } from "@/lib/ideaFinder/types";
@@ -13,6 +12,7 @@ interface IdeaGridProps {
   generationStep?: string;
   onIdeaClick: (idea: GeneratedIdea) => void;
   onSave?: (idea: GeneratedIdea) => void;
+  savedIdeaIds?: Record<string, string>;
   onGenerateMore?: () => void;
 }
 
@@ -39,7 +39,7 @@ export default function IdeaGrid({
   generationStep,
   onIdeaClick,
   onSave,
-  onGenerateMore,
+  savedIdeaIds,
 }: IdeaGridProps) {
   const currentModeStr = mode ? MODE_LABELS[mode] : "Voice-Match";
   const firstPlatform = ideas.length > 0 ? ideas[0].platform : "All Platforms";
@@ -110,10 +110,10 @@ export default function IdeaGrid({
         </span>
       </div>
 
-      <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6 pb-40">
+      <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6 pb-20">
         {ideas.map((idea, idx) => (
-          <motion.div 
-            key={idea.id} 
+          <motion.div
+            key={idea.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: idx * 0.05 }}
@@ -124,22 +124,10 @@ export default function IdeaGrid({
               mode={mode}
               onClick={onIdeaClick}
               onSave={onSave}
+              isSaved={!!(savedIdeaIds && savedIdeaIds[idea.id])}
             />
           </motion.div>
         ))}
-
-        {/* Generate More */}
-        {onGenerateMore && (
-          <div className="break-inside-avoid py-8 text-center flex justify-center">
-            <button
-              onClick={onGenerateMore}
-              className="font-black text-sm uppercase tracking-widest bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 text-[#000100] px-8 py-4 rounded-2xl transition-all hover:-translate-y-1 flex items-center gap-2"
-            >
-              <Sparkles size={16} className="text-[#0052FF]" />
-              Generate Variations
-            </button>
-          </div>
-        )}
       </div>
     </motion.div>
   );

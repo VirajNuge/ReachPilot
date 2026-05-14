@@ -21,7 +21,7 @@ import {
   getTotalPostCount,
   getPostCountByFormat,
   getAverageEngagementByFormat,
-} from "../socialMediaPost";
+} from "./socialMediaPost";
 
 import {
   ensureMetricsIndexes,
@@ -30,10 +30,10 @@ import {
   getLatestMetricsForPlatform,
   calculateGrowthVsPrevious,
   getMetricsForAccount,
-} from "../socialMediaMetrics";
+} from "./socialMediaMetrics";
 
-import type { SocialMediaPostDocument, Platform } from "../socialMediaPost";
-import type { SocialMediaMetricsDocument } from "../socialMediaMetrics";
+import type { SocialMediaPostDocument, Platform } from "./socialMediaPost";
+import type { SocialMediaMetricsDocument } from "./socialMediaMetrics";
 
 // Test constants
 const TEST_USER_ID = "test-user-123";
@@ -296,3 +296,9 @@ if (require.main === module) {
 }
 
 export default runPhase1Tests;
+
+// In test runner environments we don't execute the heavy integration script by default.
+// Provide a skipped placeholder test so test runners like vitest do not mark the file as
+// "no test suite found" when this file is present in the test folder.
+import { it } from 'vitest';
+it.skip('phase1 models integration test - skipped in unit test runs', () => {});

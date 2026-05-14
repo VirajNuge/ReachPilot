@@ -38,7 +38,7 @@ export class TwitterFetcher extends BasePlatformFetcher {
 
     try {
       const response = await fetch(
-        `${this.API_BASE}/users/${this.connection.platformUserId}/tweets?max_results=${Math.min(limit, 100)}&tweet.fields=created_at,public_metrics,author_id&media.fields=url,type`,
+        `${this.API_BASE}/users/${this.connection.platformUserId}/tweets?max_results=${Math.min(limit, 100)}&exclude=retweets,replies&tweet.fields=created_at,public_metrics,organic_metrics,non_public_metrics,author_id&media.fields=url,type`,
         {
           headers: {
             Authorization: `Bearer ${this.connection.accessToken}`,
@@ -162,6 +162,8 @@ export class TwitterFetcher extends BasePlatformFetcher {
 
   private parseTwitterPost(tweet: any, media: any[] = []): RawPlatformPost {
     const metrics = tweet.public_metrics || {};
+    const organic = tweet.organic_metrics || {};
+    const nonPublic = tweet.non_public_metrics || {};
 
     // Find media for this tweet
     let mediaUrls: Array<{ type: "image" | "video"; url: string }> = [];
@@ -181,10 +183,10 @@ export class TwitterFetcher extends BasePlatformFetcher {
       media: mediaUrls,
       createdAt: new Date(tweet.created_at),
       metrics: {
-        likes: metrics.like_count || 0,
-        comments: metrics.reply_count || 0,
-        shares: metrics.retweet_count || 0,
-        views: metrics.impression_count || 0,
+        likes: organic.like_count ?? metrics.like_count ?? 0,
+        comments: organic.reply_count ?? metrics.reply_count ?? 0,
+        shares: organic.retweet_count ?? metrics.retweet_count ?? 0,
+        views: organic.impression_count ?? nonPublic.impression_count ?? metrics.impression_count ?? 0,
       },
     };
   }

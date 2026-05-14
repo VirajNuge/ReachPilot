@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useParams, useRouter } from "next/navigation";
 import {
@@ -45,6 +45,10 @@ const Sidebar = () => {
 
   const isActive = (path: string) => pathname?.includes(path);
 
+  const prefetchRoute = (route: string) => {
+    router.prefetch(route);
+  };
+
   // --- DESIGN SYSTEM TOKENS ---
   const activeMainLink =
     "bg-white text-[#0052FF] shadow-[0_4px_20px_rgba(0,0,0,0.03)]";
@@ -55,24 +59,6 @@ const Sidebar = () => {
     "text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-3 mt-6";
   const subLinkBase =
     "block ml-4 px-4 py-2.5 text-[12px] font-bold rounded-xl transition-all duration-200";
-
-  useEffect(() => {
-    if (!accountId) return;
-
-    const frequentRoutes = [
-      `/${accountId}/profileAnalyzer`,
-      `/${accountId}/accountPersona`,
-      `/${accountId}/postAnalyzer`,
-      `/${accountId}/postGenerator`,
-      `/${accountId}/generateIdeas`,
-      `/${accountId}/publishing`,
-      `/${accountId}/analytics`,
-      `/${accountId}/questionMine`,
-      `/${accountId}/explorePostsIdeas`,
-    ];
-
-    frequentRoutes.forEach((route) => router.prefetch(route));
-  }, [accountId, router]);
 
   return (
     <aside className="w-[260px] h-screen shrink-0 bg-[#E8ECF2] flex flex-col z-50 border-none font-sans antialiased">
@@ -98,9 +84,11 @@ const Sidebar = () => {
         </p>
 
         <Link
-          href={`/${accountId}/profileAnalyzer`}
+          href={`/${accountId}/dashboard`}
+          prefetch={false}
+          onMouseEnter={() => prefetchRoute(`/${accountId}/dashboard`)}
           className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none no-underline outline-none ${
-            isActive("/dashboard") || isActive("profileAnalyzer") ? activeMainLink : inactiveMainLink
+            isActive("/dashboard") ? activeMainLink : inactiveMainLink
           }`}
         >
           <FaTachometerAlt
@@ -151,6 +139,8 @@ const Sidebar = () => {
                 <Link
                   key={item.path}
                   href={`/${accountId}/${item.path}`}
+                  prefetch={false}
+                  onMouseEnter={() => prefetchRoute(`/${accountId}/${item.path}`)}
                   className={`${subLinkBase} border-none no-underline outline-none ${
                     isActive(item.path)
                       ? "text-[#0052FF] bg-white shadow-sm"
@@ -166,6 +156,8 @@ const Sidebar = () => {
           {/* --- TOOLS: IDEA FINDER --- */}
           <Link
             href={`/${accountId}/generateIdeas`}
+            prefetch={false}
+            onMouseEnter={() => prefetchRoute(`/${accountId}/generateIdeas`)}
             className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none no-underline outline-none mt-1 ${
               isActive("generateIdeas") ? activeMainLink : inactiveMainLink
             }`}
@@ -184,6 +176,8 @@ const Sidebar = () => {
         <div className="space-y-1">
           <Link
             href={`/${accountId}/publishing`}
+            prefetch={false}
+            onMouseEnter={() => prefetchRoute(`/${accountId}/publishing`)}
             className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none ${
               isActive("publishing") ? activeMainLink : inactiveMainLink
             }`}
@@ -199,6 +193,8 @@ const Sidebar = () => {
 
           <Link
             href={`/${accountId}/analytics`}
+            prefetch={false}
+            onMouseEnter={() => prefetchRoute(`/${accountId}/analytics`)}
             className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none ${
               isActive("analytics") ? activeMainLink : inactiveMainLink
             }`}
@@ -214,19 +210,21 @@ const Sidebar = () => {
 
 
           <Link
-            href="/account"
+            href={`/${accountId}/accountPersona`}
+            prefetch={false}
+            onMouseEnter={() => prefetchRoute(`/${accountId}/accountPersona`)}
             className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none mt-1 ${
-              isActive("/account") ? activeMainLink : inactiveMainLink
+              isActive("/accountPersona") ? activeMainLink : inactiveMainLink
             }`}
           >
             <FaUser
               size={15}
               className={
-                isActive("/account") ? "text-[#0052FF]" : "text-slate-400"
-              }
-            />
-            <span>Account</span>
-          </Link>
+              isActive("/accountPersona") ? "text-[#0052FF]" : "text-slate-400"
+            }
+          />
+          <span>Account</span>
+        </Link>
         </div>
 
         {/* --- UTILITY SECTION --- */}

@@ -11,7 +11,7 @@ import { postGenerationsToDrafts } from "../../components/Publishing/utils";
 import type { PlatformPublishResult } from "../../components/Publishing/PublishToast";
 import { PublishToast } from "../../components/Publishing/PublishToast";
 import { CustomPostModal } from "../../components/Publishing/CustomPostModal";
-import { OptimalSlot } from "../../components/Publishing/OptimalTimesPanel";
+import type { OptimalSlot } from "@/lib/publishing/types";
 
 /* ── Stat card ───────────────────────────────────────────────────────────── */
 
@@ -45,7 +45,7 @@ export default function PublishingPage() {
   const params = useParams();
   const routeAccountId = params.id as string;
   const router = useRouter();
-  const [resolvedAccountId, setResolvedAccountId] = useState<string | null>(null);
+  const [resolvedAccountId, setResolvedAccountId] = useState<string | null>(routeAccountId || null);
 
   const navigateToPostGenerator = () => router.push(`/${routeAccountId}/postGenerator`);
 
@@ -56,31 +56,28 @@ export default function PublishingPage() {
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [globalPublishResults, setGlobalPublishResults] = useState<PlatformPublishResult[] | null>(null);
   const [isCustomPostModalOpen, setIsCustomPostModalOpen] = useState(false);
-  const [calendarViewMode, setCalendarViewMode] = useState<"month" | "week">("week");
+  const [calendarViewMode, setCalendarViewMode] = useState<"month" | "week">("month");
   const [optimalSlots, setOptimalSlots] = useState<OptimalSlot[]>([]);
   const [isOptimalTimesLoading, setIsOptimalTimesLoading] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("reachpilot_optimal_times");
-    if (saved) {
-      try {
-        setOptimalSlots(JSON.parse(saved));
-      } catch (e) {
-        // ignore
-      }
-    }
-  }, []);
+  const [persona, setPersona] = useState<{ _id?: string; personaName?: string } | null>(null);
+  const [personaLoading, setPersonaLoading] = useState(false);
+  const currentMonth = new Date();
+  const currentMonthParams = `month=${currentMonth.getMonth()}&year=${currentMonth.getFullYear()}`;
 
   const handleApplyOptimalSlots = (slots: OptimalSlot[]) => {
     setOptimalSlots(slots);
-    localStorage.setItem("reachpilot_optimal_times", JSON.stringify(slots));
-    setCalendarViewMode("week");
+    setCalendarViewMode("month");
   };
 
   useEffect(() => {
     let mounted = true;
 
     const resolveAccountId = async () => {
+      if (routeAccountId) {
+        setResolvedAccountId(routeAccountId);
+        return;
+      }
+
       try {
         const activeRes = await fetch("/api/accounts/active");
         if (activeRes.ok) {
@@ -109,7 +106,7 @@ export default function PublishingPage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [routeAccountId]);
 
   // Ref mirrors activeDragId for capture-phase handler (avoids stale closure)
   const activeDragIdRef = useRef<string | null>(null);
@@ -132,6 +129,50 @@ export default function PublishingPage() {
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
+
+  useEffect(() => {
+    if (!resolvedAccountId) return;
+
+    let cancelled = false;
+    const loadPublishingContext = async () => {
+      setPersonaLoading(true);
+      setIsOptimalTimesLoading(true);
+
+      try {
+        const personaRes = await fetch(`/api/persona/save?accountId=${resolvedAccountId}`);
+        const personaData = await personaRes.json();
+        const nextPersona = personaData?.persona ?? null;
+
+        if (!cancelled) {
+          setPersona(nextPersona);
+        }
+
+        const optimalRes = await fetch(`/api/publishing/optimal-times?accountId=${resolvedAccountId}&${currentMonthParams}${nextPersona?._id ? `&personaId=${nextPersona._id}` : ""}`);
+        const optimalData = await optimalRes.json();
+
+        if (!optimalRes.ok) {
+          throw new Error(optimalData.error || "Failed to load optimal times");
+        }
+
+        if (!cancelled && Array.isArray(optimalData.slots)) {
+          setOptimalSlots(optimalData.slots);
+        }
+      } catch (error) {
+        console.error("Failed to load publishing context:", error);
+      } finally {
+        if (!cancelled) {
+          setPersonaLoading(false);
+          setIsOptimalTimesLoading(false);
+        }
+      }
+    };
+
+    loadPublishingContext();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [resolvedAccountId, currentMonthParams]);
 
   const selectedPost = drafts.find((d) => d.id === selectedId) ?? null;
 
@@ -284,6 +325,40 @@ export default function PublishingPage() {
       return [{ platform: "all", success: false, error: "Network error" }];
     }
   };
+
+  const handleCalculateOptimalTimes = async () => {
+    if (!resolvedAccountId) return;
+
+    setIsOptimalTimesLoading(true);
+    try {
+      const res = await fetch("/api/publishing/optimal-times", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          accountId: resolvedAccountId,
+          month: currentMonth.getMonth(),
+          year: currentMonth.getFullYear()
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to generate optimal times");
+      }
+
+      if (Array.isArray(data.slots)) {
+        handleApplyOptimalSlots(data.slots);
+      }
+    } catch (error) {
+      console.error("Failed to calculate optimal times:", error);
+    } finally {
+      setIsOptimalTimesLoading(false);
+    }
+  };
+
+  const hasPersona = personaLoading || Boolean(persona?._id);
   const totalPlatforms = [...new Set(drafts.flatMap((d) => d.platforms))].length;
   const totalHashtags  = drafts.reduce(
     (acc, d) =>
@@ -357,9 +432,9 @@ export default function PublishingPage() {
             viewMode={calendarViewMode}
             setViewMode={setCalendarViewMode}
             optimalSlots={optimalSlots}
-            onApplyOptimalSlots={handleApplyOptimalSlots}
+            onCalculateOptimalTimes={handleCalculateOptimalTimes}
+            hasPersona={hasPersona}
             isOptimalTimesLoading={isOptimalTimesLoading}
-            setIsOptimalTimesLoading={setIsOptimalTimesLoading}
           />
         </div>
 

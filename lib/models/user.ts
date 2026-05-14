@@ -120,3 +120,32 @@ export async function getUserById(id: string): Promise<SafeUser | null> {
     createdAt: user.createdAt.toISOString(),
   };
 }
+
+export async function getUserByEmail(email: string): Promise<SafeUser | null> {
+  const col = await getCollection();
+  const user = await col.findOne({ email });
+  if (!user) return null;
+
+  return {
+    id: user._id!.toString(),
+    username: user.username,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    createdAt: user.createdAt.toISOString(),
+  };
+}
+
+export async function updateUserPassword(userId: string, newPassword: string) {
+  const col = await getCollection();
+  const { ObjectId } = await import("mongodb");
+  let objectId: any;
+  try {
+    objectId = new ObjectId(userId);
+  } catch {
+    throw new Error("Invalid user id");
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
+  await col.updateOne({ _id: objectId }, { $set: { password: hashedPassword } });
+}

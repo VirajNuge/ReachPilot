@@ -23,27 +23,56 @@ interface GrowthChartProps {
   history?: HistoryPoint[];
   prediction?: PredictionPoint[];
   anomalies?: AnomalyPoint[];
+  postEvents?: import("@/lib/analytics/types").PostEvent[];
 }
 
-export default function GrowthChart({ platform, history, prediction, anomalies }: GrowthChartProps) {
+export default function GrowthChart({ platform, history, prediction, anomalies, postEvents }: GrowthChartProps) {
   const [showForecast, setShowForecast] = useState(false);
   const [showAnomalies, setShowAnomalies] = useState(true); // Default ON
+  const [hoveredPost, setHoveredPost] = useState<import("@/lib/analytics/types").PostEvent | null>(null);
 
   const baseHistory = history ?? HISTORY_DATA;
   const basePrediction = prediction ?? PREDICTION_DATA;
-  const baseAnomalies = anomalies ?? ANOMALY_DATA;
+  const rawAnomalies = anomalies ?? ANOMALY_DATA;
 
   const chartData = showForecast
     ? [...baseHistory, ...basePrediction.slice(1)]
     : baseHistory;
 
+  const baseAnomalies = rawAnomalies.filter(a => chartData.some(d => d.date === a.date));
+
   const colors: Record<string, string> = {
-    linkedin: "#0077B5",
     twitter: "#000000",
     instagram: "#E1306C",
     facebook: "#1877F2",
     threads: "#333333",
-    pinterest: "#E60023",
+  };
+
+  // Render post markers (dots) on the chart for published posts
+  const renderPostMarkers = () => {
+    if (!postEvents || postEvents.length === 0) return null;
+    return postEvents.map((post, idx) => {
+      const dateKey = new Date(post.postedAt).toISOString().split("T")[0];
+      const point = chartData.find((d) => String(d.date) === String(dateKey));
+      if (!point) return null;
+      const platformKey = post.platform === "x" ? "twitter" : post.platform;
+      const yVal = (point as any)[platformKey] ?? (point as any).all ?? 0;
+      const fill = colors[platformKey] || "#111827";
+      return (
+        <ReferenceDot
+          key={`post-${idx}`}
+          x={dateKey}
+          y={yVal}
+          r={5}
+          fill={fill}
+          stroke="#fff"
+          strokeWidth={1.5}
+          ifOverflow="extendDomain"
+          onMouseEnter={() => setHoveredPost(post)}
+          onMouseLeave={() => setHoveredPost(null)}
+        />
+      );
+    });
   };
 
   // Custom Tooltip for Anomalies
@@ -69,7 +98,11 @@ export default function GrowthChart({ platform, history, prediction, anomalies }
               }`}
             >
               <div className="flex items-center gap-1 font-bold mb-1">
-                <span>{anomaly.icon}</span>
+                {anomaly.type === "spike" ? (
+                  <Sparkles size={14} className="text-green-600" />
+                ) : (
+                  <AlertCircle size={14} className="text-red-600" />
+                )}
                 {anomaly.type === "spike" ? "Viral Spike" : "Anomaly Detected"}
               </div>
               <p className="leading-relaxed opacity-90">{anomaly.reason}</p>
@@ -233,9 +266,39 @@ export default function GrowthChart({ platform, history, prediction, anomalies }
                 }}
               />
             )}
+
+            {/* Post markers */}
+            {renderPostMarkers()}
           </AreaChart>
         </ResponsiveContainer>
       </div>
+      {hoveredPost && (
+        <div className="pointer-events-none">
+          <div className="absolute right-6 top-6 z-50">
+            <div className="w-[260px] rounded-lg border bg-white p-3 shadow-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-14 h-14 rounded-md bg-slate-100 overflow-hidden">
+                  {hoveredPost.thumbnail ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={hoveredPost.thumbnail} alt="post" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <span className="text-slate-400">🖼️</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-bold text-[#000100] truncate">{hoveredPost.platform}</div>
+                  <div className="text-xs text-slate-500">{new Date(hoveredPost.postedAt).toLocaleString()}</div>
+                  <div className="mt-2 text-sm text-slate-700">
+                    {hoveredPost.metrics ? `${hoveredPost.metrics.likes ?? 0} likes • ${hoveredPost.metrics.comments ?? 0} comments` : "No metrics"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

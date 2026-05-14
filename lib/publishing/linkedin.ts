@@ -4,6 +4,7 @@
  * Supports text-only and single image posts.
  */
 import type { PublishPayload, PublishResult } from "./types";
+import { linkedinFetch } from "@/lib/utils/linkedinFetch";
 
 const API_BASE = "https://api.linkedin.com/v2";
 
@@ -17,7 +18,7 @@ async function uploadLinkedInImage(
 ): Promise<string | null> {
   try {
     // Step 1: Register upload
-    const registerRes = await fetch(`${API_BASE}/assets?action=registerUpload`, {
+    const registerRes = await linkedinFetch(`${API_BASE}/assets?action=registerUpload`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -48,10 +49,11 @@ async function uploadLinkedInImage(
     if (!uploadUrl || !assetUrn) return null;
 
     // Step 2: Download image and PUT to LinkedIn
+    // Image download uses standard fetch because it's typically an S3/Cloudinary URL, not LinkedIn.
     const imgRes = await fetch(imageUrl);
     const imgBuffer = await imgRes.arrayBuffer();
 
-    await fetch(uploadUrl, {
+    await linkedinFetch(uploadUrl, {
       method: "PUT",
       headers: { "Content-Type": "image/jpeg" },
       body: imgBuffer,
@@ -124,7 +126,7 @@ export async function publishToLinkedIn(
       };
     }
 
-    const res = await fetch(`${API_BASE}/ugcPosts`, {
+    const res = await linkedinFetch(`${API_BASE}/ugcPosts`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,

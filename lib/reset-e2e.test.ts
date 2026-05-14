@@ -1,20 +1,29 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import * as userModel from './models/user'
+import * as auth from './auth'
+import * as mailer from './mailer'
 import { POST } from '../app/api/auth/forgot/route'
 
 describe('reset flow (unit e2e simulation)', () => {
-  it('returns resetLink in response when user exists and NODE_ENV=test', async () => {
-    // Arrange: mock getUserByEmail to return a user
-    const mockUser = { id: 'test-user-1', username: 'tester', email: 'tester@example.com', firstName: 'Tester' }
-    vi.spyOn(userModel, 'getUserByEmail').mockResolvedValue(mockUser as any)
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    vi.clearAllMocks()
+  })
 
-    // Act: create a fake request with a json() method both the route expects
+  it('returns resetLink in response when user exists and NODE_ENV=test', async () => {
+    // Arrange: mock dependencies
+    const mockUser = { id: 'test-user-1', username: 'tester', email: 'tester@example.com', firstName: 'Tester' }
+    const mockToken = 'test-jwt-token-xyz'
+    
+    vi.spyOn(userModel, 'getUserByEmail').mockResolvedValue(mockUser as any)
+    vi.spyOn(auth, 'signResetToken').mockResolvedValue(mockToken)
+    vi.spyOn(mailer, 'sendEmail').mockResolvedValue(undefined as any)
+
+    // Act: create a fake request with a json() method
     const req: any = {
       json: async () => ({ email: mockUser.email }),
+      headers: new Headers(),
     }
-
-    // Ensure test mode
-    process.env.NODE_ENV = 'test'
 
     const result: any = await POST(req as any)
 
@@ -22,7 +31,6 @@ describe('reset flow (unit e2e simulation)', () => {
     expect(result).toHaveProperty('success', true)
     expect(result).toHaveProperty('resetLink')
     expect(typeof result.resetLink).toBe('string')
-    // cleanup
-    ;(userModel.getUserByEmail as any).mockRestore?.()
+    expect(result.resetLink).toContain('token=test-jwt-token-xyz')
   })
 })

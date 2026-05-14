@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
+import { createSecretKey } from 'crypto';
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 const AUTH_COOKIE_NAME = "rp_token";
@@ -15,8 +16,8 @@ type SafeUserToken = {
 };
 
 function getKey() {
-  // jose expects a Uint8Array key for HMAC algorithms
-  return new TextEncoder().encode(JWT_SECRET);
+  // Create a Node KeyObject for HMAC signing - reliable KeyLike for jose
+  return createSecretKey(Buffer.from(JWT_SECRET, 'utf8'));
 }
 
 export async function signToken(user: SafeUserToken) {

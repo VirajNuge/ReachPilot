@@ -1,9 +1,14 @@
 import { SignJWT, jwtVerify } from "jose";
 import { NextRequest } from "next/server";
 
-const ADMIN_JWT_SECRET = new TextEncoder().encode(
-  process.env.ADMIN_JWT_SECRET || "admin_super_secret_change_in_production"
-);
+function getAdminJwtSecret() {
+  const secret = process.env.ADMIN_JWT_SECRET;
+  if (!secret) {
+    throw new Error("ADMIN_JWT_SECRET is not set");
+  }
+
+  return new TextEncoder().encode(secret);
+}
 
 const ADMIN_COOKIE_NAME = "rp_admin_token";
 
@@ -19,14 +24,14 @@ export async function signAdminToken(username: string): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("8h")
-    .sign(ADMIN_JWT_SECRET);
+    .sign(getAdminJwtSecret());
 }
 
 export async function verifyAdminToken(
   token: string
 ): Promise<{ username: string; role: string } | null> {
   try {
-    const { payload } = await jwtVerify(token, ADMIN_JWT_SECRET);
+    const { payload } = await jwtVerify(token, getAdminJwtSecret());
     return payload as { username: string; role: string };
   } catch {
     return null;

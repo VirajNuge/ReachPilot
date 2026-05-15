@@ -3,7 +3,6 @@ import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { createSecretKey } from 'crypto';
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 const AUTH_COOKIE_NAME = "rp_token";
 
 type SafeUserToken = {
@@ -16,8 +15,13 @@ type SafeUserToken = {
 };
 
 function getKey() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET is not set");
+  }
+
   // Create a Node KeyObject for HMAC signing - reliable KeyLike for jose
-  return createSecretKey(Buffer.from(JWT_SECRET, 'utf8'));
+  return createSecretKey(Buffer.from(secret, 'utf8'));
 }
 
 export async function signToken(user: SafeUserToken) {

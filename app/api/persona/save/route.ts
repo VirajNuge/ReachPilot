@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { upsertPersona } from "@/lib/models/persona";
 import { getUserById } from "@/lib/models/user";
 import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
-
-const JWT_SECRET = process.env.JWT_SECRET || "reachpilot-secret-key";
+import { verifyToken } from "../../../../lib/auth";
 
 function toTrimmedString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -29,8 +27,7 @@ async function getUserIdFromRequest(req: NextRequest): Promise<string | null> {
      const token = cookieStore.get("rp_token")?.value;
     if (!token) return null;
 
-    const secret = new TextEncoder().encode(JWT_SECRET);
-    const { payload } = await jwtVerify(token, secret);
+    const payload = await verifyToken(token);
     return (payload.userId as string) || null;
   } catch {
     return null;

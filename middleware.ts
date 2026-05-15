@@ -1,9 +1,5 @@
-import { jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
-
-const ADMIN_JWT_SECRET = new TextEncoder().encode(
-  process.env.ADMIN_JWT_SECRET || "admin_super_secret_change_in_production"
-);
+import { verifyAdminToken } from "./lib/adminAuth";
 
 const ADMIN_COOKIE_NAME = "rp_admin_token";
 
@@ -42,7 +38,10 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    await jwtVerify(token, ADMIN_JWT_SECRET);
+    const verified = await verifyAdminToken(token);
+    if (!verified) {
+      throw new Error("Invalid admin token");
+    }
     return NextResponse.next();
   } catch {
     // Invalid / expired token

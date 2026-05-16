@@ -15,7 +15,11 @@ export async function GET(request: NextRequest) {
     const cookieStore = await cookies();
     const activeAccountId = cookieStore.get(ACTIVE_ACCOUNT_COOKIE)?.value;
 
-    return NextResponse.json({ accountId: activeAccountId || null });
+    return NextResponse.json({ accountId: activeAccountId || null }, {
+      headers: {
+        "Cache-Control": "private, max-age=30, stale-while-revalidate=60",
+      },
+    });
   } catch (error) {
     console.error('Error fetching active account:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

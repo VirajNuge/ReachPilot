@@ -16,7 +16,11 @@ export async function GET(request: NextRequest) {
       accounts = [defaultAccount];
     }
 
-    return NextResponse.json({ accounts });
+    return NextResponse.json({ accounts }, {
+      headers: {
+        "Cache-Control": "private, max-age=30, stale-while-revalidate=60",
+      },
+    });
   } catch (error) {
     console.error('Error fetching accounts:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

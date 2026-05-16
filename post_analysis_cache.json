@@ -1,5 +1,737 @@
 [
   {
+    "id": "c9f4fb4e-5628-4f90-b0be-e4d03199a488",
+    "analysis": {
+      "hookCTA": {
+        "trigger": "Social Proof/Data Comparison",
+        "skeleton": "Game X has [impressive metric] compared to [other popular games].",
+        "pivotA": "Fortnite is dominating PlayStation! Check out these player numbers vs GTA 5, Minecraft & more.",
+        "pivotAEngagement": "High Shares",
+        "pivotB": "Is Fortnite still King? The player count on PlayStation might surprise you...",
+        "pivotBEngagement": "High Comments",
+        "pivotC": "These PlayStation numbers prove Fortnite isn't dying anytime soon. See how it stacks up against other titans.",
+        "pivotCEngagement": "High Likes",
+        "ctaType": "Statistical Comparison",
+        "ctaTip": "Highlight surprising data points to spark curiosity and discussion."
+      },
+      "retention": {
+        "segments": [
+          {
+            "text": "Fortnite had *14.6M PLAYERS* this week in PlayStation (USA) alone",
+            "retention": "high"
+          },
+          {
+            "text": "Compared to:\n• GTA 5 → 5.13M\n• Minecraft → 4.97M\n• Call of Duty → 4.95M\n• Apex Legends → 1.72M\n• Marvel Rivals → 1.58M\n• Battlefield 6 → 1.51M\n• Arc Raiders → 972K",
+            "retention": "medium"
+          },
+          {
+            "text": "[VIA @mysticryan on YouTube]",
+            "retention": "low"
+          }
+        ],
+        "seedComments": [
+          "Wow, Fortnite is crushing it! What do you think contributes to its continued success?",
+          "These numbers are insane! Any thoughts on why GTA 5 still has such a strong player base?",
+          "Interesting comparison. I wonder how these numbers will change when GTA 6 releases."
+        ]
+      },
+      "leadPersona": {
+        "audienceData": [
+          {
+            "label": "Fortnite Players",
+            "value": 0.5,
+            "color": "#3498db"
+          },
+          {
+            "label": "GTA Enthusiasts",
+            "value": 0.3,
+            "color": "#e74c3c"
+          },
+          {
+            "label": "General Gamers",
+            "value": 0.2,
+            "color": "#9b59b6"
+          }
+        ],
+        "highIntentLeads": [
+          {
+            "name": "Teewhy",
+            "role": "Opinionated Gamer",
+            "intent": "Expresses skepticism and anticipation for future games.",
+            "avatar": "https://pbs.twimg.com/profile_images/1964988137223970816/vQOW5Uhj_bigger.jpg"
+          },
+          {
+            "name": "҉F҉L҉i͟g҉h҉t҉",
+            "role": "GTA Supporter",
+            "intent": "Highly anticipating GTA 6 and believes it will break records.",
+            "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=%D2%89F%D2%89L%D2%89i%CD%9Fg%D2%89h%D2%89t%D2%89"
+          }
+        ],
+        "icpAlignment": {
+          "title": "Ideal Customer Profile Alignment",
+          "score": 0.75
+        }
+      },
+      "commentGap": {
+        "gapData": [
+          {
+            "gap": "Comparison of Fortnite vs. other games (especially GTA 6)",
+            "frequency": 0.6,
+            "strategy": "Create content that compares gameplay, features, and community aspects of Fortnite and its competitors."
+          },
+          {
+            "gap": "Fortnite's competitive scene and Zero Build mode",
+            "frequency": 0.2,
+            "strategy": "Address concerns about competitive Fortnite and the impact of Zero Build mode through explainer videos or community discussions."
+          },
+          {
+            "gap": "Sustained success of GTA 5",
+            "frequency": 0.2,
+            "strategy": "Analyze the reasons behind GTA 5's enduring popularity and how it maintains its player base."
+          }
+        ],
+        "confusionPoint": {
+          "text": "Contradictory opinions about Fortnite's current state (dead vs. thriving)",
+          "sentiment": "mixed",
+          "insight": "Highlight the different perspectives and address the perception that Fortnite is declining."
+        }
+      },
+      "visualStrategy": {
+        "category": "Data Visualization",
+        "colors": [
+          "blue",
+          "green",
+          "yellow"
+        ],
+        "prompts": {
+          "midjourney": "Data visualization of game player counts, Fortnite dominating, PlayStation, vibrant colors, clean design",
+          "dalle": "Infographic showing Fortnite player numbers compared to other popular games on PlayStation, 3D render, modern design"
+        }
+      },
+      "viralVelocity": {
+        "velocityData": {
+          "likesPerHour": 883,
+          "trend": "Trending High",
+          "peakTime": "Immediate Post",
+          "accountAvg": 300,
+          "growthPrediction": "Continued high engagement expected if the discussion continues with GTA 6 comparisons."
+        }
+      },
+      "sentiment": {
+        "sentimentData": {
+          "positive": 0.2,
+          "constructive": 0.3,
+          "neutral": 0.3,
+          "negative": 0.2,
+          "keywords": [
+            "Fortnite",
+            "GTA 6",
+            "Players",
+            "PlayStation",
+            "Numbers"
+          ],
+          "dominantEmotion": "Anticipation",
+          "trustScore": "High",
+          "sarcasmLevel": "Low",
+          "isControversial": true
+        }
+      },
+      "competitor": {
+        "benchmarkData": {
+          "engagementRate": 0.61,
+          "accountAvg": 0.03,
+          "nicheAvg": 0.025,
+          "isOutlier": true,
+          "botSignal": "Low",
+          "followers": "6.5M"
+        }
+      }
+    },
+    "postData": {
+      "platform": "x",
+      "author": "HYPEX",
+      "handle": "@HYPEX",
+      "authorPfp": "https://pbs.twimg.com/profile_images/1680830035639369730/0BG8cBZa_bigger.jpg",
+      "content": "Fortnite had *14.6M PLAYERS* this week in PlayStation (USA) alone \n\nCompared to:\n• GTA 5 → 5.13M\n• Minecraft → 4.97M\n• Call of Duty → 4.95M\n• Apex Legends → 1.72M\n• Marvel Rivals → 1.58M\n• Battlefield 6 → 1.51M\n• Arc Raiders → 972K\n\n[VIA @mysticryan on YouTube]",
+      "postUrl": "https://x.com/HYPEX/status/2055341697580560551",
+      "images": [
+        "https://pbs.twimg.com/media/HIYKFTjXoAErZHW?format=png&name=360x360",
+        "https://pbs.twimg.com/media/HIYKFw2XEAAmHxp?format=jpg&name=360x360"
+      ],
+      "videos": [],
+      "postedAt": "2026-05-15T17:37:01.000Z",
+      "metrics": {
+        "likes": 10596,
+        "replies": 313,
+        "retweets": 504,
+        "views": 0
+      },
+      "comments": [
+        {
+          "user": "“҉F҉L҉i͟g҉h҉t҉“҉",
+          "pfp": "https://pbs.twimg.com/profile_images/2053158557374124032/VXQ1msim_bigger.jpg",
+          "text": "Bro GTA 6 will break these records and hold it for yrs ..\n\nFortnite motion is top notch too but GTA 6 coming",
+          "timestamp": "2026-05-15T19:31:24.000Z",
+          "engagement": {
+            "likes": 25,
+            "replies": 7,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "CursedAnime",
+          "pfp": "https://pbs.twimg.com/profile_images/2038867922618318849/Q_XA1sZc_bigger.jpg",
+          "text": "that's mind-blowing how gta 5 is still pulling in numbers like this",
+          "timestamp": "2026-05-15T20:31:07.000Z",
+          "engagement": {
+            "likes": 3,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Teewhy",
+          "pfp": "https://pbs.twimg.com/profile_images/1964988137223970816/vQOW5Uhj_bigger.jpg",
+          "text": "That’s it? Fortnite fell off GTA 6 is going to have 50 mill",
+          "timestamp": "2026-05-15T17:41:50.000Z",
+          "engagement": {
+            "likes": 37,
+            "replies": 16,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Jayden",
+          "pfp": "https://pbs.twimg.com/profile_images/1949973782103261185/rO3HZS1D_bigger.png",
+          "text": "and yet they ignore comp fortnite fell off when they started implementing zb to everything",
+          "timestamp": "2026-05-15T20:20:24.000Z",
+          "engagement": {
+            "likes": 1,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "SE Hozaifa",
+          "pfp": "https://pbs.twimg.com/profile_images/2027075636347674624/5XM0DyVu_bigger.jpg",
+          "text": "My TikTok comments told me Fortnite was dead though :/",
+          "timestamp": "2026-05-15T20:20:49.000Z",
+          "engagement": {
+            "likes": 3,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "VICE Vault",
+          "pfp": "https://pbs.twimg.com/profile_images/1984944453182742528/wqggLhm8_bigger.jpg",
+          "text": "When GTA 6 releases it will have 14 mil and 5 for Fortnite",
+          "timestamp": "2026-05-15T20:26:22.000Z",
+          "engagement": {
+            "likes": 1,
+            "replies": 0,
+            "retweets": 0
+          }
+        }
+      ],
+      "commentCount": 6
+    },
+    "timestamp": 1778879027858
+  },
+  {
+    "id": "de6efc19-f3e9-4cd5-83f5-0b64dcbd2766",
+    "analysis": {
+      "hookCTA": {
+        "trigger": "Social Proof / Comparison",
+        "skeleton": "X number of people are doing [thing], compared to [other popular thing].",
+        "pivotA": "14.6M people are playing Fortnite, are you missing out?",
+        "pivotAEngagement": "High Comments",
+        "pivotB": "Fortnite's dominance on PlayStation: Here's how it compares to other top titles.",
+        "pivotBEngagement": "High Shares",
+        "pivotC": "Is Fortnite really still this popular? The numbers don't lie.",
+        "pivotCEngagement": "High Comments",
+        "ctaType": "Question/Intrigue",
+        "ctaTip": "Use a question to prompt engagement and make it about the reader."
+      },
+      "retention": {
+        "segments": [
+          {
+            "text": "In the United States, 14.6M players have played Fortnite in the past week on PlayStation.",
+            "retention": "high"
+          },
+          {
+            "text": "Spotted VIA @MysticRyan On YouTube",
+            "retention": "medium"
+          },
+          {
+            "text": "For comparison, other popular titles on PlayStation include:",
+            "retention": "high"
+          },
+          {
+            "text": "Apex Legends - 1.72M",
+            "retention": "medium"
+          },
+          {
+            "text": "Grand Theft Auto V (PS5 Version) - 5.13M",
+            "retention": "medium"
+          },
+          {
+            "text": "Minecraft - 4.97M",
+            "retention": "medium"
+          },
+          {
+            "text": "Call of Duty - 4.95M",
+            "retention": "medium"
+          },
+          {
+            "text": "Marvel Rivals - 1.58M",
+            "retention": "medium"
+          },
+          {
+            "text": "Battlefield 6 - 1.51M",
+            "retention": "medium"
+          },
+          {
+            "text": "Arc Raiders - 972K",
+            "retention": "low"
+          }
+        ],
+        "seedComments": [
+          "Wow, those Fortnite numbers are insane!",
+          "How do these numbers compare to PC/Xbox?",
+          "Is this growth or decline for Fortnite?"
+        ]
+      },
+      "leadPersona": {
+        "audienceData": [
+          {
+            "label": "Fortnite Players",
+            "value": 0.6,
+            "color": "#FF5733"
+          },
+          {
+            "label": "Gamer Enthusiasts",
+            "value": 0.3,
+            "color": "#3498DB"
+          },
+          {
+            "label": "Industry Analysts",
+            "value": 0.1,
+            "color": "#2ECC71"
+          }
+        ],
+        "highIntentLeads": [
+          {
+            "name": "Jar-Jar Binks",
+            "role": "Fortnite Player",
+            "intent": "Anticipation for future updates",
+            "avatar": "https://pbs.twimg.com/profile_images/1959779939189653504/8Fxmeedd_bigger.jpg"
+          },
+          {
+            "name": "MeowzAttack",
+            "role": "Fortnite Player",
+            "intent": "Defending Fortnite's continued relevance",
+            "avatar": "https://pbs.twimg.com/profile_images/1850461346959085568/H38zn73g_bigger.jpg"
+          }
+        ],
+        "icpAlignment": {
+          "title": "Ideal Customer Profile Alignment",
+          "score": 0.75
+        }
+      },
+      "commentGap": {
+        "gapData": [
+          {
+            "gap": "Accuracy of data",
+            "frequency": 0.4,
+            "strategy": "Provide source links and clarify data collection methods."
+          },
+          {
+            "gap": "Platform comparison",
+            "frequency": 0.3,
+            "strategy": "Include data from other platforms (PC, Xbox) for a broader view."
+          },
+          {
+            "gap": "Reasons for Fortnite's popularity",
+            "frequency": 0.3,
+            "strategy": "Create content exploring the factors driving Fortnite's success and comparing it to competitors."
+          }
+        ],
+        "confusionPoint": {
+          "text": "With how bad the season has been I don’t believe that number at all.",
+          "sentiment": "negative",
+          "insight": "Perceived quality of the current season impacting perceived player count."
+        }
+      },
+      "visualStrategy": {
+        "category": "Data Visualization",
+        "colors": [
+          "Blue",
+          "Green",
+          "Yellow"
+        ],
+        "prompts": {
+          "midjourney": "Data visualization, bar graph, Fortnite player count significantly higher than other games, PlayStation, vibrant colors, clean design",
+          "dalle": "Infographic comparing Fortnite player count on PlayStation to other popular games, clear labels, visually appealing, modern aesthetic"
+        }
+      },
+      "viralVelocity": {
+        "velocityData": {
+          "likesPerHour": 44.45,
+          "trend": "Stable",
+          "peakTime": "Unknown",
+          "accountAvg": 30,
+          "growthPrediction": "Maintain current engagement levels."
+        }
+      },
+      "sentiment": {
+        "sentimentData": {
+          "positive": 0.3,
+          "constructive": 0.2,
+          "neutral": 0.3,
+          "negative": 0.2,
+          "keywords": [
+            "popular",
+            "dead game",
+            "bots",
+            "believe"
+          ],
+          "dominantEmotion": "Interest",
+          "trustScore": "Medium",
+          "sarcasmLevel": "Low",
+          "isControversial": false
+        }
+      },
+      "competitor": {
+        "benchmarkData": {
+          "engagementRate": 6.87,
+          "accountAvg": 2.5,
+          "nicheAvg": 2.5,
+          "isOutlier": true,
+          "botSignal": "Low",
+          "followers": "50K"
+        }
+      }
+    },
+    "postData": {
+      "platform": "x",
+      "author": "FireMonkey",
+      "handle": "@FireMonkey",
+      "authorPfp": "https://pbs.twimg.com/profile_images/1891950260299223040/7_aEHhlm_bigger.jpg",
+      "content": "In the United States, 14.6M players have played Fortnite in the past week on PlayStation.\n\nSpotted VIA \n@MysticRyan\n On YouTube\n\nFor comparison, other popular titles on PlayStation include:\n\nApex Legends - 1.72M\nGrand Theft Auto V (PS5 Version) - 5.13M\nMinecraft - 4.97M\nCall of Duty - 4.95M\nMarvel Rivals - 1.58M\nBattlefield 6 - 1.51M\nArc Raiders - 972K",
+      "postUrl": "https://x.com/FireMonkey/status/2055331573424074972",
+      "images": [
+        "https://pbs.twimg.com/media/HIYAQIRXsAE6Dnj?format=png&name=360x360",
+        "https://pbs.twimg.com/media/HIYAvlVXcAAPKmH?format=jpg&name=360x360",
+        "https://pbs.twimg.com/media/HIYAyPfWYAIH8BD?format=jpg&name=360x360",
+        "https://pbs.twimg.com/media/HIYA2zEWwAAqCEg?format=jpg&name=360x360"
+      ],
+      "videos": [],
+      "postedAt": "2026-05-15T16:56:47.000Z",
+      "metrics": {
+        "likes": 889,
+        "replies": 32,
+        "retweets": 69,
+        "views": 0
+      },
+      "comments": [
+        {
+          "user": "MeowzAttack",
+          "pfp": "https://pbs.twimg.com/profile_images/1850461346959085568/H38zn73g_bigger.jpg",
+          "text": "Right.. and people said dead game.. 🫪",
+          "timestamp": "2026-05-15T20:13:02.000Z",
+          "engagement": {
+            "likes": 4,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Jar-Jar Binks",
+          "pfp": "https://pbs.twimg.com/profile_images/1959779939189653504/8Fxmeedd_bigger.jpg",
+          "text": "The boss is coming this year",
+          "timestamp": "2026-05-15T17:00:09.000Z",
+          "engagement": {
+            "likes": 26,
+            "replies": 3,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Fortnitehater69",
+          "pfp": "https://pbs.twimg.com/profile_images/2025970958557929472/5v4zGpXw_bigger.png",
+          "text": "Half of them gotta be bots",
+          "timestamp": "2026-05-15T17:43:19.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Nate",
+          "pfp": "https://pbs.twimg.com/profile_images/1762039271723077633/puP3jcnX_bigger.jpg",
+          "text": "With how bad the season has been I don’t believe that number at all.",
+          "timestamp": "2026-05-15T17:32:23.000Z",
+          "engagement": {
+            "likes": 1,
+            "replies": 5,
+            "retweets": 0
+          }
+        }
+      ],
+      "commentCount": 4
+    },
+    "timestamp": 1778878283001
+  },
+  {
+    "id": "d3581b38-08f6-48e4-95a2-0eb2167b0960",
+    "analysis": {
+      "hookCTA": {
+        "trigger": "Data Reveal",
+        "skeleton": "Here's a surprising statistic about [TOPIC] on [PLATFORM].",
+        "pivotA": "Fortnite dominates PlayStation! 14.6M players are hooked. Is it still the king of battle royale?",
+        "pivotAEngagement": "High Comments",
+        "pivotB": "PlayStation's most played games revealed! Fortnite leads, but the rest might surprise you...",
+        "pivotBEngagement": "High Shares",
+        "pivotC": "Fortnite isn't dying, it's thriving! See how its PlayStation numbers stack up against Apex, CoD, and more.",
+        "pivotCEngagement": "High Likes",
+        "ctaType": "Comparison",
+        "ctaTip": "Highlight the contrast between Fortnite's popularity and other games. Spark debate and discussion."
+      },
+      "retention": {
+        "segments": [
+          {
+            "text": "In the United States, 14.6M players have played Fortnite in the past week on PlayStation.",
+            "retention": "high"
+          },
+          {
+            "text": "Spotted VIA @MysticRyan On YouTube",
+            "retention": "medium"
+          },
+          {
+            "text": "For comparison, other popular titles on PlayStation include:",
+            "retention": "high"
+          },
+          {
+            "text": "Apex Legends - 1.72M",
+            "retention": "medium"
+          },
+          {
+            "text": "Grand Theft Auto V (PS5 Version) - 5.13M",
+            "retention": "medium"
+          },
+          {
+            "text": "Minecraft - 4.97M",
+            "retention": "medium"
+          },
+          {
+            "text": "Call of Duty - 4.95M",
+            "retention": "medium"
+          },
+          {
+            "text": "Marvel Rivals - 1.58M",
+            "retention": "medium"
+          },
+          {
+            "text": "Battlefield 6 - 1.51M",
+            "retention": "medium"
+          },
+          {
+            "text": "Arc Raiders - 972K",
+            "retention": "low"
+          }
+        ],
+        "seedComments": [
+          "How do these numbers compare to Xbox or PC?",
+          "Is Fortnite's dominance a good or bad thing for the gaming industry?",
+          "What's your favorite game on this list and why?"
+        ]
+      },
+      "leadPersona": {
+        "audienceData": [
+          {
+            "label": "Fortnite Gamers",
+            "value": 60,
+            "color": "blue"
+          },
+          {
+            "label": "PlayStation Enthusiasts",
+            "value": 25,
+            "color": "green"
+          },
+          {
+            "label": "Gaming Industry Observers",
+            "value": 15,
+            "color": "red"
+          }
+        ],
+        "highIntentLeads": [
+          {
+            "name": "Jar-Jar Binks",
+            "role": "Fortnite Player",
+            "intent": "Hyped about upcoming Fortnite content.",
+            "avatar": "https://pbs.twimg.com/profile_images/1959779939189653504/8Fxmeedd_bigger.jpg"
+          },
+          {
+            "name": "MeowzAttack",
+            "role": "Fortnite Defender",
+            "intent": "Countering 'dead game' narratives.",
+            "avatar": "https://pbs.twimg.com/profile_images/1850461346959085568/H38zn73g_bigger.jpg"
+          }
+        ],
+        "icpAlignment": {
+          "title": "Ideal Customer Profile Alignment",
+          "score": 7.5
+        }
+      },
+      "commentGap": {
+        "gapData": [
+          {
+            "gap": "Comparison to other platforms (Xbox, PC)",
+            "frequency": 0.4,
+            "strategy": "Provide data on other platforms to give a more complete picture."
+          },
+          {
+            "gap": "Discussion of bot presence in Fortnite",
+            "frequency": 0.2,
+            "strategy": "Address bot concerns directly with in-game stats or developer statements."
+          },
+          {
+            "gap": "Season quality affecting player numbers",
+            "frequency": 0.3,
+            "strategy": "Gauge sentiment about current seasons and potential improvements."
+          }
+        ],
+        "confusionPoint": {
+          "text": "With how bad the season has been I don’t believe that number at all.",
+          "sentiment": "Negative",
+          "insight": "Players are skeptical of reported numbers due to perceived low quality of the current season."
+        }
+      },
+      "visualStrategy": {
+        "category": "Data Visualization",
+        "colors": [
+          "Blue",
+          "Green",
+          "White"
+        ],
+        "prompts": {
+          "midjourney": "Data visualization, bar graph comparing Fortnite player count to other games, PlayStation theme, clean design, vibrant colors, 3D rendering",
+          "dalle": "Create an image of a futuristic cityscape with game characters from Fortnite, Apex Legends, GTA V, and Minecraft standing tall as skyscrapers. Show data bars overlaid on the buildings, visually representing the player counts. Use a PlayStation color scheme."
+        }
+      },
+      "viralVelocity": {
+        "velocityData": {
+          "likesPerHour": 44.45,
+          "trend": "Stable",
+          "peakTime": "Unknown",
+          "accountAvg": 1.5,
+          "growthPrediction": "Steady engagement with potential for spikes during updates or events."
+        }
+      },
+      "sentiment": {
+        "sentimentData": {
+          "positive": 25,
+          "constructive": 25,
+          "neutral": 25,
+          "negative": 25,
+          "keywords": [
+            "Fortnite",
+            "PlayStation",
+            "Players",
+            "Popular",
+            "Games"
+          ],
+          "dominantEmotion": "Speculation",
+          "trustScore": "Moderate",
+          "sarcasmLevel": "Low",
+          "isControversial": true
+        }
+      },
+      "competitor": {
+        "benchmarkData": {
+          "engagementRate": 0.06,
+          "accountAvg": 2,
+          "nicheAvg": 2.5,
+          "isOutlier": false,
+          "botSignal": "Low",
+          "followers": "10K+"
+        }
+      }
+    },
+    "postData": {
+      "platform": "x",
+      "author": "FireMonkey",
+      "handle": "@FireMonkey",
+      "authorPfp": "https://pbs.twimg.com/profile_images/1891950260299223040/7_aEHhlm_bigger.jpg",
+      "content": "In the United States, 14.6M players have played Fortnite in the past week on PlayStation.\n\nSpotted VIA \n@MysticRyan\n On YouTube\n\nFor comparison, other popular titles on PlayStation include:\n\nApex Legends - 1.72M\nGrand Theft Auto V (PS5 Version) - 5.13M\nMinecraft - 4.97M\nCall of Duty - 4.95M\nMarvel Rivals - 1.58M\nBattlefield 6 - 1.51M\nArc Raiders - 972K",
+      "postUrl": "https://x.com/FireMonkey/status/2055331573424074972",
+      "images": [
+        "https://pbs.twimg.com/media/HIYAQIRXsAE6Dnj?format=png&name=360x360",
+        "https://pbs.twimg.com/media/HIYAvlVXcAAPKmH?format=jpg&name=360x360",
+        "https://pbs.twimg.com/media/HIYAyPfWYAIH8BD?format=jpg&name=360x360",
+        "https://pbs.twimg.com/media/HIYA2zEWwAAqCEg?format=jpg&name=360x360"
+      ],
+      "videos": [],
+      "postedAt": "2026-05-15T16:56:47.000Z",
+      "metrics": {
+        "likes": 889,
+        "replies": 32,
+        "retweets": 69,
+        "views": 0
+      },
+      "comments": [
+        {
+          "user": "MeowzAttack",
+          "pfp": "https://pbs.twimg.com/profile_images/1850461346959085568/H38zn73g_bigger.jpg",
+          "text": "Right.. and people said dead game.. 🫪",
+          "timestamp": "2026-05-15T20:13:02.000Z",
+          "engagement": {
+            "likes": 4,
+            "replies": 0,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Jar-Jar Binks",
+          "pfp": "https://pbs.twimg.com/profile_images/1959779939189653504/8Fxmeedd_bigger.jpg",
+          "text": "The boss is coming this year",
+          "timestamp": "2026-05-15T17:00:09.000Z",
+          "engagement": {
+            "likes": 26,
+            "replies": 3,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Fortnitehater69",
+          "pfp": "https://pbs.twimg.com/profile_images/2025970958557929472/5v4zGpXw_bigger.png",
+          "text": "Half of them gotta be bots",
+          "timestamp": "2026-05-15T17:43:19.000Z",
+          "engagement": {
+            "likes": 0,
+            "replies": 1,
+            "retweets": 0
+          }
+        },
+        {
+          "user": "Nate",
+          "pfp": "https://pbs.twimg.com/profile_images/1762039271723077633/puP3jcnX_bigger.jpg",
+          "text": "With how bad the season has been I don’t believe that number at all.",
+          "timestamp": "2026-05-15T17:32:23.000Z",
+          "engagement": {
+            "likes": 1,
+            "replies": 5,
+            "retweets": 0
+          }
+        }
+      ],
+      "commentCount": 4
+    },
+    "timestamp": 1778878155153
+  },
+  {
     "id": "e678718d-c1fc-4be6-b8c1-698cb0539e4c",
     "analysis": {
       "hookCTA": {

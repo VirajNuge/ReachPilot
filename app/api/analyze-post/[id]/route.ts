@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import { getPostAnalysisHistoryByAnalysisId } from "../../../../lib/models/postAnalyzerHistory";
+import { getAuthFromRequest } from "../../../../lib/auth";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -41,6 +43,27 @@ export async function GET(
     const matchedAnalysis = cacheArray.find((item: any) => item.id === id);
 
     if (!matchedAnalysis) {
+      const auth = await getAuthFromRequest(request as any);
+      const accountId = new URL(request.url).searchParams.get("accountId") || undefined;
+      if (auth?.userId && accountId) {
+        const historyRecord = await getPostAnalysisHistoryByAnalysisId(auth.userId, accountId, id);
+        if (historyRecord) {
+          return NextResponse.json(
+            {
+              success: true,
+              data: {
+                id: historyRecord.analysisId,
+                analysis: historyRecord.analysisData?.analysis || historyRecord.analysis,
+                postData: historyRecord.analysisData?.postData || historyRecord.postData,
+                timestamp: historyRecord.analysisData?.timestamp || historyRecord.createdAt.toISOString(),
+                historyId: historyRecord._id?.toHexString?.(),
+              },
+            },
+            { headers: corsHeaders },
+          );
+        }
+      }
+
       return NextResponse.json(
         { error: "Analysis not found." },
         { status: 404, headers: corsHeaders },

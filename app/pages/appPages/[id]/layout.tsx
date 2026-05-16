@@ -31,42 +31,32 @@ export default function DashboardLayout({
   const title = getTitle(pathname);
   const { user, loading } = useAuth();
 
+  // Redirect when auth resolves with no user — shell stays visible
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
     }
   }, [loading, user, router]);
 
-  // Show loading spinner while checking auth
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-[#E8ECF2]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-[#0052FF] border-t-transparent rounded-full animate-spin" />
-          <span className="text-slate-400 text-sm font-medium">Loading...</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Redirect to login if not authenticated
-  if (!user) {
-    return null;
-  }
-
+  // Render shell immediately — no blank-screen spinner
   return (
     <div className="flex h-screen w-full bg-[#E8ECF2]">
-      {/* Sidebar - Fixed width, full height */}
       <Sidebar />
-
-      {/* Main Content Wrapper */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-hidden">
-        {/* TopMenu - Pinned to the top of this container */}
         <TopMenu pageName={title} />
-
-        {/* Scrollable Content Area — transparent so cards float on shell bg */}
         <main className="flex-1 overflow-y-auto [scrollbar-width:none] w-full">
-          {children}
+          {loading && !user ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-10 h-10 border-4 border-[#0052FF] border-t-transparent rounded-full animate-spin" />
+                <span className="text-slate-400 text-sm font-medium">
+                  Loading...
+                </span>
+              </div>
+            </div>
+          ) : (
+            children
+          )}
         </main>
       </div>
     </div>

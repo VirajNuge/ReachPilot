@@ -1,7 +1,9 @@
 // ============================================================
 // ReachPilot — AI Prompt Builders for Post Generation Pipeline
 // 3 Stages: Content Strategist → Caption Generator → Image Prompt
+// SERVER ONLY — never import this from a client component
 // ============================================================
+import "server-only";
 
 import type {
   PostGenerationInput,

@@ -9,7 +9,7 @@ interface UseAnalysisResult {
   refetch: () => Promise<void>;
 }
 
-export function useAnalysisData(initialData?: any): UseAnalysisResult {
+export function useAnalysisData(initialData?: any, historyId?: string): UseAnalysisResult {
   const [data, setData] = useState<RawAnalysisData | null>(initialData || null);
   const [platform, setPlatform] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(!initialData);
@@ -19,6 +19,22 @@ export function useAnalysisData(initialData?: any): UseAnalysisResult {
     setLoading(true);
     setError(null);
     try {
+      if (historyId) {
+        const res = await fetch(`/api/analyze/${historyId}`);
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          setError(body.error || "Failed to load history analysis");
+          return;
+        }
+        const body = await res.json();
+        if (body.success && body.analysis) {
+          setData(body.analysis);
+          return;
+        }
+        setError(body.error || "Failed to load history analysis");
+        return;
+      }
+
       // The GET endpoint returns the cached analysis written by the extension.
       // It always responds with a complete JSON body (not a stream), so we use
       // response.json() here. The POST /api/analyze endpoint uses streaming but
@@ -59,7 +75,7 @@ export function useAnalysisData(initialData?: any): UseAnalysisResult {
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [historyId]);
 
   return { data, platform, loading, error, refetch: fetchData };
 }

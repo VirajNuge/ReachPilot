@@ -117,8 +117,8 @@ export default function OverviewDashboard({ overview, history, postEvents, bestP
       </section>
 
       {/* New: Cross-platform chart + Best posts list */}
-      <section className="grid gap-6 lg:grid-cols-5">
-        <div className="lg:col-span-2 rounded-[28px] border border-slate-100 bg-white p-6 shadow-[0_4px_24px_rgba(0,0,0,0.05)]">
+      <section className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
+        <div className="min-w-0 rounded-[28px] border border-slate-100 bg-white p-6 shadow-[0_4px_24px_rgba(0,0,0,0.05)]">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Overview trends</div>
@@ -136,7 +136,7 @@ export default function OverviewDashboard({ overview, history, postEvents, bestP
           </div>
         </div>
 
-        <div className="lg:col-span-2 rounded-[28px] border border-slate-100 bg-white p-4 shadow-[0_4px_24px_rgba(0,0,0,0.05)]">
+        <div className="min-w-0 rounded-[28px] border border-slate-100 bg-white p-4 shadow-[0_4px_24px_rgba(0,0,0,0.05)]">
           <div className="mb-3 flex items-center justify-between gap-4 px-2 pt-2">
             <div>
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Best posts (30d)</div>

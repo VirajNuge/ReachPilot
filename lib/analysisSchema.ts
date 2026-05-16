@@ -1,4 +1,4 @@
-// Shared Gemini analysis schema — used by both /api/analyze and /api/analyze-extension
+import "server-only";
 import { SchemaType, Schema } from "@google/generative-ai";
 
 // 1. CORE SCHEMA: Profile, content basics, and pillars

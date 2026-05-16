@@ -1,555 +1,583 @@
 {
   "analysis": {
     "profile": {
-      "name": "Karthik",
-      "headline": "Jacked Engineer Tweeting Tech",
-      "followers": 12700,
-      "projects": "prev ai/software engineer intern @ startups x2",
-      "profileScore": 68.5,
-      "bio": "23, jacked Engineer. prev ai/software engineer intern @ startups x2",
-      "pfp": "https://pbs.twimg.com/profile_images/1983037272665587712/wpipC69n_200x200.jpg",
-      "banner": "https://pbs.twimg.com/profile_banners/1884617498194288640/1761627907/1080x360",
-      "followingCount": 596
+      "name": "HYPEX",
+      "headline": "Fortnite Leaks & News Expert",
+      "followers": 4200000,
+      "projects": "Creator Code: HYPEX",
+      "profileScore": 78,
+      "bio": "All Latest Fortnite Leaks & News | Creator Code: HYPEX | Epic Games Partner\n\n24  | downtobusinesshypex@gmail.com | Alt \n@itsRealHYPEX",
+      "pfp": "https://pbs.twimg.com/profile_images/1680830035639369730/0BG8cBZa_200x200.jpg",
+      "banner": "https://pbs.twimg.com/profile_banners/2210485170/1689576157/1080x360",
+      "followingCount": 918
     },
     "quickFixes": [
       {
-        "headline": "Run Polls on Tech Choices",
-        "description": "Polling performs well; adding polls could increase engagement by 15%.",
+        "headline": "Run more polls",
+        "description": "Polls can significantly increase engagement by prompting direct interaction, potentially adding 500+ engagements per poll.",
         "tag": "HIGH IMPACT"
       },
       {
-        "headline": "Leverage Trending Tech News",
-        "description": "Capitalize on trending news by commenting to boost visibility by 20%.",
+        "headline": "Consolidate Posting Times",
+        "description": "Focusing posts around the peak hours of 2-3 PM & 7-9 PM could improve visibility and engagement, adding potentially 10% more engagement.",
         "tag": "HIGH IMPACT"
       },
       {
-        "headline": "More Original Image/Video Content",
-        "description": "Creating unique visual content could increase retweets by 25%.",
+        "headline": "Leverage platform trends",
+        "description": "Jump on trending topics within Fortnite, which can increase visibility and attract new followers, potentially adding 100+ followers a month.",
+        "tag": "HIGH IMPACT"
+      },
+      {
+        "headline": "Add questions to hooks",
+        "description": "Asking questions in the hook of posts can grab attention, resulting in more replies and higher overall engagement, potentially adding 200 engagements.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Ask More Specific Tech Questions",
-        "description": "Refining questions can help boost relevant replies by 10%.",
+        "headline": "Shorten post copy",
+        "description": "Reduce the amount of text to be more concise, thereby immediately capturing the audience's attention and potentially increasing click-through rates by 5%.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Use Consistent Brand Colors",
-        "description": "Applying consistent branding improves profile recognition by 5%.",
+        "headline": "Use rich media",
+        "description": "Use more visuals (images and videos) which will likely increase engagement, potentially adding 500+ likes per mixed media post.",
         "tag": "MEDIUM IMPACT"
       },
       {
-        "headline": "Add Humor to Tech Takes",
-        "description": "Injecting humor makes content more shareable, boosting visibility by 8%.",
+        "headline": "Engage with comments",
+        "description": "Replying to comments can foster a stronger community and increase loyalty, potentially boosting engagement by 15%.",
         "tag": "LOW IMPACT"
       },
       {
-        "headline": "Engage More With Commenters",
-        "description": "Replying to comments could build community and increase engagement by 7%.",
+        "headline": "Use relevant hashtags",
+        "description": "Using trending hashtags can increase post visibility, potentially drawing in new followers and increasing engagement by 5%.",
         "tag": "LOW IMPACT"
       },
       {
-        "headline": "Post Short Tech Opinion Threads",
-        "description": "Breaking insights into threads makes them digestible and increases engagement by 6%.",
+        "headline": "Optimize bio keywords",
+        "description": "Adding more relevant keywords to the bio can enhance searchability, which could increase profile visits by 10%.",
         "tag": "LOW IMPACT"
       },
       {
-        "headline": "Join Tech Twitter Spaces",
-        "description": "Participating in Twitter Spaces expands reach and builds authority by 4%.",
-        "tag": "LOW IMPACT"
-      },
-      {
-        "headline": "Promote a Free Tech Template",
-        "description": "Offering a free resource generates leads and boosts engagement by 3%.",
+        "headline": "Promote creator code",
+        "description": "Reminding followers to use the creator code can drive more support, potentially adding 5% more revenue.",
         "tag": "LOW IMPACT"
       }
     ],
     "bioAnalysis": {
-      "clarityScore": 7,
-      "keywordScore": 6,
-      "tone": "Informal, conversational, tech-focused.",
+      "clarityScore": 8,
+      "keywordScore": 9,
+      "tone": "Informative and timely",
       "strengths": [
-        "Relatable tech humor",
-        "Strong opinions on tech products",
-        "Consistent posting",
-        "Mix of text and media content"
+        "Provides latest Fortnite leaks and news",
+        "Uses a creator code for support",
+        "Strong focus on updates and announcements",
+        "Clear call to action to support with creator code"
       ],
       "weaknesses": [
-        "Inconsistent engagement",
-        "Lacks clear call to action",
-        "Limited originality in media content",
-        "No community engagement"
+        "Lacks personal engagement or behind-the-scenes content",
+        "Limited use of interactive content like polls or questions",
+        "Could benefit from more diverse content formats",
+        "Relies heavily on external links"
       ],
       "suggestions": [
-        "Increase original content creation",
-        "Engage directly with audience through comments",
-        "Add lead magnet to bio",
-        "Consistently use relevant hashtags"
+        "Incorporate more personal updates to humanize the brand",
+        "Add interactive polls to engage followers",
+        "Diversify content with guides, tips, and community highlights",
+        "Create exclusive content for those who use the creator code"
       ]
     },
     "keywords": {
       "current": [
-        "coding",
-        "Windows",
-        "browser",
-        "software engineer",
-        "tech",
-        "Microsoft",
-        "Apple",
-        "YouTube",
-        "LinkedIn",
-        "languages"
+        "Fortnite",
+        "Leaks",
+        "News",
+        "Code",
+        "Item Shop",
+        "Cosmetics",
+        "Epic Games",
+        "Update",
+        "Emote",
+        "Bundle",
+        "Creator",
+        "Season"
       ],
       "missing": [
-        "AI",
-        "startups",
-        "cloud computing",
-        "data science",
-        "cybersecurity",
-        "machine learning",
-        "web development",
-        "UI/UX"
+        "Gameplay",
+        "Tips",
+        "Challenges",
+        "Community",
+        "Skins",
+        "Tournaments",
+        "Metaverse",
+        "Gaming",
+        "Zero Build",
+        "Live Event"
       ]
     },
     "textAnalysis": {
-      "frequency": "Posts 3.4 times/day, aligning well with optimal frequency.",
-      "contentMix": "Favors text-based content (63%) but integrates mixed media in 37% of posts.",
-      "engagement": "Inconsistent engagement, suggesting room for improvement in hook strength."
+      "frequency": "Frequent Posting (7 posts/day)",
+      "contentMix": "Primarily Text with Mixed Media elements",
+      "engagement": "High Like Rate, Low Comment Volume"
     },
     "contentMetrics": {
       "frequencyScore": 85,
-      "contentMixScore": 70,
-      "engagementScore": 45
+      "contentMixScore": 65,
+      "engagementScore": 70
     },
     "pulseHeartbeat": [
       {
         "day": "Mon",
-        "activityScore": 65,
-        "postsCount": 4,
-        "peakHour": "11:00 PM",
+        "activityScore": 45,
+        "postsCount": 0,
+        "peakHour": "N/A",
         "trend": "Flat"
       },
       {
         "day": "Tue",
-        "activityScore": 70,
-        "postsCount": 5,
-        "peakHour": "9:09 PM",
+        "activityScore": 45,
+        "postsCount": 0,
+        "peakHour": "N/A",
         "trend": "Flat"
       },
       {
         "day": "Wed",
-        "activityScore": 68,
-        "postsCount": 4,
-        "peakHour": "11:01 PM",
+        "activityScore": 45,
+        "postsCount": 0,
+        "peakHour": "N/A",
         "trend": "Flat"
       },
       {
         "day": "Thu",
-        "activityScore": 72,
-        "postsCount": 5,
-        "peakHour": "11:01 PM",
-        "trend": "Flat"
+        "activityScore": 95,
+        "postsCount": 11,
+        "peakHour": "2 PM",
+        "trend": "Rising"
       },
       {
         "day": "Fri",
-        "activityScore": 67,
-        "postsCount": 3,
-        "peakHour": "11:01 PM",
+        "activityScore": 65,
+        "postsCount": 2,
+        "peakHour": "11 PM",
         "trend": "Flat"
       },
       {
         "day": "Sat",
-        "activityScore": 75,
-        "postsCount": 4,
-        "peakHour": "11:01 PM",
-        "trend": "Flat"
+        "activityScore": 50,
+        "postsCount": 1,
+        "peakHour": "1 AM",
+        "trend": "Dropping"
       },
       {
         "day": "Sun",
-        "activityScore": 23,
-        "postsCount": 1,
-        "peakHour": "7:01 PM",
-        "trend": "Dropping"
+        "activityScore": 45,
+        "postsCount": 0,
+        "peakHour": "N/A",
+        "trend": "Flat"
       }
     ],
     "schedule": [
       {
-        "day": "MONDAY",
+        "day": "Monday",
         "slots": [
           {
-            "id": "6AM-9AM",
-            "label": "Morning",
+            "id": "mon_6am",
+            "label": "6 AM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "mon_12pm",
+            "label": "12 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "mon_6pm",
+            "label": "6 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "mon_9pm",
+            "label": "9 PM",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "Tuesday",
+        "slots": [
+          {
+            "id": "tue_6am",
+            "label": "6 AM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "tue_12pm",
+            "label": "12 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "tue_6pm",
+            "label": "6 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "tue_9pm",
+            "label": "9 PM",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "Wednesday",
+        "slots": [
+          {
+            "id": "wed_6am",
+            "label": "6 AM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "wed_12pm",
+            "label": "12 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "wed_6pm",
+            "label": "6 PM",
+            "value": 10,
+            "engagement": "Low"
+          },
+          {
+            "id": "wed_9pm",
+            "label": "9 PM",
+            "value": 10,
+            "engagement": "Low"
+          }
+        ]
+      },
+      {
+        "day": "Thursday",
+        "slots": [
+          {
+            "id": "thu_6am",
+            "label": "6 AM",
             "value": 20,
             "engagement": "Low"
           },
           {
-            "id": "9AM-12PM",
-            "label": "Late Morning",
+            "id": "thu_12pm",
+            "label": "12 PM",
+            "value": 30,
+            "engagement": "Medium"
+          },
+          {
+            "id": "thu_6pm",
+            "label": "6 PM",
+            "value": 90,
+            "engagement": "High"
+          },
+          {
+            "id": "thu_9pm",
+            "label": "9 PM",
+            "value": 90,
+            "engagement": "High"
+          }
+        ]
+      },
+      {
+        "day": "Friday",
+        "slots": [
+          {
+            "id": "fri_6am",
+            "label": "6 AM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "fri_12pm",
+            "label": "12 PM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "fri_6pm",
+            "label": "6 PM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "fri_9pm",
+            "label": "9 PM",
+            "value": 80,
+            "engagement": "High"
+          }
+        ]
+      },
+      {
+        "day": "Saturday",
+        "slots": [
+          {
+            "id": "sat_6am",
+            "label": "6 AM",
             "value": 60,
             "engagement": "Medium"
           },
           {
-            "id": "12PM-3PM",
-            "label": "Afternoon",
-            "value": 65,
-            "engagement": "Medium"
+            "id": "sat_12pm",
+            "label": "12 PM",
+            "value": 20,
+            "engagement": "Low"
           },
           {
-            "id": "3PM-6PM",
-            "label": "Late Afternoon",
-            "value": 75,
-            "engagement": "Medium"
+            "id": "sat_6pm",
+            "label": "6 PM",
+            "value": 20,
+            "engagement": "Low"
+          },
+          {
+            "id": "sat_9pm",
+            "label": "9 PM",
+            "value": 20,
+            "engagement": "Low"
           }
         ]
       },
       {
-        "day": "TUESDAY",
+        "day": "Sunday",
         "slots": [
           {
-            "id": "6AM-9AM",
-            "label": "Morning",
-            "value": 20,
+            "id": "sun_6am",
+            "label": "6 AM",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "9AM-12PM",
-            "label": "Late Morning",
-            "value": 70,
-            "engagement": "Medium"
-          },
-          {
-            "id": "12PM-3PM",
-            "label": "Afternoon",
-            "value": 75,
-            "engagement": "Medium"
-          },
-          {
-            "id": "3PM-6PM",
-            "label": "Late Afternoon",
-            "value": 80,
-            "engagement": "High"
-          }
-        ]
-      },
-      {
-        "day": "WEDNESDAY",
-        "slots": [
-          {
-            "id": "6AM-9AM",
-            "label": "Morning",
-            "value": 20,
+            "id": "sun_12pm",
+            "label": "12 PM",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "9AM-12PM",
-            "label": "Late Morning",
-            "value": 20,
+            "id": "sun_6pm",
+            "label": "6 PM",
+            "value": 10,
             "engagement": "Low"
           },
           {
-            "id": "12PM-3PM",
-            "label": "Afternoon",
-            "value": 75,
-            "engagement": "Medium"
-          },
-          {
-            "id": "3PM-6PM",
-            "label": "Late Afternoon",
-            "value": 80,
-            "engagement": "High"
-          }
-        ]
-      },
-      {
-        "day": "THURSDAY",
-        "slots": [
-          {
-            "id": "6AM-9AM",
-            "label": "Morning",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "9AM-12PM",
-            "label": "Late Morning",
-            "value": 70,
-            "engagement": "Medium"
-          },
-          {
-            "id": "12PM-3PM",
-            "label": "Afternoon",
-            "value": 75,
-            "engagement": "Medium"
-          },
-          {
-            "id": "3PM-6PM",
-            "label": "Late Afternoon",
-            "value": 80,
-            "engagement": "High"
-          }
-        ]
-      },
-      {
-        "day": "FRIDAY",
-        "slots": [
-          {
-            "id": "6AM-9AM",
-            "label": "Morning",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "9AM-12PM",
-            "label": "Late Morning",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "12PM-3PM",
-            "label": "Afternoon",
-            "value": 75,
-            "engagement": "Medium"
-          },
-          {
-            "id": "3PM-6PM",
-            "label": "Late Afternoon",
-            "value": 80,
-            "engagement": "High"
-          }
-        ]
-      },
-      {
-        "day": "SATURDAY",
-        "slots": [
-          {
-            "id": "6AM-9AM",
-            "label": "Morning",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "9AM-12PM",
-            "label": "Late Morning",
-            "value": 70,
-            "engagement": "Medium"
-          },
-          {
-            "id": "12PM-3PM",
-            "label": "Afternoon",
-            "value": 75,
-            "engagement": "Medium"
-          },
-          {
-            "id": "3PM-6PM",
-            "label": "Late Afternoon",
-            "value": 80,
-            "engagement": "High"
-          }
-        ]
-      },
-      {
-        "day": "SUNDAY",
-        "slots": [
-          {
-            "id": "6AM-9AM",
-            "label": "Morning",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "9AM-12PM",
-            "label": "Late Morning",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "12PM-3PM",
-            "label": "Afternoon",
-            "value": 20,
-            "engagement": "Low"
-          },
-          {
-            "id": "3PM-6PM",
-            "label": "Late Afternoon",
-            "value": 20,
+            "id": "sun_9pm",
+            "label": "9 PM",
+            "value": 10,
             "engagement": "Low"
           }
         ]
       }
     ],
-    "scheduleHighlight": "Post consistently in the late afternoon (3PM-6PM) for the best engagement.",
-    "csiScore": 55,
+    "scheduleHighlight": "Best posting times are Thursday between 2 PM and 9 PM, and Friday at 11 PM.",
+    "csiScore": 68,
     "contentPillars": [
       {
-        "name": "Tech Commentary",
-        "percentage": 0.3,
-        "count": 8,
-        "avgEngagement": "Medium",
-        "description": "Posts that offer observations and opinions on tech products and industry trends.",
+        "name": "Fortnite News & Leaks",
+        "percentage": 0.5,
+        "count": 7,
+        "avgEngagement": "High",
+        "description": "Covers the latest news, leaks, and updates regarding Fortnite.",
         "topPosts": [
           {
             "id": "2",
             "type": "Text",
             "engagementRate": "High",
-            "captionSnippet": "Asks which is best for coding: MacBook or Windows Laptop.",
+            "captionSnippet": "Reports on Fortnite's player statistics compared to other popular games.",
             "thumbnail": ""
           },
           {
-            "id": "15",
+            "id": "9",
             "type": "Text",
-            "engagementRate": "Medium",
-            "captionSnippet": "Notes Microsoft Edge is most used browser for downloading Google Chrome.",
+            "engagementRate": "High",
+            "captionSnippet": "Announces fixes and changes to Fortnite, such as the Danny Phantom update.",
             "thumbnail": ""
           }
         ],
         "color": "#8b5cf6"
       },
       {
-        "name": "Coding Culture",
-        "percentage": 0.25,
-        "count": 7,
-        "avgEngagement": "Medium",
-        "description": "Relatable content about the life and struggles of a software engineer.",
-        "topPosts": [
-          {
-            "id": "25",
-            "type": "Text",
-            "engagementRate": "Very High",
-            "captionSnippet": "Asks how to reach a high level of intelligence, relatable to programmers.",
-            "thumbnail": ""
-          },
-          {
-            "id": "24",
-            "type": "Text",
-            "engagementRate": "Medium",
-            "captionSnippet": "Simple statement: \"deleted LinkedIn\".",
-            "thumbnail": ""
-          }
-        ],
-        "color": "#3b82f6"
-      },
-      {
-        "name": "Nostalgic Tech",
-        "percentage": 0.2,
+        "name": "Item Shop & Cosmetics",
+        "percentage": 0.36,
         "count": 5,
         "avgEngagement": "Medium",
-        "description": "Content that evokes nostalgia for past tech, e.g., Windows 3.1.",
+        "description": "Focuses on new items, cosmetics, and bundles available in the Fortnite Item Shop.",
         "topPosts": [
           {
-            "id": "5",
+            "id": "12",
             "type": "Mixed Media",
             "engagementRate": "Medium",
-            "captionSnippet": "Demonstrates how to start Windows 3.1 in 1994.",
+            "captionSnippet": "Showcases the Toony Tabby's Emote.",
             "thumbnail": "Image/Video"
           },
           {
-            "id": "22",
-            "type": "Text",
+            "id": "13",
+            "type": "Mixed Media",
             "engagementRate": "Medium",
-            "captionSnippet": "Details the evolution of programming languages from 1940s to 2026.",
-            "thumbnail": ""
+            "captionSnippet": "Highlights all cosmetics added today to Fortnite.",
+            "thumbnail": "Image/Video"
           }
         ],
         "color": "#10b981"
       },
       {
-        "name": "Visual Humor",
-        "percentage": 0.25,
-        "count": 7,
+        "name": "Promotions & Collaborations",
+        "percentage": 0.14,
+        "count": 2,
         "avgEngagement": "Low",
-        "description": "Funny images/videos related to tech or coding.",
+        "description": "Details collaborations, promotions, and special events in Fortnite.",
         "topPosts": [
           {
-            "id": "6",
-            "type": "Mixed Media",
+            "id": "7",
+            "type": "Text",
             "engagementRate": "Low",
-            "captionSnippet": "Humorous take on math, enhanced with a video.",
-            "thumbnail": "Image/Video"
+            "captionSnippet": "Announces the LEGO Batman x Fortnite collaboration.",
+            "thumbnail": ""
           },
           {
-            "id": "16",
-            "type": "Mixed Media",
+            "id": "5",
+            "type": "Text",
             "engagementRate": "Low",
-            "captionSnippet": "Depicts the struggle of finding a YouTube video while eating.",
-            "thumbnail": "Image/Video"
+            "captionSnippet": "Informs about the release of Adam Smasher and how to obtain him.",
+            "thumbnail": ""
           }
         ],
         "color": "#f59e0b"
       }
     ],
-    "pillarInsight": "Double down on coding culture and tech commentary; they drive more engagement than visual humor.",
+    "pillarInsight": "Increase Mixed Media posts, as they tend to get more engagement than text-only posts. Expand coverage of promotions and collaborations.",
     "postDNA": [
       {
-        "hookType": "Comparative Question",
+        "hookType": "Direct Question",
+        "format": "Text",
+        "topic": "Season Tier List",
+        "verdict": "Performed relatively well, but not exceptional. It engaged the audience directly but lacked visual appeal."
+      },
+      {
+        "hookType": "Statistical Highlight",
+        "format": "Text",
+        "topic": "Player Statistics",
+        "verdict": "High-performing post. Presenting data effectively grabbed attention and generated discussion."
+      },
+      {
+        "hookType": "Announcement",
         "format": "Mixed Media",
-        "topic": "Mobile Phones",
-        "verdict": "Started strong, but needs more specific hooks to increase engagement"
+        "topic": "Overwatch TikTok",
+        "verdict": "Mixed Media approach was engaging but the topic might have been too specific for broad appeal."
       },
       {
-        "hookType": "Open-Ended Question",
+        "hookType": "Direct Update",
         "format": "Text",
-        "topic": "Coding",
-        "verdict": "Highly successful, proving conversational tone resonates"
+        "topic": "Adam Smasher Release",
+        "verdict": "Performed poorly due to lack of visual engagement."
       },
       {
-        "hookType": "Comparative Question",
+        "hookType": "Announcement",
         "format": "Text",
-        "topic": "Coding",
-        "verdict": "Good, showing interest in coding setups"
+        "topic": "Cash Cup Announcement",
+        "verdict": "Low Engagement. May be of limited interest to the wider audience."
       },
       {
-        "hookType": "Humorous Question",
+        "hookType": "Announcement",
         "format": "Text",
-        "topic": "Corporate Culture",
-        "verdict": "Moderate, the humor can be hit or miss"
+        "topic": "LEGO Batman Collaboration",
+        "verdict": "Low Engagement. This post's audience is not as interested as item shop and gameplay updates."
       },
       {
-        "hookType": "Nostalgic Showcase",
+        "hookType": "Free Offer",
+        "format": "Text",
+        "topic": "Free Horizon Wrap",
+        "verdict": "Low Engagement. These type of posts do not seem to attract significant views."
+      },
+      {
+        "hookType": "Update Fix",
+        "format": "Text",
+        "topic": "Danny Phantom Fix",
+        "verdict": "High Engagement. Update information tends to generate views."
+      },
+      {
+        "hookType": "Emote Showcase",
         "format": "Mixed Media",
-        "topic": "Old Tech",
-        "verdict": "Good, evoking past memories"
+        "topic": "Kenan Yildiz Emote",
+        "verdict": "This post type is engaging, particularly if the item is of interest."
+      },
+      {
+        "hookType": "Item Shop Update",
+        "format": "Text",
+        "topic": "Overwatch Bundle",
+        "verdict": "These post types do not attract engagement. Could use Mixed Media in the future."
+      },
+      {
+        "hookType": "Emote Showcase",
+        "format": "Mixed Media",
+        "topic": "Toony Tabby Emote",
+        "verdict": "These mixed media posts do attract high engagement"
+      },
+      {
+        "hookType": "Item Shop Update",
+        "format": "Mixed Media",
+        "topic": "All Cosmetics Added",
+        "verdict": "Mixed media updates do attract good levels of engagement."
+      },
+      {
+        "hookType": "Emote Showcase",
+        "format": "Mixed Media",
+        "topic": "Nurse Hikari Emote",
+        "verdict": "Another good example of an emote performing well in Mixed Media format."
       }
     ],
     "engagementVitals": {
       "engagementRate": 0,
       "benchmarkRate": 1.5,
       "reachEfficiency": 0,
-      "conversationDensity": 29,
+      "conversationDensity": 0,
       "amplificationPower": 0,
       "status": "Critical",
-      "insight": "Engagement rate is critically low because total views are missing; focus on increasing visibility with stronger hooks."
+      "insight": "Engagement is low due to a lack of view data; implementing strategies to increase views is crucial."
     },
     "velocity": {
-      "hookRate": 2.5,
-      "category": "Pulse",
+      "hookRate": 65,
+      "category": "Momentum",
       "velocityGraph": [
         {
           "hour": "1h",
-          "engagement": 5
+          "engagement": 20
         },
         {
           "hour": "2h",
-          "engagement": 12
+          "engagement": 35
         },
         {
           "hour": "4h",
-          "engagement": 25
+          "engagement": 55
         },
         {
           "hour": "12h",
-          "engagement": 60
+          "engagement": 85
         },
         {
           "hour": "24h",
           "engagement": 100
         }
       ],
-      "insight": "The hook effectiveness is low, indicating weak initial grabbing power, resulting in mostly a pulse category engagement."
+      "insight": "Strong initial hook creates good momentum in the first 2 hours."
     },
     "psychTriggers": {
       "radarData": [
         {
           "trigger": "Urgency",
-          "score": 10,
+          "score": 20,
           "fullMark": 100
         },
         {
@@ -559,17 +587,17 @@
         },
         {
           "trigger": "Social Proof",
-          "score": 30,
-          "fullMark": 100
-        },
-        {
-          "trigger": "Authority",
           "score": 40,
           "fullMark": 100
         },
         {
+          "trigger": "Authority",
+          "score": 80,
+          "fullMark": 100
+        },
+        {
           "trigger": "FOMO",
-          "score": 20,
+          "score": 30,
           "fullMark": 100
         },
         {
@@ -578,341 +606,343 @@
           "fullMark": 100
         }
       ],
-      "winningTrigger": "Curiosity",
-      "insight": "Curiosity is the strongest trigger, suggesting that questions and teasers effectively engage the audience."
+      "winningTrigger": "Authority",
+      "insight": "Establishing authority as a trusted source of Fortnite news is key to engagement."
     },
     "postFatigue": {
-      "status": "Warning",
-      "fatigueScore": 60,
-      "optimalFrequency": "3x per day",
-      "saturationPoint": 4,
+      "status": "Healthy",
+      "fatigueScore": 35,
+      "optimalFrequency": "5x per day",
+      "saturationPoint": 7,
       "weeklyImpact": [
         {
           "day": "Mon",
-          "posts": 4,
-          "impactScore": 0.9
-        },
-        {
-          "day": "Tue",
-          "posts": 5,
-          "impactScore": 0.8
-        },
-        {
-          "day": "Wed",
-          "posts": 4,
-          "impactScore": 0.75
-        },
-        {
-          "day": "Thu",
-          "posts": 5,
-          "impactScore": 0.85
-        },
-        {
-          "day": "Fri",
-          "posts": 3,
-          "impactScore": 1
-        },
-        {
-          "day": "Sat",
-          "posts": 5,
+          "posts": 2,
           "impactScore": 1.1
         },
         {
-          "day": "Sun",
+          "day": "Tue",
+          "posts": 2,
+          "impactScore": 1.2
+        },
+        {
+          "day": "Wed",
+          "posts": 2,
+          "impactScore": 1.1
+        },
+        {
+          "day": "Thu",
+          "posts": 6,
+          "impactScore": 1.3
+        },
+        {
+          "day": "Fri",
+          "posts": 2,
+          "impactScore": 0.9
+        },
+        {
+          "day": "Sat",
           "posts": 1,
-          "impactScore": 0.6
+          "impactScore": 0.8
+        },
+        {
+          "day": "Sun",
+          "posts": 0,
+          "impactScore": 0.7
         }
       ]
     },
     "viralRecipe": [
       {
         "id": "outlier-1",
-        "engagementMultiplier": "21.86x",
-        "hookType": "Curiosity Loop",
-        "hookText": "how to reach his level of intelligence ?",
+        "engagementMultiplier": "9.2x",
+        "hookType": "Data-Backed",
+        "hookText": "Fortnite had *14.6M PLAYERS* this week in PlayStation (USA) alone",
         "ingredients": [
           {
-            "name": "Relatability",
-            "value": "Targets a universal desire for self-improvement.",
+            "name": "Data Visualization",
+            "value": "Comparative statistics",
             "score": 9
           },
           {
-            "name": "Open-Ended Question",
-            "value": "Invites audience participation and personal anecdotes.",
+            "name": "Authority Signal",
+            "value": "Via @mysticryan",
             "score": 8
           },
           {
-            "name": "Humor",
-            "value": "Subtle comedic tone makes the content shareable.",
+            "name": "Formatting",
+            "value": "Bolded key numbers",
             "score": 7
           }
         ],
-        "whyItWorked": "Capitalizes on a common aspiration, triggering a desire for knowledge and connection with others sharing the same goal.",
+        "whyItWorked": "Provides quantifiable evidence of Fortnite's dominance, appealing to a data-driven audience.",
         "templateStructure": [
-          "HOOK: [Pose a desirable but seemingly unattainable goal]",
-          "BODY: [Present a relatable scenario]",
-          "TWIST: [Offer a humorous or thought-provoking solution]",
-          "CTA: [Invite commentary or personal experiences]"
+          "HOOK: [Start with impressive statistic]",
+          "BODY: [Compare to other popular games]",
+          "TWIST: [Cite credible source for authority]",
+          "CTA: [Invite discussion on the implications]"
         ]
       },
       {
         "id": "outlier-2",
-        "engagementMultiplier": "5.45x",
-        "hookType": "Contrarian Take",
-        "hookText": "Microsoft Edge is most used browser for downloading Google Chrome",
+        "engagementMultiplier": "7.3x",
+        "hookType": "Challenge Hook",
+        "hookText": "Where do you put C7S1 & C7S2 in your all-time list so far??",
         "ingredients": [
           {
-            "name": "Irony",
-            "value": "Highlights an amusing contradiction in user behavior.",
-            "score": 10
+            "name": "Direct Question",
+            "value": "Invites personal opinions",
+            "score": 9
           },
           {
-            "name": "Simplicity",
-            "value": "Presents a clear, easily understandable observation.",
+            "name": "Visual Aid",
+            "value": "Link to tierlist template",
             "score": 8
           },
           {
-            "name": "Familiarity",
-            "value": "Relates to a common user experience.",
+            "name": "Specific Context",
+            "value": "Referencing game seasons",
             "score": 7
           }
         ],
-        "whyItWorked": "The ironic statement challenges assumptions and triggers a reflective response about their own experiences.",
+        "whyItWorked": "Challenges audience members to assess and compare the current seasons of the game.",
         "templateStructure": [
-          "HOOK: [State a surprising or paradoxical observation]",
-          "BODY: [Provide a relatable context]",
-          "TWIST: [Highlight the underlying irony]",
-          "CTA: [Encourage reflection or sharing of similar experiences]"
+          "HOOK: [Pose specific ranking question]",
+          "BODY: [Provide a way for users to create rankings]",
+          "TWIST: [Encourage users to share their lists]",
+          "CTA: [Drive traffic to interactive tool]"
         ]
       },
       {
         "id": "outlier-3",
-        "engagementMultiplier": "5.38x",
-        "hookType": "Listicle",
-        "hookText": "evolution of programming languages:",
+        "engagementMultiplier": "6.5x",
+        "hookType": "Curiosity Loop",
+        "hookText": "FORTNITE HAS FIXED DANNY PHANTOM",
         "ingredients": [
           {
-            "name": "Historical Context",
-            "value": "Provides a timeline of technological development.",
+            "name": "Intrigue",
+            "value": "Before/After comparison",
             "score": 9
           },
           {
-            "name": "Informative",
-            "value": "Offers valuable knowledge about the subject.",
+            "name": "Visual Proof",
+            "value": "Showcase improvement",
             "score": 8
           },
           {
-            "name": "Completeness",
-            "value": "Presents a sense of thoroughness, making the information trustworthy.",
+            "name": "Familiar reference",
+            "value": "Appealing to Danny Phantom fans",
             "score": 7
           }
         ],
-        "whyItWorked": "Provides an informative, chronological overview that satisfies curiosity and inspires reflection.",
+        "whyItWorked": "Grabs attention with unexpected news, piquing curiosity about the changes.",
         "templateStructure": [
-          "HOOK: [Introduce a structured list or historical overview]",
-          "BODY: [Provide a timeline of events or items]",
-          "TWIST: [Add a modern or unexpected twist]",
-          "CTA: [Invite further discussion or expansion on the topic]"
+          "HOOK: [Announce surprising fix]",
+          "BODY: [Show comparison for impact]",
+          "TWIST: [Cater to fans of the fixed element]",
+          "CTA: [Invite commentary on the improvement]"
         ]
       },
       {
         "id": "outlier-4",
-        "engagementMultiplier": "4.64x",
-        "hookType": "Challenge Hook",
-        "hookText": "be honest, which one is best for coding ?",
+        "engagementMultiplier": "5.0x",
+        "hookType": "Announcement",
+        "hookText": "ADAM SMASHER RELEASES TONIGHT (1,500 VB)",
         "ingredients": [
           {
-            "name": "Simplicity",
-            "value": "Poses a straightforward question.",
-            "score": 10
-          },
-          {
-            "name": "Relevance",
-            "value": "Addresses a practical concern for the target audience.",
+            "name": "Direct Alert",
+            "value": "Time-sensitive information",
             "score": 9
           },
           {
-            "name": "Engagement",
-            "value": "Encourages audience participation.",
+            "name": "Clarity",
+            "value": "Precise details and cost",
             "score": 8
+          },
+          {
+            "name": "Exclusivity",
+            "value": "Limited Time Offer",
+            "score": 7
           }
         ],
-        "whyItWorked": "Addresses a practical concern for the target audience and encourages direct engagement, facilitating a sense of community.",
+        "whyItWorked": "Creates immediacy and interest by announcing a new release and its cost.",
         "templateStructure": [
-          "HOOK: [Pose a direct question about a common issue]",
-          "BODY: [Provide context or options]",
-          "TWIST: [Offer a surprising insight]",
-          "CTA: [Prompt for a quick choice]"
+          "HOOK: [Start with specific release details]",
+          "BODY: [Give a cost of the item]",
+          "TWIST: [Offer a limited time bonus]",
+          "CTA: [Encourage buying soon]"
         ]
       },
       {
         "id": "outlier-5",
-        "engagementMultiplier": "4.58x",
-        "hookType": "Controversial Statement",
-        "hookText": "deleted LinkedIn",
+        "engagementMultiplier": "4.0x",
+        "hookType": "Listicle",
+        "hookText": "ALL COSMETICS ADDED TODAY TO FORTNITE",
         "ingredients": [
           {
-            "name": "Boldness",
-            "value": "Makes a provocative statement that deviates from the norm.",
-            "score": 10
+            "name": "All-Inclusive Content",
+            "value": "Compiles comprehensive information",
+            "score": 9
           },
           {
-            "name": "Brevity",
-            "value": "Short, punchy statement captures immediate attention.",
+            "name": "Visual Showcase",
+            "value": "Images and videos of content",
             "score": 8
           },
           {
-            "name": "Relatability",
-            "value": "Resonates with common frustrations.",
+            "name": "Up-to-Date Detail",
+            "value": "Highlights the newest additions",
             "score": 7
           }
         ],
-        "whyItWorked": "Deviates from the norm and resonates with common frustrations in professional contexts, sparking discussion and validation.",
+        "whyItWorked": "Efficient way to deliver important news and showcase visuals of new additions to the game.",
         "templateStructure": [
-          "HOOK: [State a bold action or opinion]",
-          "BODY: [Expand on the reasoning]",
-          "TWIST: [Include a relatable insight]",
-          "CTA: [Prompt for reaction or agreement]"
+          "HOOK: [Alert of comprehensive additions]",
+          "BODY: [Showcase visual of the information]",
+          "TWIST: [Keep list up to date]",
+          "CTA: [Encourage fans to show their favorite]"
         ]
       }
     ],
     "voiceSpectrum": {
-      "personaName": "The Tech Alchemist",
+      "personaName": "The Fortnite Insider",
       "axes": [
         {
-          "id": "formal-casual",
+          "id": "formality",
           "leftLabel": "Formal",
           "rightLabel": "Casual",
+          "score": 40
+        },
+        {
+          "id": "technicality",
+          "leftLabel": "Technical",
+          "rightLabel": "Simple",
           "score": 60
         },
         {
-          "id": "technical-simple",
-          "leftLabel": "Technical",
-          "rightLabel": "Simple",
+          "id": "seriousness",
+          "leftLabel": "Serious",
+          "rightLabel": "Playful",
           "score": 30
         },
         {
-          "id": "serious-playful",
-          "leftLabel": "Serious",
-          "rightLabel": "Playful",
-          "score": 70
-        },
-        {
-          "id": "data-story",
+          "id": "datadriven",
           "leftLabel": "Data-driven",
           "rightLabel": "Story-driven",
-          "score": 40
+          "score": -20
         }
       ],
       "signatureWords": [
-        "Bro",
-        "So real",
-        "Weird",
-        "Just found out",
-        "Guess"
+        "Fortnite",
+        "VB",
+        "Epic Games",
+        "Cosmetics",
+        "Update"
       ],
-      "insight": "This voice strikes a balance between approachability and expertise, making complex topics engaging for a wide audience."
+      "insight": "An informal and simple approach works because fans just want the latest updates without jargon."
     },
     "crowdPersonas": {
       "primaryArchetype": {
-        "id": "mid-level-dev",
-        "role": "The Mid-Level Dev",
-        "iconName": "LaptopCode",
+        "id": "primary-1",
+        "role": "The Dedicated Player",
+        "iconName": "UserTie",
         "color": "#3b82f6",
-        "bio": "Struggling with real-world challenges, they seek practical advice and community validation. They are trying to increase their coding abilities and relevance.",
+        "bio": "A committed Fortnite player who follows all the latest news and updates to stay competitive and informed.",
         "percentage": 50,
         "triggers": [
-          "New Frameworks",
-          "Code Efficiency",
-          "Career Growth"
+          "New Cosmetics",
+          "Game Updates",
+          "Competitive Events"
         ],
         "painPoints": [
-          "Tech Debt",
-          "Imposter Syndrome"
+          "Staying Informed",
+          "Meta Shifts"
         ]
       },
       "secondaryArchetypes": [
         {
-          "id": "student-coder",
-          "role": "The Student Coder",
+          "id": "secondary-1",
+          "role": "The Casual Fan",
           "iconName": "Users",
           "color": "#8b5cf6",
-          "bio": "Starting their coding journey, they are eager to learn and explore fundamental concepts. They are building a foundation for future career aspirations.",
+          "bio": "An individual who enjoys Fortnite for its entertainment value and follows updates to stay engaged with the game.",
           "percentage": 30,
           "triggers": [
-            "Beginner Tutorials",
-            "Basic Algorithms",
-            "Coding Bootcamps"
+            "New Events",
+            "Cosmetic Updates",
+            "Game Improvements"
           ],
           "painPoints": [
-            "Syntax Errors",
-            "Lack of Direction"
+            "Fun Updates",
+            "Engaging Content"
           ]
         },
         {
-          "id": "tech-enthusiast",
-          "role": "The Tech Enthusiast",
-          "iconName": "Rocket",
+          "id": "secondary-2",
+          "role": "The Cosmetic Collector",
+          "iconName": "LaptopCode",
           "color": "#10b981",
-          "bio": "Following the latest industry trends, they enjoy engaging in high-level discussions and comparing technologies. They are looking for validation and insight.",
+          "bio": "A player focused on collecting unique and rare cosmetic items to customize their in-game appearance.",
           "percentage": 20,
           "triggers": [
-            "Latest Tech Releases",
-            "Future Predictions",
-            "Industry Debates"
+            "Cosmetic Releases",
+            "Limited Items",
+            "Exclusive Offers"
           ],
           "painPoints": [
-            "Information Overload",
-            "Lack of Practical Application"
+            "New Cosmetics",
+            "Exclusive Offers"
           ]
         }
       ],
       "insight": {
-        "title": "Focus on Practical Applications",
-        "description": "The audience distribution leans towards mid-level developers and students, emphasizing the need for content that offers practical solutions and guidance.",
-        "actionable": "Shift content towards real-world coding challenges and hands-on tutorials to increase engagement and provide direct value to the target audience."
+        "title": "Focus on Comprehensive Content",
+        "description": "The audience distribution indicates a broad interest in all aspects of Fortnite. Catering content to each archetype will boost engagement.",
+        "actionable": "Produce more how-to and tutorial-style content for the 'Dedicated Player' and showcase new and exciting events for 'Casual Fan' and update daily for the 'Cosmetic Collector.'"
       }
     },
     "crowdSentiment": {
-      "totalComments": 750,
+      "totalComments": 1940,
       "vibeScore": 6.5,
       "vibes": [
         {
           "type": "Fanboys",
-          "percentage": 30,
-          "count": 225,
+          "percentage": 60,
+          "count": 1164,
           "keywords": [
             "amazing",
-            "obsessed",
             "love this",
             "fire",
-            "need this"
+            "need this",
+            "obsessed"
           ],
           "color": "#8b5cf6",
           "description": "Social Proof & Loyalty"
         },
         {
           "type": "Seekers",
-          "percentage": 40,
-          "count": 300,
+          "percentage": 20,
+          "count": 388,
           "keywords": [
             "price?",
-            "does this work with X?",
             "how to install?",
-            "where to buy?"
+            "where to buy?",
+            "does this work with X?",
+            "tutorial?"
           ],
           "color": "#3b82f6",
           "description": "Unmet Demand (High Intent)"
         },
         {
           "type": "Skeptics",
-          "percentage": 20,
-          "count": 150,
+          "percentage": 10,
+          "count": 194,
           "keywords": [
             "is this real?",
             "X is cheaper",
             "any reviews?",
-            "looks too good to be true"
+            "looks too good to be true",
+            "legit?"
           ],
           "color": "#f59e0b",
           "description": "Trust Barriers"
@@ -920,7 +950,7 @@
         {
           "type": "Critics",
           "percentage": 10,
-          "count": 75,
+          "count": 194,
           "keywords": [
             "broken",
             "slow",
@@ -939,63 +969,122 @@
         },
         {
           "post": 2,
-          "score": 7.1
-        },
-        {
-          "post": 3,
           "score": 6.8
         },
         {
-          "post": 4,
+          "post": 3,
           "score": 6.5
         },
         {
+          "post": 4,
+          "score": 7
+        },
+        {
           "post": 5,
-          "score": 6.9
+          "score": 6
         }
       ]
     },
     "questionCloud": [
       {
         "id": "kw_1",
-        "word": "Coding Laptop",
-        "count": 87,
+        "word": "Cosmetic Release",
+        "count": 30,
         "engagement": 75,
         "intent": "Educational",
         "sampleQuestions": [
           {
-            "text": "which one is best for coding ?",
-            "likes": 67
+            "text": "What cosmetics are releasing?",
+            "likes": 15
           },
           {
-            "text": "MacBook or Windows Laptop?",
-            "likes": 103
+            "text": "Will the cosmetics release?",
+            "likes": 12
           }
         ]
       },
       {
         "id": "kw_2",
-        "word": "Setup Additions",
-        "count": 15,
-        "engagement": 33,
-        "intent": "Educational",
+        "word": "Pricing",
+        "count": 25,
+        "engagement": 80,
+        "intent": "Buying",
         "sampleQuestions": [
           {
-            "text": "what should i add more to my setup ?",
-            "likes": 33
+            "text": "How much is the new skin?",
+            "likes": 18
+          },
+          {
+            "text": "Is this V-bucks?",
+            "likes": 14
           }
         ]
       },
       {
         "id": "kw_3",
-        "word": "Browser Choice",
-        "count": 76,
-        "engagement": 67,
+        "word": "Game Updates",
+        "count": 20,
+        "engagement": 70,
         "intent": "Educational",
         "sampleQuestions": [
           {
-            "text": "guess the browser ?",
-            "likes": 67
+            "text": "Whats new?",
+            "likes": 10
+          },
+          {
+            "text": "What's included in update?",
+            "likes": 8
+          }
+        ]
+      },
+      {
+        "id": "kw_4",
+        "word": "Item Availability",
+        "count": 15,
+        "engagement": 65,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "When will it be back?",
+            "likes": 7
+          },
+          {
+            "text": "How long is it available?",
+            "likes": 6
+          }
+        ]
+      },
+      {
+        "id": "kw_5",
+        "word": "Compatability",
+        "count": 10,
+        "engagement": 60,
+        "intent": "Educational",
+        "sampleQuestions": [
+          {
+            "text": "Does it work with console?",
+            "likes": 5
+          },
+          {
+            "text": "Is mobile included?",
+            "likes": 4
+          }
+        ]
+      },
+      {
+        "id": "kw_6",
+        "word": "Bugs/Issues",
+        "count": 8,
+        "engagement": 55,
+        "intent": "Urgency",
+        "sampleQuestions": [
+          {
+            "text": "Anyone else having this issue?",
+            "likes": 3
+          },
+          {
+            "text": "Still broken?",
+            "likes": 2
           }
         ]
       }
@@ -1004,156 +1093,156 @@
       {
         "hour": 0,
         "creatorPosts": 0,
-        "audienceActivity": 5
+        "audienceActivity": 20
       },
       {
         "hour": 1,
-        "creatorPosts": 0,
-        "audienceActivity": 3
+        "creatorPosts": 1,
+        "audienceActivity": 30
       },
       {
         "hour": 2,
         "creatorPosts": 0,
-        "audienceActivity": 2
+        "audienceActivity": 25
       },
       {
         "hour": 3,
-        "creatorPosts": 0,
-        "audienceActivity": 1
+        "creatorPosts": 1,
+        "audienceActivity": 35
       },
       {
         "hour": 4,
         "creatorPosts": 0,
-        "audienceActivity": 1
+        "audienceActivity": 20
       },
       {
         "hour": 5,
         "creatorPosts": 0,
-        "audienceActivity": 2
+        "audienceActivity": 10
       },
       {
         "hour": 6,
         "creatorPosts": 0,
-        "audienceActivity": 4
+        "audienceActivity": 10
       },
       {
         "hour": 7,
         "creatorPosts": 0,
-        "audienceActivity": 6
+        "audienceActivity": 15
       },
       {
         "hour": 8,
         "creatorPosts": 0,
-        "audienceActivity": 8
+        "audienceActivity": 20
       },
       {
         "hour": 9,
         "creatorPosts": 0,
-        "audienceActivity": 10
+        "audienceActivity": 30
       },
       {
         "hour": 10,
         "creatorPosts": 0,
-        "audienceActivity": 20
+        "audienceActivity": 40
       },
       {
         "hour": 11,
-        "creatorPosts": 4,
-        "audienceActivity": 60
+        "creatorPosts": 0,
+        "audienceActivity": 50
       },
       {
         "hour": 12,
         "creatorPosts": 0,
-        "audienceActivity": 40
+        "audienceActivity": 60
       },
       {
         "hour": 13,
         "creatorPosts": 0,
-        "audienceActivity": 30
+        "audienceActivity": 70
       },
       {
         "hour": 14,
-        "creatorPosts": 0,
-        "audienceActivity": 20
+        "creatorPosts": 4,
+        "audienceActivity": 80
       },
       {
         "hour": 15,
         "creatorPosts": 0,
-        "audienceActivity": 30
+        "audienceActivity": 75
       },
       {
         "hour": 16,
-        "creatorPosts": 5,
+        "creatorPosts": 1,
         "audienceActivity": 70
       },
       {
         "hour": 17,
-        "creatorPosts": 7,
-        "audienceActivity": 80
-      },
-      {
-        "hour": 18,
-        "creatorPosts": 0,
-        "audienceActivity": 70
-      },
-      {
-        "hour": 19,
-        "creatorPosts": 5,
-        "audienceActivity": 100
-      },
-      {
-        "hour": 20,
-        "creatorPosts": 0,
-        "audienceActivity": 80
-      },
-      {
-        "hour": 21,
-        "creatorPosts": 3,
-        "audienceActivity": 70
-      },
-      {
-        "hour": 22,
         "creatorPosts": 0,
         "audienceActivity": 60
       },
       {
-        "hour": 23,
+        "hour": 18,
+        "creatorPosts": 0,
+        "audienceActivity": 50
+      },
+      {
+        "hour": 19,
+        "creatorPosts": 2,
+        "audienceActivity": 85
+      },
+      {
+        "hour": 20,
         "creatorPosts": 3,
+        "audienceActivity": 90
+      },
+      {
+        "hour": 21,
+        "creatorPosts": 0,
+        "audienceActivity": 80
+      },
+      {
+        "hour": 22,
+        "creatorPosts": 2,
         "audienceActivity": 70
+      },
+      {
+        "hour": 23,
+        "creatorPosts": 1,
+        "audienceActivity": 60
       }
     ],
     "tribes": [
       {
-        "name": "Code Newbies",
-        "size": 35,
+        "name": "Competitive Players",
+        "size": 40,
         "growth": "Stable",
-        "sentiment": "Positive"
-      },
-      {
-        "name": "Mid-Career Devs",
-        "size": 45,
-        "growth": "Growing",
         "sentiment": "Neutral"
       },
       {
-        "name": "Tech Bro",
-        "size": 20,
-        "growth": "Declining",
-        "sentiment": "Skeptical"
+        "name": "Cosmetic Collectors",
+        "size": 30,
+        "growth": "Rising",
+        "sentiment": "Positive"
+      },
+      {
+        "name": "Casual Gamers",
+        "size": 30,
+        "growth": "Stable",
+        "sentiment": "Neutral"
       }
     ],
     "shadowAudience": {
-      "lurkersPercent": 80,
-      "engagersPercent": 20,
-      "insight": "There are more lurkers than engagers, indicating a need to encourage active participation."
+      "lurkersPercent": 90,
+      "engagersPercent": 10,
+      "insight": "The majority of the audience consists of silent observers, with only a small fraction actively participating in comments."
     },
     "audienceTemperature": {
-      "tempScore": 56,
-      "label": "Warm",
-      "fanboyPercent": 30,
+      "tempScore": 68,
+      "label": "Hot",
+      "fanboyPercent": 60,
       "criticPercent": 10,
-      "dominantEmotion": "Curiosity",
-      "recommendation": "Increase temperature by addressing skeptics and critics to foster trust."
+      "dominantEmotion": "Amazing",
+      "recommendation": "Maintain high levels of audience enthusiasm by addressing critical feedback with solutions."
     },
     "hypeValueScore": {
       "hype": 40,
@@ -1161,40 +1250,40 @@
     },
     "ideaBank": [
       {
-        "concept": "Create a tutorial on setting up a perfect coding environment.",
-        "impact": "Addresses audience's interest in coding and provides actionable value."
+        "concept": "Create a poll asking users what their favorite Fortnite season is and why.",
+        "impact": "Generates engagement and provides valuable audience insights."
       },
       {
-        "concept": "Start a thread about the pros and cons of different programming languages for specific tasks.",
-        "impact": "Taps into the coding debate and encourages high engagement."
+        "concept": "Share a behind-the-scenes look at how leaks are discovered and verified.",
+        "impact": "Builds trust and positions the account as an authority."
       },
       {
-        "concept": "Share a video showing a day in the life of a software engineer.",
-        "impact": "Provides relatable content and attracts views with behind-the-scenes glimpses."
+        "concept": "Host a giveaway of V-Bucks or a rare Fortnite skin.",
+        "impact": "Attracts new followers and boosts engagement."
       },
       {
-        "concept": "Host a poll asking about the audience's biggest challenges in their current projects.",
-        "impact": "Gathers valuable insights for future content creation and increases interaction."
+        "concept": "Create a video explaining the lore and backstory of a popular Fortnite character.",
+        "impact": "Appeals to dedicated fans and expands reach on video platforms."
       },
       {
-        "concept": "Post a comparison of different cloud service providers for developers.",
-        "impact": "Offers practical advice and caters to the audience's professional interests."
+        "concept": "Start a thread speculating about future Fortnite updates and features.",
+        "impact": "Sparks discussion and generates excitement."
       }
     ],
     "leadMagnet": {
-      "type": "Checklist",
-      "title": "Ultimate Coding Environment Checklist",
-      "hook": "Optimize your coding setup for maximum productivity.",
+      "type": "Other",
+      "title": "Fortnite Leaks Newsletter",
+      "hook": "Get exclusive Fortnite leaks and news delivered straight to your inbox.",
       "friction": "Low",
       "temp": "Cold",
-      "suggestion": "Offer a 'Done-For-You' coding environment setup for those who prefer a hands-off approach.",
-      "whyItWorks": "Addresses the audience's desire to improve their coding efficiency and productivity."
+      "suggestion": "Offer a free checklist of the top 5 most anticipated Fortnite updates to increase conversions.",
+      "whyItWorks": "Provides value to Fortnite enthusiasts and builds an email list for future promotions."
     },
     "ctaAnalysis": {
       "mix": [
         {
           "type": "Engagement",
-          "score": 65,
+          "score": 70,
           "fullMark": 100
         },
         {
@@ -1204,281 +1293,250 @@
         },
         {
           "type": "Conversion",
-          "score": 5,
+          "score": 10,
           "fullMark": 100
         },
         {
           "type": "Conversation",
-          "score": 15,
+          "score": 5,
           "fullMark": 100
         }
       ],
       "topTrigger": {
-        "keyword": "OPINIONS",
-        "count": 10
+        "keyword": "SUPPORT",
+        "count": 2
       },
       "urgencyScore": 10,
       "dominantStyle": "Reach Hunter",
       "placementHeatmap": [
         {
           "location": "First Line",
-          "count": 2
+          "count": 0
         },
         {
           "location": "Bottom",
-          "count": 20
+          "count": 3
         },
         {
           "location": "P.S.",
-          "count": 5
+          "count": 1
         }
       ]
     },
     "techStack": {
-      "tools": [
-        {
-          "category": "Code Editor",
-          "name": "VS Code",
-          "confidence": "High"
-        },
-        {
-          "category": "Operating System",
-          "name": "Windows",
-          "confidence": "Medium"
-        },
-        {
-          "category": "Browser",
-          "name": "Chrome",
-          "confidence": "High"
-        }
-      ],
+      "tools": [],
       "businessClass": "Hobbyist",
-      "verdict": "Karthik is running a basic setup focused on exploring various topics."
+      "verdict": "The profile utilizes a simple setup, focusing on content creation rather than advanced business tools."
     },
     "valueLadder": {
-      "products": {},
-      "gap": "Missing Bait",
-      "insight": "Offer a free checklist or ebook to capture leads and build an audience."
+      "products": {
+        "Bait": {
+          "name": "Fortnite Leaks",
+          "price": "Free",
+          "type": "News",
+          "intensity": "Low"
+        }
+      },
+      "gap": "Missing Tripwire",
+      "insight": "Introduce a low-ticket item, such as a guide to mastering a specific Fortnite skill, to monetize the audience."
     },
     "growthTasks": [
       {
-        "id": "task-1",
-        "title": "Create a free coding resource",
+        "id": "gt-1",
+        "title": "Create a Fortnite tips guide",
         "category": "Quick Win",
         "impact": 7,
         "effort": 3,
         "type": "Funnel",
-        "status": "To Do",
-        "reasoning": "Captures lost leads and builds an audience base.",
+        "status": "Pending",
+        "reasoning": "Monetize the audience with a low-ticket offer.",
         "actionType": "Content"
       },
       {
-        "id": "task-2",
-        "title": "Optimize profile bio",
+        "id": "gt-2",
+        "title": "Run a V-Bucks giveaway",
+        "category": "Big Bet",
+        "impact": 8,
+        "effort": 6,
+        "type": "Content",
+        "status": "Pending",
+        "reasoning": "Attract new followers and boost engagement.",
+        "actionType": "Strategy"
+      },
+      {
+        "id": "gt-3",
+        "title": "Optimize the bio link",
         "category": "Quick Win",
         "impact": 6,
         "effort": 2,
-        "type": "Content",
-        "status": "To Do",
-        "reasoning": "Improves profile clarity and attracts targeted followers.",
+        "type": "Funnel",
+        "status": "Pending",
+        "reasoning": "Capture lost leads from the bio.",
         "actionType": "Bio"
-      },
-      {
-        "id": "task-3",
-        "title": "Engage with audience in comment sections",
-        "category": "Quick Win",
-        "impact": 7,
-        "effort": 3,
-        "type": "Crowd",
-        "status": "To Do",
-        "reasoning": "Increases community interaction and builds rapport.",
-        "actionType": "Strategy"
-      },
-      {
-        "id": "task-4",
-        "title": "Implement a consistent posting schedule",
-        "category": "Big Bet",
-        "impact": 8,
-        "effort": 5,
-        "type": "Content",
-        "status": "To Do",
-        "reasoning": "Maintains audience interest and visibility.",
-        "actionType": "Strategy"
-      },
-      {
-        "id": "task-5",
-        "title": "Experiment with different content formats",
-        "category": "Big Bet",
-        "impact": 7,
-        "effort": 4,
-        "type": "Content",
-        "status": "To Do",
-        "reasoning": "Attracts a wider audience and keeps content fresh.",
-        "actionType": "Content"
       }
     ],
     "disruptor": {
       "score": 75,
-      "focus": "Tech Humor & Insightful Debates",
+      "focus": "Concise Trend Reporting",
       "schedule": [
         {
           "day": "Monday",
-          "time": "10:00 AM",
-          "pillar": "Debate",
-          "topic": "Best coding setup: Windows vs. Mac",
-          "hookStyle": "Controversial",
-          "suggestedHook": "Windows vs. Mac for coding in 2026: What's your weapon of choice?",
-          "strategicReason": "Start the week with a hot debate to capture early attention."
+          "time": "08:00 AM",
+          "pillar": "Authority",
+          "topic": "Latest Fortnite Leaks",
+          "hookStyle": "Data-backed",
+          "suggestedHook": "New skins and weapons leaked! Check out the full list.",
+          "strategicReason": "Provide concise trend reporting to counter broad coverage."
         },
         {
           "day": "Tuesday",
-          "time": "03:00 PM",
-          "pillar": "Tutorial",
-          "topic": "VS Code extensions for productivity",
-          "hookStyle": "Actionable",
-          "suggestedHook": "Level up your VS Code with these top 5 extensions!",
-          "strategicReason": "Provide practical tips to those coding during the day."
+          "time": "02:00 PM",
+          "pillar": "Educational",
+          "topic": "Gameplay Tips",
+          "hookStyle": "Curiosity Loop",
+          "suggestedHook": "Want to level up your game? Try these tips.",
+          "strategicReason": "Offer direct value to audience members."
         },
         {
           "day": "Wednesday",
           "time": "07:00 PM",
-          "pillar": "Humor",
-          "topic": "Coding memes",
-          "hookStyle": "Humorous",
-          "suggestedHook": "Share your most relatable coding meme!",
-          "strategicReason": "Mid-week humor boosts engagement."
+          "pillar": "Community",
+          "topic": "Community Spotlight",
+          "hookStyle": "Empathetic",
+          "suggestedHook": "Check out this awesome creation by one of our followers!",
+          "strategicReason": "Highlight community contributions to boost morale."
         },
         {
           "day": "Thursday",
-          "time": "10:00 AM",
-          "pillar": "Discussion",
-          "topic": "Future of programming languages",
-          "hookStyle": "Insightful",
-          "suggestedHook": "Is English the next big programming language?",
-          "strategicReason": "Start a deep discussion on a trending topic."
+          "time": "01:00 PM",
+          "pillar": "Speculation",
+          "topic": "Future Updates",
+          "hookStyle": "Controversial",
+          "suggestedHook": "What if Epic adds this feature? Let's discuss!",
+          "strategicReason": "Generate discussion and interaction with followers."
         },
         {
           "day": "Friday",
-          "time": "03:00 PM",
-          "pillar": "List",
-          "topic": "Top 5 coding tools for 2026",
-          "hookStyle": "Data-backed",
-          "suggestedHook": "The ultimate list of coding tools to master in 2026!",
-          "strategicReason": "Provide a quick and useful Friday resource."
+          "time": "09:00 AM",
+          "pillar": "Opinion",
+          "topic": "Fortnite Season Review",
+          "hookStyle": "Story-driven",
+          "suggestedHook": "This season was a roller coaster. Here's my review.",
+          "strategicReason": "Offer unique takes on new developments."
         },
         {
           "day": "Saturday",
-          "time": "07:00 PM",
+          "time": "03:00 PM",
           "pillar": "Humor",
-          "topic": "Share coding fails",
-          "hookStyle": "Humorous",
-          "suggestedHook": "Share your most hilarious coding fail story!",
-          "strategicReason": "End the week with lighthearted and relatable content."
+          "topic": "Fortnite Memes",
+          "hookStyle": "Story-driven",
+          "suggestedHook": "Relatable Fortnite memes for your weekend.",
+          "strategicReason": "Increase engagement through humor."
         },
         {
           "day": "Sunday",
-          "time": "01:00 PM",
-          "pillar": "Reflection",
-          "topic": "Best thing you learned about coding this week",
-          "hookStyle": "Curiosity",
-          "suggestedHook": "What was your coding \"aha!\" moment this week?",
-          "strategicReason": "Close out the week by fostering thoughtful reflection."
+          "time": "06:00 PM",
+          "pillar": "BehindTheScenes",
+          "topic": "Development Insights",
+          "hookStyle": "Data-backed",
+          "suggestedHook": "Dive into the behind-the-scenes of Fortnite development.",
+          "strategicReason": "Provide insights to build authority."
         }
       ]
     },
     "funnelTactics": [
       {
-        "title": "Offer a free coding checklist",
-        "problem": "Missing top-of-funnel offer to capture potential leads.",
-        "solution": "Create a free checklist for setting up a coding environment.",
-        "impact": "+15% Lead Capture",
+        "title": "Optimize Bio Link",
+        "problem": "The current bio link has too many options.",
+        "solution": "Replace with a dedicated landing page focused on a single offer.",
+        "impact": "+20% Click-through",
         "difficulty": "Easy",
         "status": "Pending",
-        "id": "ft-1"
+        "id": "funnel-1"
       },
       {
-        "title": "Promote free resources more prominently",
-        "problem": "Existing free resources are not easily discoverable.",
-        "solution": "Add a clear call-to-action link in the profile bio.",
-        "impact": "+10% Click-through",
-        "difficulty": "Easy",
-        "status": "Pending",
-        "id": "ft-2"
-      },
-      {
-        "title": "Run targeted ads",
-        "problem": "Not actively reaching a broader audience.",
-        "solution": "Create simple ads promoting the free coding resource.",
-        "impact": "+20% New Followers",
+        "title": "Add a Tripwire",
+        "problem": "The current funnel jumps from free content to high-ticket offers.",
+        "solution": "Offer a $27 template or guide to capture the middle.",
+        "impact": "+15% Conversion",
         "difficulty": "Medium",
         "status": "Pending",
-        "id": "ft-3"
+        "id": "funnel-2"
+      },
+      {
+        "title": "Retargeting Campaign",
+        "problem": "Not retargeting website visitors.",
+        "solution": "Implement a retargeting campaign on X to bring back potential leads.",
+        "impact": "+10% Lead Generation",
+        "difficulty": "Hard",
+        "status": "Pending",
+        "id": "funnel-3"
       }
     ],
     "crowdTactics": [
       {
-        "title": "Address skeptics directly",
-        "audienceState": "Skeptical",
-        "action": "Reply to top comments with case studies.",
+        "title": "Vibe Matching",
+        "audienceState": "Engaged",
+        "action": "Reply to the top 5 comments with a case study or success story.",
         "targetParams": "Builds Trust",
         "status": "Ready",
-        "id": "ct-1"
+        "id": "crowd-1"
       },
       {
-        "title": "Provide detailed solutions",
+        "title": "Addressing Skepticism",
+        "audienceState": "Skeptical",
+        "action": "Create a post directly addressing common doubts and concerns.",
+        "targetParams": "Boosts Credibility",
+        "status": "Ready",
+        "id": "crowd-2"
+      },
+      {
+        "title": "Issue Resolution",
         "audienceState": "Frustrated",
-        "action": "Offer step-by-step guides for common issues.",
-        "targetParams": "Reduces Friction",
+        "action": "Actively monitor comments for issues and provide quick resolutions.",
+        "targetParams": "Improves Satisfaction",
         "status": "Ready",
-        "id": "ct-2"
-      },
-      {
-        "title": "Engage fan base",
-        "audienceState": "Engaged",
-        "action": "Ask for opinions and feedback on new ideas.",
-        "targetParams": "Fosters Community",
-        "status": "Ready",
-        "id": "ct-3"
+        "id": "crowd-3"
       }
     ],
     "competitorGap": {
       "metrics": [
         {
           "category": "Engagement Rate",
-          "profileValue": 0,
+          "profileValue": 0.5,
           "benchmarkValue": 1.5,
           "gapType": "Opportunity"
         },
         {
           "category": "Post Frequency",
-          "profileValue": 3.4,
+          "profileValue": 7,
           "benchmarkValue": 4,
-          "gapType": "Opportunity"
+          "gapType": "Over-indexed"
         },
         {
           "category": "Content Quality",
           "profileValue": 60,
-          "benchmarkValue": 70,
+          "benchmarkValue": 75,
           "gapType": "Opportunity"
         },
         {
           "category": "Hook Strength",
           "profileValue": 50,
-          "benchmarkValue": 65,
+          "benchmarkValue": 70,
           "gapType": "Opportunity"
         }
       ],
       "topOpportunity": "Engagement Rate",
-      "insight": "The profile has a significant opportunity to improve its engagement rate by optimizing content and posting strategy.",
+      "insight": "The competitor has a significantly lower engagement rate than the industry benchmark, indicating an opportunity to improve content relevance and interaction.",
       "recommendations": [
-        "Increase posting frequency to 4 posts/day to align with the platform's optimal range.",
-        "Improve hook strength by using more controversial or curiosity-inducing opening lines.",
-        "Engage more actively with the audience by replying to comments and asking for feedback."
+        "Focus on creating more engaging content that resonates with the audience's interests.",
+        "Experiment with different content formats, such as polls and questions, to increase interaction.",
+        "Actively respond to comments and messages to build relationships with followers."
       ]
     }
   },
   "platform": "x",
-  "postCount": 27,
+  "postCount": 14,
   "source": "extension_scrape",
-  "timestamp": 1774257262405
+  "timestamp": 1778879374174
 }

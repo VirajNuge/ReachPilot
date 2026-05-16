@@ -1,8 +1,8 @@
-// app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
-import Chatbot from "./components/Chatbot/Chatbot";
 import Providers from "./providers";
+// ChatbotLoader is a Client Component that lazy-loads Chatbot with ssr:false
+import ChatbotLoader from "./components/ChatbotLoader";
 
 export const metadata: Metadata = {
   title: "ReachPilot",
@@ -50,7 +50,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <Providers>
           {children}
-          <Chatbot />
+          <ChatbotLoader />
         </Providers>
       </body>
     </html>

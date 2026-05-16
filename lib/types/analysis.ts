@@ -1,3 +1,27 @@
+export interface AnalysisHistoryQuery {
+  accountId: string;
+  platform?: string;
+  dateRange?: { from: string; to: string };
+  minScore?: number;
+  limit?: number;
+  skip?: number;
+}
+
+export interface AnalysisHistoryItem {
+  id: string;
+  profileHandle: string;
+  profileName?: string;
+  overallScore: number;
+  platform: string;
+  createdAt: string;
+  snapshot?: any;
+}
+
+export interface AnalysisHistoryResponse {
+  analyses: AnalysisHistoryItem[];
+  total: number;
+  hasMore: boolean;
+}
 export interface VelocityPoint {
   hour: string;
   engagement: number;

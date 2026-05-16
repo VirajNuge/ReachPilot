@@ -79,6 +79,15 @@ async function ensureIndexes(db: Db): Promise<void> {
     // savedIdeas (Idea Finder planner)
     db.collection("savedIdeas").createIndex({ userId: 1, accountId: 1, status: 1 }, { background: true }),
     db.collection("savedIdeas").createIndex({ createdAt: -1 }, { background: true }),
+    // profileAnalyzerHistory
+    db.collection("profileAnalyzerHistory").createIndex({ userId: 1, accountId: 1, createdAt: -1 }, { background: true }),
+    db.collection("profileAnalyzerHistory").createIndex({ userId: 1, accountId: 1, platform: 1 }, { background: true }),
+    db.collection("profileAnalyzerHistory").createIndex({ userId: 1, overallScore: -1 }, { background: true }),
+
+    // postAnalyzerHistory
+    db.collection("postAnalyzerHistory").createIndex({ userId: 1, accountId: 1, createdAt: -1 }, { background: true }),
+    db.collection("postAnalyzerHistory").createIndex({ userId: 1, accountId: 1, platform: 1 }, { background: true }),
+    db.collection("postAnalyzerHistory").createIndex({ userId: 1, analysisId: 1 }, { background: true }),
   ]);
 }
 

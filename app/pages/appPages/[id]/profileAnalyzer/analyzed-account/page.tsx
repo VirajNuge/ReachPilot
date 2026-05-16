@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaCompass,
@@ -36,10 +36,6 @@ const PulseScore = dynamic(
 );
 const HeartbeatChart = dynamic(
   () => import("../../../components/Pulse/HeartbeatChart"),
-  { ssr: false }
-);
-const EngagementVitalsPanel = dynamic(
-  () => import("../../../components/Pulse/EngagementVitals"),
   { ssr: false }
 );
 const AudienceTemp = dynamic(
@@ -196,8 +192,11 @@ const MOCK_PILLARS: UI_PillarData[] = [
 
 function AnalysisContent() {
   const [activeTab, setActiveTab] = useState("Pulse");
+  const params = useParams();
+  const accountId = params?.id as string | undefined;
   const searchParams = useSearchParams();
   const loadId = searchParams.get("loadId");
+  const historyId = searchParams.get("historyId");
   const link = searchParams.get("link"); // existing
   const { user } = useAuth();
 
@@ -207,7 +206,7 @@ function AnalysisContent() {
     platform: apiPlatform,
     loading: apiLoading,
     error: apiError,
-  } = useAnalysisData();
+  } = useAnalysisData(undefined, historyId || undefined);
 
   // Local state to handle either API data or History data
   const [data, setData] = useState<RawAnalysisData | null>(null);
@@ -518,7 +517,7 @@ function AnalysisContent() {
         setLoading(false);
         // Auto-save only if it's a fresh analysis (no loadId and no manual data)
         if (!loadId && !manualDataParam) {
-          saveAnalysis(apiData, user?.id);
+          saveAnalysis(apiData, user?.id, accountId);
         }
       } else if (apiError) {
         setError(apiError);
@@ -648,12 +647,6 @@ function AnalysisContent() {
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                       {/* Left Column (Wide) - 2/3 width */}
                       <div className="xl:col-span-2 flex flex-col gap-6">
-                        {/* Engagement Vitals - Top row stats */}
-                        <EngagementVitalsPanel
-                          data={data.engagementVitals}
-                          platform={platform ?? undefined}
-                        />
-
                         {/* Heartbeat Chart - Main wide chart */}
                         <HeartbeatChart data={data.pulseHeartbeat} />
 

@@ -5,10 +5,13 @@ import {
   getPlatformPrompt,
   PLATFORM_BENCHMARKS,
   getQuickWins,
-} from "../platformPrompts";
+} from "../../platformPrompts";
+import { getAuthFromRequest } from "../../../../../lib/auth";
+import { getAccountById } from "../../../../../lib/models/account";
+import { createProfileAnalysisHistory } from "../../../../../lib/models/profileAnalyzerHistory";
 
 // Platform-specific analysis endpoint
-// POST /api/analyze/[platform] { profileData: string }
+// POST /api/analyze/platform/[platform] { profileData: string }
 
 interface RouteContext {
   params: Promise<{ platform: string }>;
@@ -243,6 +246,48 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const prompt = getPlatformPrompt(platform, JSON.stringify(dataToAnalyze));
     const result = await model.generateContent(prompt);
     const analysis = JSON.parse(result.response.text());
+
+    // Attempt to persist analysis for authenticated users when accountId provided
+    try {
+      const auth = await getAuthFromRequest(request);
+      const accountId = body?.accountId as string | undefined;
+      if (auth && auth.userId && accountId) {
+        const account = await getAccountById(accountId);
+        if (account && account.userId === auth.userId) {
+          // Build minimal record
+          const doc = {
+            platform,
+            profileUrl: body?.profileUrl,
+            profileHandle: analysis.profile?.headline || body?.profileHandle || "",
+            profileName: analysis.profile?.name || body?.profileName || "",
+            overallScore: analysis.scores?.overall ?? 0,
+            profileScore: analysis.scores?.profile ?? undefined,
+            contentScore: analysis.scores?.content ?? undefined,
+            engagementScore: analysis.scores?.engagement ?? undefined,
+            growthScore: analysis.scores?.growth ?? undefined,
+            analysisData: analysis,
+            snapshot: {
+              quickFixes: (analysis.quickFixes || []).map((q: any) => ({ headline: q.headline, tag: q.impact })),
+              topStrengths: analysis.bioAnalysis?.strengths || [],
+              topWeaknesses: analysis.bioAnalysis?.weaknesses || [],
+              recommendedActions: (analysis.quickFixes || []).slice(0,3).map((q: any) => q.headline),
+            },
+            source: "web",
+            status: "completed",
+            analyzedAt: new Date(),
+            tags: [],
+            notes: undefined,
+          } as any;
+
+          // Fire-and-forget: await but don't fail the main response if saving errors
+          createProfileAnalysisHistory(auth.userId, accountId, doc).catch((err: unknown) =>
+            console.warn("Failed to save analysis to history:", err),
+          );
+        }
+      }
+    } catch (e) {
+      console.warn("Auto-save analysis check failed:", e);
+    }
 
     // Add platform-specific quick wins
     const quickWins = getQuickWins(platform);

@@ -223,8 +223,17 @@ export default function AccountPersona() {
       .catch(() => {});
   }, [accountId]);
 
-  // Load Google Fonts metadata once
+  // Load Google Fonts metadata once — cached in sessionStorage
   useEffect(() => {
+    const CACHE_KEY = "rp_google_fonts_v1";
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) {
+        setGoogleFonts(JSON.parse(cached));
+        return;
+      }
+    } catch {}
+
     setFontsLoading(true);
     fetch("https://fonts.google.com/metadata.json")
       .then((r) => r.json())
@@ -234,6 +243,7 @@ export default function AccountPersona() {
           .filter(Boolean)
           .sort((a, b) => a.localeCompare(b));
         setGoogleFonts(families);
+        try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(families)); } catch {}
       })
       .catch(() => {
         // Fallback to a curated list if fetch fails

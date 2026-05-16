@@ -1,5 +1,16 @@
 import { RawAnalysisData } from "./types/analysis";
 
+export interface PostAnalysisHistorySession {
+  id: string;
+  analysisId: string;
+  timestamp: string;
+  postAuthor: string;
+  postHandle: string;
+  score: number;
+  summary?: string;
+  data: any;
+}
+
 export interface AnalysisSession {
   id: string;
   timestamp: string; // ISO date string
@@ -10,6 +21,7 @@ export interface AnalysisSession {
 }
 
 const STORAGE_KEY = "reachpilot_analysis_history";
+const POST_STORAGE_KEY = "reachpilot_post_analysis_history";
 
 // Helper: get user-scoped storage key
 const getUserStorageKey = (userId?: string) => {
@@ -17,20 +29,32 @@ const getUserStorageKey = (userId?: string) => {
   return STORAGE_KEY;
 };
 
+const getPostStorageKey = (accountId?: string) => {
+  if (accountId) return `${POST_STORAGE_KEY}_${accountId}`;
+  return POST_STORAGE_KEY;
+};
+
 // Try to save to server first, fallback to localStorage
 export const saveAnalysis = async (
   data: RawAnalysisData,
-  userId?: string
+  userId?: string,
+  accountId?: string,
+  extra?: { profileHandle?: string; profileName?: string }
 ) => {
   if (typeof window === "undefined") return;
 
-  // If user is logged in, save to server
+  // If user is logged in, attempt server save to new history endpoint
   if (userId) {
     try {
-      const res = await fetch("/api/sessions", {
+      const body: any = { analysisData: data };
+      if (accountId) body.accountId = accountId;
+      if (extra?.profileHandle) body.profileHandle = extra.profileHandle;
+      if (extra?.profileName) body.profileName = extra.profileName;
+
+      const res = await fetch("/api/analyze/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data }),
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         // Also save locally for immediate access
@@ -38,7 +62,7 @@ export const saveAnalysis = async (
         return;
       }
     } catch (error) {
-      console.error("Failed to save to server:", error);
+      console.error("Failed to save to server history:", error);
     }
   }
 
@@ -68,32 +92,114 @@ const saveToLocalStorage = (data: RawAnalysisData, userId?: string) => {
 };
 
 // Fetch history: server-first if logged in, else localStorage
-export const getHistory = async (
-  userId?: string
-): Promise<AnalysisSession[]> => {
-  if (typeof window === "undefined") return [];
+export const fetchAnalysisHistory = async (
+  accountId?: string,
+  options?: { platform?: string; limit?: number; skip?: number }
+): Promise<{ analyses: any[]; total: number; hasMore: boolean }> => {
+  if (typeof window === "undefined") return { analyses: [], total: 0, hasMore: false };
+  if (!accountId) return { analyses: [], total: 0, hasMore: false };
 
-  if (userId) {
-    try {
-      const res = await fetch("/api/sessions");
-      if (res.ok) {
-        const data = await res.json();
-        return (data.sessions || []).map(
-          (s: Record<string, unknown>) => ({
-            id: (s.sessionId as string) || (s._id as string),
-            timestamp: s.timestamp as string,
-            profileHandle: s.profileHandle as string,
-            profileName: s.profileName as string,
-            score: s.score as number,
-            data: s.data as RawAnalysisData,
-          })
-        );
-      }
-    } catch (error) {
-      console.error("Failed to fetch from server:", error);
+  const params = new URLSearchParams();
+  params.set("accountId", accountId);
+  if (options?.platform) params.set("platform", options.platform);
+  if (options?.limit) params.set("limit", String(options.limit));
+  if (options?.skip) params.set("skip", String(options.skip));
+
+  const res = await fetch(`/api/analyze/history?${params.toString()}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch analysis history");
+  }
+  return res.json();
+};
+
+export const fetchAnalysisFull = async (analysisId: string): Promise<any | null> => {
+  if (typeof window === "undefined") return null;
+  try {
+    const res = await fetch(`/api/analyze/${analysisId}`);
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.analysis || null;
+  } catch (e) {
+    console.error("Failed to fetch analysis:", e);
+    return null;
+  }
+};
+
+export const savePostAnalysis = async (
+  data: any,
+  accountId?: string,
+  extra?: { analysisId?: string; source?: string },
+) => {
+  if (typeof window === "undefined" || !accountId) return;
+
+  try {
+    const body: any = {
+      accountId,
+      analysisId: extra?.analysisId || data?.id,
+      analysisData: data,
+      source: extra?.source || "web",
+    };
+
+    const res = await fetch("/api/analyze-post/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (res.ok) {
+      savePostToLocalStorage(data, accountId);
+      return;
     }
+  } catch (error) {
+    console.error("Failed to save to server post history:", error);
   }
 
+  savePostToLocalStorage(data, accountId);
+};
+
+export const fetchPostAnalysisHistory = async (
+  accountId?: string,
+  options?: { platform?: string; limit?: number; skip?: number },
+): Promise<{ analyses: PostAnalysisHistorySession[]; total: number; hasMore: boolean }> => {
+  if (typeof window === "undefined") return { analyses: [], total: 0, hasMore: false };
+  if (!accountId) return { analyses: [], total: 0, hasMore: false };
+
+  try {
+    const params = new URLSearchParams();
+    params.set("accountId", accountId);
+    if (options?.platform) params.set("platform", options.platform);
+    if (options?.limit) params.set("limit", String(options.limit));
+    if (options?.skip) params.set("skip", String(options.skip));
+
+    const res = await fetch(`/api/analyze-post/history?${params.toString()}`);
+    if (res.ok) {
+      const json = await res.json();
+      return {
+        analyses: (json.analyses || []).map((item: any) => ({
+          id: item.id,
+          analysisId: item.analysisId,
+          timestamp: item.timestamp,
+          postAuthor: item.postAuthor,
+          postHandle: item.postHandle,
+          score: item.score ?? 0,
+          summary: item.summary,
+          data: item,
+        })),
+        total: json.total || 0,
+        hasMore: !!json.hasMore,
+      };
+    }
+  } catch (error) {
+    console.warn("Failed to fetch server post history, falling back to local:", error);
+  }
+
+  return getPostHistory(accountId);
+};
+
+// Backwards-compatible getHistory that falls back to localStorage when needed
+export const getHistory = async (userId?: string): Promise<AnalysisSession[]> => {
+  if (typeof window === "undefined") return [];
+  // If userId is provided but account-level ID isn't known here, keep using localStorage
   return getFromLocalStorage(userId);
 };
 
@@ -134,4 +240,49 @@ export const clearHistory = async (userId?: string) => {
 
   const key = getUserStorageKey(userId);
   localStorage.removeItem(key);
+};
+
+const getPostHistorySync = (accountId?: string): PostAnalysisHistorySession[] => {
+  try {
+    const key = getPostStorageKey(accountId);
+    const stored = localStorage.getItem(key);
+    return stored ? (JSON.parse(stored) as PostAnalysisHistorySession[]) : [];
+  } catch (error) {
+    console.error("Failed to load post history:", error);
+    return [];
+  }
+};
+
+const savePostToLocalStorage = (data: any, accountId?: string) => {
+  try {
+    const key = getPostStorageKey(accountId);
+    const existing = getPostHistorySync(accountId);
+    const analysisId = data?.id || crypto.randomUUID();
+    const newSession: PostAnalysisHistorySession = {
+      id: analysisId,
+      analysisId,
+      timestamp: data?.timestamp || new Date().toISOString(),
+      postAuthor: data?.postData?.author || "Unknown",
+      postHandle: data?.postData?.handle || "",
+      score: data?.postData?.metrics?.views || 0,
+      summary:
+        data?.analysis?.viralVelocity?.growthPrediction ||
+        data?.analysis?.sentiment?.dominantEmotion ||
+        "Post analysis completed",
+      data,
+    };
+
+    const updated = [newSession, ...existing.filter((item) => item.analysisId !== newSession.analysisId)].slice(0, 20);
+    localStorage.setItem(key, JSON.stringify(updated));
+  } catch (error) {
+    console.error("Failed to save post analysis:", error);
+  }
+};
+
+export const getPostHistory = async (
+  accountId?: string,
+): Promise<{ analyses: PostAnalysisHistorySession[]; total: number; hasMore: boolean }> => {
+  if (typeof window === "undefined") return { analyses: [], total: 0, hasMore: false };
+  const analyses = getPostHistorySync(accountId);
+  return { analyses, total: analyses.length, hasMore: false };
 };

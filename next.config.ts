@@ -34,12 +34,6 @@ const nextConfig: NextConfig = {
       config.output.chunkLoadTimeout = 120000;
     }
 
-    // Optimize chunk naming for better long-term caching
-    if (!dev) {
-      config.output.filename = "[name].[contenthash:8].js";
-      config.output.chunkFilename = "[name].[contenthash:8].js";
-    }
-
     return config;
   },
   // ── Compression & Caching ────────────────────────────────────────────

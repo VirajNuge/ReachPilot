@@ -40,4 +40,4 @@ vi.mock('next/headers', () => ({
 process.env.JWT_SECRET = 'test-secret-key-for-testing';
 process.env.ADMIN_JWT_SECRET = 'test-admin-secret-key-for-testing';
 process.env.MONGODB_URI = 'mongodb://test:test@localhost:27017/test';
-process.env.NODE_ENV = 'test';
+(process.env as Record<string, string | undefined>).NODE_ENV = 'test';

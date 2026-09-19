@@ -37,7 +37,7 @@ const VALID_PLATFORMS: IdeaPlatform[] = [
   "all",
 ];
 
-export function isValidRequest(body: unknown): body is IdeaFinderRequest {
+function isValidRequest(body: unknown): body is IdeaFinderRequest {
   if (typeof body !== "object" || body === null) return false;
   const b = body as Record<string, unknown>;
   const hasValidCoreMessage =
@@ -56,7 +56,7 @@ export function isValidRequest(body: unknown): body is IdeaFinderRequest {
   );
 }
 
-export function buildEmptyIdeaFinderContext(platform: IdeaPlatform) {
+function buildEmptyIdeaFinderContext(platform: IdeaPlatform) {
   return {
     persona: {
       summary: "",
@@ -85,7 +85,7 @@ export function buildEmptyIdeaFinderContext(platform: IdeaPlatform) {
   };
 }
 
-export function joinCandidateText(
+function joinCandidateText(
   candidate: { content?: { parts?: Array<{ text?: string | null }> } } | undefined,
 ): string {
   const parts = candidate?.content?.parts;

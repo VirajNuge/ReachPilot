@@ -3,7 +3,7 @@ import {
   buildEmptyIdeaFinderContext,
   isValidRequest,
   joinCandidateText,
-} from "./route";
+} from "@/lib/ideaFinder/requestHelpers";
 
 describe("idea-finder generate route helpers", () => {
   it("joins grounded candidate text across multiple parts", () => {

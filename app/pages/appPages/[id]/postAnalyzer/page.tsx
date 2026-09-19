@@ -64,7 +64,7 @@ export default function PostAnalyzerPage() {
     };
 
     fetchAnalysis();
-  }, [analysisId]);
+  }, [analysisId, accountId]);
 
   useEffect(() => {
     if (!analysisData || !accountId || !analysisData.id) return;

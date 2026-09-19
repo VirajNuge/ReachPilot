@@ -24,29 +24,29 @@ const faqs: FAQItem[] = [
       "Unlike traditional schedulers, ReachPilot integrates AI-driven content analysis, social media analytics, and client management. It doesn’t just show data — it helps you understand growth and convert your audience into clients.",
   },
   {
-    question: "Does ReachPilot automatically post for me?",
+    question: "Can ReachPilot publish content for me?",
     answer:
-      "Yes. You can schedule your content for LinkedIn, Twitter (X), or email newsletters using the smart calendar and auto-queue system.",
+      "ReachPilot helps you plan and schedule content where supported. You remain in control of what is reviewed, edited, and published.",
   },
   {
     question: "What kind of analytics does ReachPilot provide?",
     answer:
-      "You'll see detailed metrics like post performance, engagement heatmaps, follower growth, and client conversion funnels — all visualized with charts and AI insights.",
+      "You can explore profile health, post performance, audience signals, and growth patterns through the analytics features available to your connected accounts.",
   },
   {
     question: "Is my data safe?",
     answer:
-      "Yes. ReachPilot uses encrypted storage and secure authentication through Supabase/Firebase. Your social media and client data are never shared or used for AI training.",
+      "ReachPilot uses secure authentication and protected storage. Review the Privacy Policy for the current data practices and connected-service details.",
   },
   {
     question: "Is ReachPilot free to use?",
     answer:
-      "ReachPilot offers a free trial for new users. After the trial, you can choose between a Creator, Pro, or Agency plan depending on your needs.",
+      "ReachPilot currently has Starter, Pro, and Agency plans. See the pricing page for the current plan structure and included features.",
   },
   {
     question: "What features are planned for the next release?",
     answer:
-      "Upcoming updates include Threads & Instagram integration, Voice-to-post assistant, AI content calendar insights, and an agency workspace with multi-client management.",
+      "ReachPilot is evolving continuously. Contact us if you have a workflow or integration that would make the product more useful for you.",
   },
 ];
 
@@ -64,14 +64,14 @@ const FAQSection: React.FC = () => {
           key={index}
           className={`faq-item ${openIndex === index ? "active" : ""}`}
         >
-          <button onClick={() => toggleFAQ(index)} className="faq-question">
+          <button onClick={() => toggleFAQ(index)} className="faq-question" aria-expanded={openIndex === index} aria-controls={`faq-answer-${index}`}>
             <span className="faq-question-text">{faq.question}</span>
             <span className={`faq-icon ${openIndex === index ? "open" : ""}`}>
               +
             </span>
           </button>
 
-          <div className={`faq-answer ${openIndex === index ? "show" : ""}`}>
+          <div id={`faq-answer-${index}`} className={`faq-answer ${openIndex === index ? "show" : ""}`}>
             {faq.answer}
           </div>
         </div>

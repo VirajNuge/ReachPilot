@@ -1,11 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createUser } from "../../../../lib/models/user";
 import { signToken, setAuthCookie } from "../../../../lib/auth";
+import { isSignupAccessCodeConfigured, isSignupAccessCodeValid } from "../../../../lib/signupAccessCode";
+import { randomUUID } from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { username, email, firstName, lastName, password } = body;
+    const { username, email, firstName, lastName, password, signupCode } = body;
+
+    if (!isSignupAccessCodeConfigured()) {
+      return NextResponse.json(
+        { error: "Signup is temporarily unavailable. Please contact the owner." },
+        { status: 503 },
+      );
+    }
+
+    if (!isSignupAccessCodeValid(signupCode)) {
+      return NextResponse.json(
+        { error: "The access code is invalid or missing.", code: "invalid_access_code" },
+        { status: 403 },
+      );
+    }
 
     // Validation
     if (!username || !email || !firstName || !lastName || !password) {
@@ -49,8 +65,29 @@ export async function POST(request: NextRequest) {
     response.cookies.set(cookie);
     return response;
   } catch (error: unknown) {
+    const requestId = randomUUID();
     const message = error instanceof Error ? error.message : "Signup failed";
-    const status = message.includes("already") ? 409 : 500;
-    return NextResponse.json({ error: message }, { status });
+    const errorCode = typeof error === "object" && error !== null && "code" in error
+      ? (error as { code?: unknown }).code
+      : undefined;
+    const duplicate = errorCode === 11000 || /already exists|duplicate key/i.test(message);
+
+    console.error("[auth/signup] request failed", {
+      requestId,
+      code: errorCode,
+      name: error instanceof Error ? error.name : "UnknownError",
+    });
+
+    if (duplicate) {
+      return NextResponse.json(
+        { error: "Username or email is already registered", code: "already_exists", requestId },
+        { status: 409 },
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Unable to create your account right now. Please try again shortly.", code: "database_unavailable", requestId },
+      { status: 503 },
+    );
   }
 }

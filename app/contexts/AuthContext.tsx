@@ -43,6 +43,7 @@ interface AuthContextType {
     firstName: string;
     lastName: string;
     password: string;
+    signupCode: string;
   }) => Promise<void>;
   logout: () => Promise<void>;
 }

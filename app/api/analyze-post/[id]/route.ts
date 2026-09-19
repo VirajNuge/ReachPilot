@@ -53,8 +53,8 @@ export async function GET(
               success: true,
               data: {
                 id: historyRecord.analysisId,
-                analysis: historyRecord.analysisData?.analysis || historyRecord.analysis,
-                postData: historyRecord.analysisData?.postData || historyRecord.postData,
+                analysis: historyRecord.analysisData?.analysis,
+                postData: historyRecord.analysisData?.postData,
                 timestamp: historyRecord.analysisData?.timestamp || historyRecord.createdAt.toISOString(),
                 historyId: historyRecord._id?.toHexString?.(),
               },

@@ -1,11 +1,13 @@
 // ============================================================
-// ReachPilot — Central AI Configuration
-// Change model IDs here to apply across all routes
+// ReachPilot — Central provider-neutral AI configuration.
+// Values may be overridden through server-only environment variables.
 // ============================================================
 
 export const AI_MODELS = {
-  /** Default text generation model used by all post-gen routes */
-  TEXT: "gemini-2.5-flash",
-  /** Image generation model (used in generate-image route) */
-  IMAGE_DEFAULT: process.env.GEMINI_IMAGE_MODEL ?? "gemini-2.5-flash-image",
+  /** Cheapest text model/router. Override with OPENROUTER_TEXT_MODEL. */
+  TEXT: process.env.OPENROUTER_TEXT_MODEL ?? "openrouter/free",
+  /** Vision-capable model/router. Override with OPENROUTER_VISION_MODEL. */
+  VISION: process.env.OPENROUTER_VISION_MODEL ?? "openrouter/free",
+  /** Dedicated image model. Override with OPENROUTER_IMAGE_MODEL. */
+  IMAGE_DEFAULT: process.env.OPENROUTER_IMAGE_MODEL ?? "openai/gpt-image-2",
 } as const;

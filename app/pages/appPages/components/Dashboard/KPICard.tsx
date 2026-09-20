@@ -1,4 +1,15 @@
 import React from "react";
+import {
+  PenTool,
+  Send,
+  Zap,
+  Users,
+  Bookmark,
+  Sparkles,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+} from "lucide-react";
 
 export type KPITrend = "up" | "down" | "stable";
 
@@ -11,42 +22,107 @@ interface KPICardProps {
   icon?: React.ReactNode;
 }
 
-const trendConfig: Record<KPITrend, { textColor: string; badgeBg: string; glyph: string; barColor: string }> = {
-  up:     { textColor: "text-emerald-600", badgeBg: "bg-emerald-50 border-emerald-100",  glyph: "↑", barColor: "bg-emerald-400" },
-  down:   { textColor: "text-rose-500",    badgeBg: "bg-rose-50 border-rose-100",        glyph: "↓", barColor: "bg-rose-400"   },
-  stable: { textColor: "text-slate-500",   badgeBg: "bg-slate-100 border-slate-200",     glyph: "→", barColor: "bg-slate-300"  },
-};
+function getDefaultIcon(label: string) {
+  const l = label.toLowerCase();
+  if (l.includes("generated")) {
+    return {
+      icon: <PenTool size={16} strokeWidth={2.2} />,
+      bg: "bg-blue-50 text-blue-600",
+    };
+  }
+  if (l.includes("published")) {
+    return {
+      icon: <Send size={16} strokeWidth={2.2} />,
+      bg: "bg-emerald-50 text-emerald-600",
+    };
+  }
+  if (l.includes("engagement")) {
+    return {
+      icon: <Zap size={16} strokeWidth={2.2} />,
+      bg: "bg-purple-50 text-purple-600",
+    };
+  }
+  if (l.includes("follower")) {
+    return {
+      icon: <Users size={16} strokeWidth={2.2} />,
+      bg: "bg-amber-50 text-amber-600",
+    };
+  }
+  if (l.includes("template")) {
+    return {
+      icon: <Bookmark size={16} strokeWidth={2.2} />,
+      bg: "bg-indigo-50 text-indigo-600",
+    };
+  }
+  return {
+    icon: <Sparkles size={16} strokeWidth={2.2} />,
+    bg: "bg-cyan-50 text-cyan-600",
+  };
+}
 
-export default function KPICard({ label, value, unit, delta, trend = "stable" }: KPICardProps) {
-  const cfg = trendConfig[trend];
+export default function KPICard({
+  label,
+  value,
+  unit,
+  delta,
+  trend = "stable",
+  icon,
+}: KPICardProps) {
+  const defaultIcon = getDefaultIcon(label);
+
+  const trendStyles = {
+    up: {
+      text: "text-emerald-600",
+      bg: "bg-emerald-50 border-emerald-100/80",
+      Icon: TrendingUp,
+    },
+    down: {
+      text: "text-rose-600",
+      bg: "bg-rose-50 border-rose-100/80",
+      Icon: TrendingDown,
+    },
+    stable: {
+      text: "text-slate-500",
+      bg: "bg-slate-100 border-slate-200/80",
+      Icon: Minus,
+    },
+  }[trend];
+
+  const TrendIcon = trendStyles.Icon;
 
   return (
-    <div className="relative bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden cursor-default">
-      {/* Subtle top accent line */}
-      <div className={`absolute top-0 left-0 right-0 h-0.5 ${cfg.barColor} opacity-60 group-hover:opacity-100 transition-opacity`} />
-
-      <div className="flex items-start justify-between mb-3">
-        <span className="text-[11px] uppercase tracking-widest font-bold text-slate-400">
-          {label}
-        </span>
+    <div className="group relative min-w-0 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+      {/* Top row: Icon + Trend badge */}
+      <div className="flex items-center justify-between gap-2">
+        <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${defaultIcon.bg}`}>
+          {icon || defaultIcon.icon}
+        </div>
         <span
-          className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${cfg.badgeBg} ${cfg.textColor} transition-transform group-hover:scale-110`}
+          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${trendStyles.bg} ${trendStyles.text}`}
         >
-          {cfg.glyph}
+          <TrendIcon size={12} strokeWidth={2.5} />
+          {delta !== undefined ? `${delta > 0 ? "+" : ""}${delta}%` : "—"}
         </span>
       </div>
 
-      <div className="text-[32px] font-black text-[#1A1D23] tracking-tight leading-none">
-        {value}
-        {unit ? <span className="text-[18px] font-bold text-slate-400 ml-1">{unit}</span> : null}
+      {/* Middle: Value */}
+      <div className="mt-3 flex items-baseline gap-1">
+        <span className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          {value}
+        </span>
+        {unit ? (
+          <span className="text-base font-semibold text-slate-500">{unit}</span>
+        ) : null}
       </div>
 
-      <div className={`mt-2.5 text-[12px] font-semibold ${cfg.textColor}`}>
-        {delta !== undefined ? (
-          <>{delta > 0 ? "+" : ""}{delta}% vs last period</>
-        ) : (
-          <span className="text-slate-300">— no change</span>
-        )}
+      {/* Bottom: Label & context */}
+      <div className="mt-1">
+        <div className="truncate text-xs font-semibold text-slate-500">
+          {label}
+        </div>
+        <div className="mt-0.5 text-[11px] text-slate-400">
+          vs last period
+        </div>
       </div>
     </div>
   );

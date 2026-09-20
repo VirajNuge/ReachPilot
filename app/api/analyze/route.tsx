@@ -1,5 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { NextResponse } from "next/server";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
+import { NextRequest, NextResponse } from "next/server";
 import { scrapeProfile } from "@/lib/scrapeService";
 import {
   getPlatformPrompt,
@@ -7,13 +7,16 @@ import {
   PLATFORM_BENCHMARKS,
 } from "./platformPrompts";
 import { coreSchema } from "@/lib/analysisSchema";
+import { getAuthFromRequest } from "@/lib/auth";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const auth = await getAuthFromRequest(req);
+    if (!auth?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500 },
       );
     }
@@ -29,10 +32,10 @@ export async function POST(req: Request) {
     const scrapedText = await scrapeProfile(link);
 
     // 2. Setup Gemini
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "openrouter/free",
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: coreSchema,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 
 import { AI_MODELS } from "@/lib/aiConfig";
 import { getAuthFromRequest } from "@/lib/auth";
@@ -294,9 +294,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "GEMINI_API_KEY is not set" }, { status: 500 });
+      return NextResponse.json({ error: "OPENROUTER_API_KEY is not configured" }, { status: 500 });
     }
 
     const body = (await request.json()) as VoiceToInputRequest;
@@ -307,7 +307,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
     const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
 
     const transcriptionResult = await model.generateContent([

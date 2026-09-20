@@ -1,5 +1,6 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { NextResponse } from "next/server";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
+import { NextRequest, NextResponse } from "next/server";
+import { getAuthFromRequest } from "@/lib/auth";
 
 const SYSTEM_PROMPT = `You are ReachPilot Assistant, a friendly and helpful AI assistant for the ReachPilot social media optimization platform.
 
@@ -34,9 +35,11 @@ interface ChatMessage {
   parts: { text: string }[];
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const auth = await getAuthFromRequest(req);
+    if (!auth?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
         { error: "API key not configured" },
@@ -53,9 +56,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "openrouter/free",
       systemInstruction: SYSTEM_PROMPT,
     });
 

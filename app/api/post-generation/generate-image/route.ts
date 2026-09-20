@@ -1,181 +1,68 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenAI, Modality } from "@google/genai";
 import { getAuthFromRequest } from "@/lib/auth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
+import { AI_MODELS } from "@/lib/aiConfig";
+import { generateImage, getSafeAiError } from "@/lib/ai/openrouter";
 import type {
   CreativeHandoffV2,
-  GeminiImageModel,
   ImageCreativeDirectorOutput,
   PostGenerationInput,
   PosterPromptOutput,
   ImageVariation,
-  ReferenceImage,
 } from "@/lib/types/postGeneration";
 import { POST_IMAGE_SIZES } from "@/lib/types/postGeneration";
 import { buildPosterPrompt, PLATFORM_ASPECT_RATIO } from "@/lib/postGeneration/posterPromptBuilder";
 import { POSTGEN_CREATIVE_DIRECTOR_STAGE } from "@/lib/postGeneration/featureFlags";
 
-// Imagen models use generateImages(); Gemini models use generateContent()
-const IMAGEN_MODELS = new Set([
-  "imagen-4.0-generate-001",
-  "imagen-4.0-fast-generate-001",
-  "imagen-4.0-ultra-generate-001",
-]);
-
-/** Extract base64 string from a data URL or return as-is if already raw base64 */
 function stripDataUrlPrefix(dataUrl: string): string {
-  // Use indexOf + slice instead of regex to avoid call stack overflow on large base64 strings
-  const marker = ";base64,";
-  const markerIdx = dataUrl.indexOf(marker);
-  if (markerIdx !== -1) {
-    return dataUrl.slice(markerIdx + marker.length);
-  }
-  return dataUrl;
+  return dataUrl.includes(";base64,") ? dataUrl.slice(dataUrl.indexOf(";base64,") + 8) : dataUrl;
 }
 
-/** Call Gemini generateContent() and extract the first image part */
-async function callGeminiGenerateContent(
-  ai: GoogleGenAI,
-  modelId: string,
-  prompt: string,
-  logoBase64?: string,
-  logoMimeType?: string,
-  referenceImages?: ReferenceImage[]
-): Promise<{ data: string; mimeType: string } | null> {
-  const contentParts: object[] = [];
-
-  // Inject reference images first (subject/style references)
-  if (referenceImages && referenceImages.length > 0) {
-    for (const ref of referenceImages) {
-      const mimeMatch = ref.dataUrl.match(/^data:([^;]+);base64,/);
-      const mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
-      const base64 = stripDataUrlPrefix(ref.dataUrl);
-      contentParts.push({
-        inlineData: { mimeType: mime, data: base64 },
-      });
-      // Add a label so the model understands what this reference is
-      if (ref.label) {
-        contentParts.push({ text: `[Reference: ${ref.label}]` });
-      }
-    }
-  }
-
-  // If logo provided, inject as a reference image
-  if (logoBase64) {
-    contentParts.push({
-      inlineData: {
-        mimeType: logoMimeType ?? "image/png",
-        data: logoBase64,
-      },
-    });
-    contentParts.push({ text: "[Logo — include in image]" });
-  }
-
-  // Text prompt
-  contentParts.push({ text: prompt });
-
-  const config: Record<string, unknown> = {
-    responseModalities: [Modality.IMAGE, Modality.TEXT],
-  };
-
-  const response = await ai.models.generateContent({
-    model: modelId,
-    contents: [{ role: "user", parts: contentParts }],
-    config,
-  });
-
-  const parts = response.candidates?.[0]?.content?.parts ?? [];
-  for (const part of parts) {
-    if ("inlineData" in part && part.inlineData?.data) {
-      return {
-        data: part.inlineData.data,
-        mimeType: part.inlineData.mimeType ?? "image/png",
-      };
-    }
-  }
-  return null;
-}
-
-/** Call Imagen generateImages() — supports numberOfImages natively */
-async function callImagenGenerateImages(
-  ai: GoogleGenAI,
-  modelId: string,
-  prompt: string,
-  aspectRatio: string,
-  count: number
-): Promise<Array<{ data: string; mimeType: string }>> {
-  const response = await ai.models.generateImages({
-    model: modelId,
-    prompt,
-    config: {
-      numberOfImages: count,
-      aspectRatio,
-    },
-  });
-
-  const results: Array<{ data: string; mimeType: string }> = [];
-  for (const generatedImage of response.generatedImages ?? []) {
-    const imageBytes = generatedImage.image?.imageBytes;
-    if (imageBytes) {
-      const data =
-        typeof imageBytes === "string"
-          ? imageBytes
-          : Buffer.from(imageBytes as Uint8Array).toString("base64");
-      results.push({ data, mimeType: "image/png" });
-    }
-  }
-  return results;
+function normalizeImageReference(value: string): string {
+  if (value.startsWith("data:")) return value;
+  return `data:image/png;base64,${stripDataUrlPrefix(value)}`;
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await getAuthFromRequest(req);
+  if (!auth?.userId) {
+    return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
+  }
+
   try {
-    const auth = await getAuthFromRequest(req);
-    if (!auth?.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "GEMINI_API_KEY is not set" }, { status: 500 });
-    }
-
     const body = (await req.json()) as {
       posterOutput: PosterPromptOutput;
       creativeHandoff?: CreativeHandoffV2;
       creativeDirector?: ImageCreativeDirectorOutput;
       input: PostGenerationInput;
-      imageModel?: GeminiImageModel;
+      imageModel?: string;
       accountId?: string;
     };
 
     if (!body.posterOutput || !body.input) {
-      return NextResponse.json(
-        { error: "posterOutput and input are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "posterOutput and input are required" }, { status: 400 });
     }
 
-    // SEC-05: Guard against oversized base64 payloads (~10MB limit per image)
-    const MAX_BASE64_BYTES = 10 * 1024 * 1024; // 10MB
-    if (body.input.brandAssets?.logoUrl && body.input.brandAssets.logoUrl.length > MAX_BASE64_BYTES) {
+    const maxImagePayload = 10 * 1024 * 1024;
+    const logoUrl = body.input.brandAssets?.logoUrl;
+    if (logoUrl && logoUrl.length > maxImagePayload) {
       return NextResponse.json({ error: "Logo image is too large (max 10MB)" }, { status: 413 });
     }
-    if (Array.isArray(body.input.referenceImages)) {
-      for (const ref of body.input.referenceImages) {
-        if (ref.dataUrl && ref.dataUrl.length > MAX_BASE64_BYTES) {
-          return NextResponse.json({ error: "Reference image is too large (max 10MB)" }, { status: 413 });
-        }
+    for (const reference of body.input.referenceImages ?? []) {
+      if (reference.dataUrl.length > maxImagePayload) {
+        return NextResponse.json({ error: "Reference image is too large (max 10MB)" }, { status: 413 });
       }
     }
 
-    // Server-side persona brand asset merge — fills missing brandAssets from persona
     try {
-      if (auth.userId && body.accountId) {
+      if (body.accountId) {
         const persona = await getPersonaByUserAndAccount(auth.userId, body.accountId);
         if (persona) {
           const personaColors = persona.colorPalette?.length
             ? persona.colorPalette
-            : persona.brandColorHex ? [persona.brandColorHex] : [];
+            : persona.brandColorHex
+              ? [persona.brandColorHex]
+              : [];
           if (body.input.brandAssets.colorPalette.length === 0 && personaColors.length > 0) {
             body.input.brandAssets.colorPalette = personaColors;
           }
@@ -188,109 +75,49 @@ export async function POST(req: NextRequest) {
         }
       }
     } catch {
-      // Non-fatal — proceed without persona brand assets
+      // Persona assets are an enhancement; image generation can continue without them.
     }
 
-    const modelId: string = body.imageModel ?? "gemini-2.5-flash-image";
     const primaryPlatform = body.input.platforms[0] ?? "instagram_post";
-    // Prefer explicit user size selection over platform default
-    const selectedSize = POST_IMAGE_SIZES.find((s) => s.id === body.input.imageSize);
+    const selectedSize = POST_IMAGE_SIZES.find((size) => size.id === body.input.imageSize);
     const aspectRatio = selectedSize?.ratio ?? PLATFORM_ASPECT_RATIO[primaryPlatform] ?? "1:1";
-    const imageSizeLabel = selectedSize
-      ? `${selectedSize.width}×${selectedSize.height}`
-      : undefined;
-
-    // Build the complete poster prompt
     const posterPrompt = buildPosterPrompt(
       body.input,
       body.posterOutput,
       body.creativeHandoff,
       POSTGEN_CREATIVE_DIRECTOR_STAGE ? body.creativeDirector : undefined,
-      aspectRatio
+      aspectRatio,
     );
 
-    // Append reference image labels to the prompt text for Imagen (which can't take inline images)
-    const referenceImages = body.input.referenceImages ?? [];
-    let promptWithRefs = posterPrompt;
-    if (referenceImages.length > 0) {
-      const refDescriptions = referenceImages
-        .map((r) => r.label || "reference subject")
-        .join(", ");
-      promptWithRefs = `${posterPrompt}\n\nIncorporate the following subjects/elements in the image: ${refDescriptions}.`;
-    }
+    const references = [
+      ...(body.input.referenceImages ?? []).map((reference) => normalizeImageReference(reference.dataUrl)),
+      ...(body.input.brandAssets.logoUrl
+        ? [normalizeImageReference(body.input.brandAssets.logoUrl)]
+        : []),
+    ];
 
-    let logoBase64: string | undefined;
-    let logoMimeType: string | undefined;
-    if (body.input.brandAssets.logoUrl) {
-      const raw = body.input.brandAssets.logoUrl;
-      const mimeMatch = raw.match(/^data:([^;]+);base64,/);
-      logoMimeType = mimeMatch ? mimeMatch[1] : "image/png";
-      logoBase64 = stripDataUrlPrefix(raw);
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
-    const imageVariations: ImageVariation[] = [];
-
-    try {
-      if (IMAGEN_MODELS.has(modelId)) {
-        // Imagen: single call with numberOfImages: 1
-        // Imagen doesn't support inline reference images — labels are injected into the prompt text
-        const results = await callImagenGenerateImages(ai, modelId, promptWithRefs, aspectRatio, 1);
-        results.forEach((result, index) => {
-          imageVariations.push({
-            id: index + 1,
-            imageUrl: `data:${result.mimeType};base64,${result.data}`,
-            model: modelId,
-            aspectRatio,
-          });
-        });
-      } else {
-        // Gemini: single generateContent() call, with reference images injected as inline parts
-        const result = await callGeminiGenerateContent(
-          ai,
-          modelId,
-          posterPrompt,
-          logoBase64,
-          logoMimeType,
-          referenceImages
-        );
-
-        if (result) {
-          imageVariations.push({
-            id: 1,
-            imageUrl: `data:${result.mimeType};base64,${result.data}`,
-            model: modelId,
-            aspectRatio,
-          });
-        } else {
-          console.warn("Variation 1 failed: no image returned");
-        }
-      }
-    } catch (aiError) {
-      console.error("Image generation error:", aiError);
-      return NextResponse.json(
-        {
-          error: "Image generation failed",
-          details: aiError instanceof Error ? aiError.message : String(aiError),
-        },
-        { status: 500 }
-      );
-    }
-
-    if (imageVariations.length === 0) {
-      return NextResponse.json(
-        { error: "No images were generated" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      images: imageVariations,
+    const result = await generateImage({
+      model: body.imageModel ?? AI_MODELS.IMAGE_DEFAULT,
+      prompt: posterPrompt,
       aspectRatio,
-      model: modelId,
+      count: 1,
+      referenceImages: references.length > 0 ? references : undefined,
     });
+
+    const images: ImageVariation[] = result.images.map((image, index) => ({
+      id: index + 1,
+      imageUrl: `data:${image.mimeType};base64,${image.data}`,
+      model: result.model,
+      aspectRatio,
+    }));
+
+    return NextResponse.json({ images, aspectRatio, model: result.model });
   } catch (error) {
-    console.error("Generate image route error:", error);
-    return NextResponse.json({ error: "Request failed" }, { status: 500 });
+    const safe = getSafeAiError(error);
+    console.error("[generate-image] AI request failed", { code: safe.code, requestId: safe.requestId });
+    return NextResponse.json(
+      { error: safe.message, code: safe.code, requestId: safe.requestId },
+      { status: safe.code === "rate_limit" ? 429 : 502 },
+    );
   }
 }

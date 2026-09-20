@@ -4,280 +4,114 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useParams, useRouter } from "next/navigation";
 import {
+  FaChartBar,
+  FaChevronDown,
+  FaChevronRight,
   FaFlask,
   FaLightbulb,
   FaPaperPlane,
-  FaChartBar,
-  FaTachometerAlt,
-  FaChevronDown,
-  FaChevronRight,
-  FaChrome,
-  FaArrowRight,
-  FaRegQuestionCircle,
-  FaUser,
+  FaQuestionCircle,
   FaRocket,
   FaSignOutAlt,
+  FaTachometerAlt,
+  FaTimes,
+  FaUser,
 } from "react-icons/fa";
-import { BsBoxArrowRight, BsGear } from "react-icons/bs";
-import { HiSparkles } from "react-icons/hi2";
+import { BsGear } from "react-icons/bs";
 import { useAuth } from "../../../../contexts/AuthContext";
 
-/**
- * ReachPilot Sidebar Component — Bright Bento Shell Style
- */
-const Sidebar = () => {
+export interface SidebarProps {
+  collapsed?: boolean;
+  mobileOpen?: boolean;
+  onToggle?: () => void;
+  onClose?: () => void;
+}
+
+const Sidebar = ({ collapsed = false, mobileOpen = false, onToggle, onClose }: SidebarProps) => {
   const pathname = usePathname();
   const params = useParams();
   const router = useRouter();
   const rawAccountId = params?.id;
   const accountId = Array.isArray(rawAccountId) ? rawAccountId[0] : rawAccountId ?? "1";
   const { user, logout } = useAuth();
+  const [contentOpen, setContentOpen] = useState(true);
 
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    content: true,
-    idea: false,
-    publishing: false,
-  });
-
-  const toggleMenu = (menu: string) => {
-    setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
+  const isActive = (path: string) => {
+    const target = `/${accountId}/${path.replace(/^\//, "")}`;
+    return pathname === target || pathname?.startsWith(`${target}/`);
   };
 
-  const isActive = (path: string) => pathname?.includes(path);
-
-  const prefetchRoute = (route: string) => {
+  const navigate = (route: string) => {
     router.prefetch(route);
+    onClose?.();
   };
 
-  // --- DESIGN SYSTEM TOKENS ---
-  const activeMainLink =
-    "bg-white text-[#0052FF] shadow-[0_4px_20px_rgba(0,0,0,0.03)]";
-  const inactiveMainLink =
-    "text-slate-500 hover:bg-white/60 hover:text-[#1A1D23]";
-
-  const sectionLabelStyle =
-    "text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-3 mt-6";
-  const subLinkBase =
-    "block ml-4 px-4 py-2.5 text-[12px] font-bold rounded-xl transition-all duration-200";
+  const linkClass = (active: boolean, nested = false) =>
+    `group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold no-underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+      nested ? "ml-7 text-xs" : ""
+    } ${active ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`;
 
   return (
-    <aside className="w-[260px] h-screen shrink-0 bg-[#E8ECF2] flex flex-col z-50 border-none font-sans antialiased">
-      {/* 1. BRAND IDENTITY SECTION */}
-      <div className="flex items-center gap-3 px-6 py-8 mb-2">
-        <div className="w-10 h-10 bg-[#0052FF] rounded-[14px] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(0,82,255,0.2)]">
-          <FaRocket size={20} />
-        </div>
-        <div className="flex flex-col">
-          <span className="font-black text-xl text-[#1A1D23] tracking-tight leading-none">
-            ReachPilot
-          </span>
-          <span className="text-[9px] font-bold text-[#0052FF] tracking-widest uppercase mt-1">
-            Creator Suite
-          </span>
-        </div>
-      </div>
+    <>
+      {mobileOpen ? <button type="button" aria-label="Close navigation" onClick={onClose} className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden" /> : null}
+      <aside className={`${mobileOpen ? "fixed inset-y-0 left-0 z-50 flex" : "hidden lg:flex"} ${collapsed ? "lg:w-[72px]" : "lg:w-60"} h-dvh w-60 max-w-[85vw] shrink-0 flex-col overflow-hidden border-r border-slate-200 bg-white transition-[width] duration-200`}>
+        <header className={`relative flex shrink-0 border-b border-slate-100 py-4 ${collapsed ? "flex-col items-center justify-center gap-2 px-2" : "items-center justify-between px-4"}`}>
+          <Link href={`/${accountId}/dashboard`} onClick={() => navigate(`/${accountId}/dashboard`)} className="flex min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white"><FaRocket size={16} /></span>
+            {!collapsed ? <span className="min-w-0"><span className="block truncate text-base font-bold tracking-tight text-slate-950">ReachPilot</span><span className="block text-[9px] font-bold uppercase tracking-[0.16em] text-blue-700">Creator Suite</span></span> : null}
+          </Link>
+          {!mobileOpen && onToggle ? <button type="button" onClick={onToggle} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"} title={collapsed ? "Expand navigation" : "Collapse navigation"} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">{collapsed ? <FaChevronRight size={12} /> : <FaChevronRight className="rotate-180" size={12} />}</button> : null}
+          {mobileOpen ? <button type="button" onClick={onClose} aria-label="Close navigation" className="absolute right-3 top-3 rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden"><FaTimes size={16} /></button> : null}
+        </header>
 
-      {/* 3. SCROLLABLE NAVIGATION AREA */}
-      <div className="flex-1 overflow-y-auto [scrollbar-width:none] px-4 space-y-1 pb-10">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 mb-3 mt-2">
-          Overview
-        </p>
+        <nav className="sidebar-nav no-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3" aria-label="Workspace navigation">
+          {!collapsed ? <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Overview</p> : null}
+          <Link href={`/${accountId}/dashboard`} onClick={() => navigate(`/${accountId}/dashboard`)} aria-current={isActive("dashboard") ? "page" : undefined} title={collapsed ? "Dashboard" : undefined} className={linkClass(isActive("dashboard"))}>
+            <FaTachometerAlt size={14} className="shrink-0" />{!collapsed ? <span>Dashboard</span> : null}
+          </Link>
 
-        <Link
-          href={`/${accountId}/dashboard`}
-          prefetch={false}
-          onMouseEnter={() => prefetchRoute(`/${accountId}/dashboard`)}
-          className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none no-underline outline-none ${
-            isActive("/dashboard") ? activeMainLink : inactiveMainLink
-          }`}
-        >
-          <FaTachometerAlt
-            size={15}
-            className={
-              isActive("/dashboard") ? "text-[#0052FF]" : "text-slate-400"
-            }
-          />
-          <span>Dashboard</span>
-        </Link>
-
-        {/* --- TOOLS: CONTENT LAB --- */}
-        <p className={sectionLabelStyle}>Automation & AI</p>
-
-        <div className="space-y-1">
-          <button
-            onClick={() => toggleMenu("content")}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none outline-none ${
-              openMenus.content
-                ? "text-[#1A1D23] bg-white/40"
-                : "text-slate-500 hover:bg-white/60"
-            }`}
-          >
-            <div className="flex items-center gap-3.5">
-              <FaFlask
-                size={15}
-                className={
-                  openMenus.content ? "text-[#0052FF]" : "text-slate-400"
-                }
-              />
-              <span>Content Lab</span>
-            </div>
-            {openMenus.content ? (
-              <FaChevronDown size={10} className="text-slate-400" />
-            ) : (
-              <FaChevronRight size={10} className="text-slate-400" />
-            )}
+          {!collapsed ? <p className="mb-2 mt-5 px-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Automation & AI</p> : null}
+          <button type="button" onClick={() => setContentOpen((value) => !value)} title={collapsed ? "Content Lab" : undefined} aria-expanded={contentOpen} className={`${linkClass(contentOpen)} w-full justify-between`}>
+            <span className="flex items-center gap-3"><FaFlask size={14} className="shrink-0" />{!collapsed ? <span>Content Lab</span> : null}</span>
+            {!collapsed ? (contentOpen ? <FaChevronDown size={10} /> : <FaChevronRight size={10} />) : null}
           </button>
-
-          {openMenus.content && (
-            <div className="ml-5 mt-1 border-l-2 border-slate-200/50 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
-              {[
-                { name: "Persona Builder", path: "accountPersona" },
-                { name: "Profile Analyzer", path: "profileAnalyzer" },
-                { name: "Post Analyzer", path: "postAnalyzer" },
-                { name: "Post Generator", path: "postGenerator" },
-              ].map((item) => (
-                <Link
-                  key={item.path}
-                  href={`/${accountId}/${item.path}`}
-                  prefetch={false}
-                  onMouseEnter={() => prefetchRoute(`/${accountId}/${item.path}`)}
-                  className={`${subLinkBase} border-none no-underline outline-none ${
-                    isActive(item.path)
-                      ? "text-[#0052FF] bg-white shadow-sm"
-                      : "text-slate-500 hover:text-[#1A1D23] hover:bg-white/50"
-                  }`}
-                >
-                  {item.name}
-                </Link>
+          {contentOpen && !collapsed ? (
+            <div className="mt-1 space-y-1">
+              {[{ name: "Persona Builder", path: "accountPersona" }, { name: "Profile Analyzer", path: "profileAnalyzer" }, { name: "Post Analyzer", path: "postAnalyzer" }, { name: "Post Generator", path: "postGenerator" }].map((item) => (
+                <Link key={item.path} href={`/${accountId}/${item.path}`} onClick={() => navigate(`/${accountId}/${item.path}`)} aria-current={isActive(item.path) ? "page" : undefined} className={linkClass(isActive(item.path), true)}>{item.name}</Link>
               ))}
             </div>
-          )}
-
-          {/* --- TOOLS: IDEA FINDER --- */}
-          <Link
-            href={`/${accountId}/generateIdeas`}
-            prefetch={false}
-            onMouseEnter={() => prefetchRoute(`/${accountId}/generateIdeas`)}
-            className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 border-none no-underline outline-none mt-1 ${
-              isActive("generateIdeas") ? activeMainLink : inactiveMainLink
-            }`}
-          >
-            <FaLightbulb
-              size={15}
-              className={isActive("generateIdeas") ? "text-[#FF8A00]" : "text-slate-400"}
-            />
-            <span>Idea Finder</span>
-          </Link>
-        </div>
-
-        {/* --- PERFORMANCE & ANALYTICS --- */}
-        <p className={sectionLabelStyle}>Performance</p>
-
-        <div className="space-y-1">
-          <Link
-            href={`/${accountId}/publishing`}
-            prefetch={false}
-            onMouseEnter={() => prefetchRoute(`/${accountId}/publishing`)}
-            className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none ${
-              isActive("publishing") ? activeMainLink : inactiveMainLink
-            }`}
-          >
-            <FaPaperPlane
-              size={15}
-              className={
-                isActive("publishing") ? "text-[#0052FF]" : "text-slate-400"
-              }
-            />
-            <span>Publishing</span>
+          ) : null}
+          <Link href={`/${accountId}/generateIdeas`} onClick={() => navigate(`/${accountId}/generateIdeas`)} aria-current={isActive("generateIdeas") ? "page" : undefined} title={collapsed ? "Idea Finder" : undefined} className={`mt-1 ${linkClass(isActive("generateIdeas"))}`}>
+            <FaLightbulb size={14} className="shrink-0" />{!collapsed ? <span>Idea Finder</span> : null}
           </Link>
 
-          <Link
-            href={`/${accountId}/analytics`}
-            prefetch={false}
-            onMouseEnter={() => prefetchRoute(`/${accountId}/analytics`)}
-            className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none ${
-              isActive("analytics") ? activeMainLink : inactiveMainLink
-            }`}
-          >
-            <FaChartBar
-              size={15}
-              className={
-                isActive("analytics") ? "text-[#0052FF]" : "text-slate-400"
-              }
-            />
-            <span>Analytics</span>
-          </Link>
+          {!collapsed ? <p className="mb-2 mt-5 px-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Performance</p> : null}
+          {[{ name: "Publishing", path: "publishing", icon: FaPaperPlane }, { name: "Analytics", path: "analytics", icon: FaChartBar }, { name: "Account", path: "accountPersona", icon: FaUser }].map((item) => {
+            const Icon = item.icon;
+            return <Link key={item.path} href={`/${accountId}/${item.path}`} onClick={() => navigate(`/${accountId}/${item.path}`)} aria-current={isActive(item.path) ? "page" : undefined} title={collapsed ? item.name : undefined} className={linkClass(isActive(item.path))}><Icon size={14} className="shrink-0" />{!collapsed ? <span>{item.name}</span> : null}</Link>;
+          })}
 
+          {!collapsed ? <p className="mb-2 mt-5 px-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Support</p> : null}
+          <Link href="/help" onClick={onClose} title={collapsed ? "Documentation" : undefined} className={linkClass(false)}><FaQuestionCircle size={14} className="shrink-0" />{!collapsed ? <span>Documentation</span> : null}</Link>
+          <Link href="/settings" onClick={onClose} title={collapsed ? "Settings" : undefined} className={linkClass(false)}><BsGear size={15} className="shrink-0" />{!collapsed ? <span>Workspace Settings</span> : null}</Link>
+        </nav>
 
-          <Link
-            href={`/${accountId}/accountPersona`}
-            prefetch={false}
-            onMouseEnter={() => prefetchRoute(`/${accountId}/accountPersona`)}
-            className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all border-none no-underline outline-none mt-1 ${
-              isActive("/accountPersona") ? activeMainLink : inactiveMainLink
-            }`}
-          >
-            <FaUser
-              size={15}
-              className={
-              isActive("/accountPersona") ? "text-[#0052FF]" : "text-slate-400"
-            }
-          />
-          <span>Account</span>
-        </Link>
-        </div>
-
-        {/* --- UTILITY SECTION --- */}
-        <p className={sectionLabelStyle}>Support</p>
-        <Link
-          href="/help"
-          className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold text-slate-500 hover:bg-white/60 hover:text-[#1A1D23] transition-all border-none no-underline outline-none mb-1"
-        >
-          <FaRegQuestionCircle size={15} className="text-slate-400" />
-          <span>Documentation</span>
-        </Link>
-        <Link
-          href="/settings"
-          className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[13px] font-bold text-slate-500 hover:bg-white/60 hover:text-[#1A1D23] transition-all border-none no-underline outline-none"
-        >
-          <BsGear size={15} className="text-slate-400" />
-          <span>Workspace Settings</span>
-        </Link>
-      </div>
-
-      {/* 4. USER FOOTER SECTION */}
-      <div className="p-4 mt-auto">
-        <div className="relative overflow-hidden bg-white rounded-3xl p-5 group transition-all duration-300 shadow-sm hover:shadow-md border border-white/60">
-          <div className="relative z-10">
-            {/* User Info */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-[#0052FF] rounded-xl flex items-center justify-center text-white text-[14px] font-black shrink-0">
-                {user
-                  ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
-                  : "?"}
+        <div className={`border-t border-slate-100 p-3 ${collapsed ? "flex justify-center" : ""}`}>
+          {collapsed ? (
+            <button type="button" onClick={logout} title="Sign out" aria-label="Sign out" className="rounded-lg p-2.5 text-slate-500 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><FaSignOutAlt size={15} /></button>
+          ) : (
+            <div className="rounded-xl bg-slate-50 p-3">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-xs font-bold text-white">{user ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase() : "?"}</div>
+                <div className="min-w-0"><p className="truncate text-xs font-bold text-slate-900">{user ? `${user.firstName} ${user.lastName}` : "Guest"}</p><p className="truncate text-[11px] text-slate-500">{user?.email || "Not signed in"}</p></div>
               </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[#1A1D23] text-[13px] font-black tracking-tight truncate">
-                  {user ? `${user.firstName} ${user.lastName}` : "Guest"}
-                </span>
-                <span className="text-slate-400 text-[11px] font-medium truncate">
-                  {user?.email || "Not signed in"}
-                </span>
-              </div>
+              <button type="button" onClick={logout} className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2 text-xs font-semibold text-slate-600 hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"><FaSignOutAlt size={12} />Sign out</button>
             </div>
-
-            {/* Logout Button */}
-            <button
-              onClick={logout}
-              className="flex items-center justify-center gap-2 w-full py-2.5 font-bold rounded-xl transition-all bg-[#F1F5F9] hover:bg-red-50 text-slate-500 hover:text-red-500 text-[13px]"
-            >
-              <FaSignOutAlt size={14} />
-              Sign Out
-            </button>
-          </div>
+          )}
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 

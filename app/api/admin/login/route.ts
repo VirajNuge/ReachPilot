@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ADMIN_CREDENTIALS, signAdminToken, setAdminAuthCookie } from "../../../../lib/adminAuth";
+import {
+  ADMIN_CREDENTIALS,
+  hasConfiguredAdminCredentials,
+  signAdminToken,
+  setAdminAuthCookie,
+  verifyAdminCredentials,
+} from "../../../../lib/adminAuth";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { username, password } = body;
 
-    if (
-      username !== ADMIN_CREDENTIALS.username ||
-      password !== ADMIN_CREDENTIALS.password
-    ) {
+    if (!hasConfiguredAdminCredentials()) {
+      return NextResponse.json({ error: "Admin authentication is not configured" }, { status: 503 });
+    }
+
+    if (!(await verifyAdminCredentials(username, password))) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }

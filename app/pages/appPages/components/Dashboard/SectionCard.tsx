@@ -19,20 +19,20 @@ export default function SectionCard({
 }: SectionCardProps) {
   return (
     <div
-      className={`bg-white border border-slate-200/80 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden ${className}`}
+      className={`min-w-0 flex flex-col h-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs transition-shadow duration-200 hover:shadow-sm ${className}`}
     >
-      <div className="px-6 pt-5 pb-4 flex items-start justify-between gap-4 border-b border-slate-100">
-        <div>
-          <h3 className="text-[15px] font-bold text-[#1A1D23] tracking-tight leading-tight">
+      <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-3.5 sm:py-4">
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-sm font-bold tracking-tight text-slate-900">
             {title}
           </h3>
           {subtitle ? (
-            <p className="text-[12px] font-medium text-slate-400 mt-0.5">{subtitle}</p>
+            <p className="truncate mt-0.5 text-xs text-slate-500">{subtitle}</p>
           ) : null}
         </div>
-        {action ? <div className="shrink-0 mt-0.5">{action}</div> : null}
+        {action ? <div className="shrink-0">{action}</div> : null}
       </div>
-      <div className={noPadding ? "" : "p-6"}>{children}</div>
+      <div className={`flex-1 flex flex-col ${noPadding ? "" : "p-4 sm:p-5"}`}>{children}</div>
     </div>
   );
 }

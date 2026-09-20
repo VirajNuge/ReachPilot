@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { expect, afterEach, vi, beforeEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import bcrypt from 'bcryptjs';
 
 // Cleanup after each test
 afterEach(() => {
@@ -39,5 +40,8 @@ vi.mock('next/headers', () => ({
 // Set environment variables for tests
 process.env.JWT_SECRET = 'test-secret-key-for-testing';
 process.env.ADMIN_JWT_SECRET = 'test-admin-secret-key-for-testing';
+process.env.ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'virajnuge';
+process.env.ADMIN_PASSWORD_HASH =
+  process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync('password-password123', 4);
 process.env.MONGODB_URI = 'mongodb://test:test@localhost:27017/test';
-(process.env as Record<string, string | undefined>).NODE_ENV = 'test';
+;(process.env as Record<string, string | undefined>).NODE_ENV = 'test';

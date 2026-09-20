@@ -1,5 +1,7 @@
 import React from "react";
 import SectionCard from "./SectionCard";
+import { ArrowUpRight, Bookmark, Layers } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
 
 export interface TemplateItem {
   id: string;
@@ -13,12 +15,12 @@ interface TemplatePreviewProps {
 }
 
 const categoryColors: Record<string, { bg: string; text: string }> = {
-  general:     { bg: "bg-slate-100",   text: "text-slate-600"  },
-  linkedin:    { bg: "bg-[#0A66C2]/8", text: "text-[#0A66C2]" },
+  general:     { bg: "bg-slate-100",   text: "text-slate-600" },
+  linkedin:    { bg: "bg-[#0A66C2]/10", text: "text-[#0A66C2]" },
   hooks:       { bg: "bg-purple-50",   text: "text-purple-600" },
-  storytelling:{ bg: "bg-amber-50",    text: "text-amber-600"  },
+  storytelling:{ bg: "bg-amber-50",    text: "text-amber-600" },
   engagement:  { bg: "bg-emerald-50",  text: "text-emerald-600"},
-  cta:         { bg: "bg-rose-50",     text: "text-rose-500"   },
+  cta:         { bg: "bg-rose-50",     text: "text-rose-600" },
 };
 
 function getCategoryStyle(category: string) {
@@ -26,52 +28,70 @@ function getCategoryStyle(category: string) {
 }
 
 export default function TemplatePreview({ templates }: TemplatePreviewProps) {
+  const router = useRouter();
+  const params = useParams();
+  const rawAccountId = params?.id;
+  const accountId = Array.isArray(rawAccountId) ? rawAccountId[0] : rawAccountId ?? "1";
+
   return (
     <SectionCard
       title="Templates"
       subtitle="Most used patterns"
       action={
-        <button className="text-[11px] font-semibold text-[#9C4BFF] hover:text-[#7B2FFF] bg-purple-50 hover:bg-purple-100 px-3 py-1 rounded-full transition-colors">
-          View library
+        <button
+          type="button"
+          onClick={() => router.push(`/${accountId}/postGenerator`)}
+          className="inline-flex items-center gap-1 rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        >
+          <span>View library</span>
+          <ArrowUpRight size={13} />
         </button>
       }
       noPadding
     >
-      <div className="divide-y divide-slate-100">
-        {templates.map((template) => {
-          const cs = getCategoryStyle(template.category);
-          return (
-            <div
-              key={template.id}
-              className="flex items-center gap-3.5 px-6 py-4 hover:bg-slate-50/70 transition-colors cursor-pointer group"
-            >
-              {/* Icon */}
-              <div className="flex-shrink-0 h-9 w-9 rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-100 flex items-center justify-center text-[15px] group-hover:scale-105 transition-transform">
-                📄
-              </div>
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-semibold text-[#1A1D23] truncate group-hover:text-[#9C4BFF] transition-colors">
-                  {template.name}
+      {templates.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-8 text-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-400 mb-2">
+            <Layers size={18} />
+          </div>
+          <p className="text-xs font-semibold text-slate-700">No templates saved yet</p>
+          <p className="mt-1 text-[11px] text-slate-400 max-w-xs">
+            Save successful hooks and post formats to build your reuse library.
+          </p>
+        </div>
+      ) : (
+        <div className="divide-y divide-slate-100">
+          {templates.map((template) => {
+            const cs = getCategoryStyle(template.category);
+            return (
+              <div
+                key={template.id}
+                className="flex items-center gap-3.5 px-5 py-3.5 hover:bg-slate-50/70 transition-colors cursor-pointer group"
+              >
+                {/* Icon */}
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-500 group-hover:text-blue-600 transition-colors">
+                  <Bookmark size={15} />
                 </div>
-                <span className={`mt-1 inline-block text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${cs.bg} ${cs.text}`}>
-                  {template.category}
-                </span>
-              </div>
 
-              {/* Usage */}
-              <div className="flex-shrink-0 flex items-center gap-1 text-[12px] font-bold text-slate-400">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 16 16">
-                  <path d="M8 1v9M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 13h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-                {template.usage}x
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
+                    {template.name}
+                  </div>
+                  <span className={`mt-0.5 inline-block text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${cs.bg} ${cs.text}`}>
+                    {template.category}
+                  </span>
+                </div>
+
+                {/* Usage */}
+                <div className="shrink-0 flex items-center gap-1 text-xs font-semibold text-slate-400">
+                  <span>{template.usage}x used</span>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </SectionCard>
   );
 }

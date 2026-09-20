@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { parseAIJson } from "@/lib/parseAIJson";
 
 interface OneUpMagnetResponse {
@@ -71,8 +71,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? "");
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const genAI = new OpenRouterClient();
+    const model = genAI.getGenerativeModel({ model: "openrouter/free" });
 
     const prompt = buildOneUpPrompt(competitorTitle, competitorType, competitorHook);
     const result = await model.generateContent(prompt);

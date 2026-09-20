@@ -1,6 +1,4 @@
 import { describe, it, expect } from 'vitest'
-import fetch from 'node-fetch'
-
 // This is a light-weight e2e-style test that calls the forgot endpoint with
 // DEBUG allowed via NODE_ENV=test and asserts the resetLink is present.
 
@@ -9,7 +7,7 @@ describe('reset flow (dev/test mode)', () => {
     // Adjust the email below to an address that exists in your test DB fixture.
     const email = process.env.TEST_USER_EMAIL || 'test@example.com'
 
-    const res = await fetch('http://localhost:3000/api/auth/forgot', {
+    const res = await globalThis.fetch('http://localhost:3000/api/auth/forgot', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),

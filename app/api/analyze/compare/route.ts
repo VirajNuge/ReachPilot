@@ -1,5 +1,7 @@
-import { GoogleGenerativeAI, SchemaType, Schema } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
+import { SchemaType, type Schema } from "@/lib/ai/schema";
 import { NextRequest, NextResponse } from "next/server";
+import { getAuthFromRequest } from "@/lib/auth";
 import {
   Platform,
   getComparisonPrompt,
@@ -117,10 +119,12 @@ const comparisonSchema: Schema = {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const auth = await getAuthFromRequest(request);
+    if (!auth?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500 },
       );
     }
@@ -147,9 +151,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Setup Gemini with comparison prompt
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "openrouter/free",
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: comparisonSchema,

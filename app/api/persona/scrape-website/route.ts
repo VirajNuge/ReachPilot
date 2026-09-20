@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { scrapeProfile } from "@/lib/scrapeService";
+import { getAuthFromRequest } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await getAuthFromRequest(req);
+    if (!auth?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const { url } = await req.json();
 
     if (!url || typeof url !== "string") {
@@ -40,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Use Gemini to extract brand summary from raw text
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       // If no Gemini key, return truncated raw text as fallback
       return NextResponse.json({
@@ -49,8 +52,8 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const genAI = new OpenRouterClient(apiKey);
+    const model = genAI.getGenerativeModel({ model: "openrouter/free" });
 
     const prompt = `
 You are a brand analyst. Extract a concise brand summary from this website content.

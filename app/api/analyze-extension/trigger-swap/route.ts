@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { parseAIJson } from "@/lib/parseAIJson";
 
 interface TriggerSwapResult {
@@ -111,10 +111,10 @@ Return ONLY valid JSON (no markdown, no backticks):
 
 export async function POST(req: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500 },
       );
     }
@@ -142,8 +142,8 @@ export async function POST(req: NextRequest) {
       body.insight ?? "",
     );
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const genAI = new OpenRouterClient(apiKey);
+    const model = genAI.getGenerativeModel({ model: "openrouter/free" });
 
     let responseText = "";
     try {

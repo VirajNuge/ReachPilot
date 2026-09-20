@@ -6,7 +6,7 @@ import { POST } from '../app/api/auth/forgot/route'
 
 describe('reset flow (unit e2e simulation)', () => {
   beforeEach(() => {
-    process.env.NODE_ENV = 'test'
+    (process.env as Record<string, string | undefined>).NODE_ENV = 'test'
     vi.clearAllMocks()
   })
 
@@ -25,7 +25,8 @@ describe('reset flow (unit e2e simulation)', () => {
       headers: new Headers(),
     }
 
-    const result: any = await POST(req as any)
+    const response: any = await POST(req as any)
+    const result = await response.json()
 
     // Assert
     expect(result).toHaveProperty('success', true)

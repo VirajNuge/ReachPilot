@@ -1,5 +1,7 @@
 import React from "react";
 import SectionCard from "./SectionCard";
+import { ArrowUpRight } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
 
 interface ProfileScoreProps {
   score: number;
@@ -13,6 +15,11 @@ function scoreColor(score: number) {
 }
 
 export default function ProfileScore({ score, improvements }: ProfileScoreProps) {
+  const router = useRouter();
+  const params = useParams();
+  const rawAccountId = params?.id;
+  const accountId = Array.isArray(rawAccountId) ? rawAccountId[0] : rawAccountId ?? "1";
+
   const cfg = scoreColor(score);
   // SVG circle donut
   const r = 30;
@@ -24,8 +31,13 @@ export default function ProfileScore({ score, improvements }: ProfileScoreProps)
       title="Profile Optimization"
       subtitle="Top improvements to increase conversion"
       action={
-        <button className="text-[11px] font-semibold text-[#0052FF] hover:text-[#003ED1] bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-full transition-colors">
-          View analysis
+        <button
+          type="button"
+          onClick={() => router.push(`/${accountId}/profileAnalyzer`)}
+          className="inline-flex items-center gap-1 rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        >
+          <span>View analysis</span>
+          <ArrowUpRight size={13} />
         </button>
       }
     >

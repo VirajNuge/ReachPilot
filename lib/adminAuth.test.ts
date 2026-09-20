@@ -18,18 +18,18 @@ describe('Admin Authentication', () => {
       expect(ADMIN_CREDENTIALS.username.length).toBeGreaterThan(0)
     })
 
-    it('has password defined', () => {
-      expect(ADMIN_CREDENTIALS.password).toBeDefined()
-      expect(typeof ADMIN_CREDENTIALS.password).toBe('string')
-      expect(ADMIN_CREDENTIALS.password.length).toBeGreaterThan(0)
+    it('has password hash defined', () => {
+      expect(ADMIN_CREDENTIALS.passwordHash).toBeDefined()
+      expect(typeof ADMIN_CREDENTIALS.passwordHash).toBe('string')
+      expect(ADMIN_CREDENTIALS.passwordHash.length).toBeGreaterThan(0)
     })
 
     it('username is virajnuge', () => {
       expect(ADMIN_CREDENTIALS.username).toBe('virajnuge')
     })
 
-    it('password meets minimum security requirements', () => {
-      expect(ADMIN_CREDENTIALS.password.length).toBeGreaterThanOrEqual(8)
+    it('password uses bcrypt hashing', () => {
+      expect(ADMIN_CREDENTIALS.passwordHash).toMatch(/^\$2[aby]\$/)
     })
   })
 
@@ -132,9 +132,9 @@ describe('Admin Authentication', () => {
 
   describe('Admin authentication flow', () => {
     it('validates correct credentials structure', () => {
-      const { username, password } = ADMIN_CREDENTIALS
+      const { username, passwordHash } = ADMIN_CREDENTIALS
       expect(username).toBe('virajnuge')
-      expect(password).toBe('password-password123')
+      expect(passwordHash).toMatch(/^\$2[aby]\$/)
     })
 
     it('cookie lifecycle: create -> verify -> clear', () => {
@@ -157,22 +157,22 @@ describe('Admin Authentication', () => {
 
     it('admin cookie is secure in production', () => {
       const originalEnv = process.env.NODE_ENV
-      process.env.NODE_ENV = 'production'
+      ;(process.env as Record<string, string | undefined>).NODE_ENV = 'production'
       
       const cookie = setAdminAuthCookie('test-token')
       expect(cookie.secure).toBe(true)
       
-      process.env.NODE_ENV = originalEnv
+      ;(process.env as Record<string, string | undefined>).NODE_ENV = originalEnv
     })
 
     it('admin cookie is not secure in development', () => {
       const originalEnv = process.env.NODE_ENV
-      process.env.NODE_ENV = 'development'
+      ;(process.env as Record<string, string | undefined>).NODE_ENV = 'development'
       
       const cookie = setAdminAuthCookie('test-token')
       expect(cookie.secure).toBe(false)
       
-      process.env.NODE_ENV = originalEnv
+      ;(process.env as Record<string, string | undefined>).NODE_ENV = originalEnv
     })
   })
 })

@@ -5,8 +5,12 @@ import { NextRequest } from 'next/server'
 vi.mock('../../../../lib/adminAuth', () => ({
   ADMIN_CREDENTIALS: {
     username: 'virajnuge',
-    password: 'password-password123',
+    passwordHash: 'test-hash',
   },
+  hasConfiguredAdminCredentials: vi.fn(() => true),
+  verifyAdminCredentials: vi.fn(async (username: unknown, password: unknown) =>
+    username === 'virajnuge' && password === 'password-password123'
+  ),
   signAdminToken: vi.fn(),
   setAdminAuthCookie: vi.fn(),
 }))
@@ -136,7 +140,7 @@ describe('POST /api/admin/login', () => {
       method: 'POST',
       body: JSON.stringify({
         username: ADMIN_CREDENTIALS.username,
-        password: ADMIN_CREDENTIALS.password,
+        password: 'password-password123',
       }),
       headers: { 'Content-Type': 'application/json' },
     })

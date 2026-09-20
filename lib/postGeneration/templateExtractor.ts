@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { parseAIJson } from "@/lib/parseAIJson";
 import type {
   Platform,
@@ -6,8 +6,7 @@ import type {
   PlatformVariant,
 } from "@/lib/models/userSavedPostTemplate";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "";
-const client = new GoogleGenerativeAI(GEMINI_API_KEY);
+const client = new OpenRouterClient();
 
 export interface ExtractedTemplate {
   name: string;
@@ -29,7 +28,7 @@ export interface TemplateExtractionResult {
 }
 
 /**
- * Extract a reusable template from a social media post using Gemini AI
+ * Extract a reusable template from a social media post using the configured AI provider.
  */
 export async function extractTemplateFromPost(postData: {
   platform: Platform;
@@ -47,8 +46,7 @@ export async function extractTemplateFromPost(postData: {
     // Build extraction prompt
     const prompt = buildExtractionPrompt(postData);
 
-    // Call Gemini 2.5 Flash with JSON schema
-    const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = client.getGenerativeModel({ model: "openrouter/free" });
 
     const response = await model.generateContent({
       contents: [{ role: "user", parts: [{ text: prompt }] }],

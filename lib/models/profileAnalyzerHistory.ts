@@ -42,7 +42,7 @@ const COLLECTION = "profileAnalyzerHistory";
 export async function createProfileAnalysisHistory(
   userId: string,
   accountId: string,
-  doc: Omit<ProfileAnalyzerHistoryDocument, "_id" | "createdAt" | "updatedAt">
+  doc: Omit<ProfileAnalyzerHistoryDocument, "_id" | "createdAt" | "updatedAt" | "userId" | "accountId">
 ): Promise<string> {
   const { db } = await connectToDatabase();
 

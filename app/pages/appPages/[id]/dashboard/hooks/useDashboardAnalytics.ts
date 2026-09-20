@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface DashboardAnalytics {
   impressions: number;
@@ -11,21 +11,27 @@ export interface DashboardAnalytics {
 export function useDashboardAnalytics(accountId: string, lookback: number) {
   const [data, setData] = useState<DashboardAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!accountId) return;
-    const fetchData = async () => {
-      setLoading(true);
-      const res = await fetch(
-        `/api/dashboard/analytics?accountId=${accountId}&lookback=${lookback}`
-      );
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/dashboard/analytics?accountId=${accountId}&lookback=${lookback}`);
       const json = await res.json();
-      setData(json.data);
+      if (!res.ok) throw new Error(json?.error || "Unable to load analytics");
+      setData(json.data || null);
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : "Unable to load analytics");
+    } finally {
       setLoading(false);
-    };
-
-    fetchData();
+    }
   }, [accountId, lookback]);
 
-  return { data, loading };
+  useEffect(() => {
+    fetchData();
+  }, [accountId, lookback, fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
 }

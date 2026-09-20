@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import fs from "fs/promises";
-import path from "path";
+import { NextRequest, NextResponse } from "next/server";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { parseAIJson } from "@/lib/parseAIJson";
+import { getLatestOwnedProfileAnalysis } from "@/lib/analysisAccess";
 import {
   createCaptionTemplate,
   type TemplateCategory,
@@ -11,16 +10,14 @@ import {
 
 // CORS headers so the extension page can call this
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": process.env.EXTENSION_ALLOWED_ORIGINS?.split(",")[0]?.trim() || "null",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Request-ID",
 };
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
-
-const CACHE_FILE_PATH = path.join(process.cwd(), "analysis_cache.json");
 
 // Canonical category values the DB accepts
 const VALID_CATEGORIES: TemplateCategory[] = [
@@ -166,41 +163,33 @@ function isGeneratedTemplateRaw(v: unknown): v is GeneratedTemplateRaw {
   );
 }
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set in .env.local" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500, headers: corsHeaders },
       );
     }
 
-    // 1. Read the analysis cache (written by the main analyze-extension POST route)
-    let cacheRaw: string;
-    try {
-      cacheRaw = await fs.readFile(CACHE_FILE_PATH, "utf-8");
-    } catch {
+    // 1. Read the latest user-owned analysis from MongoDB.
+    const owned = await getLatestOwnedProfileAnalysis(
+      request,
+      request.nextUrl.searchParams.get("accountId") ?? undefined,
+    );
+    if (!owned) {
       return NextResponse.json(
-        { error: "No analysis cache found. Run the extension analyzer first." },
+        { error: "Analysis not found or unauthorized" },
         { status: 404, headers: corsHeaders },
       );
     }
-
-    let cacheData: {
-      analysis: Record<string, unknown>;
-      platform: string;
+    const cacheData = owned.record.analysisData as {
+      analysis?: Record<string, unknown>;
+      platform?: string;
     };
-    try {
-      cacheData = JSON.parse(cacheRaw);
-    } catch {
-      return NextResponse.json(
-        { error: "Analysis cache is malformed." },
-        { status: 500, headers: corsHeaders },
-      );
-    }
 
-    const { analysis, platform } = cacheData;
+    const { analysis = {}, platform = owned.record.platform } = cacheData;
 
     if (!analysis || !platform) {
       return NextResponse.json(
@@ -231,16 +220,16 @@ export async function POST() {
       voiceSpectrum,
     });
 
-    // 3. Call Gemini
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // 3. Call the configured AI provider
+    const genAI = new OpenRouterClient(apiKey);
+    const model = genAI.getGenerativeModel({ model: "openrouter/free" });
 
     let responseText: string;
     try {
       const result = await model.generateContent(prompt);
       responseText = result.response.text();
     } catch (aiErr) {
-      console.error("[generate-template] Gemini error:", aiErr);
+      console.error("[generate-template] AI error:", aiErr);
       return NextResponse.json(
         { error: "AI generation failed" },
         { status: 500, headers: corsHeaders },

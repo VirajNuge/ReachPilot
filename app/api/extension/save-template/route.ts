@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
       aiAnalysis: {
         confidence: extractionResult.confidence,
         extractionMethod: extractionResult.method,
-        aiModel: "gemini-2.5-flash",
+        aiModel: "openrouter/free",
       },
       metadata: {
         tags: [],

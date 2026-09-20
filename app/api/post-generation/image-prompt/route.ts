@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 
 import { AI_MODELS } from "@/lib/aiConfig";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
@@ -122,7 +122,7 @@ async function loadPersonaData(userId: string, accountId?: string): Promise<{
 async function autoGenerateImageConcept(
   input: PostGenerationInput,
   strategy: ContentStrategyOutput,
-  genAI: GoogleGenerativeAI,
+  genAI: OpenRouterClient,
 ): Promise<string> {
   const platform = input.platforms?.[0] ?? "linkedin";
   const tone = (input.tones?.[0] ?? "professional").replace(/_/g, " ");
@@ -275,9 +275,9 @@ export async function POST(req: NextRequest) {
   const { userId } = authResult;
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "GEMINI_API_KEY is not set" }, { status: 500 });
+      return NextResponse.json({ error: "OPENROUTER_API_KEY is not configured" }, { status: 500 });
     }
 
     const body = (await req.json()) as {
@@ -307,7 +307,7 @@ export async function POST(req: NextRequest) {
     const personaContext = body.includePersona ? personaData.personaContext : "";
     let mergedInput: PostGenerationInput = { ...body.input, brandAssets: mergedBrandAssets };
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
     if (!mergedInput.imageConcept?.trim()) {
       const autoConcept = await autoGenerateImageConcept(mergedInput, body.strategy, genAI);
       if (autoConcept) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface DashboardCalendarItem {
   date: string;
@@ -9,27 +9,28 @@ export interface DashboardCalendarItem {
 export function useDashboardCalendar(accountId: string, daysAhead = 14) {
   const [data, setData] = useState<DashboardCalendarItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!accountId) return;
-    const fetchData = async () => {
-      setLoading(true);
-      const res = await fetch(
-        `/api/dashboard/calendar?accountId=${accountId}&daysAhead=${daysAhead}`
-      );
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/dashboard/calendar?accountId=${accountId}&daysAhead=${daysAhead}`);
       const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || "Unable to load calendar");
       const calendar = json.calendar || {};
-      const items = Object.entries(calendar).map(([date, value]: any) => ({
-        date,
-        count: value.count,
-        status: value.status,
-      }));
-      setData(items);
+      setData(Object.entries(calendar).map(([date, value]: any) => ({ date, count: value.count, status: value.status })));
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : "Unable to load calendar");
+    } finally {
       setLoading(false);
-    };
+    }
 
-    fetchData();
   }, [accountId, daysAhead]);
+  useEffect(() => {
+    fetchData();
+  }, [accountId, daysAhead, fetchData]);
 
-  return { data, loading };
+  return { data, loading, error, refetch: fetchData };
 }

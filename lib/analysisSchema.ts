@@ -1,5 +1,5 @@
 import "server-only";
-import { SchemaType, Schema } from "@google/generative-ai";
+import { SchemaType, type Schema } from "@/lib/ai/schema";
 
 // 1. CORE SCHEMA: Profile, content basics, and pillars
 export const coreSchema: Schema = {

@@ -284,17 +284,8 @@ const DUMMY_PREVIEW_SNAPSHOT: OutputPreviewSnapshot = {
   postPackage: {
     imagePrompt:
       "Clean modern SaaS campaign visual, dashboard UI in perspective, content tiles flowing into LinkedIn/X/Instagram/Facebook/Threads icons, warm amber glow, citrus-green accents, minimalist, high contrast, premium product launch style",
-    imageUrl:
-      "https://image.pollinations.ai/prompt/Minimal%20SaaS%20launch%20dashboard%20poster%20amber%20and%20green?width=1080&height=1080&nologo=true&enhance=true",
-    imageVariations: [
-      {
-        id: 1,
-        imageUrl:
-          "https://image.pollinations.ai/prompt/Minimal%20SaaS%20launch%20dashboard%20poster%20amber%20and%20green?width=1080&height=1080&nologo=true&enhance=true",
-        model: "gemini-2.5-flash-image",
-        aspectRatio: "1:1",
-      },
-    ],
+    imageUrl: "",
+    imageVariations: [],
     captions: {
       linkedin:
         "Most teams don’t have a content ideation problem — they have a content operations problem.\n\nWe built a workflow where one strategic brief turns into platform-ready posts in minutes.\n\nResult: faster publishing, cleaner brand voice, less back-and-forth.\n\nIf you’re still rewriting from scratch for every channel, your process is slowing your growth.",
@@ -2420,7 +2411,7 @@ export function PostGeneratorPage() {
                   <div className="grid gap-4 md:grid-cols-2">
                     <SelectField
                       label="Image Model"
-                      value={formInput.imageModel ?? "gemini-2.5-flash-image"}
+                      value={formInput.imageModel ?? "openai/gpt-image-2"}
                       onChange={(v) => updateInput({ imageModel: v as GeminiImageModel })}
                       options={imageModelOptions}
                     />

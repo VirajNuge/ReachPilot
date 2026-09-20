@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 
 import { AI_MODELS } from "@/lib/aiConfig";
 import { parseAIJson } from "@/lib/parseAIJson";
@@ -19,9 +19,9 @@ export async function POST(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "GEMINI_API_KEY is not set" }, { status: 500 });
+      return NextResponse.json({ error: "OPENROUTER_API_KEY is not configured" }, { status: 500 });
     }
 
     const body = (await req.json()) as {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = buildCreativeDirectorPrompt(body.input, body.strategy, body.imagePrompt);
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
     const model = genAI.getGenerativeModel({
       model: AI_MODELS.TEXT,
       generationConfig: {
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const result = await model.generateContent(prompt);
 
     // Safety/Empty check
-    if (!result.response || !result.response.candidates?.length) {
+    if (!result.response) {
       console.error("Image Creative Director: AI returned no candidates.");
       return NextResponse.json({ error: "AI returned an empty response" }, { status: 500 });
     }

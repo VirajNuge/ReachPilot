@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface DashboardPublishingStatus {
   drafts: number;
@@ -10,19 +10,27 @@ export interface DashboardPublishingStatus {
 export function useDashboardPublishing(accountId: string) {
   const [data, setData] = useState<DashboardPublishingStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!accountId) return;
-    const fetchData = async () => {
-      setLoading(true);
+    setLoading(true);
+    setError(null);
+    try {
       const res = await fetch(`/api/dashboard/publishing?accountId=${accountId}`);
       const json = await res.json();
-      setData(json.data);
+      if (!res.ok) throw new Error(json?.error || "Unable to load publishing status");
+      setData(json.data || null);
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : "Unable to load publishing status");
+    } finally {
       setLoading(false);
-    };
+    }
 
-    fetchData();
   }, [accountId]);
+  useEffect(() => {
+    fetchData();
+  }, [accountId, fetchData]);
 
-  return { data, loading };
+  return { data, loading, error, refetch: fetchData };
 }

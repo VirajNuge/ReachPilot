@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { requireAuth } from "@/lib/withAuth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
@@ -56,7 +56,7 @@ async function runRefine(
   input: PostGenerationInput,
   strategy: ContentStrategyOutput,
   personaContext: string,
-  genAI: GoogleGenerativeAI
+  genAI: OpenRouterClient
 ): Promise<LinkedInRefineResult | null> {
   const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
   const prompt = buildLinkedInRefinePrompt(caption, input, strategy, personaContext);
@@ -78,10 +78,10 @@ export async function POST(req: NextRequest) {
   const { userId } = authResult;
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500 }
       );
     }
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
     }
 
     const personaContext = body.includePersona ? await loadPersonaContext(userId, body.accountId) : "";
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
 
     // First refinement pass
     let refined = await runRefine(body.caption, body.input, body.strategy, personaContext, genAI);

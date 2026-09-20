@@ -72,11 +72,6 @@ export async function POST(request: NextRequest) {
     // If debug link was set on the request, include it in the JSON response
     if ((request as any)._debugResetLink) payload.resetLink = (request as any)._debugResetLink;
 
-    if (process.env.NODE_ENV === 'test') {
-      // Return plain JSON object in test environment for easier assertions
-      return payload;
-    }
-
     return NextResponse.json(payload, { status: 200 });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Request failed";

@@ -1,34 +1,46 @@
-import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextRequest, NextResponse } from "next/server";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { postAnalysisSchema } from "@/lib/postAnalysisSchema";
 import { buildPostPrompt } from "./postPrompts";
-import fs from "fs/promises";
-import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { getAuthFromRequest } from "@/lib/auth";
+import { getExtensionSession } from "@/lib/extensionAuth";
+import { createPostAnalysisHistory } from "@/lib/models/postAnalyzerHistory";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": process.env.EXTENSION_ALLOWED_ORIGINS?.split(",")[0]?.trim() || "null",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Request-ID",
 };
-
-const CACHE_FILE_PATH = path.join(process.cwd(), "post_analysis_cache.json");
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set in .env.local" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500, headers: corsHeaders },
       );
     }
 
-    const postData = await req.json();
+    const postData = (await req.json()) as Record<string, unknown>;
+
+    const appAuth = await getAuthFromRequest(req);
+    const extensionAuth = appAuth?.userId ? null : await getExtensionSession(req);
+    const userId = appAuth?.userId ?? extensionAuth?.userId;
+    const accountId =
+      (typeof postData.accountId === "string" ? postData.accountId : undefined) ??
+      extensionAuth?.accountId;
+    if (!userId || !accountId) {
+      return NextResponse.json(
+        { error: "Authentication and accountId are required", code: "unauthorized" },
+        { status: 401, headers: corsHeaders },
+      );
+    }
 
     if (!postData.content && !postData.author) {
       return NextResponse.json(
@@ -43,27 +55,33 @@ export async function POST(req: Request) {
 
     const prompt = buildPostPrompt(postData);
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: process.env.OPENROUTER_TEXT_MODEL,
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: postAnalysisSchema,
       },
     });
 
-    console.log(`[analyze-post] Sending request to Gemini...`);
+    console.log(`[analyze-post] Sending request to OpenRouter...`);
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
     const analysis = JSON.parse(responseText);
 
     // Patch highIntentLeads with real pfps from scraped comments
-    if (analysis.leadPersona?.highIntentLeads && postData.comments) {
+    if (analysis.leadPersona?.highIntentLeads && Array.isArray(postData.comments)) {
       const pfpMap: Record<string, string> = {};
       for (const comment of postData.comments) {
-        if (comment.user && comment.pfp) {
-          pfpMap[comment.user.toLowerCase().trim()] = comment.pfp;
+        if (
+          comment &&
+          typeof comment === "object" &&
+          typeof (comment as Record<string, unknown>).user === "string" &&
+          typeof (comment as Record<string, unknown>).pfp === "string"
+        ) {
+          const record = comment as Record<string, string>;
+          pfpMap[record.user.toLowerCase().trim()] = record.pfp;
         }
       }
       analysis.leadPersona.highIntentLeads = analysis.leadPersona.highIntentLeads.map(
@@ -85,23 +103,21 @@ export async function POST(req: Request) {
       timestamp: Date.now(),
     };
 
-    // Load existing cache array
-    let cacheArray = [];
-    try {
-      const existingData = await fs.readFile(CACHE_FILE_PATH, "utf-8");
-      cacheArray = JSON.parse(existingData);
-      if (!Array.isArray(cacheArray)) cacheArray = [];
-    } catch (e) {
-      // File doesn't exist yet, which is fine
-      cacheArray = [];
-    }
-
-    // Prepend new analysis and keep last 20
-    cacheArray.unshift(cacheData);
-    if (cacheArray.length > 20) cacheArray = cacheArray.slice(0, 20);
-
-    // Save back to file
-    await fs.writeFile(CACHE_FILE_PATH, JSON.stringify(cacheArray, null, 2));
+    await createPostAnalysisHistory(userId, accountId, {
+      analysisId,
+      platform: typeof postData.platform === "string" ? postData.platform : "x",
+      postUrl: typeof postData.url === "string" ? postData.url : undefined,
+      postAuthor: typeof postData.author === "string" ? postData.author : undefined,
+      postContent: typeof postData.content === "string" ? postData.content : undefined,
+      overallScore: typeof analysis.overallScore === "number" ? analysis.overallScore : undefined,
+      analysisData: cacheData,
+      snapshot: {
+        summary: typeof analysis.summary === "string" ? analysis.summary : undefined,
+      },
+      source: typeof postData.source === "string" ? postData.source : "web",
+      status: "completed",
+      analyzedAt: new Date(),
+    });
 
     console.log(
       `[analyze-post] Successfully analyzed and cached with ID: ${analysisId}`,

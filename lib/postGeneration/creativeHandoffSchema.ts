@@ -1,4 +1,5 @@
-import { Schema, SchemaType } from "@google/generative-ai";
+import { type Schema } from "@/lib/ai/schema";
+import { SchemaType } from "@/lib/ai/schema";
 
 import type {
   NegativeSpaceZone,

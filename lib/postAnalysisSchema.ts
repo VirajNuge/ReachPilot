@@ -1,4 +1,4 @@
-import { SchemaType, Schema } from "@google/generative-ai";
+import { SchemaType, type Schema } from "@/lib/ai/schema";
 
 export const postAnalysisSchema: Schema = {
   type: SchemaType.OBJECT,

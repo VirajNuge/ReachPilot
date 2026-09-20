@@ -5,6 +5,7 @@ export interface DashboardConfig {
     columns: number;
     sectionOrder: string[];
     hiddenSections: string[];
+    sectionSizes: Record<string, number>;
   };
   timeRange: {
     default: "7days" | "30days" | "90days" | "all";
@@ -20,15 +21,23 @@ export interface DashboardConfig {
 export function useDashboardConfig(accountId: string) {
   const [config, setConfig] = useState<DashboardConfig | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!accountId) return;
     const fetchConfig = async () => {
       setLoading(true);
-      const res = await fetch(`/api/dashboard/config?accountId=${accountId}`);
-      const json = await res.json();
-      setConfig(json.config);
-      setLoading(false);
+      setError(null);
+      try {
+        const res = await fetch(`/api/dashboard/config?accountId=${accountId}`);
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.error || "Unable to load dashboard settings");
+        setConfig(json.config);
+      } catch (fetchError) {
+        setError(fetchError instanceof Error ? fetchError.message : "Unable to load dashboard settings");
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchConfig();
@@ -41,9 +50,16 @@ export function useDashboardConfig(accountId: string) {
       body: JSON.stringify({ accountId, config: updates }),
     });
     const json = await res.json();
+    if (!res.ok) throw new Error(json?.error || "Unable to save dashboard settings");
     setConfig(json.config);
     return json.config;
   };
 
-  return { config, setConfig, updateConfig, loading };
+  return { config, setConfig, updateConfig, loading, error, refetch: async () => {
+    if (!accountId) return;
+    const res = await fetch(`/api/dashboard/config?accountId=${accountId}`);
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.error || "Unable to load dashboard settings");
+    setConfig(json.config);
+  } };
 }

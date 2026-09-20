@@ -7,7 +7,7 @@ import { POST as resetPOST } from '../app/api/auth/reset/route'
 
 describe('reset full flow (unit-level)', () => {
   beforeEach(() => {
-    process.env.NODE_ENV = 'test'
+    (process.env as Record<string, string | undefined>).NODE_ENV = 'test'
     vi.clearAllMocks()
   })
 
@@ -27,7 +27,8 @@ describe('reset full flow (unit-level)', () => {
       json: async () => ({ email: mockUser.email }),
       headers: new Headers(),
     }
-    const forgotRes: any = await forgotPOST(forgotReq)
+    const forgotResponse: any = await forgotPOST(forgotReq)
+    const forgotRes = await forgotResponse.json()
 
     // Assert forgot response
     expect(forgotRes).toHaveProperty('success', true)
@@ -44,7 +45,8 @@ describe('reset full flow (unit-level)', () => {
       json: async () => ({ token, password: newPassword }),
       headers: new Headers(),
     }
-    const resetRes: any = await resetPOST(resetReq)
+    const resetResponse: any = await resetPOST(resetReq)
+    const resetRes = await resetResponse.json()
 
     // Assert reset response and verify DB update was called
     expect(resetRes).toHaveProperty('success', true)

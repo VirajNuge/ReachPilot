@@ -11,20 +11,23 @@ import {
   Check,
   Trash2,
   Loader2,
+  Menu,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../../../../contexts/AuthContext";
 
-interface TopMenuProps {
+export interface TopMenuProps {
   pageName: string;
   tokens?: number;
+  onOpenSidebar?: () => void;
+  showPageTitle?: boolean;
 }
 
 /**
  * TopMenu Component — accounts data is now sourced from AuthContext
  * (no additional API calls on mount).
  */
-const TopMenu: React.FC<TopMenuProps> = ({ pageName, tokens = 2000 }) => {
+const TopMenu: React.FC<TopMenuProps> = ({ pageName, tokens = 2000, onOpenSidebar, showPageTitle = true }) => {
   const { user, loading, accounts, setAccounts, activeAccountId, setActiveAccountId } =
     useAuth();
   const router = useRouter();
@@ -128,10 +131,16 @@ const TopMenu: React.FC<TopMenuProps> = ({ pageName, tokens = 2000 }) => {
     : "U";
 
   return (
-    <header className="w-full max-w-full flex items-center justify-between px-6 py-3 bg-[#E8ECF2] sticky top-0 z-40 shrink-0 box-border">
+    <header className="sticky top-0 z-40 flex min-w-0 w-full max-w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 py-3 sm:px-6">
       {/* LEFT: PAGE TITLE */}
-      <div className="flex flex-col justify-center">
-        <nav className="flex items-center gap-2 mb-1">
+      <div className="flex min-w-0 items-center gap-3">
+        {onOpenSidebar ? (
+          <button type="button" onClick={onOpenSidebar} aria-label="Open navigation" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden">
+            <Menu size={18} />
+          </button>
+        ) : null}
+        {showPageTitle ? <div className="hidden min-w-0 flex-col justify-center sm:flex">
+          <nav className="mb-1 flex items-center gap-2">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
             Overview
           </span>
@@ -140,27 +149,28 @@ const TopMenu: React.FC<TopMenuProps> = ({ pageName, tokens = 2000 }) => {
             {pageName}
           </span>
         </nav>
-        <h1 className="text-2xl font-black text-[#1A1D23] tracking-tight flex items-center gap-2.5">
+        <h1 className="flex items-center gap-2.5 truncate text-xl font-bold tracking-tight text-slate-950">
           {pageName}
-          <div className="flex items-center justify-center w-6 h-6 bg-[#0052FF]/10 rounded-lg">
-            <Sparkles size={13} className="text-[#0052FF]" />
+          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-50">
+            <Sparkles size={13} className="text-blue-700" />
           </div>
         </h1>
+        </div> : <span className="text-sm font-bold text-slate-900 sm:hidden">ReachPilot</span>}
       </div>
 
       {/* RIGHT: GLOBAL UTILITIES */}
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         {/* Bell */}
         <div className="relative">
-          <button className="p-2.5 text-slate-400 hover:text-[#1A1D23] bg-white hover:shadow-md rounded-xl transition-all border border-white/60 shadow-sm active:scale-95">
+          <button type="button" aria-label="Notifications" className="rounded-lg border border-slate-200 bg-white p-2.5 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
             <Bell size={17} strokeWidth={2.5} />
           </button>
           <span className="absolute top-2 right-2 w-2 h-2 bg-[#FF4D4D] border-2 border-[#E8ECF2] rounded-full animate-pulse" />
         </div>
 
         {/* Tokens pill */}
-        <div className="flex items-center gap-2.5 bg-white border border-white/60 rounded-2xl px-4 py-2.5 shadow-sm hover:shadow-md transition-all cursor-pointer">
-          <div className="w-7 h-7 bg-[#0052FF]/10 rounded-xl flex items-center justify-center text-[#0052FF]">
+        <div className="hidden cursor-pointer items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2 transition-colors hover:bg-slate-50 sm:flex">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-50 text-blue-700">
             <Coins size={14} strokeWidth={2.5} />
           </div>
           <div className="flex flex-col">
@@ -174,20 +184,21 @@ const TopMenu: React.FC<TopMenuProps> = ({ pageName, tokens = 2000 }) => {
         </div>
 
         {/* Divider */}
-        <div className="w-px h-8 bg-slate-300/40" />
+        <div className="h-7 w-px bg-slate-200" />
 
         {/* Account Switcher — uses AuthContext data, zero extra fetches */}
         <div className="relative z-50" ref={dropdownRef}>
           <button
+            type="button"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-3 px-3 py-2 rounded-2xl bg-white shadow-sm hover:shadow-md border border-white/60 transition-all group"
+            aria-expanded={isDropdownOpen}
+            className="group flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-2 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:gap-3"
           >
             <div className="relative">
               <div
-                className="w-9 h-9 rounded-xl text-white flex items-center justify-center font-bold text-xs shadow-sm overflow-hidden"
+                className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg text-xs font-bold text-white"
                 style={{ backgroundColor: activeAccount?.color || "#1A1D23" }}
               >
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent" />
                 <span className="relative z-10">
                   {loading ? "?" : userInitials}
                 </span>
@@ -219,7 +230,7 @@ const TopMenu: React.FC<TopMenuProps> = ({ pageName, tokens = 2000 }) => {
 
           {/* Dropdown Panel */}
           {isDropdownOpen && (
-            <div className="absolute top-full right-0 mt-2 z-50 min-w-[280px] bg-white rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden flex flex-col">
+            <div className="absolute right-0 top-full z-50 mt-2 flex w-[min(320px,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
               {/* Header */}
               <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                 <span className="text-xs font-black text-slate-400 uppercase tracking-wider">
@@ -264,7 +275,7 @@ const TopMenu: React.FC<TopMenuProps> = ({ pageName, tokens = 2000 }) => {
               )}
 
               {/* Account List */}
-              <div className="max-h-[300px] overflow-y-auto p-2 flex flex-col gap-1">
+              <div className="no-scrollbar flex max-h-[300px] flex-col gap-1 overflow-y-auto p-2">
                 {accounts.map((account) => {
                   const isActive = account._id === activeAccount?._id;
                   return (

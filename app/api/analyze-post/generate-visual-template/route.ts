@@ -1,22 +1,19 @@
-import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { NextRequest, NextResponse } from "next/server";
+import { getOwnedPostAnalysis } from "@/lib/analysisAccess";
 import {
   createCaptionTemplate,
   type TemplatePlatform,
 } from "@/lib/models/captionTemplates";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": process.env.EXTENSION_ALLOWED_ORIGINS?.split(",")[0]?.trim() || "null",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Request-ID",
 };
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
-
-const CACHE_FILE_PATH = path.join(process.cwd(), "post_analysis_cache.json");
 
 function normalisePlatform(raw: string): TemplatePlatform {
   const map: Record<string, TemplatePlatform> = {
@@ -30,9 +27,9 @@ function normalisePlatform(raw: string): TemplatePlatform {
   return map[raw?.toLowerCase()] ?? "x";
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    let body: { analysisId?: string };
+    let body: { analysisId?: string; accountId?: string };
     try {
       body = await request.json();
     } catch {
@@ -50,43 +47,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Read cache
-    let cacheRaw: string;
-    try {
-      cacheRaw = await fs.readFile(CACHE_FILE_PATH, "utf-8");
-    } catch {
+    const owned = await getOwnedPostAnalysis(request, analysisId, body.accountId);
+    if (!owned) {
       return NextResponse.json(
-        { error: "No post analysis cache found." },
+        { error: "Analysis not found or unauthorized" },
         { status: 404, headers: corsHeaders },
       );
     }
 
-    let cacheArray: Array<{
-      id: string;
-      analysis: Record<string, unknown>;
-      postData: Record<string, unknown>;
-      timestamp: string;
-    }>;
-    try {
-      const parsed = JSON.parse(cacheRaw);
-      if (!Array.isArray(parsed)) throw new Error("Cache is not an array");
-      cacheArray = parsed;
-    } catch {
-      return NextResponse.json(
-        { error: "Post analysis cache is malformed." },
-        { status: 500, headers: corsHeaders },
-      );
-    }
-
-    const cacheEntry = cacheArray.find((item) => item.id === analysisId);
-    if (!cacheEntry) {
-      return NextResponse.json(
-        { error: "Analysis not found in cache." },
-        { status: 404, headers: corsHeaders },
-      );
-    }
-
-    const { analysis, postData } = cacheEntry;
+    const cacheData = owned.record.analysisData as {
+      analysis?: Record<string, unknown>;
+      postData?: Record<string, unknown>;
+    };
+    const analysis = cacheData.analysis ?? {};
+    const postData = cacheData.postData ?? {};
 
     // Check images
     const images = Array.isArray(postData.images) ? postData.images as string[] : [];

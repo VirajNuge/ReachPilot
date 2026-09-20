@@ -43,4 +43,10 @@ devserver.err.log
 next-env.d.ts
 nul
 
+# runtime analyzer data and generated reports
+/analysis_cache.json
+/post_analysis_cache.json
+/coverage_output.txt
+/test_results.txt
+
 

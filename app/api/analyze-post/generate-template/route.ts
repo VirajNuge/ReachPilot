@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import fs from "fs/promises";
-import path from "path";
+import { NextRequest, NextResponse } from "next/server";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { parseAIJson } from "@/lib/parseAIJson";
+import { getOwnedPostAnalysis } from "@/lib/analysisAccess";
 import {
   createCaptionTemplate,
   type TemplateCategory,
@@ -10,16 +9,14 @@ import {
 } from "@/lib/models/captionTemplates";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": process.env.EXTENSION_ALLOWED_ORIGINS?.split(",")[0]?.trim() || "null",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Request-ID",
 };
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
-
-const CACHE_FILE_PATH = path.join(process.cwd(), "post_analysis_cache.json");
 
 // ─── Category normalisation ──────────────────────────────────────────────────
 
@@ -218,18 +215,18 @@ function isGeneratedTemplateRaw(v: unknown): v is GeneratedTemplateRaw {
 
 // ─── Route handler ────────────────────────────────────────────────────────────
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set in .env.local" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500, headers: corsHeaders },
       );
     }
 
     // 1. Parse request body
-    let body: { analysisId?: string };
+    let body: { analysisId?: string; accountId?: string };
     try {
       body = await request.json();
     } catch {
@@ -247,43 +244,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Read and find the cached analysis
-    let cacheRaw: string;
-    try {
-      cacheRaw = await fs.readFile(CACHE_FILE_PATH, "utf-8");
-    } catch {
+    // 2. Read the user-owned analysis from MongoDB.
+    const owned = await getOwnedPostAnalysis(request, analysisId, body.accountId);
+    if (!owned) {
       return NextResponse.json(
-        { error: "No post analysis cache found. Run the extension analyzer first." },
+        { error: "Analysis not found or unauthorized" },
         { status: 404, headers: corsHeaders },
       );
     }
 
-    let cacheArray: Array<{
-      id: string;
-      analysis: Record<string, unknown>;
-      postData: Record<string, unknown>;
-      timestamp: string;
-    }>;
-    try {
-      const parsed = JSON.parse(cacheRaw);
-      if (!Array.isArray(parsed)) throw new Error("Cache is not an array");
-      cacheArray = parsed;
-    } catch {
-      return NextResponse.json(
-        { error: "Post analysis cache is malformed." },
-        { status: 500, headers: corsHeaders },
-      );
-    }
-
-    const cacheEntry = cacheArray.find((item) => item.id === analysisId);
-    if (!cacheEntry) {
-      return NextResponse.json(
-        { error: "Analysis not found in cache. The analysis may have expired." },
-        { status: 404, headers: corsHeaders },
-      );
-    }
-
-    const { analysis, postData } = cacheEntry;
+    const cacheData = owned.record.analysisData as {
+      analysis?: Record<string, unknown>;
+      postData?: Record<string, unknown>;
+    };
+    const analysis = cacheData.analysis ?? {};
+    const postData = cacheData.postData ?? {};
 
     // 3. Extract required fields
     const platform =
@@ -332,8 +307,8 @@ export async function POST(request: Request) {
     });
 
     // 5. Call Gemini
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const genAI = new OpenRouterClient(apiKey);
+    const model = genAI.getGenerativeModel({ model: "openrouter/free" });
 
     let responseText: string;
     try {

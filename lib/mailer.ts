@@ -10,7 +10,6 @@ if (SENDGRID_API_KEY) {
   try {
     // Dynamically require so the code still loads when package isn't installed
     // (useful for environments where the dependency hasn't been added yet)
-    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
     sg = require('@sendgrid/mail');
     sg!.setApiKey(SENDGRID_API_KEY);
   } catch (err) {

@@ -214,13 +214,9 @@ export type LayoutStyle =
   | "bottom_overlay"
   | "minimal_card";
 
-export type GeminiImageModel =
-  | "gemini-2.5-flash-image"
-  | "gemini-3.1-flash-image-preview"
-  | "gemini-3-pro-image-preview"
-  | "imagen-4.0-generate-001"
-  | "imagen-4.0-fast-generate-001"
-  | "imagen-4.0-ultra-generate-001";
+export type ImageModelId = string;
+/** @deprecated Use ImageModelId. Kept for saved-input compatibility. */
+export type GeminiImageModel = ImageModelId;
 
 export type ToneType =
   | "professional"
@@ -1057,35 +1053,10 @@ export const PLATFORM_DISPLAY: Record<PostPlatform, { label: string; color: stri
   threads: { label: "Threads", color: "#111827", shortLabel: "TH" },
 };
 
-export const IMAGE_MODEL_LABELS: Record<GeminiImageModel, { label: string; desc: string; badge: string }> = {
-  "gemini-2.5-flash-image": {
-    label: "Nano Banana",
-    desc: "Fast & versatile image generation",
-    badge: "Free",
-  },
-  "gemini-3.1-flash-image-preview": {
-    label: "Nano Banana 2",
-    desc: "Enhanced quality, faster generation",
-    badge: "Preview",
-  },
-  "gemini-3-pro-image-preview": {
-    label: "Nano Banana Pro",
-    desc: "Highest quality Gemini image model",
-    badge: "Preview",
-  },
-  "imagen-4.0-generate-001": {
-    label: "Imagen 4",
-    desc: "Photorealistic image generation",
-    badge: "Stable",
-  },
-  "imagen-4.0-fast-generate-001": {
-    label: "Imagen 4 Fast",
-    desc: "Fast photorealistic generation",
-    badge: "Stable",
-  },
-  "imagen-4.0-ultra-generate-001": {
-    label: "Imagen 4 Ultra",
-    desc: "Highest quality photorealism",
-    badge: "Pro",
+export const IMAGE_MODEL_LABELS: Record<ImageModelId, { label: string; desc: string; badge: string }> = {
+  "openai/gpt-image-2": {
+    label: "OpenRouter Image",
+    desc: "Low-cost dedicated image generation",
+    badge: "Default",
   },
 };

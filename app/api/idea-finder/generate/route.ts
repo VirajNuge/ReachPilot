@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GoogleGenAI } from "@google/genai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { requireAuth } from "@/lib/withAuth";
 import { assembleIdeaFinderContext } from "@/lib/ideaFinder/contextOrchestrator";
 import { buildIdeaFinderPrompt } from "@/lib/ideaFinder/promptBuilders";
@@ -17,126 +16,33 @@ import type {
 } from "@/lib/ideaFinder/types";
 import { randomUUID } from "crypto";
 import type { PostPlatform } from "@/lib/types/postGeneration";
+import {
+  buildEmptyIdeaFinderContext,
+  isValidRequest,
+  joinCandidateText,
+} from "@/lib/ideaFinder/requestHelpers";
 
-// ---- Validation ----
-
-const VALID_MODES: IdeaMode[] = [
-  "voice-match",
-  "trend-jacker",
-  "repurpose",
-  "gap-filler",
-  "prism",
-];
-
-const VALID_PLATFORMS: IdeaPlatform[] = [
-  "instagram",
-  "linkedin",
-  "x",
-  "facebook",
-  "pinterest",
-  "all",
-];
-
-function isValidRequest(body: unknown): body is IdeaFinderRequest {
-  if (typeof body !== "object" || body === null) return false;
-  const b = body as Record<string, unknown>;
-  const hasValidCoreMessage =
-    b.coreMessage === undefined || typeof b.coreMessage === "string";
-  const hasValidPersonaToggle =
-    b.importPersona === undefined || typeof b.importPersona === "boolean";
-  return (
-    typeof b.mode === "string" &&
-    VALID_MODES.includes(b.mode as IdeaMode) &&
-    typeof b.platform === "string" &&
-    VALID_PLATFORMS.includes(b.platform as IdeaPlatform) &&
-    typeof b.accountId === "string" &&
-    b.accountId.length > 0 &&
-    hasValidCoreMessage &&
-    hasValidPersonaToggle
-  );
-}
-
-function buildEmptyIdeaFinderContext(platform: IdeaPlatform) {
-  return {
-    persona: {
-      summary: "",
-      audience: "",
-      voice: "",
-      writingSamples: [],
-      doNotTalk: [],
-      contentThemes: [],
-      contentPillars: [],
-      uniquePOV: "",
-    },
-    analysis: {
-      ideaBank: [],
-      contentPillars: [],
-      viralRecipe: [],
-      questionCloud: [],
-      postDNA: [],
-      voiceSpectrum: { signatureWords: [], avoidWords: [] },
-    },
-    postHistory: {
-      recentPosts: [],
-    },
-    platform: {
-      target: platform === "all" ? "all platforms" : platform,
-    },
-  };
-}
-
-function joinCandidateText(
-  candidate: { content?: { parts?: Array<{ text?: string | null }> } } | undefined,
-): string {
-  const parts = candidate?.content?.parts;
-  if (!parts?.length) return "";
-
-  return parts
-    .map((part) => (typeof part?.text === "string" ? part.text : ""))
-    .join("")
-    .trim();
-}
-
-// ---- Trend-Jacker: uses @google/genai with Google Search grounding ----
+// ---- Trend-Jacker: uses the configured OpenRouter model. ----
 
 async function generateWithGrounding(
   apiKey: string,
   prompt: string
 ): Promise<{ text: string; sources: Array<{ title: string; url: string }>; searchQueries: string[] }> {
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new OpenRouterClient(apiKey);
+  const response = await ai
+    .getGenerativeModel({ model: AI_MODELS.VISION })
+    .generateContent(prompt);
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-    config: {
-      tools: [{ googleSearch: {} }],
-    },
-  });
-
-  const candidate = response.candidates?.[0];
-  const text =
-    joinCandidateText(candidate) ||
-    (typeof response.text === "string" ? response.text.trim() : "");
-  const groundingMetadata = candidate?.groundingMetadata;
-
-  const sources =
-    groundingMetadata?.groundingChunks?.map((chunk) => ({
-      title: chunk.web?.title || "",
-      url: chunk.web?.uri || "",
-    })) || [];
-
-  const searchQueries = groundingMetadata?.webSearchQueries || [];
-
-  return { text, sources, searchQueries };
+  return { text: response.response.text().trim(), sources: [], searchQueries: [] };
 }
 
-// ---- Standard modes: uses @google/generative-ai ----
+// ---- Standard modes ----
 
 async function generateStandard(
   apiKey: string,
   prompt: string
 ): Promise<string> {
-  const genAI = new GoogleGenerativeAI(apiKey);
+  const genAI = new OpenRouterClient(apiKey);
   const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
   const result = await model.generateContent(prompt);
   return result.response.text();
@@ -491,10 +397,10 @@ export async function POST(req: NextRequest) {
   const { userId } = authResult;
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500 }
       );
     }

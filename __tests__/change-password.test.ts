@@ -20,7 +20,6 @@ describe('POST /api/auth/change-password', () => {
   });
 
   it('returns 401 when not authenticated', async () => {
-    (getAuthFromRequest as unknown as jest.Mock) = getAuthFromRequest as any;
     (getAuthFromRequest as any).mockResolvedValue(null);
 
     const req = new Request('http://localhost/api/auth/change-password', {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { requireAuth } from "@/lib/withAuth";
 import { getPersonaByUserAndAccount } from "@/lib/models/persona";
 import { buildContentGenerationContext } from "@/lib/personaPromptBuilder";
@@ -55,7 +55,7 @@ async function sleep(ms: number): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function generateStrategistContent(genAI: GoogleGenerativeAI, prompt: string): Promise<string> {
+async function generateStrategistContent(genAI: OpenRouterClient, prompt: string): Promise<string> {
   const modelId = AI_MODELS.TEXT;
   const model = genAI.getGenerativeModel({ model: modelId });
   let lastError: unknown;
@@ -110,10 +110,10 @@ export async function POST(req: NextRequest) {
   const { userId } = authResult;
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500 },
       );
     }
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     const personaContext = body.includePersona ? await loadPersonaContext(userId, body.accountId) : "";
     const prompt = buildContentStrategistPrompt(body.input, personaContext);
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
 
     let responseText = "";
     try {
@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             error: quotaExhausted
-              ? `Gemini quota is exhausted for ${AI_MODELS.TEXT}. Please retry later.`
+              ? `AI quota is exhausted for ${AI_MODELS.TEXT}. Please retry later.`
               : "AI provider is temporarily rate-limited. Please retry in a few seconds.",
             details: message,
           },

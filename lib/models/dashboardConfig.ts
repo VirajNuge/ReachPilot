@@ -52,15 +52,14 @@ export interface DashboardConfigDocument {
 const COLLECTION = "dashboard_configurations";
 
 const DEFAULT_SECTION_ORDER = [
-  "kpi",
-  "activity",
   "analytics",
+  "publishing",
+  "activity",
   "calendar",
   "posts",
   "ideas",
   "templates",
   "profile",
-  "publishing",
   "recommendations",
 ];
 
@@ -90,7 +89,7 @@ export function buildDefaultDashboardConfig(
         activity: 2,
         analytics: 2,
         calendar: 2,
-        posts: 4,
+        posts: 2,
         ideas: 2,
         templates: 1,
         profile: 1,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
 import { requireAuth } from "@/lib/withAuth";
 import { buildContentScorePrompt } from "@/lib/postGenerationPrompts";
 import { parseAIJson } from "@/lib/parseAIJson";
@@ -27,10 +27,10 @@ export async function POST(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500 },
       );
     }
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       body.headline,
     );
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
     const model = genAI.getGenerativeModel({ model: AI_MODELS.TEXT });
 
     let responseText = "";

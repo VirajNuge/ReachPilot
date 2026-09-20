@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface DashboardTemplateItem {
   _id?: string;
@@ -14,21 +14,27 @@ export interface DashboardTemplateItem {
 export function useDashboardTemplates(accountId: string, limit = 4) {
   const [data, setData] = useState<DashboardTemplateItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!accountId) return;
-    const fetchData = async () => {
-      setLoading(true);
-      const res = await fetch(
-        `/api/dashboard/templates?accountId=${accountId}&limit=${limit}`
-      );
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/dashboard/templates?accountId=${accountId}&limit=${limit}`);
       const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || "Unable to load templates");
       setData(json.templates || []);
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : "Unable to load templates");
+    } finally {
       setLoading(false);
-    };
+    }
 
-    fetchData();
   }, [accountId, limit]);
+  useEffect(() => {
+    fetchData();
+  }, [accountId, limit, fetchData]);
 
-  return { data, loading };
+  return { data, loading, error, refetch: fetchData };
 }

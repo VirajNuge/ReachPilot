@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface DashboardStats {
   totalPosts: number;
@@ -12,19 +12,27 @@ export interface DashboardStats {
 export function useDashboardStats(accountId: string) {
   const [data, setData] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!accountId) return;
-    const fetchData = async () => {
-      setLoading(true);
+    setLoading(true);
+    setError(null);
+    try {
       const res = await fetch(`/api/dashboard/stats?accountId=${accountId}`);
       const json = await res.json();
-      setData(json.stats);
+      if (!res.ok) throw new Error(json?.error || "Unable to load workspace stats");
+      setData(json.stats || null);
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : "Unable to load workspace stats");
+    } finally {
       setLoading(false);
-    };
+    }
 
-    fetchData();
   }, [accountId]);
+  useEffect(() => {
+    fetchData();
+  }, [accountId, fetchData]);
 
-  return { data, loading };
+  return { data, loading, error, refetch: fetchData };
 }

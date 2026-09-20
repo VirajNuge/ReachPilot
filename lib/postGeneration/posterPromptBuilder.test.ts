@@ -5,7 +5,7 @@ import type {
   ImageCreativeDirectorOutput,
   PostGenerationInput,
   PosterPromptOutput,
-} from "./types/postGeneration";
+} from "../types/postGeneration";
 
 const INPUT: PostGenerationInput = {
   objective: "educational",

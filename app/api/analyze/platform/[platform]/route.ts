@@ -1,4 +1,5 @@
-import { GoogleGenerativeAI, SchemaType, Schema } from "@google/generative-ai";
+import { OpenRouterClient } from "@/lib/ai/openrouter";
+import { SchemaType, type Schema } from "@/lib/ai/schema";
 import { NextRequest, NextResponse } from "next/server";
 import {
   Platform,
@@ -213,10 +214,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
+        { error: "OPENROUTER_API_KEY is not configured" },
         { status: 500 },
       );
     }
@@ -234,9 +235,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const dataToAnalyze = profileData || scrapedText;
 
     // Setup Gemini with platform-specific prompt
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new OpenRouterClient(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "openrouter/free",
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: analysisSchema,

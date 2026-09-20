@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface DashboardActivityItem {
   id: string;
@@ -13,21 +13,27 @@ export interface DashboardActivityItem {
 export function useDashboardActivity(accountId: string, limit = 10) {
   const [data, setData] = useState<DashboardActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!accountId) return;
-    const fetchData = async () => {
-      setLoading(true);
-      const res = await fetch(
-        `/api/dashboard/activity?accountId=${accountId}&limit=${limit}`
-      );
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/dashboard/activity?accountId=${accountId}&limit=${limit}`);
       const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || "Unable to load recent activity");
       setData(json.activities || []);
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : "Unable to load recent activity");
+    } finally {
       setLoading(false);
-    };
+    }
 
-    fetchData();
   }, [accountId, limit]);
+  useEffect(() => {
+    fetchData();
+  }, [accountId, limit, fetchData]);
 
-  return { data, loading };
+  return { data, loading, error, refetch: fetchData };
 }

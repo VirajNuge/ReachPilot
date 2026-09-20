@@ -1,41 +1,26 @@
-import { SignJWT, jwtVerify } from "jose";
 import { NextRequest } from "next/server";
+import bcrypt from "bcryptjs";
+import { signAdminToken, verifyAdminToken } from "./adminToken";
 
-function getAdminJwtSecret() {
-  const secret = process.env.ADMIN_JWT_SECRET;
-  if (!secret) {
-    throw new Error("ADMIN_JWT_SECRET is not set");
-  }
-
-  return new TextEncoder().encode(secret);
-}
+export { signAdminToken, verifyAdminToken } from "./adminToken";
 
 const ADMIN_COOKIE_NAME = "rp_admin_token";
 
-// Hardcoded admin credentials (as requested)
 export const ADMIN_CREDENTIALS = {
-  // Updated per request: admin login for local/dev access
-  username: "virajnuge",
-  password: "password-password123",
+  username: process.env.ADMIN_USERNAME?.trim() || "",
+  passwordHash: process.env.ADMIN_PASSWORD_HASH?.trim() || "",
 };
 
-export async function signAdminToken(username: string): Promise<string> {
-  return new SignJWT({ username, role: "admin" })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("8h")
-    .sign(getAdminJwtSecret());
+export function hasConfiguredAdminCredentials(): boolean {
+  return Boolean(ADMIN_CREDENTIALS.username && ADMIN_CREDENTIALS.passwordHash);
 }
 
-export async function verifyAdminToken(
-  token: string
-): Promise<{ username: string; role: string } | null> {
-  try {
-    const { payload } = await jwtVerify(token, getAdminJwtSecret());
-    return payload as { username: string; role: string };
-  } catch {
-    return null;
+export async function verifyAdminCredentials(username: unknown, password: unknown): Promise<boolean> {
+  if (!hasConfiguredAdminCredentials() || typeof username !== "string" || typeof password !== "string") {
+    return false;
   }
+  if (username !== ADMIN_CREDENTIALS.username) return false;
+  return bcrypt.compare(password, ADMIN_CREDENTIALS.passwordHash);
 }
 
 export function setAdminAuthCookie(token: string) {

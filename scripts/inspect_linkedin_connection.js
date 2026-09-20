@@ -1,4 +1,4 @@
-// Diagnostic script: prints LinkedIn connection documents from MongoDB
+// Local diagnostic-only script: prints redacted LinkedIn connection documents from MongoDB.
 // Usage: node scripts/inspect_linkedin_connection.js
 
 require('dotenv').config({ path: './.env.local' });

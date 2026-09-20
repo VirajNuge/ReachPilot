@@ -1,8 +1,8 @@
 # ReachPilot
 
-![Uploading ChatGPT Image Sep 20, 2026, 02_49_22 PM.png…]()
+![ReachPilot Creator Suite](public/images/reachpilot-readme-hero.png)
 
-ReachPilot is an AI-assisted social content and relationship workspace for creators, consultants, founders, and agencies. It combines profile intelligence, content ideation, post analysis, publishing workflows, analytics, and client management in one application.
+ReachPilot is an AI social growth creator suite for turning audience signals into clearer content, stronger relationships, and a repeatable growth workflow. It combines profile intelligence, content ideation, post analysis, publishing workflows, analytics, and client management in one application.
 
 ## What ReachPilot includes
 

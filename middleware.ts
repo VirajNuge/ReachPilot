@@ -39,7 +39,11 @@ export async function middleware(request: NextRequest) {
 
   if (
     process.env.NODE_ENV === "production" &&
-    (pathname.startsWith("/api/debug") || pathname.startsWith("/api/test-"))
+    (
+      pathname.startsWith("/api/debug") ||
+      pathname.startsWith("/api/test-") ||
+      pathname === "/api/find-24"
+    )
   ) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -106,5 +110,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*", "/api/analyze-extension/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/api/admin/:path*",
+    "/api/analyze-extension/:path*",
+    "/api/:path*",
+  ],
 };

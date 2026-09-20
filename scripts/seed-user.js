@@ -5,6 +5,17 @@ const bcrypt = require('bcryptjs');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 
+function getArgument(name) {
+  const index = process.argv.indexOf(name);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+function usage() {
+  console.error(
+    'Usage: node scripts/seed-user.js --username <username> --email <email> --first-name <first name> --last-name <last name> --password <password>',
+  );
+}
+
 async function main() {
   const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
   const dbName = process.env.MONGO_DB || process.env.MONGODB_DB || 'reachpilot';
@@ -19,11 +30,16 @@ async function main() {
     const db = client.db(dbName);
     const users = db.collection('users');
 
-    const username = 'virajnuge';
-    const email = 'virajnuge@example.com';
-    const firstName = 'Viraj';
-    const lastName = 'Nuge';
-    const password = 'password-password123';
+    const username = getArgument('--username') || process.env.SEED_USERNAME;
+    const email = getArgument('--email') || process.env.SEED_EMAIL;
+    const firstName = getArgument('--first-name') || process.env.SEED_FIRST_NAME;
+    const lastName = getArgument('--last-name') || process.env.SEED_LAST_NAME;
+    const password = getArgument('--password') || process.env.SEED_PASSWORD;
+
+    if (!username || !email || !firstName || !lastName || !password) {
+      usage();
+      throw new Error('All seed-user identity and password values are required.');
+    }
 
     const hashed = await bcrypt.hash(password, 12);
     const doc = {
